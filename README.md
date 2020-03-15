@@ -1,8 +1,10 @@
-# SEIR_COVID19
-SEIR model for COVID-19 infection, including different clinical trajectories of infection
+# SEIR_COVID19_BR
+Modelo SEIR para infecção COVID-19, incluindo diferentes trajetórias clínicas da infecção.
 
-The directory has the R code for a Shiny application. 
+O diretório tem o código R para um aplicativo Shiny (em tradução).
 
-There is also a Python notebook simulating the same model
+Existe um notebook em Python simulando o mesmo modelo.
 
-Caution: This model is still a work in progress and will be updated over the next few days. 
+Cuidado: Este modelo ainda está em desenvolvimento e será atualizado nos próximos dias.
+
+Conteúdo e códigos baseados no repositório do <a href="https://github.com/alsnhll/SEIR_COVID19">Alison Hill</a>, traduzido e adaptado para o Brasil pelo time do <a href="https://www.cappra.institute">Cappra Institute for Data Science</a>.
