@@ -1749,264 +1749,264 @@ summary {
 
 <!-- rnb-text-begin -->
 <div id="description-and-sources-for-simulation-parameters" class="section level2">
-<h2>Description and sources for simulation parameters</h2>
+<h2>Descrição e fontes para parâmetros de simulação</h2>
 <div id="model-structure" class="section level3">
-<h3>Model structure</h3>
-<p>The basic model structure is inspired by many studies on the natural clinical progression of COVID-19 infection. For a nice summary, see <span class="citation">(Wu and McGoogan 2020)</span>. Infected individuals do not immediately develop severe symptoms, but instead pass through milder phases of infection first. In some studies, what we call <em>mild</em> infections are grouped into two different categories, <em>mild</em> and <em>moderate</em>, where individuals with <em>moderate</em> infection show radiographic signs of mild pneumonia. These <em>mild</em> and <em>moderate</em> cases occur at roughly equal proportions (for ex. see <span class="citation">P. Yang et al. (2020)</span>). There is some debate about the role of pre-symptomatic transmission (occuring from exposed stage) and asymptomatic infection and transmission for COVID-19. The current model version does not include these effects.</p>
+<h3>Estrutura do modelo</h3>
+<p>A estrutura básica do modelo é inspirada em muitos estudos sobre a progressão clínica natural da infecção por COVID-19. Para um bom resumo, consulte <span class="citation">(Wu and McGoogan 2020)</span>. Os indivíduos infectados não desenvolvem sintomas graves imediatamente, mas passam primeiro pelas fases mais leves da infecção. Em alguns estudos, o que chamamos de infecções <em>leves</em> são agrupadas em duas categorias diferentes, <em>leves</em> and <em>moderadas</em>, em que indivíduos com infecção <em>moderada</em> apresentam sinais radiográficos de pneumonia leve. Esses casos <em>leves</em> e <em>moderados</em> ocorrem em proporções aproximadamente iguais (por ex. veja <span class="citation">P. Yang et al. (2020)</span>). Há algum debate sobre o papel da transmissão pré-sintomática (que ocorre no estágio exposto) e a infecção e transmissão assintomáticas do COVID-19. A versão atual do modelo não inclui esses efeitos.</p>
 </div>
 <div id="dynamic-model-parameters" class="section level3">
-<h3>Dynamic model parameters</h3>
-<p>The behavior of the dynamic model is determined by a set of rate parameters, including the transmission rates <span class="math inline">\(\beta_i\)</span>, the progression rates <span class="math inline">\(a\)</span> and <span class="math inline">\(p_i\)</span>, the recovery rates <span class="math inline">\(\gamma_i\)</span>, and the death rate <span class="math inline">\(\mu\)</span>. While these rates themselves are not generally measured directly in studies, other quantities that are measurable can be used to back out these rate parameters.</p>
-<p>The time spent in the exposed class is called the <em>incubation period</em> and is generally assumed to be equal to the time between exposure to an infected source and the development of symptoms. In the model the average incubation period is <span class="math inline">\(1/a\)</span>.</p>
-<p>The <em>infectious period</em> is the time during which an individual can transmit to others. In our model there are potentially three different infectious periods, occuring during each clinical stage of infection (<span class="math inline">\(I_1\)</span>, <span class="math inline">\(I_2\)</span>, <span class="math inline">\(I_3\)</span>). We need to know the duration of each of these stages. We think it’s likely that an individual is most infectious during the stage of mild infection, when they would still be in the community and feeling well enough to interact with others, but in the model there is also the option for transmission in the other stages, for example transmission from hospitalized patients to their healthcare providers. At a population level, we expect most transmission to occur from these individuals with mild infection, since most patients do not progress past this stage. For COVID-19 we can estimate the duration of the first stage from a) the duration of mild symptoms, b) the time from symptom onset to hospitalization (e.g. progress to severe stage), or c) the duration of viral shedding via sputum or throat swabs, d) the serial interval between symptom onset in an index case and a secondary case they infect. In the model the quantities a)-c) equal <span class="math inline">\(1/(p_1 + \gamma_1)\)</span>, whereas d) is <span class="math inline">\(1/a + (1/2) 1/(p_1 + \gamma_1)\)</span>. These estimates converge on similar values for <span class="math inline">\(p_1+\gamma_1\)</span>. The probability of progressing to the <em>severe</em> stage is equal to the proportion of all infections that end up being either severe or critical, and must equal the parameter combination <span class="math inline">\(p_1/(p_1+\gamma_1)\)</span>.</p>
-<p>Individuals with severe infection (<span class="math inline">\(I_2\)</span>) require hospitalization. The duration of severe infections, which could be reported as the time from hospital admission to recover for individuals who did not progress to the critical stage, or the time from hospital admission to ICU admission (since critical cases require ICU-level care), corresponds to the model parameters <span class="math inline">\(1/(p_2+\gamma_2)\)</span>. Since there are not direct estimates of this duration, we instead used estimates of the total time from symptom onset to ICU-admission (e.g. combined length of mild + severe infection), and subtracted the infered duration of mild infection. Then we used the observed probability of progressing to critical infection, equal to the ratio of critical to critical + severe infections, which equals <span class="math inline">\(p_2/(p_2 + \gamma_2\)</span>), to separately work out <span class="math inline">\(p_2\)</span> and <span class="math inline">\(\gamma_2\)</span>. At the critical infection stage (<span class="math inline">\(I_3\)</span>) ICU care, generally with mechanical ventilation, is required. The duration of this stage of infection, e.g. the time from ICU admission to recovery or death, is equal to <span class="math inline">\(1/(\gamma_3 + \mu\)</span>) but not often reported. Instead, studies often report the total time from hospital admission to death, which can approximate the sum of the duration of the severe and critical stages. Thus by subtracting the duration of <span class="math inline">\(I_2\)</span>, the duration of <span class="math inline">\(I_3\)</span> can be estimated. The observed case fatality ratio (CFR) describes the fraction of all symptomatic infected individuals who eventually die. Since individuals must progress to critical infection to die, the conditional probability of someone in the critical stage dying vs recovering is given by the CFR divided by the fraction of all infections that are severe. This must equal the model parameter combination <span class="math inline">\(\mu/(\gamma_3 + \mu)\)</span>.</p>
-<p>Table 1 summarizes the literature sources we used to estimate default values for all these model parameters. Users can choose their own values based on other studies or particular regional contexts.</p>
+<h3>Parâmetros do modelo dinâmico</h3>
+<p>O comportamento do modelo dinâmico é determinado por um conjunto de parâmetros de taxa, incluindo as taxas de transmissão <span class="math inline">\(\beta_i\)</span>, as taxas de progressão <span class="math inline">\(a\)</span> e <span class="math inline">\(p_i\)</span>, as taxas de recuperação <span class="math inline">\(\gamma_i\)</span>, e a taxa de mortalidade <span class="math inline">\(\mu\)</span>. Embora essas taxas em si geralmente não sejam medidas diretamente nos estudos, outras quantidades mensuráveis podem ser usadas para recuperar esses parâmetros de taxa.</p>
+<p>O tempo gasto na classe exposta é chamado de <em>período de incubação</em> e geralmente é considerado igual ao tempo entre a exposição a uma fonte infectada e o desenvolvimento de sintomas. No modelo, o período médio de incubação é de <span class="math inline">\(1/a\)</span>.</p>
+<p>O <em>período infeccioso</em> é o tempo durante o qual um indivíduo pode transmitir a outros. Em nosso modelo, há potencialmente três períodos infecciosos diferentes, ocorrendo durante cada estágio clínico da infecção (<span class="math inline">\(I_1\)</span>, <span class="math inline">\(I_2\)</span>, <span class="math inline">\(I_3\)</span>). Precisamos saber a duração de cada uma dessas etapas. Acreditamos que é provável que um indivíduo seja mais infeccioso durante o estágio de infecção leve, quando ainda estaria na comunidade e se sentindo bem o suficiente para interagir com outros, mas no modelo também há a opção de transmissão nos outros estágios, por exemplo, transmissão de pacientes hospitalizados para seus profissionais de saúde. Em nível populacional, esperamos que a maior parte da transmissão ocorra a partir desses indivíduos com infecção leve, uma vez que a maioria dos pacientes não progride além desse estágio. Para o COVID-19, podemos estimar a duração do primeiro estágio de a) a duração dos sintomas leves, b) o tempo desde o início dos sintomas até a hospitalização (por exemplo, progresso para o estágio grave) ou c) a duração do derramamento viral por escarro ou esfregaços na garganta, d) o intervalo serial entre o início dos sintomas em um caso índice e um caso secundário que eles infectam. No modelo, as quantidades a)-c) são iguais a <span class="math inline">\(1/(p_1 + \gamma_1)\)</span>, enquanto d) é <span class="math inline">\(1/a + (1/2) 1/(p_1 + \gamma_1)\)</span>. Essas estimativas convergem em valores semelhantes para <span class="math inline">\(p_1+\gamma_1\)</span>. A probabilidade de progredir para o estágio <em>grave</em> é igual à proporção de todas as infecções que acabam sendo graves ou críticas e deve ser igual à combinação de parâmetros <span class="math inline">\(p_1/(p_1+\gamma_1)\)</span>.</p>
+<p>Indivíduos com infecção grave (<span class="math inline">\(I_2\)</span>) requerem hospitalização. A duração das infecções graves, que podem ser relatadas como o tempo entre a internação e a recuperação de indivíduos que não progrediram para o estágio crítico, ou o tempo entre a internação e a internação na UTI (uma vez que casos críticos requerem cuidados no nível da UTI), para os parâmetros do modelo <span class="math inline">\(1/(p_2+\gamma_2)\)</span>. Como não existem estimativas diretas dessa duração, utilizamos estimativas do tempo total desde o início dos sintomas até a admissão na UTI (por exemplo, duração combinada de infecção leve + grave) e subtraímos a duração inferida da infecção leve. Em seguida, usamos a probabilidade observada de progredir para infecção crítica, igual à proporção de infecções críticas para críticas + graves, que é igual a <span class="math inline">\(p_2/(p_2 + \gamma_2\)</span>), para resolver separadamente <span class="math inline">\(p_2\)</span> e <span class="math inline">\(\gamma_2\)</span>. No estágio crítico da infecção (<span class="math inline">\(I_3\)</span>) Cuidados na UTI, geralmente com ventilação mecânica, são necessários. A duração deste estágio da infecção, p. o tempo entre a admissão na UTI e a recuperação ou morte é igual a <span class="math inline">\(1/(\gamma_3 + \mu\)</span>) mas nem sempre são relatados. Em vez disso, os estudos geralmente relatam o tempo total desde a internação até a morte, o que pode aproximar a soma da duração dos estágios grave e crítico. Assim, subtraindo a duração de <span class="math inline">\(I_2\)</span>, a duração de <span class="math inline">\(I_3\)</span> pode ser estimado. A taxa de fatalidade de casos observados (CFR) descreve a fração de todos os indivíduos infectados sintomáticos que eventualmente morrem. Como os indivíduos precisam progredir para a infecção crítica para morrer, a probabilidade condicional de alguém na fase crítica morrer ou se recuperar é dada pelo CFR dividido pela fração de todas as infecções graves. Isso deve ser igual à combinação de parâmetros do modelo <span class="math inline">\(\mu/(\gamma_3 + \mu)\)</span>.</p>
+<p>A Tabela 1 resume as fontes de literatura que usamos para estimar os valores padrão para todos esses parâmetros do modelo. Os usuários podem escolher seus próprios valores com base em outros estudos ou contextos regionais específicos.</p>
 <table>
 <thead>
 <tr class="header">
-<th align="left">Quantity</th>
-<th align="left">Parameter</th>
-<th align="left">Value</th>
-<th align="left">Source</th>
+<th align="left">Quantidade</th>
+<th align="left">Parâmetro</th>
+<th align="left">Valor</th>
+<th align="left">Fonte</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Incubation Period</td>
+<td align="left">Período de incubação</td>
 <td align="left"><span class="math inline">\(1/a\)</span></td>
-<td align="left">5 days</td>
+<td align="left">5 dias</td>
 <td align="left"><span class="citation">(Li et al. 2020 ; Linton et al. 2020; Lauer et al. 2020; Bi et al. 2020; Sanche et al. 2020)</span></td>
 </tr>
 <tr class="even">
-<td align="left">Proportion of mild infections</td>
+<td align="left">Proporção de infecções leves</td>
 <td align="left"><span class="math inline">\(\gamma_1/(p_1+\gamma_1)\)</span></td>
 <td align="left">81%</td>
 <td align="left"><span class="citation">(Wu and McGoogan 2020; P. Yang et al. 2020; Liu et al. 2020)</span></td>
 </tr>
 <tr class="odd">
-<td align="left">Duration of mild infections</td>
+<td align="left">Duração de infecções leves</td>
 <td align="left"><span class="math inline">\(1/(p_1+\gamma_1)\)</span></td>
-<td align="left">6 days</td>
+<td align="left">6 dias</td>
 <td align="left">Viral shedding: <span class="citation">(Woelfel et al. 2020)</span>, Time from symptoms to hospitalization: <span class="citation">(Sanche et al. 2020; Tindale et al. 2020)</span></td>
 </tr>
 <tr class="even">
-<td align="left">Proportion of severe infections</td>
+<td align="left">Proporção de infecções graves</td>
 <td align="left"><span class="math inline">\(\gamma_1/(p_1+\gamma_1)\)</span></td>
 <td align="left">14%</td>
 <td align="left"><span class="citation">(Wu and McGoogan 2020; P. Yang et al. 2020)</span></td>
 </tr>
 <tr class="odd">
-<td align="left">Time from symptoms to ICU admission</td>
+<td align="left">Tempo desde os sintomas até a internação na UTI</td>
 <td align="left">–</td>
-<td align="left">10 days</td>
+<td align="left">10 dias</td>
 <td align="left"><span class="citation">(Huang et al. 2020; X. Yang et al. 2020; Liu et al. 2020)</span></td>
 </tr>
 <tr class="even">
-<td align="left">Duration of severe infection</td>
+<td align="left">Duração da infecção grave</td>
 <td align="left"><span class="math inline">\(1/(p_2+\gamma_2)\)</span></td>
-<td align="left">4 days</td>
+<td align="left">4 dias</td>
 <td align="left">[Time from symptoms to ICU admit] - [Duration of mild infections]</td>
 </tr>
 <tr class="odd">
-<td align="left">Proportion of critical infections</td>
+<td align="left">Proporção de infecções críticas</td>
 <td align="left">% Severe<span class="math inline">\(\times p_2/(p_2+\gamma_2)\)</span></td>
 <td align="left">6%</td>
 <td align="left"><span class="citation">(Wu and McGoogan 2020; P. Yang et al. 2020; Liu et al. 2020)</span></td>
 </tr>
 <tr class="even">
-<td align="left">Time from hospital admission to death</td>
+<td align="left">Tempo desde a internação até a morte</td>
 <td align="left">–</td>
-<td align="left">14 days</td>
+<td align="left">14 dias</td>
 <td align="left"><span class="citation">(Sanche et al. 2020; Linton et al. 2020)</span></td>
 </tr>
 <tr class="odd">
-<td align="left">During of critical infection</td>
+<td align="left">Durante uma infecção crítica</td>
 <td align="left"><span class="math inline">\(1/(\mu+\gamma_3)\)</span></td>
-<td align="left">10 days</td>
+<td align="left">10 dias</td>
 <td align="left">[Time from hospital admit to death] - [Duration of severe infections]</td>
 </tr>
 <tr class="even">
-<td align="left">Case fatality ratio</td>
+<td align="left">Razão de fatalidade de casos</td>
 <td align="left">% Critical<span class="math inline">\(\times\mu/(\mu+\gamma_3)\)</span></td>
 <td align="left">2%</td>
 <td align="left"><span class="citation">(Wu and McGoogan 2020; Russell 2020; Riou et al. 2020; Baud et al. 2020)</span></td>
 </tr>
 </tbody>
 </table>
-<p>Table 1: Estimated parameters for COVID-19 clinical progression, and literature sources</p>
-<p>The rates of transmission are generally impossible to directly observe or estimate. Instead, these values can be backed out by looking at the early exponential growth rate (<span class="math inline">\(r\)</span>) of an epidemic and choosing transmission rates that recreate these observations. The growth of COVID-19 outbreaks has varied a lot between settings and over time. Some values reported in the literature are in Table 2. Real-time automated calculation of growth rates for different countries is available at [CITE]. The default values for the simulation are currently set to match a situation with <span class="math inline">\(r=\)</span> [ADDDD]. As a default we assume that only <span class="math inline">\(\beta_1 &gt; 0\)</span> (e.g. no hospital transmission).</p>
+<p>Tabela 1: Parâmetros estimados para progressão clínica do COVID-19 e fontes da literatura</p>
+<p>As taxas de transmissão são geralmente impossíveis de observar ou estimar diretamente. Em vez disso, esses valores podem ser recuperados observando a taxa de crescimento exponencial inicial (<span class="math inline">\(r\)</span>) de uma epidemia e escolhendo taxas de transmissão que recriam essas observações. O crescimento dos surtos de COVID-19 variou muito entre as configurações e ao longo do tempo. Alguns valores relatados na literatura estão na Tabela 2. O cálculo automatizado em tempo real das taxas de crescimento para diferentes países está disponível no [CITE]. Os valores padrão para a simulação estão atualmente configurados para corresponder a uma situação com <span class="math inline">\(r=\)</span> [ADDDD]. Como padrão, assumimos que apenas <span class="math inline">\(\beta_1 &gt; 0\)</span> (por exemplo, sem transmissão hospitalar).</p>
 <table>
 <thead>
 <tr class="header">
-<th align="left">Growth rate <span class="math inline">\(r\)</span></th>
-<th align="right">Doubling time</th>
-<th align="left">Location</th>
-<th align="left">Dates</th>
-<th align="left">Source</th>
+<th align="left">Taxa de contagio <span class="math inline">\(r\)</span></th>
+<th align="right">Tempo de duplicação</th>
+<th align="left">Localização</th>
+<th align="left">Datas</th>
+<th align="left">Fonte</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">0.1</td>
-<td align="right">6.9 days</td>
+<td align="right">6.9 dias</td>
 <td align="left">Wuhan</td>
-<td align="left">Early January</td>
+<td align="left">Começo de Janeiro</td>
 <td align="left"><span class="citation">(Li et al. 2020)</span></td>
 </tr>
 <tr class="even">
 <td align="left">0.25</td>
-<td align="right">2.8 days</td>
+<td align="right">2.8 dias</td>
 <td align="left">Wuhan</td>
-<td align="left">January</td>
+<td align="left">Janeiro</td>
 <td align="left"><span class="citation">(Zhao, Chen, and Small 2020)</span></td>
 </tr>
 <tr class="odd">
 <td align="left">0.3</td>
-<td align="right">2.3 days</td>
+<td align="right">2.3 dias</td>
 <td align="left">Wuhan</td>
-<td align="left">January</td>
+<td align="left">Janeiro</td>
 <td align="left"><span class="citation">(Sanche et al. 2020)</span></td>
 </tr>
 <tr class="even">
 <td align="left">0.5</td>
-<td align="right">1.4 days</td>
-<td align="left">Italy</td>
-<td align="left">Feb 24</td>
+<td align="right">1.4 dias</td>
+<td align="left">Itália</td>
+<td align="left">Fev 24</td>
 <td align="left"><span class="citation">(Abbott 2020)</span></td>
 </tr>
 <tr class="odd">
 <td align="left">0.17</td>
-<td align="right">4.1 days</td>
-<td align="left">Italy</td>
+<td align="right">4.1 dias</td>
+<td align="left">Itália</td>
 <td align="left">Mar 9</td>
 <td align="left"><span class="citation">(Abbott 2020)</span></td>
 </tr>
 <tr class="even">
 <td align="left">0.3</td>
-<td align="right">2.3 days</td>
-<td align="left">Iran</td>
+<td align="right">2.3 dias</td>
+<td align="left">Iraã</td>
 <td align="left">Mar 2</td>
 <td align="left"><span class="citation">(Abbott 2020)</span></td>
 </tr>
 <tr class="odd">
 <td align="left">0.5</td>
-<td align="right">1.4 days</td>
-<td align="left">Spain</td>
-<td align="left">Feb 29</td>
+<td align="right">1.4 dias</td>
+<td align="left">Espanha</td>
+<td align="left">Fev 29</td>
 <td align="left"><span class="citation">(Abbott 2020)</span></td>
 </tr>
 <tr class="even">
 <td align="left">0.2</td>
-<td align="right">3.5 days</td>
-<td align="left">Spain</td>
+<td align="right">3.5 dias</td>
+<td align="left">Espanha</td>
 <td align="left">Mar 9</td>
 <td align="left"><span class="citation">(Abbott 2020)</span></td>
 </tr>
 <tr class="odd">
 <td align="left">0.2</td>
-<td align="right">3.5 days</td>
-<td align="left">France</td>
+<td align="right">3.5 dias</td>
+<td align="left">França</td>
 <td align="left">Mar 9</td>
 <td align="left"><span class="citation">(Abbott 2020)</span></td>
 </tr>
 <tr class="even">
 <td align="left">0.2</td>
-<td align="right">3.5 days</td>
-<td align="left">South Korea</td>
+<td align="right">3.5 dias</td>
+<td align="left">Coréia do Sul</td>
 <td align="left">Feb 24</td>
 <td align="left"><span class="citation">(Abbott 2020)</span></td>
 </tr>
 <tr class="odd">
 <td align="left">0.5</td>
-<td align="right">1.4 days</td>
-<td align="left">UK</td>
+<td align="right">1.4 dias</td>
+<td align="left">Reino Unido</td>
 <td align="left">Mar 2</td>
 <td align="left"><span class="citation">(Abbott 2020)</span></td>
 </tr>
 </tbody>
 </table>
-<p>Table 2: Observed early epidemic growth rates <span class="math inline">\(r\)</span> across different settings, along with the corresponding doubling times. There are many other settings where growth rates are now close to zero.</p>
+<p>Tabela 2: Taxas de crescimento <span class="math inline">\(r\)</span> precoce da epidemia observadas em diferentes configurações, juntamente com os tempos de duplicação correspondentes. Existem muitas outras configurações nas quais as taxas de crescimento agora estão próximas de zero.</p>
 </div>
 <div id="hospital-capacity-parameters" class="section level3">
-<h3>Hospital capacity parameters</h3>
-<p>One of the biggest dangers of a widespread COVID-19 epidemic is the strain it could place on hospital resources, since individuals with severe and critical infection require hospital care. The critical stage of infection requires mechanical ventilation, which is ICU-level care. Severe infection can be treated in a regular hospital ward. Individuals with mild infection do not require hospitalization, and could recover at home on their own. However, in many countries these individuals have also been hospitalized, likely as a way to isolate them and reduce transmission, as well as to monitor them for progression to more aggressive disease stages.</p>
-<p>The default hospital capacity parameters are estimated for the US, and are expressed as resources per capita. The available hospital beds (in regular wards or on ICU floors) depends on the total number of beds that exist as well as the occupancy level. During flu season (winter months), occupancy levels are generally higher. We report the number of <em>available</em> (e.g. unoccupied) beds of both types (Table 3). Studies in the pandemic preparedness literature have examined how the capacity to delivery mechanical ventilation during a respiratory pathogen outbreak could be expanded beyond the traditional ICU-bed capacity (aka <em>conventional capacity</em>) by using stockpiled ventilators, non-specialist hospital staff, and retro-fitting other hospital rooms <span class="citation">(Ajao et al. 2015)</span>. These expanded delivery levels are called <em>contingency</em> and <em>crisis</em> capacity.</p>
+<h3>Parâmetros de capacidade do hospital</h3>
+<p>Um dos maiores perigos de uma epidemia generalizada de COVID-19 é a tensão que isso poderia causar aos recursos hospitalares, uma vez que indivíduos com infecção grave e crítica requerem cuidados hospitalares. O estágio crítico da infecção requer ventilação mecânica, que é o nível de cuidados na UTI. A infecção grave pode ser tratada em uma enfermaria hospitalar regular. Indivíduos com infecção leve não necessitam de hospitalização e podem se recuperar em casa sozinhos. No entanto, em muitos países, esses indivíduos também foram hospitalizados, provavelmente como uma maneira de isolá-los e reduzir a transmissão, além de monitorá-los quanto à progressão para estágios mais agressivos da doença.</p>
+<p>Os parâmetros padrão de capacidade hospitalar são estimados para os EUA e expressos como recursos per capita. Os leitos hospitalares disponíveis (em enfermarias regulares ou no piso da UTI) dependem do número total de leitos existentes e do nível de ocupação. Durante a temporada de gripe (meses de inverno), os níveis de ocupação são geralmente mais altos. Relatamos o número de camas <em>disponíveis</em>  (por exemplo, desocupadas) de ambos os tipos (Tabela 3). Estudos na literatura de preparação para pandemia examinaram como a capacidade de fornecer ventilação mecânica durante um surto de patógeno respiratório poderia ser expandida além da capacidade tradicional do leito de UTI  (também conhecida como  <em>capacidade convencional</em>) usando ventiladores armazenados em estoque, equipe hospitalar não especializada e adaptação retroativa outros quartos de hospital  <span class="citation">(Ajao et al. 2015)</span>. Esses níveis de entrega expandidos são chamados de capacidade de <em>contingência</em> e <em>crise</em>.</p>
 <table>
 <thead>
 <tr class="header">
-<th align="left">Quantity</th>
+<th align="left">Quantidade</th>
 <th align="left">Total</th>
-<th align="left">Per 1000 ppl</th>
-<th align="left">Source</th>
+<th align="left">Por 1.000 pessoas</th>
+<th align="left">Fonte</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Hospital beds</td>
+<td align="left">Leitos hospitalares</td>
 <td align="left">900,000</td>
 <td align="left">2.8</td>
 <td align="left"><span class="citation">(National Center for Health Statistics 2017)</span></td>
 </tr>
 <tr class="even">
-<td align="left">Occupancy</td>
+<td align="left">Ocupação</td>
 <td align="left">66%</td>
 <td align="left"></td>
 <td align="left"><span class="citation">(National Center for Health Statistics 2017)</span></td>
 </tr>
 <tr class="odd">
-<td align="left">ICU beds</td>
+<td align="left">Leitos de UTI</td>
 <td align="left">80,000</td>
 <td align="left">0.26</td>
 <td align="left"><span class="citation">(Critical Care Medicine (SCCM) 2010)</span></td>
 </tr>
 <tr class="even">
-<td align="left">Occupancy</td>
+<td align="left">Ocupação</td>
 <td align="left">68%</td>
 <td align="left"></td>
 <td align="left"><span class="citation">(Critical Care Medicine (SCCM) 2010)</span></td>
 </tr>
 <tr class="odd">
-<td align="left"><span class="math inline">\(\uparrow\)</span> flu season occupany</td>
+<td align="left"><span class="math inline">\(\uparrow\)</span> durante a temporada de gripe</td>
 <td align="left">7%</td>
 <td align="left"></td>
 <td align="left"><span class="citation">(Ajao et al. 2015)</span></td>
 </tr>
 <tr class="even">
-<td align="left">Available hospital beds</td>
+<td align="left">Leitos hospitalares disponíveis</td>
 <td align="left">264,000</td>
 <td align="left">0.82</td>
 <td align="left">From above</td>
 </tr>
 <tr class="odd">
-<td align="left">Available ICU beds</td>
+<td align="left">Leitos de UTI disponíveis</td>
 <td align="left">22,000</td>
 <td align="left">0.071</td>
 <td align="left">From above</td>
 </tr>
 <tr class="even">
-<td align="left">Conventional Mechanical Ventilation Capacity</td>
+<td align="left">Capacidade de ventilação mecânica convencional</td>
 <td align="left">20,000</td>
 <td align="left">0.062</td>
 <td align="left"><span class="citation">(Ajao et al. 2015)</span></td>
 </tr>
 <tr class="odd">
-<td align="left">Contingency Mechanical Ventilation Capacity</td>
+<td align="left">Capacidade de ventilação mecânica de contingência</td>
 <td align="left">50,000</td>
 <td align="left">0.15</td>
 <td align="left"><span class="citation">(Ajao et al. 2015)</span></td>
 </tr>
 <tr class="even">
-<td align="left">Critical Mechanical Ventilation Capacity</td>
+<td align="left">Capacidade de ventilação mecânica crítica</td>
 <td align="left">135,000</td>
 <td align="left">0.24</td>
 <td align="left"><span class="citation">(Ajao et al. 2015)</span></td>
 </tr>
 </tbody>
 </table>
-<p>Table 3. US hospital capacity. Values are for adults beds only.</p>
+<p>Tabela 3. Capacidade hospitalar nos EUA. Os valores são apenas para camas de adultos.</p>
 </div>
 <div id="references" class="section level3">
-<h3>References</h3>
+<h3>Referências</h3>
 <!-- rnb-text-end -->
 <div id="refs" class="references">
 <div id="ref-abbott_temporal_2020">

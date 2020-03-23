@@ -3,9 +3,9 @@ library(shinyWidgets)
 library(plotly)
 
 fluidPage(
-  titlePanel("Modeling COVID-19 Spread vs Healthcare Capacity"),
+  titlePanel("Modelando a propagação do COVID-19 vs Capacidade Hospitalar"),
   hr(),
-  p(div(HTML("Disclaimer: This simulation is for research and educational purposes only and is not intended to be a tool for decision-making. There are many uncertainties and debates about the details of COVID-19 infection and transmission and there are many limitations to this simple model. This work is licensed under a <a href=https://creativecommons.org/licenses/by-sa/4.0/> Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) License </a>"))),
+  p(div(HTML("Aviso: Esta simulação é voltada apenas para fins educacionais e de pesquisa e não é sua intenção ser uma ferramenta para tomada de decisões. Existem muitas incertezas e debates sobre os detalhes da infecção e transmissão do COVID-19  e existem muitas limitações a este modelo simples. Este trabalho é licenciado sob uma licença <a href=https://creativecommons.org/licenses/by-sa/4.0/> Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) </a>"))),
   
   
   sidebarLayout(
@@ -13,103 +13,103 @@ fluidPage(
     sidebarPanel(
       
       setSliderColor(c(rep("#b2df8a", 3)), sliderId=c(8,9,10)),
-      h4(div(HTML("<em>Set clinical parameters...</em>"))),
-      sliderInput("IncubPeriod", "Duration of incubation period", 0, 20, 5, step=0.5, post = " days"),
-      sliderInput("DurMildInf", "Duration of mild infections", 0, 20, 6, step=1, post = " days"),
-      sliderInput("FracSevere", "% of infections that are severe", 0, 100, 15, step=1, pre="%"),
-      sliderInput("FracCritical", "% of infections that are critical",0, 20, 5, step=1, pre="%"),
+      h4(div(HTML("<em>Definir parâmetros clínicos...</em>"))),
+      sliderInput("IncubPeriod", "Duração do período de incubação", 0, 20, 5, step=0.5, post = " dias"),
+      sliderInput("DurMildInf", "Duração de infecções leves", 0, 20, 6, step=1, post = " dias"),
+      sliderInput("FracSevere", "% de infecções que são graves", 0, 100, 15, step=1, pre="%"),
+      sliderInput("FracCritical", "% de infecções que são críticas",0, 20, 5, step=1, pre="%"),
       #uiOutput("FracCriticalSlider"),
-      #sliderInput("CFR", "Case fatality rate", 0, 100, 2, step=5, pre="%"),
-      sliderInput("ProbDeath", "Death rate for critical infections", 0, 100, 40, step=1, pre="%"),
+      #sliderInput("CFR", "Taxa de Mortalidade", 0, 100, 2, step=5, pre="%"),
+      sliderInput("ProbDeath", "Taxa de mortalidade para infecções críticas", 0, 100, 40, step=1, pre="%"),
       htmlOutput("CFR"),
       br(),
-      sliderInput("DurHosp", "Duration of severe infection/hospitalization", 0, 10, 4, step=1, post = " days"),
-      sliderInput("TimeICUDeath", "Duration critical infection/ICU stay", 0, 30, 10, step=1, post = " days"),
+      sliderInput("DurHosp", "Duração de infecção grave/hospitalização", 0, 10, 4, step=1, post = " dias"),
+      sliderInput("TimeICUDeath", "Duração infecção crítica/estadia na UTI", 0, 30, 10, step=1, post = " dias"),
       hr(),
-      h4(div(HTML("<em>Set transmission values...</em>"))),
-      sliderInput("b1", div(HTML("Transmission rate (mild infections)")), 0, 3, 0.33, step=0.02),
-      sliderInput("b21", div(HTML("Transmission rate (severe infections, relative to mild)")),0, 2, 0, step=0.1),
-      sliderInput("b31", div(HTML("Transmission rate (critical infections, relative to mild)")), 0, 2, 0, step=0.1),
+      h4(div(HTML("<em>Deifinir valores de transmissão...</em>"))),
+      sliderInput("b1", div(HTML("Taxa de transmissão (infecções leves)")), 0, 3, 0.33, step=0.02),
+      sliderInput("b21", div(HTML("Taxa de transmissão (infecções graves, relativas a leves)")),0, 2, 0, step=0.1),
+      sliderInput("b31", div(HTML("Taxa de transmissão (infecções criticas, relativas a leves)")), 0, 2, 0, step=0.1),
       hr(),
-      h4(div(HTML("<em>Set simulation values...</em>"))),
-      sliderInput("LogN", div(HTML("Total population size (log10)")), 1, 9, 3, step=0.1),
+      h4(div(HTML("<em>Definir valores de simulação...</em>"))),
+      sliderInput("LogN", div(HTML("Tamanho populacional total (log10)")), 1, 9, 3, step=0.1),
       htmlOutput("N"),
       br(),
-      numericInput("InitInf","Initial # infected:",value = 1, min = 1, step = 1),
-      sliderInput("Tmax", div(HTML("Maximum time")),0, 1000, 300, step=10, post=" days"),
-      actionButton("reset", "Reset all")
+      numericInput("InitInf","# inicial de infectados:",value = 1, min = 1, step = 1),
+      sliderInput("Tmax", div(HTML("Tempo máximo")),0, 1000, 300, step=10, post=" dias"),
+      actionButton("reset", "Resetar tudo")
       
     ),
     
     mainPanel(
       
       #p(div(HTML("Test")))
-      navbarPage("Output:",
+      navbarPage("Resultados:",
                  
-                 tabPanel("Spread",
+                 tabPanel("Propagação",
                           fluidPage(
                             fluidRow(
                               
-                              h3("Predicted COVID-19 cases by clinical outcome"),
-                              p(HTML("Simulate the natural course of a COVID-19 epidemic in a single population without any interventions.")),
+                              h3("Casos previstos de COVID-19 por desfecho clínico"),
+                              p(HTML("Simule o curso natural de uma epidemia de COVID-19 em uma única população sem quaisquer intervenções.")),
                               
                               plotlyOutput("plot0"),
                               br(),
-                              radioButtons("yscale", "Y axis scale:",
+                              radioButtons("yscale", "Escala do eixo Y:",
                                            choices = list("Linear" = "linear","Log10" = "log"),inline=TRUE),
                               p(HTML("")),
-                              p(HTML("<b>User instructions:</b> The graph shows the expected numbers of individuals over time who are infected, recovered, susceptible, or dead over time. Infected individuals first pass through an exposed/incubation phase where they are asymptomatic and not infectious, and then move into a symptomatic and infections stage classified by the clinical status of infection (mild, severe, or critical). A more detailed description of the model is provided in the Model Description tab. The population size, initial condition, and parameter values used to simulate the spread of infection can be specified through the sliders located in the left-hand panel. Default slider values are equal to estimates taken from the literature (see Sources tab). To reset default values, click on the <em>Reset all</em> button located on the bottom of the panel. The plot is interactive: Hover over it to get values, double-click a curve in the legend to isolate it, or single-click to remove it. Dragging over a range allows zooming."))
+                              p(HTML("<b>Instruções ao usuário:</b> O gráfico apresenta o número esperado de indivíduos ao longo do tempo que estão infectados, recuperados suscetíveis, ou mortos. Indivíduos infectados primeiro passam por um período de exposição/incubação onde eles são assintomáticos e não infecciosos, e então migram para um estágio sintomático e infeccioso classificado pelo status clínico de infecção (leve, grave ou crítica). Uma descrição mais detalhada do modelo pode ser encontrada na aba de Descrição do Modelo. O tamanho populacional, condições iniciais, e valores de parâmetros utilizados para simular a propagação da infecção podem ser especificados através dos sliders localizados no painel a esquerda. Valores padrões dos sliders são iguais a estimativas retiradas da literatura (ver aba Fontes). Para reiniciar aos valores padrões, clique no botão <em>Resetar tudo</em> localizado na parte inferior do painel. O gráfico é interativo: Passe o mouse por cima para receber valores, duplo-clique em uma curva na legenda para isolá-la, ou clique-único para removê-la. Arrastar sobre uma extensão permite dar zoom."))
                             )
                           )
                  ),
                  
-                 tabPanel("Intervention",
+                 tabPanel("Intervenção",
                           fluidPage(
                             fluidRow(
-                              h3("Reduction in predicted COVID-19 after intervention"),
-                              p(HTML("Simulate the change in the time course of COVID-10 cases after applying an intervention")),
+                              h3("Redução no # previsto de COVID-19 após intervenção"),
+                              p(HTML("Simule a mudança na linha do tempo de casos de COVID-19 após aplicação de uma intervenção")),
                               plotlyOutput("plotInt"),
                               br(),
                               br(),
                               radioButtons("yscaleInt", "Y axis scale:",
                                            choices = list("Linear" = "linear","Log10" = "log"),inline=TRUE),
                               wellPanel(
-                                h4(div(HTML("<em>Set intervention parameters...</em>"))),
+                                h4(div(HTML("<em>Definir parâmetros de intervenção...</em>"))),
                                 selectInput("VarShowInt",
-                                            label = "Select variable to show:",
-                                            choices = c("Suceptible (S)"="S", "Exposed (E)"="E", "Mild Infections (I1)"="I1", "Severe Infections (I2)"="I2", "Critical Infections (I3)"="I3", "Recovered (R)"="R", "Dead (D)"="D", "All infected (E+I1+I2+I3)"="Inf","All symptomatic (I1+I2+I3)"="Cases","All hospitalized (I2+I3)"="Hosp"),
+                                            label = "Selecione a variável a ser mostrada:",
+                                            choices = c("Suscetíveis (S)"="S", "Expostos (E)"="E", "Infecções leves (I1)"="I1", "Infecções graves (I2)"="I2", "Infecções críticas (I3)"="I3", "Recuperados (R)"="R", "Mortos (D)"="D", "Todos infectados (E+I1+I2+I3)"="Inf","Todos sintomáticos (I1+I2+I3)"="Cases","Todos hospitalizados (I2+I3)"="Hosp"),
                                             selected = c("I3")
                                 ),
-                                numericInput("Tint","Intervention start time (days):",value = 0, min = 0, step = 10),
-                                numericInput("Tend","Intervention end time (days):",value = 300, min = 0, step = 10),
-                                p(HTML("<b>Intervention type: reducing transmission, </b> for example via social distancing or quarantining in the community (for those with mild infection) or better isolation and personal-protective wear in hospitals (for those with more severe infection). Transmission from each of the clinical stages of infection can only be reduced if the user has chosen parameters such that these stages contribute to transmission.")),
-                                sliderInput("s1", "Reduction in transmission from mild infections ", 0, 100, 30, pre="%",step=1, animate=TRUE),
-                                sliderInput("s2", "Reduction in transmission from severe infections", 0, 100, 0, pre="%",step=1, animate=TRUE),
-                                sliderInput("s3", "Reduction in transmission rate from critical infections", 0, 100, 0, pre="%",step=1, animate=TRUE),
-                                radioButtons("RoundOne", "Round values to nearest integar post-intervention?",
+                                numericInput("Tint","Inicio da intervenção (dias):",value = 0, min = 0, step = 10),
+                                numericInput("Tend","Termino da intervenção (dias):",value = 300, min = 0, step = 10),
+                                p(HTML("<b>Tipo de intervenção: reduzir transmissão, </b> por exemplo via distanciamento social ou quarentena na comunidade (para aqueles com infecções leves) ou melhor isolamento e equipamento de proteção individual em hospitais (para aqueles com infecções mais graves). Transmissão de cada estágio clínico da infecção pode ser reduzido apenas se o usuário escolheu parâmetros de forma que esses estágios contribuam para a transmissão.")),
+                                sliderInput("s1", "Redução em transmissão de infecções leves", 0, 100, 30, pre="%",step=1, animate=TRUE),
+                                sliderInput("s2", "Redução em transmissão de infecções graves", 0, 100, 0, pre="%",step=1, animate=TRUE),
+                                sliderInput("s3", "Redução na taxa de transmissão de infecções críticas", 0, 100, 0, pre="%",step=1, animate=TRUE),
+                                radioButtons("RoundOne", "Arredondar valores ao inteiro mais próximo pós-intervenção?",
                                              choices = list("True" = "True","False" = "False"),inline=TRUE),
                               ),
-                              p(HTML("<b>User instructions:</b> The graph shows the expected numbers of individuals over time who are infected, recovered, susceptible, or dead over time, with and without an intervention. Infected individuals first pass through an exposed/incubation phase where they are asymptomatic and not infectious, and then move into a symptomatic and infections stage classified by the clinical status of infection (mild, severe, or critical). A more detailed description of the model is provided in the Model Description tab. The population size, initial condition, and parameter values used to simulate the spread of infection can be specified through the sliders located in the left-hand panel. Default slider values are equal to estimates taken from the literature (see Sources tab). The strength and timing of the intervention is controlled by the sliders below the plot. To reset default values, click on the <em>Reset all</em> button located on the bottom of the panel. The plot is interactive: Hover over it to get values, double-click a curve in the legend to isolate it, or single-click to remove it. Dragging over a range allows zooming."))
+                              p(HTML("<b>Instruções ao usuário:</b> O gráfico mostra o número esperado de indivíduos ao longo do tempo que estão infectados, recuperados, suscetíveis, ou mortos ao longo do tempo, com e sem intervenção. Indivíduos infectados primeiro passam por uma fase de classificação expostos/em incubação, onde eles são assintomáticos e nao infecciosos, e então migram para um estágio sintomático e infeccioso classificado pelo status clínico da infecção (leve, grave ou crítica). Uma descrição mais detalhada do modelo pode ser encontrada na aba Descrição do Modelo. O tamanho populacional, condições iniciais e valores de parâmetros utilizados para simular a propagação da infecção podem ser especificados através dos sliders localizados no painel a esquerda. Valores padrões dos sliders são iguais a estimativas retiradas da literatura (ver aba Fontes). A intensidade e timing da intervenção é controlada pelos sliders abaixo do plot. Para reiniciar aos valores padrões, clique no botão <em>Resetar tudo</em> localizado na parte inferior do painel. O gráfico é interativo: Passe o mouse por cima para receber valores, duplo-clique em uma curva na legenda para isolá-la, ou clique-único para removê-la. Arrastar sobre uma extensão permite dar zoom."))
                             )
                           )
                  ),
                  
-                 tabPanel("Capacity",
+                 tabPanel("Capacidade",
                           fluidPage(
                             fluidRow(
-                              h3("COVID-19 Cases vs Healthcare Capacity"),
-                              p(HTML("Simulate predicted COVID-19 cases vs the capacity of the healthcare system to care for them. The care required depends on disease severity - individuals with `severe' infection require hospitalization and individuals with 'critical' infection often require ICU-level care and mechanical ventilation.")),
+                              h3("Casos COVID-19 vs Capacidade Hospitalar"),
+                              p(HTML("Simule casos previstos de COVID-19 vs a capacidade do sistema hospitalar de tratar destes. O tratamento necessário depende da gravidade da doença - indivíduos com infecções 'graves' necessitam de internação e indivíduos com infecções 'críticas' normalmente necessitam de cuidado a nível de UTI e ventilação mecânica.")),
                               plotlyOutput("plotCap"),
                               br(),
                               br(),
                               radioButtons("yscaleCap", "Y axis scale:",
                                            choices = list("Linear" = "linear","Log10" = "log"),inline=TRUE),
                               wellPanel(
-                                h4(div(HTML("<em>Set healthcare capacity...</em>"))),
-                                p(HTML(" The default values are for the U.S. and details of their sources are given in the Sources tab")),
-                                #Sliders for hospital capacity are reactive, since they take in default values from a file, so they are defined in the server file.  
+                                h4(div(HTML("<em>Definir capacidade hospitalar...</em>"))),
+                                p(HTML(" Os valores padrões são para os EUA e detalhes de suas fontes são dados na aba Fontes")),
+                                #Sliders para capacidade hospitalar são reativos, pois eles puxam os valores padrões de um arquivo, de modo que são definidos no arquivo server.  
                                 fluidRow(
-                                  p(HTML(" <b> All hospital beds: </b>")),
+                                  p(HTML(" <b> Leitos hospitalares totais: </b>")),
                                   column(width = 6,
                                          uiOutput("HospBedper")
                                   ),
@@ -126,7 +126,7 @@ fluidPage(
                                   column(width = 12,
                                          uiOutput("IncFluOcc")
                                   ),
-                                  p(HTML(" <b> Mechanical ventilators: </b>")),
+                                  p(HTML(" <b> Ventiladores mecânicos: </b>")),
                                   column(width = 4,
                                          uiOutput("ConvVentCap")
                                   ),
@@ -139,27 +139,27 @@ fluidPage(
                                 ),
                                 ),
                               wellPanel(
-                                h4(div(HTML("<em>Set intervention parameters...</em>"))),
+                                h4(div(HTML("<em>Definir parâmetros de intervenção...</em>"))),
                                 selectInput("VarShowCap",
-                                            label = "Select variable to show:",
-                                            choices = c("Critical Infections (I3) vs ICU beds"="I3bed", "Critical Infections (I3) vs ventilator capacity"="I3mv", "Severe + Critical Infections (I2+I3) vs Hospital Beds"="Hosp", "All symptomatic cases (I1+I2+I3) vs Hospital Beds"="CasesCap"),
+                                            label = "Selecione a variável a ser apresentada:",
+                                            choices = c("Infecções Críticas (I3) vs leitos UTI"="I3bed", "Infecções Críticas (I3) vs quantidade de ventiladores"="I3mv", "Infecções Graves + Críticas (I2+I3) vs Leitos Hospitalares"="Hosp", "Todos os casos sintomáticos (I1+I2+I3) vs Leitos Hospitalares"="CasesCap"),
                                             selected = c("CasesCap")
                                 ),
-                                numericInput("TintC","Intervention start time (days):",value = 0, min = 0, step = 10),
-                                numericInput("TendC","Intervention end time (days):",value = 300, min = 0, step = 10),
-                                p(HTML("<b>Intervention type: reducing transmission.</b> For example via social distancing or isolation of infected individuals. Transmission from each of the clinical stages of infection can be differntially reduced, if the user has chosen parameters such that these stages contribute to transmission.")),
-                                sliderInput("s1C", "Reduction in transmission rate (mild infections) ", 0, 100, 30, pre="%",step=1, animate=TRUE),
-                                sliderInput("s2C", "Reduction in transmission rate (severe infections) ", 0, 100, 0, pre="%",step=1, animate=TRUE),
-                                sliderInput("s3C", "Reduction in transmission rate (critical infections) ", 0, 100, 0, pre="%",step=1, animate=TRUE),
-                                radioButtons("RoundOneCap", "Round values to nearest integar post-intervention?",
+                                numericInput("TintC","Início da intervenção (dias):",value = 0, min = 0, step = 10),
+                                numericInput("TendC","Término da intervenção (dias):",value = 300, min = 0, step = 10),
+                                p(HTML("<b>Tipo de intervenção: reduzir transmissão, </b> por exemplo via distanciamento social ou quarentena na comunidade (para aqueles com infecções leves) ou melhor isolamento e equipamento de proteção individual em hospitais (para aqueles com infecções mais graves). Transmissão de cada estágio clínico da infecção pode ser reduzido apenas se o usuário escolheu parâmetros de forma que esses estágios contribuam para a transmissão.")),
+                                sliderInput("s1", "Redução em transmissão de infecções leves", 0, 100, 30, pre="%",step=1, animate=TRUE),
+                                sliderInput("s2", "Redução em transmissão de infecções graves", 0, 100, 0, pre="%",step=1, animate=TRUE),
+                                sliderInput("s3", "Redução na taxa de transmissão de infecções críticas", 0, 100, 0, pre="%",step=1, animate=TRUE),
+                                radioButtons("RoundOne", "Arredondar valores ao inteiro mais próximo pós-intervenção?",
                                              choices = list("True" = "True","False" = "False"), inline=TRUE),
                               ),
-                              p(HTML("<b>User instructions:</b> The graph shows the expected numbers of individuals over time who are infected, recovered, susceptible, or dead over time, with and without an intervention. Infected individuals first pass through an exposed/incubation phase where they are asymptomatic and not infectious, and then move into a symptomatic and infections stage classified by the clinical status of infection (mild, severe, or critical). A more detailed description of the model is provided in the Model Description tab. The population size, initial condition, and parameter values used to simulate the spread of infection can be specified through the sliders located in the left-hand panel. Default slider values are equal to estimates taken from the literature (see Sources tab). The strength and timing of the intervention is controlled by the sliders below the plot. To reset default values, click on the <em>Reset all</em> button located on the bottom of the panel. The plot is interactive: Hover over it to get values, double-click a curve in the legend to isolate it, or single-click to remove it. Dragging over a range allows zooming."))
+                              p(HTML("<b>Instruções ao usuário:</b> O gráfico mostra o número esperado de indivíduos ao longo do tempo que estão infectados, recuperados, suscetíveis, ou mortos ao longo do tempo, com e sem intervenção. Indivíduos infectados primeiro passam por uma fase de classificação expostos/em incubação, onde eles são assintomáticos e nao infecciosos, e então migram para um estágio sintomático e infeccioso classificado pelo status clínico da infecção (leve, grave ou crítica). Uma descrição mais detalhada do modelo pode ser encontrada na aba Descrição do Modelo. O tamanho populacional, condições iniciais e valores de parâmetros utilizados para simular a propagação da infecção podem ser especificados através dos sliders localizados no painel a esquerda. Valores padrões dos sliders são iguais a estimativas retiradas da literatura (ver aba Fontes). A intensidade e timing da intervenção é controlada pelos sliders abaixo do plot. Para reiniciar aos valores padrões, clique no botão <em>Resetar tudo</em> localizado na parte inferior do painel. O gráfico é interativo: Passe o mouse por cima para receber valores, duplo-clique em uma curva na legenda para isolá-la, ou clique-único para removê-la. Arrastar sobre uma extensão permite dar zoom."))
                             )
                           )
                  ),
 
-                 tabPanel("Model Description", br(),
+                 tabPanel("Descrição do Modelo", br(),
                           fluidRow(column(12,
                                           plotOutput("plot4", height=200),
                                           withMathJax(),
@@ -167,18 +167,18 @@ fluidPage(
                                           #h3("Equations"),br(),
                                           #helpText('An irrational number \\(\\sqrt{2}\\) and a fraction $$1-\\frac{1}{2}$$, $$a$$'),
                                           #includeMarkdown("SEIR.Rmd"),
-                                          h3("Rate parameters of dynamic model"),
-                                          p(HTML("These parameters can be changed using the sliders in the other tabs. The values in this table represent the current values chosen via the sliders. Note that the transmission rates chosen by the sliders are always scaled by \\(N\\), so that \\(\\beta*N\\) is constant as \\(N\\) changes.")),
+                                          h3("Parâmetros de taxas do modelo dinâmico"),
+                                          p(HTML("Esses parâmetros podem ser alterados utilizando os sliders nas outras abas. Os valores nessa tabela represantem os valores atuais selecionados via sliders. Note que as taxas de transmissão escolidas pelos sliders são sempre escaladas por \\(N\\), para que \\(\\beta*N\\) seja constante conforme \\(N\\) muda.")),
                                           tableOutput("ParameterTable"),br(),br(),
                           ))),
                  
-                 tabPanel("Sources",
+                 tabPanel("Fontes",
                           fluidPage(
                             br(),
                             uiOutput("parameterDesc")
                           )),
                  
-                 tabPanel("Code",
+                 tabPanel("Código",
                           fluidPage(
                             br(),
                             uiOutput("tab")
