@@ -7,7 +7,7 @@ import plotly.express as px
 # pic = "https://images.squarespace-cdn.com/content/5ba6af29a0cd27664cbd406b/1559413487296-DE0H6R3P8Y1Q3XZ97JWK/01.jpg?format=100w&content-type=image%2Fjpeg"
 # st.image(pic, use_column_width=False, width=100, caption=None)
 
-st.write('Este app é uma adaptação da Cappra Institute for Data Science baseada no modelo criado pelo [Alison Hill](https://github.com/alsnhll/SEIR_COVID19)')
+st.write('Este app é uma adaptação da Cappra Institute for Data Science baseada no modelo criado pelo [Alison Hill](https://alhill.shinyapps.io/COVID19seir/)')
 
 
 IncubPeriod = 0
