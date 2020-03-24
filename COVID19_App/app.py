@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np, pandas as pd
 from scipy.integrate import odeint
+from numpy.polynomial.polynomial import polyroots
 import plotly.express as px
 
 # pic = "https://images.squarespace-cdn.com/content/5ba6af29a0cd27664cbd406b/1559413487296-DE0H6R3P8Y1Q3XZ97JWK/01.jpg?format=100w&content-type=image%2Fjpeg"
@@ -28,7 +29,7 @@ p=np.zeros(3) #Taxa de progressão dos casos para outra fase da infecção
 def taxa_reprodutiva(N, b, p, g, u):
     return N*b[0]/(p[1]+g[0]) + (p[0]/(p[0]+g[0]))*(N*b[1]/(p[1]+g[1]) + N*b[2]*p[1]/((p[1]+g[1])*(u + g[2])))
             
-def params(g, p, IncubPeriod, FracMild, FracCritical, FracSevere, TimeICUDeath, CFR, DurMildInf, DurHosp, tmax, i):
+def params(g, p, IncubPeriod, FracMild, FracCritical, FracSevere, TimeICUDeath, CFR, DurMildInf, DurHosp, i):
         
         a=1/IncubPeriod #Taxa de transição dos expostos para infectado
         
@@ -46,12 +47,10 @@ def params(g, p, IncubPeriod, FracMild, FracCritical, FracSevere, TimeICUDeath, 
         p[1]=(1/DurHosp)*(FracCritical/(FracCritical+FracSevere)) #Taxa de progressão I2
         g[1]=(1/DurHosp)-p[1] #Taxa de recuperação de I2
 
-        
-        tvec=np.arange(0,tmax,0.1)
         ic=np.zeros(6) #Inicia vetor da população (cada índice para cada tipo de infectado, exposto, etc)
         ic[0]=i #População sucetível = tamanho da população
         
-        return a, u, g, p, tvec, ic
+        return a, u, g, p, ic
 
 def menu(IncubPeriod, DurMildInf, FracSevere, FracCritical, ProbDeath, DurHosp, TimeICUDeath): #Cria o menu lateral esquerdo
 
@@ -130,19 +129,26 @@ def seir(y,t,b,a,g,p,u,N):
 
             return dy
 
-def growth_rate(tvec,soln,t1,t2,i):
-    
-            i1=np.where(tvec==t1)[0][0]
-            i2=np.where(tvec==t2)[0][0]
-            r=(np.log(soln[i2,1])-np.log(soln[i1,1]))/(t2-t1)
-            DoublingTime=np.log(2)/r
 
-            return r, DoublingTime
-
+def growth_rate(g1,g2,g3,p1,p2,p3,b1,b2,b3,u,a,N):
+    sig1 = g1 + p1
+    sig2 = g2 + p2;
+    sig3 = g3 + u
+      
+    C4 = 1
+    C3 = a + sig1 + sig2 + sig3
+    C2 = a*(sig1 + sig2 + sig3 - b1*N) + sig1*sig2 + sig1*sig3 + sig2*sig3
+    C1 = a*(sig1*sig2 + sig1*sig3 + sig2*sig3 - b1*N*(sig2 + sig3) - b2*N*p1) + sig1*sig2*sig3
+    C0 = a*(sig1*sig2*sig3 - b1*N*sig2*sig3 - p1*b2*N*sig3 - p1*p2*b3*N)
+      
+      #  Compute the maximum eigenvalue, corresponding to r
+    r = max((polyroots([C0, C1, C2, C3, C4])))
+      
+    DoublingTime=np.log(2)/r
+      
+    return (r, DoublingTime)
 
 def main(IncubPeriod,b,g,p):
-    
-    
     pic = "https://images.squarespace-cdn.com/content/5c4ca9b7cef372b39c3d9aab/1575161958793-CFM6738ESA4DNTKF0SQI/CAPPRA_PRIORITARIO_BRANCO.png?content-type=image%2Fpng"
     st.sidebar.image(pic, use_column_width=False, width=100, caption=None)
     page = st.sidebar.selectbox("Simulações", ["Progressão do COVID19","Com Intervenção","Capacidade Hospitalar","Descição do Modelo","Fontes","Código"])
@@ -275,7 +281,7 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
         
         IncubPeriod, DurMildInf, FracMild, FracSevere, FracCritical, CFR, DurHosp, TimeICUDeath, b1, b2, b3, N, i, tmax = menu(IncubPeriod, DurMildInf, FracSevere, FracCritical, ProbDeath, DurHosp, TimeICUDeath)    
 
-        a, u, g, p, tvec, ic = params(g, p, IncubPeriod, FracMild, FracCritical, FracSevere, TimeICUDeath, CFR, DurMildInf, DurHosp, tmax, i)
+        a, u, g, p, ic = params(g, p, IncubPeriod, FracMild, FracCritical, FracSevere, TimeICUDeath, CFR, DurMildInf, DurHosp, i)
         
         #Inicia vetor de taxa de transmissão
         b=np.array([b1,b2,b3])
@@ -283,6 +289,7 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
         #Calcula a taxa reprodutiva básica        
         R0 = taxa_reprodutiva(N, b, p, g, u)
         
+        tvec=np.arange(0,tmax,0.1)
         soln=odeint(seir,ic,tvec,args=(b,a,g,p,u,N))
         soln=np.hstack((N-np.sum(soln,axis=1,keepdims=True),soln))
 
@@ -304,7 +311,7 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
         yscale = my_slot3.radio("Escala do eixo Y", ["Linear", "Log"])
         covid19_1(yscale)
         
-        (r,DoublingTime)=growth_rate(tvec,soln,10,20,1)
+        (r,DoublingTime) = growth_rate(g[0],g[1],g[2],p[0],p[1],p[2],b[0],b[1],b[2],u,a,N)
         
         my_slot2.text("R\N{SUBSCRIPT ZERO} = {0:4.1f} \nr = {1:4.1f} por dia \nt\N{SUBSCRIPT TWO} = {2:4.1f}".format(R0,r,DoublingTime))
         
@@ -329,31 +336,17 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
         st.subheader('Simule a mudança do avanço da epidemia de COVID-19 em uma única população com medidas de distânciamento social (ficando em casa).')
         
         my_slot1 = st.empty()
-        # Appends an empty slot to the app. We'll use this later.
-
-        my_slot2 = st.empty()
-        # Appends another empty slot.
-        
-        my_slot3 = st.empty()
-        # Appends another empty slot.
-        
-        my_slot4 = st.empty()
-        # Appends another empty slot.
-        
-        my_slot5 = st.empty()
-        # Appends another empty slot.
-        
-        my_slot6 = st.empty()
-        # Appends another empty slot.
-        
-        my_slot7 = st.empty()
-        # Appends another empty slot.
-        
-        my_slot8 = st.empty()
-        # Appends another empty slot.
-        
-        my_slot9 = st.empty()
-        # Appends another empty slot.
+        my_slot2 = st.empty()        
+        my_slot3 = st.empty()        
+        my_slot4 = st.empty()        
+        my_slot5 = st.empty()        
+        my_slot6 = st.empty()        
+        my_slot7 = st.empty()        
+        my_slot8 = st.empty()        
+        my_slot9 = st.empty()        
+        my_slot10 = st.empty()
+        my_slot11 = st.empty()
+        my_slot12 = st.empty()
         
         if IncubPeriod == 0:
             IncubPeriod = 5
@@ -380,67 +373,126 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
             i=i
             variable = variable
 
+        #Contrução do menu lateral    
         IncubPeriod, DurMildInf, FracMild, FracSevere, FracCritical, CFR, DurHosp, TimeICUDeath, b1, b2, b3, N, i, tmax = menu(IncubPeriod, DurMildInf, FracSevere, FracCritical, ProbDeath, DurHosp, TimeICUDeath)    
-
-        a, u, g, p, tvec, ic = params(g, p, IncubPeriod, FracMild, FracCritical, FracSevere, TimeICUDeath, CFR, DurMildInf, DurHosp, tmax, i)
-
-        reduc1 = my_slot7.slider("Redução na transmissão (infecções leves em %)", min_value=0, max_value=100, value=30, step=1)/100 #Taxa de transmissão (infecções leves)
-        reduc2 = my_slot8.slider("Redução na transmissão (infecções graves, relativa a infecção leve em %)", min_value=0, max_value=100, value=0, step=1)/100 #Taxa de transmissão (infecções graves, relativa a infecção leve)
-        reduc3 = my_slot9.slider("Redução na transmissão (infecções críticas, relativa a infecção leve em %)", min_value=0, max_value=100, value=0, step=1)/100 #Taxa de transmissão (infecções críticas, relativa a infecção leve)
         
+        TimeStart = my_slot7.number_input(label="Tempo de início da intervenção (dias)",min_value = 0, max_value = tmax, value=0) #Início da intervenção
+        TimeEnd = my_slot8.number_input(label="Tempo de fim da intervenção (dias)", min_value = TimeStart+1, max_value = tmax, value = tmax) #Fim da intervenção
+        
+        reduc1 = my_slot10.slider("Redução na transmissão (infecções leves em %)", min_value=0, max_value=100, value=30, step=1)/100 #Taxa de transmissão (infecções leves)
+        reduc2 = my_slot11.slider("Redução na transmissão (infecções graves, relativa a infecção leve em %)", min_value=0, max_value=100, value=0, step=1)/100 #Taxa de transmissão (infecções graves, relativa a infecção leve)
+        reduc3 = my_slot12.slider("Redução na transmissão (infecções críticas, relativa a infecção leve em %)", min_value=0, max_value=100, value=0, step=1)/100 #Taxa de transmissão (infecções críticas, relativa a infecção leve)
+        
+        a, u, g, p, ic = params(g, p, IncubPeriod, FracMild, FracCritical, FracSevere, TimeICUDeath, CFR, DurMildInf, DurHosp, i)
+
         b=np.array([b1,b2,b3])
         bSlow=np.array([(1-reduc1)*b1,(1-reduc2)*b2,(1-reduc3)*b3])
         
         R0 = taxa_reprodutiva(N, b, p, g, u)
         R0Slow = taxa_reprodutiva(N, bSlow, p, g, u)
         
-        soln=odeint(seir,ic,tvec,args=(b,a,g,p,u,N))
-        soln=np.hstack((N-np.sum(soln,axis=1,keepdims=True),soln))
+        #Simulação sem intervenção
+        tvec=np.arange(0,tmax,0.1)
+        sim_sem_int = odeint(seir,ic,tvec,args=(b,a,g,p,u,N))
+        sim_sem_int = np.hstack((N-np.sum(sim_sem_int,axis=1,keepdims=True),sim_sem_int))
         
-        solnSlow=odeint(seir,ic,tvec,args=(bSlow,a,g,p,u,N))
-        solnSlow=np.hstack((N-np.sum(solnSlow,axis=1,keepdims=True),solnSlow))
-        
-        data = []
-        data1 = []
+        #Criando dataframe
         names = ["Sucetíveis (S)","Expostos (E)","Inf. Leve (I1)","Inf. Grave (I2)","Inf. Crítico (I3)","Recuperado (R)","Morto (D)"]
-        for x in range(0, len(tvec)):
-            for y in range(0, len(solnSlow[x])):
-                data.append([tvec[x],names[y],soln[x][y]])
-                data1.append([tvec[x],names[y],solnSlow[x][y]])
+
+        df_sim_sem_int = pd.DataFrame(sim_sem_int, columns = names)
+        df_sim_sem_int['Tempo (dias)'] = tvec
+        df_sim_sem_int['Simulação'] = 'Sem intervenção'
         
-        variable = my_slot4.selectbox("Selecione a variável que deseja ver", names, 4)
-        TimeStart = my_slot5.number_input(label="Tempo de início da intervenção (dias)", value=0) #Tamanho da polulação
+        if TimeEnd>TimeStart: #Se há intervenção
+            if TimeStart > 0: #Se a intervenção começa após o dia 0
+                
+                #Simulação sem intervenção (antes do início da intervenção)
+                ic = np.zeros(6) #Inicia vetor da população (cada índice para cada tipo de infectado, exposto, etc)
+                ic[0] = i #População sucetível = tamanho da população
+                tvec = np.arange(0,TimeStart,0.1) #A simulação sem intervenção termina em t = TimeStart
+                sim_sem_int_1 = odeint(seir,ic,tvec,args=(b,a,g,p,u,N))
+                ic = sim_sem_int_1[-1]
+                sim_sem_int_1 = np.hstack((N-np.sum(sim_sem_int_1,axis=1,keepdims=True),sim_sem_int_1))
+                #Criando DataFrame
+                df_sim_com_int = pd.DataFrame(sim_sem_int_1, columns = names)
+                df_sim_com_int['Tempo (dias)'] = tvec
+                df_sim_com_int['Simulação'] = 'Com intervenção'
+            
+                #Simulação após o início da intervenção
+                tvec=np.arange(TimeStart,TimeEnd,0.1)
+                sim_com_int = odeint(seir,ic,tvec,args=(bSlow,a,g,p,u,N))
+                ic = sim_com_int[-1]
+                sim_com_int = np.hstack((N-np.sum(sim_com_int,axis=1,keepdims=True),sim_com_int))
+                #Criando DataFrame
+                df_aux = pd.DataFrame(sim_com_int, columns = names)
+                df_aux['Tempo (dias)'] = tvec
+                df_aux['Simulação'] = 'Com intervenção'
+                #Append dataframe
+                df_sim_com_int = df_sim_com_int.append(df_aux)
+                
+                if TimeEnd < tmax: #Se a intervenção termina antes do tempo final
+                    tvec = np.arange(TimeEnd,tmax,0.1) #A simulação sem intervenção termina em t = TimeStart
+                    #Simulação sem intervenção (após o fim da intervenção)
+                    sim_sem_int_2 = odeint(seir,ic,tvec,args=(b,a,g,p,u,N))
+                    sim_sem_int_2 = np.hstack((N-np.sum(sim_sem_int_2,axis=1,keepdims=True),sim_sem_int_2))
+                    #Criando dataframe
+                    df_aux = pd.DataFrame(sim_sem_int_2, columns = names)
+                    df_aux['Tempo (dias)'] = tvec
+                    df_aux['Simulação'] = 'Com intervenção'
+                    #Append dataframe
+                    df_sim_com_int = df_sim_com_int.append(df_aux)
+                    
+                    
+            elif TimeStart == 0: #Se a intervenção começa no dia 0
+                ic = np.zeros(6) #Inicia vetor da população (cada índice para cada tipo de infectado, exposto, etc)
+                ic[0] = i #População sucetível = tamanho da população
+                tvec=np.arange(0,TimeEnd,0.1)
+                sim_com_int = odeint(seir,ic,tvec,args=(bSlow,a,g,p,u,N))
+                ic = sim_com_int[-1]
+                sim_com_int = np.hstack((N-np.sum(sim_com_int,axis=1,keepdims=True),sim_com_int))
+                df_sim_com_int = pd.DataFrame(sim_com_int, columns = names)
+                df_sim_com_int['Tempo (dias)'] = tvec
+                df_sim_com_int['Simulação'] = 'Com intervenção'
+                #sim = sim_com_int
+                if TimeEnd < tmax: #Se a intervenção termina antes do tempo final
+                    tvec = np.arange(TimeEnd,tmax,0.1) #A simulação sem intervenção termina em t = TimeStart
+                    #Simulação sem intervenção (após o fim da intervenção)
+                    sim_sem_int_2 = odeint(seir,ic,tvec,args=(b,a,g,p,u,N))
+                    sim_sem_int_2 = np.hstack((N-np.sum(sim_sem_int_2,axis=1,keepdims=True),sim_sem_int_2))
+                   #Criando dataframe
+                    df_aux = pd.DataFrame(sim_sem_int_2, columns = names)
+                    df_aux['Tempo (dias)'] = tvec
+                    df_aux['Simulação'] = 'Com intervenção'
+                    df_sim_com_int = df_sim_com_int.append(df_aux)
         
-        df = pd.DataFrame(data,columns=['Tempo (dias)','legenda','Número por 1000 Pessoas'])
-        df1 = pd.DataFrame(data1,columns=['Tempo (dias)','legenda','Número por 1000 Pessoas'])
-        df1['Tempo desde a intervenção'] = df1['Tempo (dias)']+TimeStart
-        df1['legenda_aux'] = df1['legenda'].apply(lambda x: str(x) + ' (intervenção)')
-        df['legenda_aux'] = df['legenda']
-        
-        df = df[(df['legenda']==variable)]
-        df1 = df1[(df1['legenda']==variable)]
-        
-        df = df.append(df1)
+        variable = my_slot6.selectbox("Selecione a variável que deseja ver", names)
+        df_sim_com_int = df_sim_com_int.drop_duplicates(subset = ['Tempo (dias)'], keep = 'first')
+        df_sem = pd.melt(df_sim_sem_int[['Tempo (dias)',variable]], id_vars = ['Tempo (dias)'], value_name = 'Número por 1000 Pessoas', var_name = 'Legenda')
+        df_sem['Legenda'] = df_sem['Legenda'] + ' (Sem intervenção)' 
+        df_com = pd.melt(df_sim_com_int[['Tempo (dias)',variable]], id_vars = ['Tempo (dias)'], value_name = 'Número por 1000 Pessoas', var_name = 'Legenda')
+        df_com['Legenda'] = df_com['Legenda'] + ' (Com intervenção)'
+
+        df = df_sem.append(df_com)
         
         yscale = "Linear"
-        yscale = my_slot3.radio("Escala do eixo Y", ["Linear", "Log"])
+        yscale = my_slot5.radio("Escala do eixo Y", ["Linear", "Log"])
         
         if yscale == 'Log':
-            fig = px.line(df, x="Tempo (dias)", y="Número por 1000 Pessoas", log_y=True, color = 'legenda_aux')
+            fig = px.line(df, x="Tempo (dias)", y="Número por 1000 Pessoas", log_y=True, color = 'Legenda')
                 
         else:
-            fig = px.line(df, x="Tempo (dias)", y="Número por 1000 Pessoas", color = 'legenda_aux')
+            fig = px.line(df, x="Tempo (dias)", y="Número por 1000 Pessoas", color = 'Legenda')
         my_slot1.plotly_chart(fig)
         
-        (r,DoublingTime)=growth_rate(tvec,soln,30,40,i)
-        (rSlow,DoublingTimeSlow)=growth_rate(tvec,solnSlow,30,40,i)
+        (r,DoublingTime) = growth_rate(g[0],g[1],g[2],p[0],p[1],p[2],b[0],b[1],b[2],u,a,N)
+        (rSlow,DoublingTimeSlow) = growth_rate(g[0],g[1],g[2],p[0],p[1],p[2],bSlow[0],bSlow[1],bSlow[2],u,a,N)
         
         Stat = pd.DataFrame({'Linha base':[R0,r,DoublingTime],'Com distanciamento social':[R0Slow,rSlow,DoublingTimeSlow]},columns=['Linha base', 'Com distanciamento social'], index=['R\N{SUBSCRIPT ZERO}','r (por dia)','t\N{SUBSCRIPT TWO}'])
         my_slot2.table(Stat)
-        
-        st.write("A taxa de crescimento epidêmico é {0:4.2f} por dia e o tempo de duplicação é de {1:4.1f} dias ".format(r,DoublingTime))
-        
-        my_slot6.text('''Tipo de intervenção: redução da transmissão, por exemplo, através de distanciamento social ou quarentena na comunidade (para aqueles com infecção leve) ou melhor isolamento e desgaste de proteção pessoal em hospitais (para aqueles com infecção mais grave). A transmissão de cada um dos estágios clínicos da infecção só pode ser reduzida se o usuário tiver escolhido parâmetros para que esses estágios contribuam para a transmissão.''')
+        my_slot3.text("A taxa de crescimento epidêmico sem intervenção é {0:4.2f} por dia e o tempo de duplicação é de {1:4.1f} dias ".format(r,DoublingTime))
+        my_slot4.text("A taxa de crescimento epidêmico com intervenção é {0:4.2f} por dia e o tempo de duplicação é de {1:4.1f} dias ".format(rSlow,DoublingTimeSlow))
+
+        my_slot9.text('''Tipo de intervenção: redução da transmissão, por exemplo, através de distanciamento social ou quarentena na comunidade (para aqueles com infecção leve) ou melhor isolamento e desgaste de proteção pessoal em hospitais (para aqueles com infecção mais grave). A transmissão de cada um dos estágios clínicos da infecção só pode ser reduzida se o usuário tiver escolhido parâmetros para que esses estágios contribuam para a transmissão.''')
         
         st.write('''**Instruções para o usuário:** O gráfico mostra o número esperado de indivíduos infectados, recuperados, suscetíveis ou mortos ao longo do tempo, com e sem intervenção. Os indivíduos infectados passam primeiro por uma fase exposta / incubação, onde são assintomáticos e não infecciosos, e depois passam para um estágio sintomático e de infecções classificados pelo estado clínico da infecção (leve, grave ou crítica). Uma descrição mais detalhada do modelo é fornecida na guia Descrição do Modelo. O tamanho da população, a condição inicial e os valores dos parâmetros usados ​​para simular a propagação da infecção podem ser especificados através dos controles deslizantes localizados no painel esquerdo. Os valores padrão do controle deslizante são iguais às estimativas extraídas da literatura (consulte a guia Fontes). A força e o tempo da intervenção são controlados pelos controles deslizantes abaixo do gráfico. Para redefinir os valores padrão, clique no botão Redefinir tudo, localizado na parte inferior do painel. O gráfico é interativo: passe o mouse sobre ele para obter valores, clique duas vezes em uma curva na legenda para isolá-la ou clique duas vezes para removê-la. Arrastar sobre um intervalo permite aplicar zoom.''')
 
@@ -504,42 +556,106 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
         
         IncubPeriod, DurMildInf, FracMild, FracSevere, FracCritical, CFR, DurHosp, TimeICUDeath, b1, b2, b3, N, i, tmax = menu(IncubPeriod, DurMildInf, FracSevere, FracCritical, ProbDeath, DurHosp, TimeICUDeath)    
 
-        a, u, g, p, tvec, ic = params(g, p, IncubPeriod, FracMild, FracCritical, FracSevere, TimeICUDeath, CFR, DurMildInf, DurHosp, tmax, i)
 
+
+        
+        st.subheader('Parâmetros de intervenção')
+    
+        TimeStart = st.number_input(label="Tempo de início da intervenção (dias)",min_value = 0, max_value = tmax, value=0) #Início da intervenção
+        TimeEnd = st.number_input(label="Tempo de fim da intervenção (dias)", min_value = TimeStart+1, max_value = tmax, value = tmax) #Fim da intervenção
+        reduc1 = st.slider("Redução na transmissão (infecções leves em %)", min_value=0, max_value=100, value=30, step=1)/100 #Taxa de transmissão (infecções leves)
+        reduc2 = st.slider("Redução na transmissão (infecções graves, relativa a infecção leve em %)", min_value=0, max_value=100, value=0, step=1)/100 #Taxa de transmissão (infecções graves, relativa a infecção leve)
+        reduc3 = st.slider("Redução na transmissão (infecções críticas, relativa a infecção leve em %)", min_value=0, max_value=100, value=0, step=1)/100 #Taxa de transmissão (infecções críticas, relativa a infecção leve)
+        
         st.subheader('Capacidade do sistema de saúde')
         AvailHospBeds=st.number_input(label="Leitos hospitalares disponíveis (por mil pessoas)", value=1.95) #Available hospital beds per 1000 ppl in BR based on total beds and occupancy
         AvailICUBeds=st.number_input(label="Leitos na UTI disponíveis (por mil pessoas)", value=0.137) #Available ICU beds per 1000 ppl in BR, based on total beds and occupancy. Only counts adult not neonatal/pediatric beds
         ConvVentCap=st.number_input(label="Pacientes que podem ser ventilados em protocolos convencionais (por mil pessoas)", value=0.062) #Estimated excess # of patients who could be ventilated in US (per 1000 ppl) using conventional protocols
         ContVentCap=st.number_input(label="Pacientes que podem ser ventilados em protocolo de contingência (por mil pessoas)", value=0.15) #Estimated excess # of patients who could be ventilated in US (per 1000 ppl) using contingency protocols
         CrisisVentCap=st.number_input(label="Pacientes que podem ser ventilados em protocolo de crise (por mil pessoas)", value=0.24) #Estimated excess # of patients who could be ventilated in US (per 1000 ppl) using crisis protocols
-        
-        st.subheader('Parâmetros de intervenção')
-        reduc1 = st.slider("Redução na transmissão (infecções leves em %)", min_value=0, max_value=100, value=30, step=1)/100 #Taxa de transmissão (infecções leves)
-        reduc2 = st.slider("Redução na transmissão (infecções graves, relativa a infecção leve em %)", min_value=0, max_value=100, value=0, step=1)/100 #Taxa de transmissão (infecções graves, relativa a infecção leve)
-        reduc3 = st.slider("Redução na transmissão (infecções críticas, relativa a infecção leve em %)", min_value=0, max_value=100, value=0, step=1)/100 #Taxa de transmissão (infecções críticas, relativa a infecção leve)
        
-        
-        b=np.array([b1,
-                    b2,
-                    b3])
-        
-        bSlow=np.array([
-            (1-reduc1)*b1,
-            (1-reduc2)*b2,
-            (1-reduc3)*b3])
+        a, u, g, p, ic = params(g, p, IncubPeriod, FracMild, FracCritical, FracSevere, TimeICUDeath, CFR, DurMildInf, DurHosp, i)
+
+        b=np.array([b1,b2,b3])
+        bSlow=np.array([(1-reduc1)*b1,(1-reduc2)*b2,(1-reduc3)*b3])
         
         R0 = taxa_reprodutiva(N, b, p, g, u)
         R0Slow = taxa_reprodutiva(N, bSlow, p, g, u)
         
-        soln=odeint(seir,ic,tvec,args=(b,a,g,p,u,N))
-        soln=np.hstack((N-np.sum(soln,axis=1,keepdims=True),soln))
+        #Simulação sem intervenção
+        tvec=np.arange(0,tmax,0.1)
+        sim_sem_int = odeint(seir,ic,tvec,args=(b,a,g,p,u,N))
+        sim_sem_int = np.hstack((N-np.sum(sim_sem_int,axis=1,keepdims=True),sim_sem_int))
         
-        solnSlow=odeint(seir,ic,tvec,args=(bSlow,a,g,p,u,N))
-        solnSlow=np.hstack((N-np.sum(solnSlow,axis=1,keepdims=True),solnSlow))
+        #Criando dataframe
+        names = ["Sucetíveis (S)","Expostos (E)","Inf. Leve (I1)","Inf. Grave (I2)","Inf. Crítico (I3)","Recuperado (R)","Morto (D)"]
+
+        df_sim_sem_int = pd.DataFrame(sim_sem_int, columns = names)
+        df_sim_sem_int['Tempo (dias)'] = tvec
+        df_sim_sem_int['Simulação'] = 'Sem intervenção'
         
-        
-        ###Criando dataframe para plot
-        
+        if TimeEnd>TimeStart: #Se há intervenção
+            if TimeStart > 0: #Se a intervenção começa após o dia 0
+                
+                #Simulação sem intervenção (antes do início da intervenção)
+                ic = np.zeros(6) #Inicia vetor da população (cada índice para cada tipo de infectado, exposto, etc)
+                ic[0] = i #População sucetível = tamanho da população
+                tvec = np.arange(0,TimeStart,0.1) #A simulação sem intervenção termina em t = TimeStart
+                sim_sem_int_1 = odeint(seir,ic,tvec,args=(b,a,g,p,u,N))
+                ic = sim_sem_int_1[-1]
+                sim_sem_int_1 = np.hstack((N-np.sum(sim_sem_int_1,axis=1,keepdims=True),sim_sem_int_1))
+                #Criando DataFrame
+                df_sim_com_int = pd.DataFrame(sim_sem_int_1, columns = names)
+                df_sim_com_int['Tempo (dias)'] = tvec
+                df_sim_com_int['Simulação'] = 'Com intervenção'
+            
+                #Simulação após o início da intervenção
+                tvec=np.arange(TimeStart,TimeEnd,0.1)
+                sim_com_int = odeint(seir,ic,tvec,args=(bSlow,a,g,p,u,N))
+                ic = sim_com_int[-1]
+                sim_com_int = np.hstack((N-np.sum(sim_com_int,axis=1,keepdims=True),sim_com_int))
+                #Criando DataFrame
+                df_aux = pd.DataFrame(sim_com_int, columns = names)
+                df_aux['Tempo (dias)'] = tvec
+                df_aux['Simulação'] = 'Com intervenção'
+                #Append dataframe
+                df_sim_com_int = df_sim_com_int.append(df_aux)
+                
+                if TimeEnd < tmax: #Se a intervenção termina antes do tempo final
+                    tvec = np.arange(TimeEnd,tmax,0.1) #A simulação sem intervenção termina em t = TimeStart
+                    #Simulação sem intervenção (após o fim da intervenção)
+                    sim_sem_int_2 = odeint(seir,ic,tvec,args=(b,a,g,p,u,N))
+                    sim_sem_int_2 = np.hstack((N-np.sum(sim_sem_int_2,axis=1,keepdims=True),sim_sem_int_2))
+                    #Criando dataframe
+                    df_aux = pd.DataFrame(sim_sem_int_2, columns = names)
+                    df_aux['Tempo (dias)'] = tvec
+                    df_aux['Simulação'] = 'Com intervenção'
+                    #Append dataframe
+                    df_sim_com_int = df_sim_com_int.append(df_aux)
+                    
+                    
+            elif TimeStart == 0: #Se a intervenção começa no dia 0
+                ic = np.zeros(6) #Inicia vetor da população (cada índice para cada tipo de infectado, exposto, etc)
+                ic[0] = i #População sucetível = tamanho da população
+                tvec=np.arange(0,TimeEnd,0.1)
+                sim_com_int = odeint(seir,ic,tvec,args=(bSlow,a,g,p,u,N))
+                ic = sim_com_int[-1]
+                sim_com_int = np.hstack((N-np.sum(sim_com_int,axis=1,keepdims=True),sim_com_int))
+                df_sim_com_int = pd.DataFrame(sim_com_int, columns = names)
+                df_sim_com_int['Tempo (dias)'] = tvec
+                df_sim_com_int['Simulação'] = 'Com intervenção'
+                #sim = sim_com_int
+                if TimeEnd < tmax: #Se a intervenção termina antes do tempo final
+                    tvec = np.arange(TimeEnd,tmax,0.1) #A simulação sem intervenção termina em t = TimeStart
+                    #Simulação sem intervenção (após o fim da intervenção)
+                    sim_sem_int_2 = odeint(seir,ic,tvec,args=(b,a,g,p,u,N))
+                    sim_sem_int_2 = np.hstack((N-np.sum(sim_sem_int_2,axis=1,keepdims=True),sim_sem_int_2))
+                   #Criando dataframe
+                    df_aux = pd.DataFrame(sim_sem_int_2, columns = names)
+                    df_aux['Tempo (dias)'] = tvec
+                    df_aux['Simulação'] = 'Com intervenção'
+                    df_sim_com_int = df_sim_com_int.append(df_aux)
+                
         
         names = ['Todos casos sintomáticos (l1,l2,l3) vs Leitos de hospital e UTI',
                  'Casos graves (l2) e críticos (l3) vs Leitos de hospital e UTI',
@@ -547,78 +663,72 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
                 'Infecções críticas (l3) vs Capacidade de ventilação']
         
         variable = my_slot4.selectbox("Selecione a variável que deseja ver", names)
-        TimeStart = my_slot5.number_input(label="Tempo de início da intervenção (dias)", value=0) #Tamanho da polulação
+        
+        names = ["Sucetíveis (S)","Expostos (E)","Inf. Leve (I1)","Inf. Grave (I2)","Inf. Crítico (I3)","Recuperado (R)","Morto (D)"]
+
         
         if variable == 'Todos casos sintomáticos (l1,l2,l3) vs Leitos de hospital e UTI':
-            data = []
+            df_sim_com_int['Número por 1000 pessoas'] = df_sim_com_int["Inf. Leve (I1)"] + df_sim_com_int["Inf. Grave (I2)"] + df_sim_com_int["Inf. Crítico (I3)"]
+            df_sim_sem_int['Número por 1000 pessoas'] = df_sim_sem_int["Inf. Leve (I1)"] + df_sim_sem_int["Inf. Grave (I2)"] + df_sim_sem_int["Inf. Crítico (I3)"]
+            df = df_sim_sem_int[['Tempo (dias)','Número por 1000 pessoas', 'Simulação']].append(df_sim_com_int[['Tempo (dias)','Número por 1000 pessoas', 'Simulação']])
+            
             data1 = []
             data2 = []
-            data3 = []
-            for x in range(0, len(tvec)):
-                data.append([tvec[x],'Sem intervenção',soln[x,2] + soln[x,3] + soln[x,4]])
-                data1.append([tvec[x],'Com intervenção',solnSlow[x,2] + solnSlow[x,3] + solnSlow[x,4]])
-                data2.append([tvec[x],'Leitos hospitalares',AvailHospBeds])
-                data2.append([tvec[x],'Leitos da UTI',AvailICUBeds])
+            for x in range(0, tmax):
+                data1.append([x,'Leitos hospitalares',AvailHospBeds])
+                data2.append([x,'Leitos da UTI',AvailICUBeds])
                 
-            dados = pd.DataFrame(data, columns = ['Tempo (dias)','Legenda','Número por 1000 pessoas'])    
-            dados = dados.append(pd.DataFrame(data1, columns = ['Tempo (dias)','Legenda','Número por 1000 pessoas']))
-            dados = dados.append(pd.DataFrame(data2, columns = ['Tempo (dias)','Legenda','Número por 1000 pessoas']))
-            dados = dados.append(pd.DataFrame(data3, columns = ['Tempo (dias)','Legenda','Número por 1000 pessoas']))
-            fig = px.line(dados, x="Tempo (dias)", y="Número por 1000 pessoas", color = "Legenda", title = variable)
+            df = df.append(pd.DataFrame(data1, columns = ['Tempo (dias)','Simulação','Número por 1000 pessoas']))
+            df = df.append(pd.DataFrame(data2, columns = ['Tempo (dias)','Simulação','Número por 1000 pessoas']))
+            fig = px.line(df, x="Tempo (dias)", y="Número por 1000 pessoas", color = "Simulação", title = variable)
             my_slot1.plotly_chart(fig)
             
         elif variable == 'Casos graves (l2) e críticos (l3) vs Leitos de hospital e UTI':
-            data = []
+            df_sim_com_int['Número por 1000 pessoas'] = df_sim_com_int["Inf. Grave (I2)"] + df_sim_com_int["Inf. Crítico (I3)"]
+            df_sim_sem_int['Número por 1000 pessoas'] = df_sim_sem_int["Inf. Grave (I2)"] + df_sim_sem_int["Inf. Crítico (I3)"]
+            df = df_sim_sem_int[['Tempo (dias)','Número por 1000 pessoas', 'Simulação']].append(df_sim_com_int[['Tempo (dias)','Número por 1000 pessoas', 'Simulação']])
+            
             data1 = []
             data2 = []
-            data3 = []
-            for x in range(0, len(tvec)):
-                data.append([tvec[x],'Sem intervenção',soln[x,3] + soln[x,4]])
-                data1.append([tvec[x],'Com intervenção',solnSlow[x,3] + solnSlow[x,4]])
-                data2.append([tvec[x],'Leitos hospitalares',AvailHospBeds])
-                data2.append([tvec[x],'Leitos da UTI',AvailICUBeds])
+            for x in range(0, tmax):
+                data1.append([x,'Leitos hospitalares',AvailHospBeds])
+                data2.append([x,'Leitos da UTI',AvailICUBeds])
                 
-            dados = pd.DataFrame(data, columns = ['Tempo (dias)','Legenda','Número por 1000 pessoas'])    
-            dados = dados.append(pd.DataFrame(data1, columns = ['Tempo (dias)','Legenda','Número por 1000 pessoas']))
-            dados = dados.append(pd.DataFrame(data2, columns = ['Tempo (dias)','Legenda','Número por 1000 pessoas']))
-            dados = dados.append(pd.DataFrame(data3, columns = ['Tempo (dias)','Legenda','Número por 1000 pessoas']))
-            fig = px.line(dados, x="Tempo (dias)", y="Número por 1000 pessoas", color = "Legenda", title = variable)
+            df = df.append(pd.DataFrame(data1, columns = ['Tempo (dias)','Simulação','Número por 1000 pessoas']))
+            df = df.append(pd.DataFrame(data2, columns = ['Tempo (dias)','Simulação','Número por 1000 pessoas']))
+            fig = px.line(df, x="Tempo (dias)", y="Número por 1000 pessoas", color = "Simulação", title = variable)
             my_slot1.plotly_chart(fig) 
             
         elif variable == 'Infecções críticas (l3) vs Leitos na UTI':
-            data = []
+            df_sim_com_int['Número por 1000 pessoas'] = df_sim_com_int["Inf. Crítico (I3)"]
+            df_sim_sem_int['Número por 1000 pessoas'] = df_sim_sem_int["Inf. Crítico (I3)"]
+            df = df_sim_sem_int[['Tempo (dias)','Número por 1000 pessoas', 'Simulação']].append(df_sim_com_int[['Tempo (dias)','Número por 1000 pessoas', 'Simulação']])
+            
             data1 = []
-            data2 = []
-            for x in range(0, len(tvec)):
-                data.append([tvec[x],'Sem intervenção',soln[x,4]])
-                data1.append([tvec[x],'Com intervenção',solnSlow[x,4]])
-                data2.append([tvec[x],'Leitos da UTI',AvailICUBeds])
+            for x in range(0, tmax):
+                data1.append([x,'Leitos da UTI',AvailICUBeds])
                 
-            dados = pd.DataFrame(data, columns = ['Tempo (dias)','Legenda','Número por 1000 pessoas'])    
-            dados = dados.append(pd.DataFrame(data1, columns = ['Tempo (dias)','Legenda','Número por 1000 pessoas']))
-            dados = dados.append(pd.DataFrame(data2, columns = ['Tempo (dias)','Legenda','Número por 1000 pessoas']))
-            fig = px.line(dados, x="Tempo (dias)", y="Número por 1000 pessoas", color = "Legenda", title = variable)
-            my_slot1.plotly_chart(fig)            
+            df = df.append(pd.DataFrame(data1, columns = ['Tempo (dias)','Simulação','Número por 1000 pessoas']))
+            fig = px.line(df, x="Tempo (dias)", y="Número por 1000 pessoas", color = "Simulação", title = variable)
+            my_slot1.plotly_chart(fig)             
             
         elif variable == 'Infecções críticas (l3) vs Capacidade de ventilação':
-            data = []
+            df_sim_com_int['Número por 1000 pessoas'] = df_sim_com_int["Inf. Crítico (I3)"]
+            df_sim_sem_int['Número por 1000 pessoas'] = df_sim_sem_int["Inf. Crítico (I3)"]
+            df = df_sim_sem_int[['Tempo (dias)','Número por 1000 pessoas', 'Simulação']].append(df_sim_com_int[['Tempo (dias)','Número por 1000 pessoas', 'Simulação']])
+            
             data1 = []
             data2 = []
             data3 = []
-            data4 = []
-            for x in range(0, len(tvec)):
-                data.append([tvec[x],'Sem intervenção',soln[x,4]])
-                data1.append([tvec[x],'Com intervenção',solnSlow[x,4]])
-                data2.append([tvec[x],'Ventilação em protocolos convencionais',ConvVentCap])
-                data3.append([tvec[x],'Ventilação em protocolo de convenção',ContVentCap])
-                data4.append([tvec[x],'Ventilação em protocolo de crise',CrisisVentCap])
+            for x in range(0, tmax):
+                data1.append([x,'Ventilação em protocolos convencionais',ConvVentCap])
+                data2.append([x,'Ventilação em protocolo de convenção',ContVentCap])
+                data3.append([x,'Ventilação em protocolo de crise',CrisisVentCap])
                 
-            dados = pd.DataFrame(data, columns = ['Tempo (dias)','Legenda','Número por 1000 pessoas'])
-            dados = dados.append(pd.DataFrame(data1, columns = ['Tempo (dias)','Legenda','Número por 1000 pessoas']))
-            dados = dados.append(pd.DataFrame(data2, columns = ['Tempo (dias)','Legenda','Número por 1000 pessoas']))
-            dados = dados.append(pd.DataFrame(data3, columns = ['Tempo (dias)','Legenda','Número por 1000 pessoas']))
-            dados = dados.append(pd.DataFrame(data4, columns = ['Tempo (dias)','Legenda','Número por 1000 pessoas']))
-            fig = px.line(dados, x="Tempo (dias)", y="Número por 1000 pessoas", color = "Legenda", title = variable)
+            df = df.append(pd.DataFrame(data1, columns = ['Tempo (dias)','Simulação','Número por 1000 pessoas']))
+            df = df.append(pd.DataFrame(data2, columns = ['Tempo (dias)','Simulação','Número por 1000 pessoas']))
+            df = df.append(pd.DataFrame(data3, columns = ['Tempo (dias)','Simulação','Número por 1000 pessoas']))
+            fig = px.line(df, x="Tempo (dias)", y="Número por 1000 pessoas", color = 'Simulação', title = variable)
             my_slot1.plotly_chart(fig)
         
         
