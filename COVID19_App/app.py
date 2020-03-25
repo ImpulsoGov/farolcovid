@@ -8,7 +8,7 @@ from streamlit import caching
 # pic = "https://images.squarespace-cdn.com/content/5ba6af29a0cd27664cbd406b/1559413487296-DE0H6R3P8Y1Q3XZ97JWK/01.jpg?format=100w&content-type=image%2Fjpeg"
 # st.image(pic, use_column_width=False, width=100, caption=None)
 
-st.write('Este app é uma adaptação da Cappra Institute for Data Science baseada no modelo criado por [Alison Hill](https://alhill.shinyapps.io/COVID19seir/)')
+st.write('Este app é uma adaptação da Cappra Institute for Data Science baseada no modelo criado pela doutura [Alison Hill](https://alhill.shinyapps.io/COVID19seir/)')
 
 
 IncubPeriod = 0
@@ -62,16 +62,22 @@ def menu(IncubPeriod, DurMildInf, FracSevere, FracCritical, ProbDeath, DurHosp, 
         ProbDeath1 = int(ProbDeath*100)
         
         #Período de incubação em dias
-        IncubPeriod = st.sidebar.slider("Período de incubação em dias", min_value=1, max_value=20, value=IncubPeriod, step=1)  
+        IncubPeriod = st.sidebar.slider("Período de incubação (em dias)", min_value=1, max_value=20, value=IncubPeriod, step=1)  
         
         #Duração de infecções leves em dias
-        DurMildInf = st.sidebar.slider("Duração de infecções leves em dias", min_value=1, max_value=20, value=DurMildInf, step=1) 
+        DurMildInf = st.sidebar.slider("Duração de infecções leves (em dias)", min_value=1, max_value=20, value=DurMildInf, step=1) 
         
         #Fração de infecções graves
         FracSevere = st.sidebar.slider("Fração de infecções graves", min_value=0, max_value=100, value=FracSevere1, step=1)/100 
         
+        #Duração da internação em dias
+        DurHosp = st.sidebar.slider("Duração da infecção grave (permanência em leito hospitalar em dias)", min_value=1, max_value=90, value=DurHosp, step=1) 
+        
         #Fração de infecções críticas
         FracCritical = st.sidebar.slider("Fração de infecções críticas", min_value=0, max_value=100, value=FracCritical1, step=1)/100
+        
+        #Duração da infecção crítica / permanência na UTI em dias
+        TimeICUDeath = st.sidebar.slider("Duração da infecção crítica (permanência na UTI em dias", min_value=1, max_value=20, value=TimeICUDeath, step=1) 
         
         #Fração de infecções leves
         FracMild = 1 - FracSevere - FracCritical
@@ -82,24 +88,17 @@ def menu(IncubPeriod, DurMildInf, FracSevere, FracCritical, ProbDeath, DurHosp, 
         
         CFR = ProbDeath*FracCritical
         st.sidebar.text("Taxa de mortalidade geral = "+str(round(CFR*100,1))+"%")
-
         
-        #Duração da internação em dias
-        DurHosp = st.sidebar.slider("Duração da internação em dias", min_value=1, max_value=90, value=DurHosp, step=1) 
-        
-        #Duração da infecção crítica / permanência na UTI em dias
-        TimeICUDeath = st.sidebar.slider("Duração da infecção crítica / permanência na UTI em dias", min_value=1, max_value=20, value=TimeICUDeath, step=1) 
-        
-        st.sidebar.subheader('Definir parâmetros de transmissão ...')
+        st.sidebar.subheader('Definir taxas de transmissão ...')
         
         #Taxa de transmissão (infecções leves)
-        b11 = st.sidebar.slider("Taxa de transmissão (infecções leves)", min_value=0.00, max_value=3.00, value=0.33, step=0.01) 
+        b11 = st.sidebar.slider("Taxa de transmissão de infecções leves por dia", min_value=0.00, max_value=3.00, value=0.5, step=0.01) 
         
         #Taxa de transmissão (infecções graves, relativa a infecção leve)
-        b21 = st.sidebar.slider("Taxa de transmissão (infecções graves, relativa a infecção leve)", min_value=0.00, max_value=2.00, value=0.01, step=0.01) 
+        b21 = st.sidebar.slider("Taxa de transmissão de infecções graves por dia", min_value=0.00, max_value=3.00, value=0.1, step=0.01) 
         
         #Taxa de transmissão (infecções críticas, relativa a infecção leve)
-        b31 = st.sidebar.slider("Taxa de transmissão (infecções críticas, relativa a infecção leve)", min_value=0.00, max_value=2.00, value=0.01, step=0.01) 
+        b31 = st.sidebar.slider("Taxa de transmissão de infecções críticas por dia", min_value=0.00, max_value=3.00, value=0.1, step=0.01) 
         
         st.sidebar.subheader('Parâmetros da simulação ...')
         
@@ -113,8 +112,8 @@ def menu(IncubPeriod, DurMildInf, FracSevere, FracCritical, ProbDeath, DurHosp, 
         tmax = st.sidebar.slider("Tempo máximo da simulação em dias", min_value=0, max_value=1000, value=365, step=1)
         
         b1 = b11/N
-        b2 = b21*b1
-        b3 = b31*b1
+        b2 = b21/N
+        b3 = b31/N
         
         return IncubPeriod, DurMildInf, FracMild, FracSevere, FracCritical, CFR, DurHosp, TimeICUDeath, b1, b2, b3, N, i, tmax
             
@@ -322,7 +321,7 @@ No início da epidemia, antes do esgotamento dos suscetíveis, a epidemia cresce
 
 ### Parâmetros de taxa do modelo dinâmico
 Esses parâmetros podem ser alterados usando os controles deslizantes das outras guias. Os valores nesta tabela representam os valores atuais escolhidos pelos controles deslizantes. Observe que as taxas de transmissão escolhidas pelos controles deslizantes são sempre dimensionadas por $N$, de modo que $β * N$ é constante conforme $N$ alterar.""")
-        parametros = pd.DataFrame({"variável":['b1*N','b2*N','b3*N','a','g1','g2','g3','p1','p2','u','N'],"valor (/dia)":[0.330,0.000,0.000,0.200,0.133,0.188,0.060,0.033,0.062,0.040,1000.000]})
+        parametros = pd.DataFrame({"variável":['b1*N','b2*N','b3*N','a','g1','g2','g3','p1','p2','u','N'],"valor (/dia)":[0.5,0.1,0.1,0.200,0.133,0.188,0.060,0.033,0.062,0.040,1000.000]})
         st.table(parametros)
     elif page == "Progressão do COVID19":        
         if IncubPeriod == 0:
@@ -384,26 +383,25 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
         for x in range(0, len(tvec)):
             for y in range(0, len(soln[x])):
                 data.append([tvec[x],names[y],soln[x][y]])
-
-        df = pd.DataFrame(data,columns=['Tempo (dias)','legenda','Número por 1000 Pessoas'])
+        y_index = 'Número por ' + str(N) +' pessoas'
+        df = pd.DataFrame(data,columns=['Tempo (dias)','legenda',y_index])
         yscale = "Linear"
         def covid19_1(yscale):
             if yscale == 'Log':
-                fig = px.line(df, x="Tempo (dias)", y="Número por 1000 Pessoas", color='legenda', log_y=True)
+                fig = px.line(df, x="Tempo (dias)", y=y_index, color='legenda', log_y=True)
             else:
-                fig = px.line(df, x="Tempo (dias)", y="Número por 1000 Pessoas", color='legenda')
+                fig = px.line(df, x="Tempo (dias)", y=y_index, color='legenda')
             return my_slot1.plotly_chart(fig)
         
         yscale = my_slot3.radio("Escala do eixo Y", ["Linear", "Log"])
         covid19_1(yscale)
         
         (r,DoublingTime) = growth_rate(g[0],g[1],g[2],p[0],p[1],p[2],b[0],b[1],b[2],u,a,N)
-        
+
         my_slot2.text("R\N{SUBSCRIPT ZERO} = {0:4.1f} \nr = {1:4.1f} por dia \nt\N{SUBSCRIPT TWO} = {2:4.1f}".format(R0,r,DoublingTime))
         
-        st.write("A taxa de crescimento epidêmico é {0:4.2f} por dia e o tempo de duplicação é de {1:4.1f} dias ".format(r,DoublingTime))
-        st.write("A taxa de mortalidade dos caso é {0:4.2f}".format(CFR))
-        
+        st.write("A taxa de crescimento epidêmico é **{0:4.2f} por dia** e o tempo de duplicação é de **{1:4.1f} dias**".format(r,DoublingTime))
+                        
         st.write('''**Instruções para o usuário:** O gráfico mostra o número esperado de indivíduos infectados, recuperados, suscetíveis ou mortos ao longo do tempo. Os indivíduos infectados passam primeiro por uma fase exposta / incubação, onde são assintomáticos e não infecciosos, e depois passam para um estágio sintomático e de infecções classificados pelo estado clínico da infecção (leve, grave ou crítica). Uma descrição mais detalhada do modelo é fornecida na guia Descrição do Modelo. O tamanho da população, a condição inicial e os valores dos parâmetros usados para simular a propagação da infecção podem ser especificados através dos controles deslizantes localizados no painel esquerdo. Os valores padrão do controle deslizante são iguais às estimativas extraídas da literatura (consulte a guia Fontes). Para redefinir os valores padrão, clique no botão Redefinir tudo, localizado na parte inferior do painel. O gráfico é interativo: passe o mouse sobre ele para obter valores, clique duas vezes em uma curva na legenda para isolá-la ou clique duas vezes para removê-la. Arrastar sobre um intervalo permite aplicar zoom.
         
 ### Variáveis
@@ -419,7 +417,8 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
         
     elif page == "Com Intervenção":
         st.title('Previsão de redução do COVID-19 após adoção de medidas de intervenção como distanciamento social')
-        st.subheader('Simule a mudança do avanço da epidemia de COVID-19 em uma única população com medidas de distânciamento social (ficando em casa).')
+        st.subheader('Simule a mudança do avanço da epidemia de COVID-19 em uma única população com medidas de redução de transmissão (distanciamento social, quarentena, etc).')
+        st.write('Os parâmetros de redução de transmissão podem ser modificados no painel lateral esquerdo.')
         if IncubPeriod == 0:
             IncubPeriod = 5
             DurMildInf = 6
@@ -456,9 +455,21 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
             reduc3 = reduc3
             
         names = ["Sucetíveis (S)","Expostos (E)","Inf. Leve (I1)","Inf. Grave (I2)","Inf. Crítico (I3)","Recuperado (R)","Morto (D)"]
-        variable = st.selectbox("Selecione a variável que deseja ver", names)
-        yscale = "Linear"
-        yscale = st.radio("Escala do eixo Y", ["Linear", "Log"])
+        st.subheader('Selecione a variável que deseja visualizar:')
+        variable = st.selectbox("", names)
+        
+        my_slot1 = st.empty()
+        my_slot2 = st.empty()        
+        my_slot3 = st.empty()        
+        my_slot4 = st.empty()        
+        my_slot5 = st.empty()        
+        my_slot6 = st.empty()        
+        my_slot7 = st.empty()        
+        my_slot8 = st.empty()        
+        my_slot9 = st.empty()        
+        my_slot10 = st.empty()
+        my_slot11 = st.empty()
+        my_slot12 = st.empty()
 
         TimeStart, TimeEnd, reduc1, reduc2, reduc3 = intervencao(TimeStart,TimeEnd,reduc1,reduc2,reduc3,tmax)
         
@@ -484,40 +495,41 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
         
         #Simulação com intervenção
         df_sim_com_int = simulacao(TimeStart, TimeEnd, tmax, i, N, a, b, bSlow, g, p, u)
-    
+        y_index = 'Número por ' + str(N) +' pessoas'
         df_sim_com_int = df_sim_com_int.drop_duplicates(subset = ['Tempo (dias)'], keep = 'first')
-        df_sem = pd.melt(df_sim_sem_int[['Tempo (dias)',variable]], id_vars = ['Tempo (dias)'], value_name = 'Número por 1000 pessoas', var_name = 'Legenda')
+        df_sem = pd.melt(df_sim_sem_int[['Tempo (dias)',variable]], id_vars = ['Tempo (dias)'], value_name = y_index, var_name = 'Legenda')
         df_sem['Legenda'] = df_sem['Legenda'] + ' (Sem intervenção)' 
-        df_com = pd.melt(df_sim_com_int[['Tempo (dias)',variable]], id_vars = ['Tempo (dias)'], value_name = 'Número por 1000 pessoas', var_name = 'Legenda')
+        df_com = pd.melt(df_sim_com_int[['Tempo (dias)',variable]], id_vars = ['Tempo (dias)'], value_name = y_index, var_name = 'Legenda')
         df_com['Legenda'] = df_com['Legenda'] + ' (Com intervenção)'
 
         df = df_sem.append(df_com)
         
+        yscale = "Linear"
+        yscale = st.radio("Escala do eixo Y", ["Linear", "Log"])
+        
         if yscale == 'Log':
-            fig = px.line(df, x="Tempo (dias)", y="Número por 1000 pessoas", log_y=True, color = 'Legenda')
+            fig = px.line(df, x="Tempo (dias)", y=y_index, log_y=True, color = 'Legenda')
                 
         else:
-            fig = px.line(df, x="Tempo (dias)", y="Número por 1000 pessoas", color = 'Legenda')
-        st.plotly_chart(fig)
+            fig = px.line(df, x="Tempo (dias)", y=y_index, color = 'Legenda')
+        my_slot1.plotly_chart(fig)
         
         (r,DoublingTime) = growth_rate(g[0],g[1],g[2],p[0],p[1],p[2],b[0],b[1],b[2],u,a,N)
         (rSlow,DoublingTimeSlow) = growth_rate(g[0],g[1],g[2],p[0],p[1],p[2],bSlow[0],bSlow[1],bSlow[2],u,a,N)
         
-        Stat = pd.DataFrame({'Linha base':[R0,r,DoublingTime],'Com distanciamento social':[R0Slow,rSlow,DoublingTimeSlow]},columns=['Linha base', 'Com distanciamento social'], index=['R\N{SUBSCRIPT ZERO}','r (por dia)','t\N{SUBSCRIPT TWO}'])
+        Stat = pd.DataFrame({'Sem intervenção':[R0,r,DoublingTime],'Com intervenção':[R0Slow,rSlow,DoublingTimeSlow]}, index=['R\N{SUBSCRIPT ZERO}','r (por dia)','t\N{SUBSCRIPT TWO}'])
         st.table(Stat)
-        st.write("A taxa de crescimento epidêmico sem intervenção é **{0:4.2f}** por dia e o tempo de duplicação é de **{1:4.1f}** dias ".format(r,DoublingTime))
-        st.write("A taxa de crescimento epidêmico com intervenção é **{0:4.2f}** por dia e o tempo de duplicação é de **{1:4.1f}** dias ".format(rSlow,DoublingTimeSlow))
-
-        st.write('''Tipo de intervenção: redução da transmissão, por exemplo, através de distanciamento social ou quarentena na comunidade (para aqueles com infecção leve) ou melhor isolamento e desgaste de proteção pessoal em hospitais (para aqueles com infecção mais grave). A transmissão de cada um dos estágios clínicos da infecção só pode ser reduzida se o usuário tiver escolhido parâmetros para que esses estágios contribuam para a transmissão.''')
+        st.write("**- Sem intervenção**: A taxa de crescimento epidêmico é **{0:4.2f} por dia**; o tempo de duplicação é **{1:4.1f} dias**".format(r,DoublingTime))
+        st.write("**- Com intervenção**: A taxa de crescimento epidêmico é **{0:4.2f} por dia**; o tempo de duplicação é **{1:4.1f} dias**".format(rSlow,DoublingTimeSlow))
         
-        st.write('''**Instruções para o usuário:** O gráfico mostra o número esperado de indivíduos infectados, recuperados, suscetíveis ou mortos ao longo do tempo, com e sem intervenção. Os indivíduos infectados passam primeiro por uma fase exposta / incubação, onde são assintomáticos e não infecciosos, e depois passam para um estágio sintomático e de infecções classificados pelo estado clínico da infecção (leve, grave ou crítica). Uma descrição mais detalhada do modelo é fornecida na guia Descrição do Modelo. O tamanho da população, a condição inicial e os valores dos parâmetros usados ​​para simular a propagação da infecção podem ser especificados através dos controles deslizantes localizados no painel esquerdo. Os valores padrão do controle deslizante são iguais às estimativas extraídas da literatura (consulte a guia Fontes). A força e o tempo da intervenção são controlados pelos controles deslizantes abaixo do gráfico. Para redefinir os valores padrão, clique no botão Redefinir tudo, localizado na parte inferior do painel. O gráfico é interativo: passe o mouse sobre ele para obter valores, clique duas vezes em uma curva na legenda para isolá-la ou clique duas vezes para removê-la. Arrastar sobre um intervalo permite aplicar zoom.''')
-
-
+        st.write("""**Instruções para o usuário:** O gráfico mostra o número esperado de indivíduos infectados, recuperados, suscetíveis ou mortos ao longo do tempo, com e sem intervenção. Os indivíduos infectados passam primeiro por uma fase exposta / incubação, onde são assintomáticos e não infecciosos, e depois passam para um estágio sintomático e de infecções classificados pelo estado clínico da infecção (leve, grave ou crítica). Uma descrição mais detalhada do modelo é fornecida na guia Descrição do Modelo.""")
+        st.write("""O tamanho da população, a condição inicial e os valores dos parâmetros usados para simular a propagação da infecção podem ser especificados através dos controles deslizantes localizados no painel esquerdo. Os valores padrão do controle deslizante são iguais às estimativas extraídas da literatura (consulte a guia Fontes). A força e o tempo da intervenção são controlados pelos controles deslizantes abaixo do gráfico. O gráfico é interativo: passe o mouse sobre ele para obter valores, clique duas vezes em uma curva na legenda para isolá-la ou clique duas vezes para removê-la. Arrastar sobre um intervalo permite aplicar zoom.""")
         
     elif page == "Capacidade Hospitalar":
         st.title('Casos COVID-19 vs capacidade de assistência médica')
-        st.subheader('''Simule casos previstos do COVID-19 versus a capacidade do sistema de saúde de cuidar deles. Os cuidados necessários dependem da gravidade da doença - indivíduos com infecção "grave" requerem hospitalização e indivíduos com infecção "crítica" geralmente requerem cuidados no nível da UTI e ventilação mecânica.''')
-         
+        st.subheader('''Simule casos previstos do COVID-19 versus a capacidade do sistema de saúde de cuidar deles. Os cuidados necessários dependem da gravidade da doença: indivíduos com infecção "grave" requerem hospitalização e indivíduos com infecção "crítica" requerem cuidados na UTI e ventilação mecânica.''')
+        st.write('Os parâmetros de redução de transmissão podem ser modificados no painel lateral esquerdo.')
+
         if IncubPeriod == 0:
             IncubPeriod = 5
             DurMildInf = 6
@@ -554,11 +566,12 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
             reduc2 = reduc2
             reduc3 = reduc3
             
-        varnames = ['Todos casos sintomáticos (l1,l2,l3) vs Leitos de hospital e UTI',
-                 'Casos graves (l2) e críticos (l3) vs Leitos de hospital e UTI',
+        varnames = ['Todos casos sintomáticos (l1,l2,l3) vs Leitos de hospital + UTI',
+                 'Casos graves (l2) e críticos (l3) vs Leitos de hospital + UTI',
                  'Infecções críticas (l3) vs Leitos na UTI',
                 'Infecções críticas (l3) vs Capacidade de ventilação']
-        variable = st.selectbox("Selecione a variável que deseja ver", varnames)
+        st.subheader('Selecione a variável que deseja visualizar:')
+        variable = st.selectbox("", varnames)
         
         my_slot1 = st.empty()
         my_slot2 = st.empty()
@@ -578,11 +591,11 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
         IncubPeriod, DurMildInf, FracMild, FracSevere, FracCritical, CFR, DurHosp, TimeICUDeath, b1, b2, b3, N, i, tmax = menu(IncubPeriod, DurMildInf, FracSevere, FracCritical, ProbDeath, DurHosp, TimeICUDeath)    
         
         st.subheader('Capacidade do sistema de saúde')
-        AvailHospBeds=st.number_input(label="Leitos hospitalares disponíveis (por mil pessoas)", value=1.95) #Available hospital beds per 1000 ppl in BR based on total beds and occupancy
-        AvailICUBeds=st.number_input(label="Leitos na UTI disponíveis (por mil pessoas)", value=0.137) #Available ICU beds per 1000 ppl in BR, based on total beds and occupancy. Only counts adult not neonatal/pediatric beds
-        ConvVentCap=st.number_input(label="Pacientes que podem ser ventilados em protocolos convencionais (por mil pessoas)", value=0.062) #Estimated excess # of patients who could be ventilated in US (per 1000 ppl) using conventional protocols
-        ContVentCap=st.number_input(label="Pacientes que podem ser ventilados em protocolo de contingência (por mil pessoas)", value=0.15) #Estimated excess # of patients who could be ventilated in US (per 1000 ppl) using contingency protocols
-        CrisisVentCap=st.number_input(label="Pacientes que podem ser ventilados em protocolo de crise (por mil pessoas)", value=0.24) #Estimated excess # of patients who could be ventilated in US (per 1000 ppl) using crisis protocols
+        AvailHospBeds=st.number_input(label="Leitos hospitalares disponíveis (por mil pessoas)", value=1.95)*N/1000 #Available hospital beds per 1000 ppl in BR based on total beds and occupancy
+        AvailICUBeds=st.number_input(label="Leitos na UTI disponíveis (por mil pessoas)", value=0.137)*N/1000 #Available ICU beds per 1000 ppl in BR, based on total beds and occupancy. Only counts adult not neonatal/pediatric beds
+        ConvVentCap=st.number_input(label="Pacientes que podem ser ventilados em protocolos convencionais (por mil pessoas)", value=0.062)*N/1000 #Estimated excess # of patients who could be ventilated in US (per 1000 ppl) using conventional protocols
+        ContVentCap=st.number_input(label="Pacientes que podem ser ventilados em protocolo de contingência (por mil pessoas)", value=0.15)*N/1000 #Estimated excess # of patients who could be ventilated in US (per 1000 ppl) using contingency protocols
+        CrisisVentCap=st.number_input(label="Pacientes que podem ser ventilados em protocolo de crise (por mil pessoas)", value=0.24)*N/1000 #Estimated excess # of patients who could be ventilated in US (per 1000 ppl) using crisis protocols
        
         a, u, g, p, ic = params(g, p, IncubPeriod, FracMild, FracCritical, FracSevere, TimeICUDeath, CFR, DurMildInf, DurHosp, i)
 
@@ -606,50 +619,45 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
         
         #Simulação com intervenção
         df_sim_com_int = simulacao(TimeStart, TimeEnd, tmax, i, N, a, b, bSlow, g, p, u)
-        
-        if variable == 'Todos casos sintomáticos (l1,l2,l3) vs Leitos de hospital e UTI':
-            df_sim_com_int['Número por 1000 pessoas'] = df_sim_com_int["Inf. Leve (I1)"] + df_sim_com_int["Inf. Grave (I2)"] + df_sim_com_int["Inf. Crítico (I3)"]
-            df_sim_sem_int['Número por 1000 pessoas'] = df_sim_sem_int["Inf. Leve (I1)"] + df_sim_sem_int["Inf. Grave (I2)"] + df_sim_sem_int["Inf. Crítico (I3)"]
-            df = df_sim_sem_int[['Tempo (dias)','Número por 1000 pessoas', 'Simulação']].append(df_sim_com_int[['Tempo (dias)','Número por 1000 pessoas', 'Simulação']])
+        y_index = 'Número por ' + str(N) +' pessoas'
+
+        if variable == 'Todos casos sintomáticos (l1,l2,l3) vs Leitos de hospital + UTI':
+            df_sim_com_int[y_index] = df_sim_com_int["Inf. Leve (I1)"] + df_sim_com_int["Inf. Grave (I2)"] + df_sim_com_int["Inf. Crítico (I3)"]
+            df_sim_sem_int[y_index] = df_sim_sem_int["Inf. Leve (I1)"] + df_sim_sem_int["Inf. Grave (I2)"] + df_sim_sem_int["Inf. Crítico (I3)"]
+            df = df_sim_sem_int[['Tempo (dias)',y_index, 'Simulação']].append(df_sim_com_int[['Tempo (dias)',y_index, 'Simulação']])
             
             data1 = []
-            data2 = []
             for x in range(0, tmax):
-                data1.append([x,'Leitos hospitalares',AvailHospBeds])
-                data2.append([x,'Leitos da UTI',AvailICUBeds])
+                data1.append([x,'Leitos hospitalares + UTI',AvailHospBeds + AvailICUBeds])
                 
-            df = df.append(pd.DataFrame(data1, columns = ['Tempo (dias)','Simulação','Número por 1000 pessoas']))
-            df = df.append(pd.DataFrame(data2, columns = ['Tempo (dias)','Simulação','Número por 1000 pessoas']))
+            df = df.append(pd.DataFrame(data1, columns = ['Tempo (dias)','Simulação',y_index]))
             
-        elif variable == 'Casos graves (l2) e críticos (l3) vs Leitos de hospital e UTI':
-            df_sim_com_int['Número por 1000 pessoas'] = df_sim_com_int["Inf. Grave (I2)"] + df_sim_com_int["Inf. Crítico (I3)"]
-            df_sim_sem_int['Número por 1000 pessoas'] = df_sim_sem_int["Inf. Grave (I2)"] + df_sim_sem_int["Inf. Crítico (I3)"]
-            df = df_sim_sem_int[['Tempo (dias)','Número por 1000 pessoas', 'Simulação']].append(df_sim_com_int[['Tempo (dias)','Número por 1000 pessoas', 'Simulação']])
+        elif variable == 'Casos graves (l2) e críticos (l3) vs Leitos de hospital + UTI':
+            df_sim_com_int[y_index] = df_sim_com_int["Inf. Grave (I2)"] + df_sim_com_int["Inf. Crítico (I3)"]
+            df_sim_sem_int[y_index] = df_sim_sem_int["Inf. Grave (I2)"] + df_sim_sem_int["Inf. Crítico (I3)"]
+            df = df_sim_sem_int[['Tempo (dias)',y_index, 'Simulação']].append(df_sim_com_int[['Tempo (dias)',y_index, 'Simulação']])
             
             data1 = []
-            data2 = []
             for x in range(0, tmax):
-                data1.append([x,'Leitos hospitalares',AvailHospBeds])
-                data2.append([x,'Leitos da UTI',AvailICUBeds])
+                data1.append([x,'Leitos hospitalares + UTI',AvailHospBeds + AvailICUBeds])
                 
-            df = df.append(pd.DataFrame(data1, columns = ['Tempo (dias)','Simulação','Número por 1000 pessoas']))
-            df = df.append(pd.DataFrame(data2, columns = ['Tempo (dias)','Simulação','Número por 1000 pessoas']))
+            df = df.append(pd.DataFrame(data1, columns = ['Tempo (dias)','Simulação',y_index]))
 
         elif variable == 'Infecções críticas (l3) vs Leitos na UTI':
-            df_sim_com_int['Número por 1000 pessoas'] = df_sim_com_int["Inf. Crítico (I3)"]
-            df_sim_sem_int['Número por 1000 pessoas'] = df_sim_sem_int["Inf. Crítico (I3)"]
-            df = df_sim_sem_int[['Tempo (dias)','Número por 1000 pessoas', 'Simulação']].append(df_sim_com_int[['Tempo (dias)','Número por 1000 pessoas', 'Simulação']])
+            df_sim_com_int[y_index] = df_sim_com_int["Inf. Crítico (I3)"]
+            df_sim_sem_int[y_index] = df_sim_sem_int["Inf. Crítico (I3)"]
+            df = df_sim_sem_int[['Tempo (dias)',y_index, 'Simulação']].append(df_sim_com_int[['Tempo (dias)',y_index, 'Simulação']])
             
             data1 = []
             for x in range(0, tmax):
                 data1.append([x,'Leitos da UTI',AvailICUBeds])
                 
-            df = df.append(pd.DataFrame(data1, columns = ['Tempo (dias)','Simulação','Número por 1000 pessoas']))
+            df = df.append(pd.DataFrame(data1, columns = ['Tempo (dias)','Simulação',y_index]))
         
         elif variable == 'Infecções críticas (l3) vs Capacidade de ventilação':
-            df_sim_com_int['Número por 1000 pessoas'] = df_sim_com_int["Inf. Crítico (I3)"]
-            df_sim_sem_int['Número por 1000 pessoas'] = df_sim_sem_int["Inf. Crítico (I3)"]
-            df = df_sim_sem_int[['Tempo (dias)','Número por 1000 pessoas', 'Simulação']].append(df_sim_com_int[['Tempo (dias)','Número por 1000 pessoas', 'Simulação']])
+            df_sim_com_int[y_index] = df_sim_com_int["Inf. Crítico (I3)"]
+            df_sim_sem_int[y_index] = df_sim_sem_int["Inf. Crítico (I3)"]
+            df = df_sim_sem_int[['Tempo (dias)',y_index, 'Simulação']].append(df_sim_com_int[['Tempo (dias)',y_index, 'Simulação']])
             
             data1 = []
             data2 = []
@@ -659,16 +667,17 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
                 data2.append([x,'Ventilação em protocolo de convenção',ContVentCap])
                 data3.append([x,'Ventilação em protocolo de crise',CrisisVentCap])
                 
-            df = df.append(pd.DataFrame(data1, columns = ['Tempo (dias)','Simulação','Número por 1000 pessoas']))
-            df = df.append(pd.DataFrame(data2, columns = ['Tempo (dias)','Simulação','Número por 1000 pessoas']))
-            df = df.append(pd.DataFrame(data3, columns = ['Tempo (dias)','Simulação','Número por 1000 pessoas']))
+            df = df.append(pd.DataFrame(data1, columns = ['Tempo (dias)','Simulação',y_index]))
+            df = df.append(pd.DataFrame(data2, columns = ['Tempo (dias)','Simulação',y_index]))
+            df = df.append(pd.DataFrame(data3, columns = ['Tempo (dias)','Simulação',y_index]))
             
-        fig = px.line(df, x="Tempo (dias)", y="Número por 1000 pessoas", color = 'Simulação')
+        fig = px.line(df, x="Tempo (dias)", y=y_index, color = 'Simulação')
         my_slot1.plotly_chart(fig)
 
         
         
-        st.write("""**Instruções para o usuário:** O gráfico mostra o número esperado de indivíduos infectados, recuperados, suscetíveis ou mortos ao longo do tempo, com e sem intervenção. Os indivíduos infectados passam primeiro por uma fase exposta / incubação, onde são assintomáticos e não infecciosos, e depois passam para um estágio sintomático e de infecções classificados pelo estado clínico da infecção (leve, grave ou crítica). Uma descrição mais detalhada do modelo é fornecida na guia Descrição do Modelo. O tamanho da população, a condição inicial e os valores dos parâmetros usados ​​para simular a propagação da infecção podem ser especificados através dos controles deslizantes localizados no painel esquerdo. Os valores padrão do controle deslizante são iguais às estimativas extraídas da literatura (consulte a guia Fontes). A força e o tempo da intervenção são controlados pelos controles deslizantes abaixo do gráfico. Para redefinir os valores padrão, clique no botão Redefinir tudo, localizado na parte inferior do painel. O gráfico é interativo: passe o mouse sobre ele para obter valores, clique duas vezes em uma curva na legenda para isolá-la ou clique duas vezes para removê-la. Arrastar sobre um intervalo permite aplicar zoom.""")
+        st.write("""**Instruções para o usuário:** O gráfico mostra o número esperado de indivíduos infectados, recuperados, suscetíveis ou mortos ao longo do tempo, com e sem intervenção. Os indivíduos infectados passam primeiro por uma fase exposta / incubação, onde são assintomáticos e não infecciosos, e depois passam para um estágio sintomático e de infecções classificados pelo estado clínico da infecção (leve, grave ou crítica). Uma descrição mais detalhada do modelo é fornecida na guia Descrição do Modelo.""")
+        st.write("""O tamanho da população, a condição inicial e os valores dos parâmetros usados para simular a propagação da infecção podem ser especificados através dos controles deslizantes localizados no painel esquerdo. Os valores padrão do controle deslizante são iguais às estimativas extraídas da literatura (consulte a guia Fontes). A força e o tempo da intervenção são controlados pelos controles deslizantes abaixo do gráfico. O gráfico é interativo: passe o mouse sobre ele para obter valores, clique duas vezes em uma curva na legenda para isolá-la ou clique duas vezes para removê-la. Arrastar sobre um intervalo permite aplicar zoom.""")
         
     elif page=="Fontes":
         st.write("""## Descrição e fontes para parâmetros de simulação
@@ -946,5 +955,4 @@ Quer saber mais sobre o COVID-19, confira nosso [estudo](http://covid19.capprala
 if __name__ == "__main__":
     main(IncubPeriod,b,g,p)
     
-
 
