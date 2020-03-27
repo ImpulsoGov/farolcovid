@@ -1,87 +1,92 @@
 import streamlit as st
 import numpy as np, pandas as pd
 from scipy.integrate import odeint
-from numpy.polynomial.polynomial import polyroots
+from numpy import linalg as LA
 import plotly.express as px
 from streamlit import caching
 
-# pic = "https://images.squarespace-cdn.com/content/5ba6af29a0cd27664cbd406b/1559413487296-DE0H6R3P8Y1Q3XZ97JWK/01.jpg?format=100w&content-type=image%2Fjpeg"
-# st.image(pic, use_column_width=False, width=100, caption=None)
-
-st.write('Este app é uma adaptação da Cappra Institute for Data Science baseada no modelo criado pela doutura [Alison Hill](https://alhill.shinyapps.io/COVID19seir/)')
-
+st.write('Este app é uma adaptação da Cappra Institute for Data Science baseada no modelo criado pela [Alison Hill](https://alhill.shinyapps.io/COVID19seir/)')
 
 IncubPeriod = 0
-b=np.array([0.33,0,0]) #Taxa de transmissão
-                         #b[1] -> Transmissão de I1
-                         #b[2] -> Transmissão de I2
-                         #b[3] -> Transmissão de I3
-            
-g=np.zeros(3) #Taxa de recuperação dos casos
-              #g[0] -> Recuperação de I1
-              #g[1] -> Recuperação de I2
-              #g[2] -> Recuperação de I3
-            
-p=np.zeros(3) #Taxa de progressão dos casos para outra fase da infecção
-              #p[0] -> Progressão de I1
-              #p[1] -> Progressão de I2
-              #p[2] -> Progressão de I3
 
-def taxa_reprodutiva(N, b, p, g, u):
-    return N*b[0]/(p[1]+g[0]) + (p[0]/(p[0]+g[0]))*(N*b[1]/(p[1]+g[1]) + N*b[2]*p[1]/((p[1]+g[1])*(u + g[2])))
-            
-def params(g, p, IncubPeriod, FracMild, FracCritical, FracSevere, TimeICUDeath, CFR, DurMildInf, DurHosp, i):
+#Taxa reprodutiva padrão
+def taxa_reprodutiva(N, be, b0, b1, b2, b3, p1, p2, g0, g1, g2, g3, a1, u, f):
+    
+    return N*((be/a1)+f*(b0/g0)+(1-f)*((b1/(p1+g1))+(p1/(p1+g1))*(b2/(p2+g2)+ (p2/(p2+g2))*(b3/(u+g3)))))
+
+#Taxa reprodutiva com sazonalidade
+def taxa_reprodutiva_seas(N, be, b0, b1, b2, b3, p1, p2, g0, g1, g2, g3, a1, u, f, SeasAmp, SeasPhase):
+
+    Ro_now = N*((b1/(p1+g1))+(p1/(p1+g1))*(b2/(p2+g2)+ (p2/(p2+g2))*(b3/(u+g3))))*(1 + SeasAmp*np.cos(2*np.pi*(0-SeasPhase)/365))
+    Ro_max = N*((b1/(p1+g1))+(p1/(p1+g1))*(b2/(p2+g2)+ (p2/(p2+g2))*(b3/(u+g3))))*(1 + SeasAmp)
+    Ro_min = N*((b1/(p1+g1))+(p1/(p1+g1))*(b2/(p2+g2)+ (p2/(p2+g2))*(b3/(u+g3))))*(1 - SeasAmp)
+    
+    return Ro_now, Ro_max, Ro_min
+
+#Cálculo dos parâmetros do modelo SEIR            
+def params(IncubPeriod, FracMild, FracCritical, FracSevere, TimeICUDeath, CFR, DurMildInf, DurHosp, i, PresymPeriod, FracAsym, DurAsym, N):
         
-        a=1/IncubPeriod #Taxa de transição dos expostos para infectado
+        if PresymPeriod > 0:
+            a1 = min(10^6,1/PresymPeriod) #Frequênca de surgimento do vírus
+        else:
+            a1 = 10^6
+         
+        if IncubPeriod > PresymPeriod:
+            a0 = min(10^6, 1/(IncubPeriod - PresymPeriod)) #Frequência de incubação até possibilidade de transmissão
+        else:
+            a0 = 10^6
+        f = FracAsym #Fração de assintomáticos
+        
+        g0 = 1/DurAsym #Taxa de recuperação dos assintomáticos
         
         if FracCritical==0:
             u=0
         else:
             u=(1/TimeICUDeath)*(CFR/FracCritical)
             
+        g1 = (1/DurMildInf)*FracMild #Taxa de recuperação I1
+        p1 =(1/DurMildInf) - g1 #Taxa de progreção I1
+
+        g3 =(1/TimeICUDeath)-u #Taxa de recuperação I3
         
-        g[0]=(1/DurMildInf)*FracMild #Taxa de recuperação I1
-        p[0]=(1/DurMildInf)-g[0] #Taxa de progreção I1
+        p2 =(1/DurHosp)*(FracCritical/(FracCritical+FracSevere)) #Taxa de progressão I2
+        g2 = (1/DurHosp) - p2 #Taxa de recuperação de I2
 
-        g[2]=(1/TimeICUDeath)-u #Taxa de recuperação I3
+        ic=np.zeros(9) #Inicia vetor da população (cada índice para cada tipo de infectado, exposto, etc)
+        ic[0]= N-i #População
+        ic[1] = i #População exposta
         
-        p[1]=(1/DurHosp)*(FracCritical/(FracCritical+FracSevere)) #Taxa de progressão I2
-        g[1]=(1/DurHosp)-p[1] #Taxa de recuperação de I2
+        return a0, a1, u, g0, g1, g2, g3, p1, p2, f, ic
+#Menu dos parâmetros gerais
+def menu(IncubPeriod, DurMildInf, FracSevere, FracCritical, ProbDeath, DurHosp, TimeICUDeath, AllowSeason, SeasAmp, SeasPhase, AllowAsym, FracAsym, DurAsym, AllowPresym, PresymPeriod): #Cria o menu lateral esquerdo
 
-        ic=np.zeros(6) #Inicia vetor da população (cada índice para cada tipo de infectado, exposto, etc)
-        ic[0]=i #População sucetível = tamanho da população
-        
-        return a, u, g, p, ic
-
-def menu(IncubPeriod, DurMildInf, FracSevere, FracCritical, ProbDeath, DurHosp, TimeICUDeath): #Cria o menu lateral esquerdo
-
-        st.sidebar.subheader('Definir parâmetros clínicos ...')
+        st.sidebar.subheader('Parâmetros clínicos:')
         
         FracSevere1 = int(FracSevere*100)
         FracCritical1 = int(FracCritical*100)
         ProbDeath1 = int(ProbDeath*100)
         
         #Período de incubação em dias
-        IncubPeriod = st.sidebar.slider("Período de incubação (em dias)", min_value=1, max_value=20, value=IncubPeriod, step=1)  
+        IncubPeriod = st.sidebar.slider("Período de incubação (em dias)", min_value=0, max_value=20, value=IncubPeriod, step=1)  
         
         #Duração de infecções leves em dias
         DurMildInf = st.sidebar.slider("Duração de infecções leves (em dias)", min_value=1, max_value=20, value=DurMildInf, step=1) 
         
         #Fração de infecções graves
-        FracSevere = st.sidebar.slider("Fração de infecções graves", min_value=0, max_value=100, value=FracSevere1, step=1)/100 
+        FracSevere = st.sidebar.slider("% de infecções graves", min_value=0, max_value=100, value=FracSevere1, step=1)/100 
         
         #Duração da internação em dias
-        DurHosp = st.sidebar.slider("Duração da infecção grave (permanência em leito hospitalar em dias)", min_value=1, max_value=90, value=DurHosp, step=1) 
+        DurHosp = st.sidebar.slider("Duração da infecção grave (permanência em leito hospitalar em dias)", min_value=1, max_value=30, value=DurHosp, step=1) 
         
         #Fração de infecções críticas
-        FracCritical = st.sidebar.slider("Fração de infecções críticas", min_value=0, max_value=100, value=FracCritical1, step=1)/100
+        FracCritical = st.sidebar.slider("% de infecções críticas", min_value=0, max_value=100, value=FracCritical1, step=1)/100
         
         #Duração da infecção crítica / permanência na UTI em dias
-        TimeICUDeath = st.sidebar.slider("Duração da infecção crítica (permanência na UTI em dias", min_value=1, max_value=20, value=TimeICUDeath, step=1) 
+        TimeICUDeath = st.sidebar.slider("Duração da infecção crítica (permanência na UTI em dias", min_value=1, max_value=30, value=TimeICUDeath, step=1) 
         
         #Fração de infecções leves
         FracMild = 1 - FracSevere - FracCritical
-        st.sidebar.text("Fração de infecções leves = "+str(round(FracMild*100,1))+"%")
+        st.sidebar.text("% de infecções leves = "+str(round(FracMild*100,1))+"%")
         
         #Taxa de mortalidade de casos (fração de infecções resultando em morte)
         ProbDeath = st.sidebar.slider("Taxa de mortalidade em casos críticos", min_value=0, max_value=100, value=ProbDeath1, step=1)/100
@@ -89,19 +94,66 @@ def menu(IncubPeriod, DurMildInf, FracSevere, FracCritical, ProbDeath, DurHosp, 
         CFR = ProbDeath*FracCritical
         st.sidebar.text("Taxa de mortalidade geral = "+str(round(CFR*100,1))+"%")
         
-        st.sidebar.subheader('Definir taxas de transmissão ...')
+        st.sidebar.subheader('Taxas de transmissão:')
         
         #Taxa de transmissão (infecções leves)
-        b11 = st.sidebar.slider("Taxa de transmissão de infecções leves por dia", min_value=0.00, max_value=3.00, value=0.5, step=0.01) 
+        b1 = st.sidebar.slider("Taxa de transmissão de infecções leves por dia", min_value=0.00, max_value=3.00, value=0.5, step=0.01) 
         
         #Taxa de transmissão (infecções graves, relativa a infecção leve)
-        b21 = st.sidebar.slider("Taxa de transmissão de infecções graves por dia", min_value=0.00, max_value=3.00, value=0.1, step=0.01) 
+        b2 = st.sidebar.slider("Taxa de transmissão de infecções graves por dia", min_value=0.00, max_value=3.00, value=0.1, step=0.01) 
         
         #Taxa de transmissão (infecções críticas, relativa a infecção leve)
-        b31 = st.sidebar.slider("Taxa de transmissão de infecções críticas por dia", min_value=0.00, max_value=3.00, value=0.1, step=0.01) 
+        b3 = st.sidebar.slider("Taxa de transmissão de infecções críticas por dia", min_value=0.00, max_value=3.00, value=0.1, step=0.01) 
         
-        st.sidebar.subheader('Parâmetros da simulação ...')
+        st.sidebar.subheader('Parâmetros de infecções assintomáticas:')
+        #Permitir infecções assintomáticas
+        AllowAsym = st.sidebar.radio("Permitir infecções assintomáticas?", ["Não","Sim"])
+        if AllowAsym=="Sim":
+            #Fração de assintomáticos
+            FracAsym = 0.3
+            FracAsym=st.sidebar.slider("Fração de infecções assintomáticas", min_value=0, max_value=100, value=int(FracAsym*100), step=1)/100
+            #Duração dos assintomáticos
+            DurAsym=st.sidebar.slider("Duração de infecções assintomáticas", min_value=1, max_value=20, value=DurAsym, step=1)
+            #Taxa de tranmissão
+            b0 = st.sidebar.slider("Taxa de transmissão de infecções assintomáticas por dia", min_value=0.00, max_value=3.00, value=0.1, step=0.01) 
+        else:
+            FracAsym=0
+            DurAsym=7
+            b0 = 0 
         
+        st.sidebar.subheader('Parâmetros de transmissões pré-sintomáticas:')
+        #Permitir transmissões pré-sintomática
+        AllowPresym = st.sidebar.radio("Permitir transmissões pré-sintomáticas?", ["Não","Sim"])
+
+        if AllowPresym=="Sim":
+            #Periodo de transmissão
+            if IncubPeriod > 2:
+                PresymPeriod=st.sidebar.slider("Tempo antes do início dos sintomas no qual a transmissão é possível", min_value=0, max_value=IncubPeriod, value=PresymPeriod, step=1)
+            elif IncubPeriod == 0:
+                st.sidebar.text("Periodo de incubação é zero, logo todos os expostos transmitem")
+                PresymPeriod = 0
+            else:
+                PresymPeriod=st.sidebar.slider("Tempo antes do início dos sintomas no qual a transmissão é possível", min_value=0, max_value=IncubPeriod, value=IncubPeriod - 1, step=1)
+            #Taxa de transmissão
+            be = st.sidebar.slider("Taxa de transmissão pré-sintomática por dia", min_value=0.0, max_value=3.00, value=0.5, step=0.01)
+        else:
+            PresymPeriod=0
+            be = 0
+            
+        st.sidebar.subheader('Parâmetros de sazonalidade:')
+        #Permitir ou não a sazonalidade
+        AllowSeason = st.sidebar.radio("Permitir Sazonalidade?", ["Não","Sim"])
+        if AllowSeason=="Sim":
+            #Amplitude da sazonlidade
+            SeasAmp = st.sidebar.slider("Amplitude da sazonalidade", min_value=0, max_value=100, value=SeasAmp, step=1)/100 
+            #Fase da sazonalidade
+            SeasPhase = st.sidebar.slider("Amplitude da sazonalidade", min_value=-365, max_value=365, value=SeasPhase, step=1) 
+        else:
+            SeasAmp=0.0 
+            SeasPhase=0 
+        seas0=(1 + SeasAmp*np.cos(2*np.pi*SeasPhase/365)) #value of seasonality coefficient at time zero
+
+        st.sidebar.subheader('Parâmetros da simulação:')
         #Tamanho da polulação
         N = st.sidebar.number_input(label="Tamanho da população", value=1000) 
         
@@ -111,39 +163,47 @@ def menu(IncubPeriod, DurMildInf, FracSevere, FracCritical, ProbDeath, DurHosp, 
         #Tempo máximo da simulação
         tmax = st.sidebar.slider("Tempo máximo da simulação em dias", min_value=0, max_value=1000, value=365, step=1)
         
-        b1 = b11/N
-        b2 = b21/N
-        b3 = b31/N
+        #Taxas de trnamissão percapita
+        b1 = b1/(N*seas0)
+        b2 = b2/(N*seas0)
+        b3 = b3/(N*seas0)
+        b0 = b0/(N*seas0)
+        be = be/(N*seas0)
         
-        return IncubPeriod, DurMildInf, FracMild, FracSevere, FracCritical, CFR, DurHosp, TimeICUDeath, b1, b2, b3, N, i, tmax
-            
-def intervencao(TimeStart,TimeEnd,reduc1,reduc2,reduc3,tmax):
+        return IncubPeriod, DurMildInf, FracMild, FracSevere, FracCritical, CFR, DurHosp, TimeICUDeath, AllowSeason, SeasAmp, SeasPhase, AllowAsym, FracAsym, DurAsym, AllowPresym, PresymPeriod, seas0, b0, b1, b2, b3, be, N, i, tmax
+
+#Menu dos parâmetros de intervenção
+def intervencao(TimeStart,TimeEnd,reduc1,reduc2,reduc3,reducpre,reducasym,tmax):
         st.sidebar.subheader('Parâmetros de intervenção')
         #Início da intervenção
         TimeStart = st.sidebar.slider(label="Tempo de início da intervenção (dias)",min_value = 0, max_value = tmax, value = TimeStart, step = 1) 
         #Fim da intervenção
         TimeEnd = st.sidebar.slider(label="Tempo de fim da intervenção (dias)", min_value = 0, max_value = tmax, value = TimeEnd, step = 1) 
         #Taxa de transmissão (infecções leves)
-        reduc1 = st.sidebar.slider("Redução na transmissão (infecções leves em %)", min_value=0, max_value=100, value=int(reduc1*100), step=1)/100   
+        reduc1 = st.sidebar.slider("Redução na transmissão causada por infecções leves (%)", min_value=0, max_value=100, value=int(reduc1*100), step=1)/100   
         #Taxa de transmissão (infecções graves, relativa a infecção leve)
-        reduc2 = st.sidebar.slider("Redução na transmissão (infecções graves, relativa a infecção leve em %)", min_value=0, max_value=100, value=int(reduc2*100), step=1)/100 
+        reduc2 = st.sidebar.slider("Redução na transmissão causada por infecções graves (%)", min_value=0, max_value=100, value=int(reduc2*100), step=1)/100 
         #Taxa de transmissão (infecções críticas, relativa a infecção leve)
-        reduc3 = st.sidebar.slider("Redução na transmissão (infecções críticas, relativa a infecção leve em %)", min_value=0, max_value=100, value=int(reduc3*100), step=1)/100 
-        
-        return TimeStart,TimeEnd,reduc1,reduc2,reduc3
+        reduc3 = st.sidebar.slider("Redução na transmissão causada por infecções críticas (%)", min_value=0, max_value=100, value=int(reduc3*100), step=1)/100
+        #Redução da transmissão de assintomáticos
+        reducasym = st.sidebar.slider("Redução na transmissão causada por infecções assintomáticas (%), se estiverem permitidas", min_value=0, max_value=100, value=int(reducasym*100), step = 1)/100
+        #Redução da transmissão de pré-sintomáticos
+        reducpre = st.sidebar.slider("Redução na transmissão causada por infecções pré sintomáticas (%), se estiverem permitidas", min_value=0, max_value=100, value=int(reducpre*100), step = 1)/100
+        return TimeStart,TimeEnd,reduc1,reduc2,reduc3,reducpre, reducasym
     
-def simulacao(TimeStart, TimeEnd, tmax, i, N, a, b, bSlow, g, p, u):
-    names = ["Sucetíveis (S)","Expostos (E)","Inf. Leve (I1)","Inf. Grave (I2)","Inf. Crítico (I3)","Recuperado (R)","Morto (D)"]
-    
+#Simulação com intevenção
+def simulacao(TimeStart, TimeEnd, tmax, i, N, a0, a1, b0, be, b1, b2, b3, b0Int, beInt, b1Int, b2Int, b3Int, g0, g1, g2, g3, p1, p2 , u, names, f, AllowAsym, AllowPresym, SeasAmp, SeasPhase):
+
     if TimeEnd>TimeStart: #Se há intervenção
             if TimeStart > 0: #Se a intervenção começa após o dia 0
                 #Simulação sem intervenção (antes do início da intervenção)
-                ic = np.zeros(6) #Inicia vetor da população (cada índice para cada tipo de infectado, exposto, etc)
-                ic[0] = i #População sucetível = tamanho da população
+                ic = np.zeros(9) #Inicia vetor da população (cada índice para cada tipo de infectado, exposto, etc)
+                ic[0] = N-i #População sucetível = tamanho da população
+                ic[1] = i #População exposta
                 tvec = np.arange(0,TimeStart,0.1) #A simulação sem intervenção termina em t = TimeStart
-                sim_sem_int_1 = odeint(seir,ic,tvec,args=(b,a,g,p,u,N))
-                ic = sim_sem_int_1[-1]
-                sim_sem_int_1 = np.hstack((N-np.sum(sim_sem_int_1,axis=1,keepdims=True),sim_sem_int_1))
+                sim_sem_int_1 = odeint(seir,ic,tvec,args=(a0,a1,g0,g1,g2,g3,p1,p2,u,be,b0,b1,b2,b3,f, AllowPresym, AllowAsym, SeasAmp, SeasPhase))
+                ic = sim_sem_int_1[-1] #Salva a população atual
+                
                 #Criando DataFrame
                 df_sim_com_int = pd.DataFrame(sim_sem_int_1, columns = names)
                 df_sim_com_int['Tempo (dias)'] = tvec
@@ -151,9 +211,8 @@ def simulacao(TimeStart, TimeEnd, tmax, i, N, a, b, bSlow, g, p, u):
             
                 #Simulação após o início da intervenção
                 tvec=np.arange(TimeStart,TimeEnd,0.1)
-                sim_com_int = odeint(seir,ic,tvec,args=(bSlow,a,g,p,u,N))
-                ic = sim_com_int[-1]
-                sim_com_int = np.hstack((N-np.sum(sim_com_int,axis=1,keepdims=True),sim_com_int))
+                sim_com_int = odeint(seir,ic,tvec,args=(a0,a1,g0,g1,g2,g3,p1,p2,u,beInt,b0Int,b1Int,b2Int,b3Int,f, AllowPresym, AllowAsym, SeasAmp, SeasPhase))
+                ic = sim_com_int[-1] #Salva população atual
                 #Criando DataFrame
                 df_aux = pd.DataFrame(sim_com_int, columns = names)
                 df_aux['Tempo (dias)'] = tvec
@@ -164,8 +223,7 @@ def simulacao(TimeStart, TimeEnd, tmax, i, N, a, b, bSlow, g, p, u):
                 if TimeEnd < tmax: #Se a intervenção termina antes do tempo final
                     tvec = np.arange(TimeEnd,tmax,0.1) #A simulação sem intervenção termina em t = TimeStart
                     #Simulação sem intervenção (após o fim da intervenção)
-                    sim_sem_int_2 = odeint(seir,ic,tvec,args=(b,a,g,p,u,N))
-                    sim_sem_int_2 = np.hstack((N-np.sum(sim_sem_int_2,axis=1,keepdims=True),sim_sem_int_2))
+                    sim_sem_int_2 = odeint(seir,ic,tvec,args=(a0,a1,g0,g1,g2,g3,p1,p2,u,be,b0,b1,b2,b3,f, AllowPresym, AllowAsym, SeasAmp, SeasPhase))
                     #Criando dataframe
                     df_aux = pd.DataFrame(sim_sem_int_2, columns = names)
                     df_aux['Tempo (dias)'] = tvec
@@ -175,12 +233,12 @@ def simulacao(TimeStart, TimeEnd, tmax, i, N, a, b, bSlow, g, p, u):
                     
                     
             elif TimeStart == 0: #Se a intervenção começa no dia 0
-                ic = np.zeros(6) #Inicia vetor da população (cada índice para cada tipo de infectado, exposto, etc)
-                ic[0] = i #População sucetível = tamanho da população
+                ic = np.zeros(9) #Inicia vetor da população (cada índice para cada tipo de infectado, exposto, etc)
+                ic[0] = N - i #População sucetível = tamanho da população
+                ic[1] = i
                 tvec=np.arange(0,TimeEnd,0.1)
-                sim_com_int = odeint(seir,ic,tvec,args=(bSlow,a,g,p,u,N))
+                sim_com_int = odeint(seir,ic,tvec,args=(a0,a1,g0,g1,g2,g3,p1,p2,u,beInt,b0Int,b1Int,b2Int,b3Int,f, AllowPresym, AllowAsym, SeasAmp, SeasPhase))
                 ic = sim_com_int[-1]
-                sim_com_int = np.hstack((N-np.sum(sim_com_int,axis=1,keepdims=True),sim_com_int))
                 df_sim_com_int = pd.DataFrame(sim_com_int, columns = names)
                 df_sim_com_int['Tempo (dias)'] = tvec
                 df_sim_com_int['Simulação'] = 'Com intervenção'
@@ -188,8 +246,7 @@ def simulacao(TimeStart, TimeEnd, tmax, i, N, a, b, bSlow, g, p, u):
                 if TimeEnd < tmax: #Se a intervenção termina antes do tempo final
                     tvec = np.arange(TimeEnd,tmax,0.1) #A simulação sem intervenção termina em t = TimeStart
                     #Simulação sem intervenção (após o fim da intervenção)
-                    sim_sem_int_2 = odeint(seir,ic,tvec,args=(b,a,g,p,u,N))
-                    sim_sem_int_2 = np.hstack((N-np.sum(sim_sem_int_2,axis=1,keepdims=True),sim_sem_int_2))
+                    sim_sem_int_2 = odeint(seir,ic,tvec,args=(a0,a1,g0,g1,g2,g3,p1,p2,u,be,b0,b1,b2,b3,f, AllowPresym, AllowAsym, SeasAmp, SeasPhase))
                    #Criando dataframe
                     df_aux = pd.DataFrame(sim_sem_int_2, columns = names)
                     df_aux['Tempo (dias)'] = tvec
@@ -198,39 +255,90 @@ def simulacao(TimeStart, TimeEnd, tmax, i, N, a, b, bSlow, g, p, u):
             return df_sim_com_int
     
 
-def seir(y,t,b,a,g,p,u,N): 
+#Modelo SEIR
+def seir(y,t,a0,a1,g0,g1,g2,g3,p1,p2,u,be,b0,b1,b2,b3,f, AllowPresym, AllowAsym, SeasAmp, SeasPhase): 
         
-            dy=[0,0,0,0,0,0]
-            S=N-sum(y); # S -> casos sucetiveis
-            dy[0] = (b[0]*y[1] + b[1]*y[2] + b[2]*y[3])*S - a*y[0] #dE -> casos expostos
-            dy[1] = a*y[0] - (g[0] + p[0])*y[1] #dI1 -> Casos leves
-            dy[2] = p[0]*y[1] - (g[1]+p[1])*y[2] #dI2 -> Casos graves
-            dy[3] = p[1]*y[2] -(g[2] + u)*y[3] #dI3 -> Casos Críticos
-            dy[4] = g[0]*y[1] + g[1]*y[2] + g[2]*y[3] #dR -> Recuperados
-            dy[5] = u*y[3] #dD -> Mortos
+    dy=[0, #Sucetiveis y[0]
+        0, #Expostos y[1]
+        0, #Expostos transmissores y[2]
+        0, #I0 - Assintomáticos y[3]
+        0, #I1 - Leves y[4]
+        0, #I2 - Graves y[5]
+        0, #I3 - Críticos y[6]
+        0, #Recuperados y[7]
+        0] #Mortos y[8]
+    
+    S = y[0] #Sucetiveis y[0]
+    E0 = y[1] #Expostos y[1]
+    E1 = y[2] #Expostos transmissores y[2]
+    I0 = y[3] #I0 - Assintomáticos y[3]
+    I1 = y[4] #I1 - Leves y[4]
+    I2 = y[5] #I2 - Graves y[5]
+    I3 = y[6] #I3 - Críticos y[6]
+    R = y[7] #Recuperados y[7]
+    D = y[8] #Mortos y[8]
+    
+    seas=(1 + SeasAmp*np.cos(2*np.pi*(t-SeasPhase)/365))
+    
+    dy[0] = -(be*E1 + b0*I0 + b1*I1 +b2*I2 + b3*I3)*S*seas #Variação de sucetíveis
+    
+    dy[1] = (be*E1 + b0*I0 + b1*I1 + b2*I2 + b3*I3)*S*seas - a0*E0 #Variação de expostos não transmissores
+    
+    if AllowPresym == 'Sim': #Se os pré-sintomáticos transmitem   
+        dy[2] = a0*E0 - a1*E1 #Variação de pré-sintomáticos transmissores
+        if AllowAsym == 'Sim': #Se há assintomáticos
+            dy[3] = f*a1*E1 - g0*I0 #Variação de assintomáticos
+            dy[4] = (1-f)*a1*E1 - g1*I1 - p1*I1 #Variação de casos leves
+        else: #Se não há assintomáticos
+            dy[3] = 0 #Variação de assintomáticos é zero
+            dy[4] = (1-f)*a1*E1 - g1*I1 - p1*I1 #Variação de casos leves
+    else: #Se os pré-sintomáticos não transmitem
+        dy[2] = 0 #Variação de pré-sintomáticos transmissores é zero
+        if AllowAsym == 'Sim': #Se há assintomáticos
+            dy[3] = f*a0*E0 - g0*I0 #Variação de assintomáticos
+            dy[4] = (1-f)*a0*E0 - g1*I1 - p1*I1 #Variação de casos leves
+        else:#Se não há
+            dy[3] = 0 #Variação de assintomáticos é zero
+            dy[4] = (1-f)*a0*E0 - g1*I1 - p1*I1 #Variação de casos leves
+ 
+    dy[5] = p1*I1-g2*I2-p2*I2 #Variação de casos graves
+    
+    dy[6] = p2*I2-g3*I3-u*I3 #Variação de casos críticos
+    
+    dy[7] = g0*I0+g1*I1+g2*I2+g3*I3 #Variação de recuperados
+    
+    dy[8] = u*I3 #Variação de mortos
+    
+    return dy
 
-            return dy
-
-
-def growth_rate(g1,g2,g3,p1,p2,p3,b1,b2,b3,u,a,N):
-    sig1 = g1 + p1
-    sig2 = g2 + p2;
-    sig3 = g3 + u
-      
-    C4 = 1
-    C3 = a + sig1 + sig2 + sig3
-    C2 = a*(sig1 + sig2 + sig3 - b1*N) + sig1*sig2 + sig1*sig3 + sig2*sig3
-    C1 = a*(sig1*sig2 + sig1*sig3 + sig2*sig3 - b1*N*(sig2 + sig3) - b2*N*p1) + sig1*sig2*sig3
-    C0 = a*(sig1*sig2*sig3 - b1*N*sig2*sig3 - p1*b2*N*sig3 - p1*p2*b3*N)
-      
-      #  Compute the maximum eigenvalue, corresponding to r
-    r = max((polyroots([C0, C1, C2, C3, C4])))
-      
+def new_growth_rate(g0,g1,g2,g3,p1,p2,be,b0,b1,b2,b3,u,a0,a1,N,f): #Growth rate após o update
+    
+    JacobianMat=np.array([
+                 [-a0, N*be, N*b0, N*b1, N*b2, N*b3, 0, 0],
+                 [a0, -a1, 0, 0, 0, 0, 0, 0],
+                 [0, a1*f, -g0, 0, 0, 0, 0, 0],
+                 [0, a1 - a1*f, 0, -p1-g1, 0, 0, 0, 0],
+                 [0, 0, 0, p1, -p2-g2, 0, 0, 0],
+                 [0, 0, 0, 0, p2, -u-g3, 0, 0],
+                 [0, 0, g0, g1, g2, g3 , 0, 0],
+                 [0, 0, 0, 0, 0, u, 0, 0]
+                ])
+    
+    eig = LA.eig(JacobianMat)
+    eigvalue = eig[0].real
+    eigvector = eig[1]
+    
+    r = max(eigvalue)
+    
+    MaxEigenVector=eigvector.T[np.argmax(eigvalue)]
+    MaxEigenVector=MaxEigenVector/MaxEigenVector[len(MaxEigenVector)-1]
+    MaxEigenVector=MaxEigenVector.real
     DoublingTime=np.log(2)/r
-      
-    return (r, DoublingTime)
+    
+    return r, DoublingTime
 
-def main(IncubPeriod,b,g,p):
+
+def main(IncubPeriod):
     pic = "https://images.squarespace-cdn.com/content/5c4ca9b7cef372b39c3d9aab/1575161958793-CFM6738ESA4DNTKF0SQI/CAPPRA_PRIORITARIO_BRANCO.png?content-type=image%2Fpng"
     st.sidebar.image(pic, use_column_width=False, width=100, caption=None)
     page = st.sidebar.selectbox("Simulações", ["Progressão do COVID19","Com Intervenção","Capacidade Hospitalar","Descição do Modelo","Fontes","Código"])
@@ -337,25 +445,14 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
             i = 1
             TimeStart = 0
             TimeEnd = tmax
-            reduc1 = 0.3
-            reduc2 = 0
-            reduc3 = 0
-        else:
-            IncubPeriod = IncubPeriod
-            DurMildInf = DurMildInf
-            FracMild = FracMild
-            FracSevere = FracSevere
-            FracCritical = FracCritical
-            ProbDeath = ProbDeath
-            TimeICUDeath = TimeICUDeath
-            DurHosp = DurHosp
-            tmax = tmax
-            i = i
-            TimeStart = TimeStart
-            TimeEnd = TimeEnd
-            reduc1 = reduc1
-            reduc2 = reduc2
-            reduc3 = reduc3
+            AllowSeason = 'Não'
+            SeasAmp = 0
+            SeasPhase = 0
+            AllowAsym = 'Não'
+            FracAsym = 0
+            DurAsym = 6
+            AllowPresym = 'Não'
+            PresymPeriod = 2
             
         st.title("Casos previstos de COVID-19 por resultado clínico")
         st.subheader('Simule o curso natural de uma epidemia de COVID-19 em uma única população sem nenhuma intervenção.')
@@ -364,27 +461,40 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
         my_slot2 = st.empty()        
         my_slot3 = st.empty()
         
-        IncubPeriod, DurMildInf, FracMild, FracSevere, FracCritical, CFR, DurHosp, TimeICUDeath, b1, b2, b3, N, i, tmax = menu(IncubPeriod, DurMildInf, FracSevere, FracCritical, ProbDeath, DurHosp, TimeICUDeath)    
+        #Menu
+        IncubPeriod, DurMildInf, FracMild, FracSevere, FracCritical, CFR, DurHosp, TimeICUDeath, AllowSeason, SeasAmp, SeasPhase, AllowAsym, FracAsym, DurAsym, AllowPresym, PresymPeriod, seas0, b0, b1, b2, b3, be, N, i, tmax = menu(IncubPeriod, DurMildInf, FracSevere, FracCritical, ProbDeath, DurHosp, TimeICUDeath, AllowSeason, SeasAmp, SeasPhase, AllowAsym, FracAsym, DurAsym, AllowPresym, PresymPeriod)    
 
-        a, u, g, p, ic = params(g, p, IncubPeriod, FracMild, FracCritical, FracSevere, TimeICUDeath, CFR, DurMildInf, DurHosp, i)
+        #Parâmetros do SEIR
+        a0, a1, u, g0, g1, g2, g3, p1, p2, f, ic = params(IncubPeriod, FracMild, FracCritical, FracSevere, TimeICUDeath, CFR, DurMildInf, DurHosp, i, PresymPeriod, FracAsym, DurAsym, N)
         
-        #Inicia vetor de taxa de transmissão
-        b=np.array([b1,b2,b3])
+        #Taxa reprodutiva e valores de crescimento
+        if AllowSeason:
+            R0 = taxa_reprodutiva_seas(N, be, b0, b1, b2, b3, p1, p2, g0, g1, g2, g3, a1, u, f, SeasAmp, SeasPhase)[0]
+        else:
+            R0 = taxa_reprodutiva(N, be, b0, b1, b2, b3, p1, p2, g0, g1, g2, g3, a1, u, f)
+            
+        (r,DoublingTime) = new_growth_rate(g0,g1,g2,g3,p1,p2,be,b0,b1,b2,b3,u,a0,a1,N,f)
+        
+        my_slot2.text("R\N{SUBSCRIPT ZERO} = {0:4.1f} \nr = {1:4.1f} por dia \nt\N{SUBSCRIPT TWO} = {2:4.1f}".format(R0,r,DoublingTime))
 
-        #Calcula a taxa reprodutiva básica        
-        R0 = taxa_reprodutiva(N, b, p, g, u)
-        
+        #Simulação
         tvec=np.arange(0,tmax,0.1)
-        soln=odeint(seir,ic,tvec,args=(b,a,g,p,u,N))
-        soln=np.hstack((N-np.sum(soln,axis=1,keepdims=True),soln))
+        soln=odeint(seir,ic,tvec,args=(a0,a1,g0,g1,g2,g3,p1,p2,u,be,b0,b1,b2,b3,f, AllowPresym, AllowAsym, SeasAmp, SeasPhase))
 
+        #Criação do dataframe
         data = []
-        names = ["Sucetíveis (S)","Expostos (E)","Inf. Leve (I1)","Inf. Grave (I2)","Inf. Crítico (I3)","Recuperado (R)","Morto (D)"]
+        names = ["Sucetíveis (S)","Expostos (E0)","Pré-sintomáticos (E1)","Assintomáticos (I0)","Inf. Leve (I1)","Inf. Grave (I2)","Inf. Crítico (I3)","Recuperado (R)","Morto (D)"]
         for x in range(0, len(tvec)):
             for y in range(0, len(soln[x])):
                 data.append([tvec[x],names[y],soln[x][y]])
         y_index = 'Número por ' + str(N) +' pessoas'
         df = pd.DataFrame(data,columns=['Tempo (dias)','legenda',y_index])
+        
+        if AllowAsym == 'Não':
+            df = df[df['legenda'] != "Assintomáticos (I0)"]
+        if AllowPresym == 'Não':
+            df = df[df['legenda'] != "Pré-sintomáticos (E1)"]
+        
         yscale = "Linear"
         def covid19_1(yscale):
             if yscale == 'Log':
@@ -395,25 +505,23 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
         
         yscale = my_slot3.radio("Escala do eixo Y", ["Linear", "Log"])
         covid19_1(yscale)
-        
-        (r,DoublingTime) = growth_rate(g[0],g[1],g[2],p[0],p[1],p[2],b[0],b[1],b[2],u,a,N)
-
-        my_slot2.text("R\N{SUBSCRIPT ZERO} = {0:4.1f} \nr = {1:4.1f} por dia \nt\N{SUBSCRIPT TWO} = {2:4.1f}".format(R0,r,DoublingTime))
-        
-        st.write("A taxa de crescimento epidêmico é **{0:4.2f} por dia** e o tempo de duplicação é de **{1:4.1f} dias**".format(r,DoublingTime))
                         
         st.write('''**Instruções para o usuário:** O gráfico mostra o número esperado de indivíduos infectados, recuperados, suscetíveis ou mortos ao longo do tempo. Os indivíduos infectados passam primeiro por uma fase exposta / incubação, onde são assintomáticos e não infecciosos, e depois passam para um estágio sintomático e de infecções classificados pelo estado clínico da infecção (leve, grave ou crítica). Uma descrição mais detalhada do modelo é fornecida na guia Descrição do Modelo. O tamanho da população, a condição inicial e os valores dos parâmetros usados para simular a propagação da infecção podem ser especificados através dos controles deslizantes localizados no painel esquerdo. Os valores padrão do controle deslizante são iguais às estimativas extraídas da literatura (consulte a guia Fontes). Para redefinir os valores padrão, clique no botão Redefinir tudo, localizado na parte inferior do painel. O gráfico é interativo: passe o mouse sobre ele para obter valores, clique duas vezes em uma curva na legenda para isolá-la ou clique duas vezes para removê-la. Arrastar sobre um intervalo permite aplicar zoom.
         
 ### Variáveis
 * $S$: Indivíduos Suscetíveis
-* $E$: Indivíduos Expostos - infectados, mas ainda não infecciosos ou sintomáticos
+* $E_0$: Indivíduos Expostos - infectados, em estágio pré-sintomático mas não transmite o vírus
+* $E_1$: Indivíduos Expostos - infectados, em estágio pré-sintomático mas transmite o vírus
 * $I_i$: Indivíduos infectados na classe de gravidade $i$. A gravidade aumenta com $i$ e assumimos que os indivíduos devem passar por todas as classes anteriores
-  * $I_1$: Infecção leve (hospitalização não é necessária) - Mild Infection
-  * $I_2$: Infecção grave (hospitalização necessária) - Severe infection
-  * $I_3$: Infecção crítica (cuidados na UTI necessária) - Critical infection
+  * $I_0$: Infecção assintomática (hospitalização não é necessária)
+  * $I_1$: Infecção leve (hospitalização não é necessária)
+  * $I_2$: Infecção grave (hospitalização necessária)
+  * $I_3$: Infecção crítica (cuidados na UTI necessária)
 * $R$: Indivíduos que se recuperaram da doença e agora estão imunes
 * $D$: Indivíduos mortos
-* $N=S+E+I_1+I_2+I_3+R+D$ Tamanho total da população (constante)''')
+* $N = S + E_0 + E_1 + I+0 + I_1 + I_2 + I_3 + R + D$ Tamanho total da população (constante)
+
+Os indivíduos $E_1$ e $I_0$ estão desativados na simulação, mas podem ser ativados no painel lateral esquerdo.''')
         
     elif page == "Com Intervenção":
         st.title('Previsão de redução do COVID-19 após adoção de medidas de intervenção como distanciamento social')
@@ -436,25 +544,30 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
             reduc1 = 0.3
             reduc2 = 0
             reduc3 = 0
-        else:
-            IncubPeriod = IncubPeriod
-            DurMildInf = DurMildInf
-            FracMild = FracMild
-            FracSevere = FracSevere
-            FracCritical = FracCritical
-            ProbDeath = ProbDeath
-            TimeICUDeath = TimeICUDeath
-            DurHosp = DurHosp
-            tmax=tmax
-            i=i
-            variable = variable
-            TimeStart = TimeStart
-            TimeEnd = TimeEnd
-            reduc1 = reduc1
-            reduc2 = reduc2
-            reduc3 = reduc3
-            
-        names = ["Sucetíveis (S)","Expostos (E)","Inf. Leve (I1)","Inf. Grave (I2)","Inf. Crítico (I3)","Recuperado (R)","Morto (D)"]
+            reducasym = 0
+            reducpre = 0
+            AllowSeason = 'Não'
+            SeasAmp = 0
+            SeasPhase = 0
+            AllowAsym = 'Não'
+            FracAsym = 0.3
+            DurAsym = 7
+            AllowPresym = 'Não'
+            PresymPeriod = 2
+
+        #Menu de interveção
+        TimeStart, TimeEnd, reduc1, reduc2, reduc3, reducpre, reducasym = intervencao(TimeStart,TimeEnd,reduc1,reduc2,reduc3,reducpre,reducasym, tmax)
+        
+        #Menu
+        IncubPeriod, DurMildInf, FracMild, FracSevere, FracCritical, CFR, DurHosp, TimeICUDeath, AllowSeason, SeasAmp, SeasPhase, AllowAsym, FracAsym, DurAsym, AllowPresym, PresymPeriod, seas0, b0, b1, b2, b3, be, N, i, tmax = menu(IncubPeriod, DurMildInf, FracSevere, FracCritical, ProbDeath, DurHosp, TimeICUDeath, AllowSeason, SeasAmp, SeasPhase, AllowAsym, FracAsym, DurAsym, AllowPresym, PresymPeriod)            
+
+        names = ["Sucetíveis (S)","Expostos (E0)","Pré-sintomáticos (E1)","Assintomáticos (I0)","Inf. Leve (I1)","Inf. Grave (I2)","Inf. Crítico (I3)","Recuperado (R)","Morto (D)"]
+        if AllowAsym == 'Não':
+            names.remove("Assintomáticos (I0)")
+        if AllowPresym == 'Não':
+            names.remove("Pré-sintomáticos (E1)")
+
+        #Menu de seleção
         st.subheader('Selecione a variável que deseja visualizar:')
         variable = st.selectbox("", names)
         
@@ -470,23 +583,24 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
         my_slot10 = st.empty()
         my_slot11 = st.empty()
         my_slot12 = st.empty()
+   
+        #Parâmetros do SEIR
+        a0, a1, u, g0, g1, g2, g3, p1, p2, f, ic = params(IncubPeriod, FracMild, FracCritical, FracSevere, TimeICUDeath, CFR, DurMildInf, DurHosp, i, PresymPeriod, FracAsym, DurAsym, N)
 
-        TimeStart, TimeEnd, reduc1, reduc2, reduc3 = intervencao(TimeStart,TimeEnd,reduc1,reduc2,reduc3,tmax)
-        
-        IncubPeriod, DurMildInf, FracMild, FracSevere, FracCritical, CFR, DurHosp, TimeICUDeath, b1, b2, b3, N, i, tmax = menu(IncubPeriod, DurMildInf, FracSevere, FracCritical, ProbDeath, DurHosp, TimeICUDeath)    
-        
-        a, u, g, p, ic = params(g, p, IncubPeriod, FracMild, FracCritical, FracSevere, TimeICUDeath, CFR, DurMildInf, DurHosp, i)
+        #Calculo das taxas de transmissão durante a intervenção
+        b1Int = (1 - reduc1)*b1
+        b2Int = (1 - reduc2)*b2
+        b3Int = (1 - reduc3)*b3
+        beInt = (1 - reducpre)*be
+        b0Int = (1 - reducasym)*b0
 
-        b=np.array([b1,b2,b3])
-        bSlow=np.array([(1-reduc1)*b1,(1-reduc2)*b2,(1-reduc3)*b3])
+        tvec=np.arange(0,tmax,0.1)
+        soln=odeint(seir,ic,tvec,args=(a0,a1,g0,g1,g2,g3,p1,p2,u,be,b0,b1,b2,b3,f, AllowPresym, AllowAsym, SeasAmp, SeasPhase))
         
-        R0 = taxa_reprodutiva(N, b, p, g, u)
-        R0Slow = taxa_reprodutiva(N, bSlow, p, g, u)
-        
+        names = ["Sucetíveis (S)","Expostos (E0)","Pré-sintomáticos (E1)","Assintomáticos (I0)","Inf. Leve (I1)","Inf. Grave (I2)","Inf. Crítico (I3)","Recuperado (R)","Morto (D)"]
 #########  Simulação sem intervenção #########################################################
         tvec=np.arange(0,tmax,0.1)
-        sim_sem_int = odeint(seir,ic,tvec,args=(b,a,g,p,u,N))
-        sim_sem_int = np.hstack((N-np.sum(sim_sem_int,axis=1,keepdims=True),sim_sem_int))
+        sim_sem_int = odeint(seir,ic,tvec,args=(a0,a1,g0,g1,g2,g3,p1,p2,u,be,b0,b1,b2,b3,f, AllowPresym, AllowAsym, SeasAmp, SeasPhase))
         #Criando dataframe
         df_sim_sem_int = pd.DataFrame(sim_sem_int, columns = names)
         df_sim_sem_int['Tempo (dias)'] = tvec
@@ -494,7 +608,7 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
 #############################################################################################
         
         #Simulação com intervenção
-        df_sim_com_int = simulacao(TimeStart, TimeEnd, tmax, i, N, a, b, bSlow, g, p, u)
+        df_sim_com_int = simulacao(TimeStart, TimeEnd, tmax, i, N, a0, a1, b0, be, b1, b2 , b3, b0Int, beInt, b1Int, b2Int, b3Int, g0, g1, g2, g3, p1, p2, u, names, f, AllowAsym, AllowPresym, SeasAmp, SeasPhase)
         y_index = 'Número por ' + str(N) +' pessoas'
         df_sim_com_int = df_sim_com_int.drop_duplicates(subset = ['Tempo (dias)'], keep = 'first')
         df_sem = pd.melt(df_sim_sem_int[['Tempo (dias)',variable]], id_vars = ['Tempo (dias)'], value_name = y_index, var_name = 'Legenda')
@@ -502,11 +616,18 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
         df_com = pd.melt(df_sim_com_int[['Tempo (dias)',variable]], id_vars = ['Tempo (dias)'], value_name = y_index, var_name = 'Legenda')
         df_com['Legenda'] = df_com['Legenda'] + ' (Com intervenção)'
 
+        #Junta dataframes
         df = df_sem.append(df_com)
+        
+        if AllowAsym == 'Não':
+            df = df[df['Legenda'] != "Assintomáticos (I0)"]
+        if AllowPresym == 'Não':
+            df = df[df['Legenda'] != "Pré-sintomáticos (E1)"]
         
         yscale = "Linear"
         yscale = st.radio("Escala do eixo Y", ["Linear", "Log"])
         
+        #Plot
         if yscale == 'Log':
             fig = px.line(df, x="Tempo (dias)", y=y_index, log_y=True, color = 'Legenda')
                 
@@ -514,13 +635,22 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
             fig = px.line(df, x="Tempo (dias)", y=y_index, color = 'Legenda')
         my_slot1.plotly_chart(fig)
         
-        (r,DoublingTime) = growth_rate(g[0],g[1],g[2],p[0],p[1],p[2],b[0],b[1],b[2],u,a,N)
-        (rSlow,DoublingTimeSlow) = growth_rate(g[0],g[1],g[2],p[0],p[1],p[2],bSlow[0],bSlow[1],bSlow[2],u,a,N)
+        #Cálculo da taxa reprodutiva e etc    
+        if AllowSeason:
+            R0 = taxa_reprodutiva_seas(N, be, b0, b1, b2, b3, p1, p2, g0, g1, g2, g3, a1, u, f, SeasAmp, SeasPhase)[0]
+            R0Int = taxa_reprodutiva_seas(N, beInt, b0Int, b1Int, b2Int, b3Int, p1, p2, g0, g1, g2, g3, a1, u, f, SeasAmp, SeasPhase)[0]
+        else:
+            R0 = taxa_reprodutiva(N, be, b0, b1, b2, b3, p1, p2, g0, g1, g2, g3, a1, u, f)
+            R0 = taxa_reprodutiva(N, beInt, b0Int, b1Int, b2Int, b3Int, p1, p2, g0, g1, g2, g3, a1, u, f)
+
+            
+        (r,DoublingTime) = new_growth_rate(g0,g1,g2,g3,p1,p2,be,b0,b1,b2,b3,u,a0,a1,N,f)
+        (rInt,DoublingTimeInt) = new_growth_rate(g0,g1,g2,g3,p1,p2,beInt,b0Int,b1Int,b2Int,b3Int,u,a0,a1,N,f)
         
-        Stat = pd.DataFrame({'Sem intervenção':[R0,r,DoublingTime],'Com intervenção':[R0Slow,rSlow,DoublingTimeSlow]}, index=['R\N{SUBSCRIPT ZERO}','r (por dia)','t\N{SUBSCRIPT TWO}'])
+        Stat = pd.DataFrame({'Sem intervenção':[R0,r,DoublingTime],'Com intervenção':[R0Int,rInt,DoublingTimeInt]}, index=['R\N{SUBSCRIPT ZERO}','r (por dia)','t\N{SUBSCRIPT TWO}'])
         st.table(Stat)
         st.write("**- Sem intervenção**: A taxa de crescimento epidêmico é **{0:4.2f} por dia**; o tempo de duplicação é **{1:4.1f} dias**".format(r,DoublingTime))
-        st.write("**- Com intervenção**: A taxa de crescimento epidêmico é **{0:4.2f} por dia**; o tempo de duplicação é **{1:4.1f} dias**".format(rSlow,DoublingTimeSlow))
+        st.write("**- Com intervenção**: A taxa de crescimento epidêmico é **{0:4.2f} por dia**; o tempo de duplicação é **{1:4.1f} dias**".format(rInt,DoublingTimeInt))
         
         st.write("""**Instruções para o usuário:** O gráfico mostra o número esperado de indivíduos infectados, recuperados, suscetíveis ou mortos ao longo do tempo, com e sem intervenção. Os indivíduos infectados passam primeiro por uma fase exposta / incubação, onde são assintomáticos e não infecciosos, e depois passam para um estágio sintomático e de infecções classificados pelo estado clínico da infecção (leve, grave ou crítica). Uma descrição mais detalhada do modelo é fornecida na guia Descrição do Modelo.""")
         st.write("""O tamanho da população, a condição inicial e os valores dos parâmetros usados para simular a propagação da infecção podem ser especificados através dos controles deslizantes localizados no painel esquerdo. Os valores padrão do controle deslizante são iguais às estimativas extraídas da literatura (consulte a guia Fontes). A força e o tempo da intervenção são controlados pelos controles deslizantes abaixo do gráfico. O gráfico é interativo: passe o mouse sobre ele para obter valores, clique duas vezes em uma curva na legenda para isolá-la ou clique duas vezes para removê-la. Arrastar sobre um intervalo permite aplicar zoom.""")
@@ -547,25 +677,18 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
             reduc1 = 0.3
             reduc2 = 0
             reduc3 = 0
+            reducasym = 0
+            reducpre = 0
+            AllowSeason = 'Não'
+            SeasAmp = 0
+            SeasPhase = 0
+            AllowAsym = 'Não'
+            FracAsym = 0.3
+            DurAsym = 7
+            AllowPresym = 'Não'
+            PresymPeriod = 2
 
-        else:
-            IncubPeriod = IncubPeriod
-            DurMildInf = DurMildInf
-            FracMild = FracMild
-            FracSevere = FracSevere
-            FracCritical = FracCritical
-            ProbDeath = ProbDeath
-            TimeICUDeath = TimeICUDeath
-            DurHosp = DurHosp
-            tmax=tmax
-            i=i
-            variable = variable
-            TimeStart = TimeStart
-            TimeEnd = TimeEnd
-            reduc1 = reduc1
-            reduc2 = reduc2
-            reduc3 = reduc3
-            
+        #Menu de seleção    
         varnames = ['Todos casos sintomáticos (l1,l2,l3) vs Leitos de hospital + UTI',
                  'Casos graves (l2) e críticos (l3) vs Leitos de hospital + UTI',
                  'Infecções críticas (l3) vs Leitos na UTI',
@@ -586,9 +709,11 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
         my_slot11 = st.empty()
         my_slot12 = st.empty()
         
-        TimeStart, TimeEnd, reduc1, reduc2, reduc3 = intervencao(TimeStart,TimeEnd,reduc1,reduc2,reduc3,tmax)
-
-        IncubPeriod, DurMildInf, FracMild, FracSevere, FracCritical, CFR, DurHosp, TimeICUDeath, b1, b2, b3, N, i, tmax = menu(IncubPeriod, DurMildInf, FracSevere, FracCritical, ProbDeath, DurHosp, TimeICUDeath)    
+        
+        TimeStart, TimeEnd, reduc1, reduc2, reduc3, reducpre, reducasym = intervencao(TimeStart,TimeEnd,reduc1,reduc2,reduc3,reducpre,reducasym, tmax)
+        
+        IncubPeriod, DurMildInf, FracMild, FracSevere, FracCritical, CFR, DurHosp, TimeICUDeath, AllowSeason, SeasAmp, SeasPhase, AllowAsym, FracAsym, DurAsym, AllowPresym, PresymPeriod, seas0, b0, b1, b2, b3, be, N, i, tmax = menu(IncubPeriod, DurMildInf, FracSevere, FracCritical, ProbDeath, DurHosp, TimeICUDeath, AllowSeason, SeasAmp, SeasPhase, AllowAsym, FracAsym, DurAsym, AllowPresym, PresymPeriod)     
+           
         
         st.subheader('Capacidade do sistema de saúde')
         AvailHospBeds=st.number_input(label="Leitos hospitalares disponíveis (por mil pessoas)", value=1.95)*N/1000 #Available hospital beds per 1000 ppl in BR based on total beds and occupancy
@@ -597,30 +722,30 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
         ContVentCap=st.number_input(label="Pacientes que podem ser ventilados em protocolo de contingência (por mil pessoas)", value=0.15)*N/1000 #Estimated excess # of patients who could be ventilated in US (per 1000 ppl) using contingency protocols
         CrisisVentCap=st.number_input(label="Pacientes que podem ser ventilados em protocolo de crise (por mil pessoas)", value=0.24)*N/1000 #Estimated excess # of patients who could be ventilated in US (per 1000 ppl) using crisis protocols
        
-        a, u, g, p, ic = params(g, p, IncubPeriod, FracMild, FracCritical, FracSevere, TimeICUDeath, CFR, DurMildInf, DurHosp, i)
+        a0, a1, u, g0, g1, g2, g3, p1, p2, f, ic = params(IncubPeriod, FracMild, FracCritical, FracSevere, TimeICUDeath, CFR, DurMildInf, DurHosp, i, PresymPeriod, FracAsym, DurAsym, N)
 
-        b=np.array([b1,b2,b3])
-        bSlow=np.array([(1-reduc1)*b1,(1-reduc2)*b2,(1-reduc3)*b3])
+        b1Int = (1 - reduc1)*b1
+        b2Int = (1 - reduc2)*b2
+        b3Int = (1 - reduc3)*b3
+        beInt = max(0,(1 - reducpre)*be)
+        b0Int = max(0,(1 - reducasym)*b0) 
         
-        R0 = taxa_reprodutiva(N, b, p, g, u)
-        R0Slow = taxa_reprodutiva(N, bSlow, p, g, u)
-        
-########  Simulação sem intervenção ######################################################################################################
+        names = ["Sucetíveis (S)","Expostos (E1)","Pré-sintomáticos (E1)","Assintomáticos (I0)","Inf. Leve (I1)","Inf. Grave (I2)","Inf. Crítico (I3)","Recuperado (R)","Morto (D)"]
+
+#########  Simulação sem intervenção #########################################################
         tvec=np.arange(0,tmax,0.1)
-        sim_sem_int = odeint(seir,ic,tvec,args=(b,a,g,p,u,N))
-        sim_sem_int = np.hstack((N-np.sum(sim_sem_int,axis=1,keepdims=True),sim_sem_int))
-        
+        sim_sem_int = odeint(seir,ic,tvec,args=(a0,a1,g0,g1,g2,g3,p1,p2,u,be,b0,b1,b2,b3,f, AllowPresym, AllowAsym, SeasAmp, SeasPhase))
         #Criando dataframe
-        names = ["Sucetíveis (S)","Expostos (E)","Inf. Leve (I1)","Inf. Grave (I2)","Inf. Crítico (I3)","Recuperado (R)","Morto (D)"]
         df_sim_sem_int = pd.DataFrame(sim_sem_int, columns = names)
         df_sim_sem_int['Tempo (dias)'] = tvec
         df_sim_sem_int['Simulação'] = 'Sem intervenção'
-###########################################################################################################################################       
+#############################################################################################
         
         #Simulação com intervenção
-        df_sim_com_int = simulacao(TimeStart, TimeEnd, tmax, i, N, a, b, bSlow, g, p, u)
-        y_index = 'Número por ' + str(N) +' pessoas'
+        df_sim_com_int = simulacao(TimeStart, TimeEnd, tmax, i, N, a0, a1, b0, be, b1, b2 , b3, b0Int, beInt, b1Int, b2Int, b3Int, g0, g1, g2, g3, p1, p2, u, names, f, AllowAsym, AllowPresym, SeasAmp, SeasPhase)
+        y_index = 'Número por ' + str(N) +' pessoas'  
 
+        #Plots
         if variable == 'Todos casos sintomáticos (l1,l2,l3) vs Leitos de hospital + UTI':
             df_sim_com_int[y_index] = df_sim_com_int["Inf. Leve (I1)"] + df_sim_com_int["Inf. Grave (I2)"] + df_sim_com_int["Inf. Crítico (I3)"]
             df_sim_sem_int[y_index] = df_sim_sem_int["Inf. Leve (I1)"] + df_sim_sem_int["Inf. Grave (I2)"] + df_sim_sem_int["Inf. Crítico (I3)"]
@@ -674,7 +799,6 @@ Esses parâmetros podem ser alterados usando os controles deslizantes das outras
         fig = px.line(df, x="Tempo (dias)", y=y_index, color = 'Simulação')
         my_slot1.plotly_chart(fig)
 
-        
         
         st.write("""**Instruções para o usuário:** O gráfico mostra o número esperado de indivíduos infectados, recuperados, suscetíveis ou mortos ao longo do tempo, com e sem intervenção. Os indivíduos infectados passam primeiro por uma fase exposta / incubação, onde são assintomáticos e não infecciosos, e depois passam para um estágio sintomático e de infecções classificados pelo estado clínico da infecção (leve, grave ou crítica). Uma descrição mais detalhada do modelo é fornecida na guia Descrição do Modelo.""")
         st.write("""O tamanho da população, a condição inicial e os valores dos parâmetros usados para simular a propagação da infecção podem ser especificados através dos controles deslizantes localizados no painel esquerdo. Os valores padrão do controle deslizante são iguais às estimativas extraídas da literatura (consulte a guia Fontes). A força e o tempo da intervenção são controlados pelos controles deslizantes abaixo do gráfico. O gráfico é interativo: passe o mouse sobre ele para obter valores, clique duas vezes em uma curva na legenda para isolá-la ou clique duas vezes para removê-la. Arrastar sobre um intervalo permite aplicar zoom.""")
@@ -946,13 +1070,13 @@ Zhao, Qingyuan, Yang Chen, and Dylan S. Small. 2020. “Analysis of the Epidemic
     elif page == "Código":
         st.write("""Os códigos deste simulador estão no [GitHub](https://github.com/dumsantos/SEIR_COVID19_BR) e possuem uma versão em Python usando Streamlit e outra em R usando Shiny. Contate eduardo@cappra.com.br em caso de perguntas.
 
-Agradecimento para Alison Hill que desenvolveu a ferramenta inicial em R, Guilherme e Caetano que auxiliaram na tradução e codificação da versão em Python e também a todo o time da Cappra Institute for Data Science pelas pesquisas desenvolvidas.
+Agradecimento para Alison Hill que desenvolveu a ferramenta inicial em R, [Guilherme Machado](https://www.linkedin.com/in/guilhermermachado/) e [Caetano Slaviero](https://www.linkedin.com/in/caetanoslaviero/) que auxiliaram na tradução e codificação da versão em Python e também a todo o time da Cappra Institute for Data Science pelas pesquisas desenvolvidas.
 
 Quer saber mais sobre o COVID-19, confira nosso [estudo](http://covid19.cappralab.com).""")
         
 
 
 if __name__ == "__main__":
-    main(IncubPeriod,b,g,p)
+    main(IncubPeriod)
     
 
