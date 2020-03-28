@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/590525/4dbe3689dcab4c518e4786de4572d4b2
+bundleId: https://api.rpubs.com/api/v1/document/590525/4dbe3689dcab4c518e4786de4572d4b2
+url: http://rpubs.com/guimac09/590525
+when: 1585326836.64458

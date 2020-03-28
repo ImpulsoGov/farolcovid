@@ -1,0 +1,33 @@
+---
+title: "Sobre"
+output: html_notebook
+---
+
+Este app é uma adaptação da <b>Cappra Institute for Data Science</b> baseada no modelo criado por <b>Alison Hill</b>
+
+Os códigos deste simulador estão no [GitHub](https://github.com/dumsantos/SEIR_COVID19_BR) e possuem uma versão em Python usando Streamlit e outra em R usando Shiny. Contate [Eduardo Santos](http://linkedin.com/in/dumsantos) em caso de perguntas.
+
+Agradecimento para Alison Hill que desenvolveu a ferramenta inicial em R, [Guilherme Machado](https://www.linkedin.com/in/guilhermermachado/) e [Caetano Slaviero](https://www.linkedin.com/in/caetanoslaviero/) que auxiliaram na tradução e codificação da versão em Python e também a todo o time da [Cappra Institute for Data Science](https://cappralab.com/) pelas pesquisas desenvolvidas.
+
+Quer saber mais sobre o COVID-19, [confira nosso estudo](http://covid19.cappralab.com/). 
+
+Rscripts originais estão disponíveis no [Github](https://github.com/alsnhll/SEIR_COVID19).
+
+Este modelo foi originalmente desenvolvido por [Alison Hill](https://twitter.com/alison_l_hill) e você pode contactá-la em <alhill@fas.harvard.edu>. 
+
+Um time de pesquisadores têm contribuído para o desenvolvimento contínuo deste modelo e app:
+
+* [Mike Levy](https://www.med.upenn.edu/apps/faculty/index.php/g275/p6363868) @Penn (Consultoria epidemiológica e desenvolvimento do modelo)
+* [Sherrie Xie](https://www.linkedin.com/in/sherrie-xie-362197154) @Penn (tutorial e texto explicatório do modelo)
+* Justin Sheen @Penn (síntese e codificação de dados)
+* Julianna Shinnick @Penn (revisão literária e coleção de parâmetros)
+* Andrei Gheorghe @Harvard (análise matemática do modelo)
+* [Chris Rehmann](https://www.engineering.iastate.edu/people/profile/rehmann/) @Iowa State (análise matemática do modelo)
+
+Outros apps relacionados ao COVID-19 que recomendamos:
+
+* https://cappralab.com/simulacovid19 - A versão em python do app desenvolvida pelo time do Cappra Institute
+* https://benflips.shinyapps.io/nCovForecast/ - Para rastreamento da taxa de aumento de infecções ao longo do tempo, comparando países, e estimando a fração de casos detectados
+* https://mackgrenfell.com/forecaster/covid19 - Simula crescimento exponencial simples e compara a capacidade hospitalar
+* http://gabgoh.github.io/COVID/index.html - Visualize o impacto do timing da intervenção e impacto na redução de casos
+* https://neherlab.org/covid19/ - Similar a este app, simula dinâmicas epidêmicas e compara a capacidade hospitalar
