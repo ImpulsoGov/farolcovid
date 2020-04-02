@@ -15,12 +15,14 @@ class Documents(enum.Enum):
         FAQ='https://docs.google.com/document/d/1lanC52PjzU2taQISs1kO9mEJPtvwZM4uyvnHL9IalbQ/edit'
         GITHUB='https://github.com/ImpulsoGov/simulacovid/tree/master/COVID19_App'
 
+from models import Colors, Documents, SimulatorOutput, KPI
+
 def local_css(file_name):
     with open(file_name) as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 
-def generateKPIRow(label1, value1, label2, value2):
+def generateKPIRow(kpi1: KPI, kpi2: KPI) -> None:
         st.write('''
         <div class='kpi-wrapper'>
                 <div class='kpi-container green-bg'>
@@ -31,10 +33,10 @@ def generateKPIRow(label1, value1, label2, value2):
                         <h3>%s:</h3>
                         <span class='kpi'>%s</span>
                 </div>
-        <div>''' % (label1, value1, label2, value2), 
+        <div>''' % (kpi1.label, '{:,}'.format(kpi1.value), kpi2.label, '{:,}'.format(kpi2.value)), 
         unsafe_allow_html=True)
 
-def generateSimulatorOutput(color, min_range, max_range, label):
+def generateSimulatorOutput(output: SimulatorOutput) -> None:
         st.write('''
                 <div class="simulator-output-wrapper %s">
                         <h3>entre</h3>
@@ -49,7 +51,7 @@ def generateSimulatorOutput(color, min_range, max_range, label):
                                 </span>
                         </div> 
                 </div>
-        ''' % (color.value, min_range, max_range, label),
+        ''' % (output.color.value, output.min_range, output.max_range, output.label),
         unsafe_allow_html=True)
 
 
@@ -115,7 +117,7 @@ evitar o colapso do sistema.</i>
         st.write('### Selecione seu município abaixo para gerar as projeções')
         city = st.selectbox('Município', ['Campinas', 'Rio de Janeiro'])
 
-        generateKPIRow("CASOS CONFIRMADOS", "53.231", "MORTERS CONFIRMADAS", "1343")
+        generateKPIRow(KPI(label="CASOS CONFIRMADOS", value=53231), KPI(label="MORTERS CONFIRMADAS", value=1343))
 
         st.write('''
 **Fonte:** Brasil.IO atualizado diariamente com base em boletins das secretarias de saúde publicados.
@@ -133,7 +135,7 @@ evitar o colapso do sistema.</i>
 ### Seu município tem a seguinte **capacidade hospitalar:**
         ''')
 
-        generateKPIRow("LEITOS", "53.231", "VENTILADORES", "1343")
+        generateKPIRow(KPI(label="LEITOS", value=53231), KPI(label="VENTILADORES", value=1343))
 
         st.write('''
         <b>Fonte:</b> DATASUS CNes, Fevereiro 2020. Incluímos leitos hospitalares da rede SUS 
@@ -164,11 +166,11 @@ evitar o colapso do sistema.</i>
         </div>
         ''', unsafe_allow_html=True)
 
-        generateSimulatorOutput(Colors.RED, 24, 25, 'LEITOS')
+        generateSimulatorOutput(SimulatorOutput(color=Colors.RED, min_range=24, max_range=25, label='LEITOS'))
         
         st.write('<br/>', unsafe_allow_html=True)
 
-        generateSimulatorOutput(Colors.ORANGE, 24, 25, 'VENTILADORES')
+        generateSimulatorOutput(SimulatorOutput(color=Colors.ORANGE, min_range=24, max_range=25, label='VENTILADORES'))
         
 
         st.write('''
@@ -179,11 +181,11 @@ evitar o colapso do sistema.</i>
         </div>
         ''', unsafe_allow_html=True)
 
-        generateSimulatorOutput(Colors.GREEN, 24, 25, 'LEITOS')
+        generateSimulatorOutput(SimulatorOutput(color=Colors.GREEN, min_range=24, max_range=25, label='LEITOS'))
         
         st.write('<br/>', unsafe_allow_html=True)
 
-        generateSimulatorOutput(Colors.GREEN, 24, 25, 'VENTILADORES')
+        generateSimulatorOutput(SimulatorOutput(color=Colors.GREEN, min_range=24, max_range=25, label='VENTILADORES'))
 
         st.write('# E como me preparo?')
 
