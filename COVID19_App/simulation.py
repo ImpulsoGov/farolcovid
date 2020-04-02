@@ -1,5 +1,8 @@
 import streamlit as st
 import enum
+from model import seir
+import os
+import plotly.express as px
 
 class Colors(enum.Enum):
         RED='red-bg'
@@ -49,6 +52,29 @@ def generateSimulatorOutput(color, min_range, max_range, label):
         ''' % (color.value, min_range, max_range, label),
         unsafe_allow_html=True)
 
+
+# =======> TESTANDO
+def run_evolution():
+    
+    st.sidebar.subheader('Selecione os dados do seu município para rodar o modelo')
+
+    population_params = dict()
+    population_params['N'] = st.sidebar.number_input('População', 0, 10000, 10000, key='N')
+    population_params['I'] = st.sidebar.number_input('Casos confirmados', 0, 10000, 1000, key='I')
+    population_params['D'] = st.sidebar.number_input('Mortes confirmadas', 0, 10000, 10, key='D')
+    population_params['R'] = st.sidebar.number_input('Pessoas recuperadas', 0, 10000, 0, key='R')
+    
+    evolution = seir.entrypoint(population_params, os.getcwd())
+    
+    # Generate fig
+    fig = px.line(evolution.melt('dias'), x='dias', y='value', color='variable')
+    fig.update_layout({'plot_bgcolor': 'rgba(0, 0, 0, 0)', 
+                       'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+                       'yaxis_title': 'Número de pessoas'})
+
+    return fig
+# <================
+        
 def main():
         local_css("style.css")
 
@@ -78,12 +104,16 @@ evitar o colapso do sistema.</i>
                 do projeto. Acesse nossas 
                 <a href="%s">Perguntas Frequentes.</a>
         </i>''' % (Documents.METHODOLOGY.value, Documents.GITHUB.value, Documents.FAQ.value), unsafe_allow_html=True)
+        
+        # =======> TESTANDO
+#         st.write('## Qual a situação do seu município?')
+#         st.write('Selecione os dados do seu município para rodar o modelo')
 
-        st.write('## Qual a situação do seu município?')     
-
-        st.write('### Selecione seu município ao lado para gerar as projeções')
-
-        st.selectbox('Município', ['Campinas'])
+#         # st.line_chart(evolution)
+#         st.plotly_chart(run_evolution())
+        # <================
+        st.write('### Selecione seu município abaixo para gerar as projeções')
+        city = st.selectbox('Município', ['Campinas', 'Rio de Janeiro'])
 
         generateKPIRow("CASOS CONFIRMADOS", "53.231", "MORTERS CONFIRMADAS", "1343")
 
