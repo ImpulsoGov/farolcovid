@@ -1,0 +1,113 @@
+:root {
+    --main-green: #1FA592 ;
+    --main-red: #F26D3D;
+    --main-orange: #F59954;
+    --main-yellow: #F2D335;
+    --main-white: #fff;
+    --main-padding: 2em;
+    --minor-padding: 1em;
+    --main-border-radius: 15px;
+}
+
+h1 {
+    color: var(--main-green);
+}
+
+.info {
+    padding: var(--main-padding);
+    background-color:#f2f2f2;
+    display: flex;
+    justify-content: center;
+}
+
+.scenario {
+    padding: var(--main-padding);
+    display: flex;
+    justify-content: center;
+}
+
+/* KPI Output - Square Style */
+.kpi-wrapper {
+    display: flex;
+    flex-direction: row; 
+    justify-content: space-between;
+    padding: var(--main-padding);
+
+}
+
+.kpi-container {
+    display: flex;
+    flex-direction: column;
+    font-weight: bold;
+    padding: 2em;
+    margin: 1em;
+    border-radius: 15px;
+    flex: 1 1 50%;
+}
+
+.kpi {
+    font-size: 64px;
+    font-weight: bold;
+    color:var(--main-white);
+    
+}
+
+/* Simulation Output - Banner Style */
+.simulator-output-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: var(--minor-padding);
+    border-radius: var(--main-border-radius);
+} 
+
+.simulator-output-row {
+    display: flex;
+    flex-direction: row;   
+    justify-content: space-around;
+    align-items: center;
+}
+
+.simulator-output-row-prediction {
+    /* flex-basis: 60%; */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    flex: 1 1 50%;
+    
+}
+
+.simulator-output-row-prediction-value {
+    font-size: 96px;
+    font-weight: bold;
+    color: var(--main-white)
+}
+
+.simulator-output-row-prediction-separator {
+    font-size: 32px;
+    font-weight: bold;
+    color: white;
+}
+
+.simulator-output-row-prediction-label {
+    flex: 1 0 50%;
+    font-size: 24px;
+    color: white;
+}
+
+/* Background color classes */
+.red-bg {
+    background-color: var(--main-red);
+}
+
+.green-bg {
+    background-color: var(--main-green);
+}
+
+.yellow-bg {
+    background-color: var(--main-yellow);
+}
+
+.orange-bg {
+    background-color: var(--main-orange);
+}
