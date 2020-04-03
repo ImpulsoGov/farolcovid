@@ -2,7 +2,34 @@ import streamlit as st
 from models import Colors, Documents, Strategies, SimulatorOutput, KPI 
 from typing import List
 import utils
+from model import seir
+import os
+import plotly.express as px
 
+
+# =======> TESTANDO (para funcionar, descomente o código nas linhas 112-116!)
+def run_evolution():
+    
+    st.sidebar.subheader('Selecione os dados do seu município para rodar o modelo')
+
+    population_params = dict()
+    population_params['N'] = st.sidebar.number_input('População', 0, 10000, 10000, key='N')
+    population_params['I'] = st.sidebar.number_input('Casos confirmados', 0, 10000, 1000, key='I')
+    population_params['D'] = st.sidebar.number_input('Mortes confirmadas', 0, 10000, 10, key='D')
+    population_params['R'] = st.sidebar.number_input('Pessoas recuperadas', 0, 10000, 0, key='R')
+    
+    model_parameters = yaml.load(open(os.getcwd() + '/model_parameters.yaml', 'r'), Loader=yaml.FullLoader)
+    evolution = seir.entrypoint(population_params, model_parameters, initial=True)
+    
+    # Generate fig
+    fig = px.line(evolution.melt('dias'), x='dias', y='value', color='variable')
+    fig.update_layout({'plot_bgcolor': 'rgba(0, 0, 0, 0)', 
+                       'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+                       'yaxis_title': 'Número de pessoas'})
+
+    return fig
+# <================
+        
 def main():
         utils.localCSS("style.css")
 
@@ -30,12 +57,16 @@ evitar o colapso do sistema.</i>
                 do projeto. Acesse nossas 
                 <a href="%s">Perguntas Frequentes.</a>
         </i>''' % (Documents.METHODOLOGY.value, Documents.GITHUB.value, Documents.FAQ.value), unsafe_allow_html=True)
+        
+        # =======> TESTANDO
+#         st.write('## Qual a situação do seu município?')
+#         st.write('Selecione os dados do seu município para rodar o modelo')
 
-        st.write('## Qual a situação do seu município?')     
-
-        st.write('### Selecione seu município ao lado para gerar as projeções')
-
-        st.selectbox('Município', ['Campinas'])
+#         # st.line_chart(evolution)
+#         st.plotly_chart(run_evolution())
+        # <================
+        st.write('### Selecione seu município abaixo para gerar as projeções')
+        city = st.selectbox('Município', ['Campinas', 'Rio de Janeiro'])
 
         utils.generateKPIRow(KPI(label="CASOS CONFIRMADOS", value=53231), KPI(label="MORTERS CONFIRMADAS", value=1343))
 

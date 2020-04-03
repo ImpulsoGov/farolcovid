@@ -41,9 +41,7 @@ def generateSimulatorOutput(output: SimulatorOutput) -> None:
 
 def generateStrategyCard(strategy: ContainmentStrategy) -> str:
         background = '{}-bg'.format(strategy.color)
-        print(background)
         code_color = strategy.color + '-span'
-        print(code_color)
 
         return '''<div class="scenario-card">
                         <div class="scenario-card-header">
@@ -58,7 +56,6 @@ def generateStrategyCard(strategy: ContainmentStrategy) -> str:
 
 def generateStrategiesSection(strategies: List[ContainmentStrategy]) -> None:
         cards = list(map(generateStrategyCard, strategies))
-        print(cards[0])
 
         st.write('''
         <div class="scenario-wrapper">
