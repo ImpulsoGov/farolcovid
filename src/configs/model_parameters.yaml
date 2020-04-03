@@ -1,6 +1,4 @@
-
-
-brazil:    
+br:    
     seir_parameters:
         # => new values:
         mild_proportion: 0.8

@@ -1,8 +1,13 @@
 import streamlit as st
 import enum
-from model import seir
+
 import os
 import plotly.express as px
+import yaml
+
+import loader
+from model import seir
+from models import Colors, Documents, SimulatorOutput, KPI
 
 class Colors(enum.Enum):
         RED='red-bg'
@@ -15,7 +20,7 @@ class Documents(enum.Enum):
         FAQ='https://docs.google.com/document/d/1lanC52PjzU2taQISs1kO9mEJPtvwZM4uyvnHL9IalbQ/edit'
         GITHUB='https://github.com/ImpulsoGov/simulacovid/tree/master/COVID19_App'
 
-from models import Colors, Documents, SimulatorOutput, KPI
+
 
 def local_css(file_name):
     with open(file_name) as f:
@@ -54,6 +59,14 @@ def generateSimulatorOutput(output: SimulatorOutput) -> None:
         ''' % (output.color.value, output.min_range, output.max_range, output.label),
         unsafe_allow_html=True)
 
+def add_all(x, all_string='Todos'):
+        return [all_string] + list(x)
+
+def filter_frame(_df, name, all_string='Todos'):
+
+        if name == all_string:
+                return _df[[]].sum()
+
 
 # =======> TESTANDO (para funcionar, descomente o código nas linhas 112-116!)
 def run_evolution():
@@ -81,6 +94,8 @@ def run_evolution():
 def main():
         local_css("style.css")
 
+        config = yaml.load(open('configs/config.yaml', 'r'))
+        cities = loader.read_data('br', config)    
 
         st.title("SimulaCovid")
         st.subheader('Como seu município pode se preparar para a Covid-19')
@@ -115,10 +130,35 @@ evitar o colapso do sistema.</i>
 #         # st.line_chart(evolution)
 #         st.plotly_chart(run_evolution())
         # <================
-        st.write('### Selecione seu município abaixo para gerar as projeções')
-        city = st.selectbox('Município', ['Campinas', 'Rio de Janeiro'])
 
-        generateKPIRow(KPI(label="CASOS CONFIRMADOS", value=53231), KPI(label="MORTERS CONFIRMADAS", value=1343))
+        def filter_options(_df, var, col, all_string='Todos'):
+
+                if var == 'Todos':
+                        return _df
+                else:
+                        return _df.query(f'{col} == "{var}"')
+
+        st.write('### Selecione seu município abaixo para gerar as projeções')
+        state_name = st.selectbox('Estado', 
+                        add_all(cities['state_name'].unique()))
+        
+        cities_filtered = filter_options(cities, state_name, 'state_name')
+
+        health_region = st.selectbox('Região SUS', 
+                            add_all(cities_filtered['health_system_region'].unique())
+                            )
+        cities_filtered = filter_options(cities_filtered, health_region, 'health_system_region')
+
+        city_name = st.selectbox('Município', 
+                            add_all(cities_filtered['city_name'].unique())
+                            )
+        cities_filtered = filter_options(cities_filtered, city_name, 'city_name')
+
+        selected_region = cities_filtered.sum(numeric_only=True)
+
+
+        generateKPIRow(KPI(label="CASOS CONFIRMADOS", value=selected_region['number_cases']),
+                       KPI(label="MORTES CONFIRMADAS", value=selected_region['deaths']))
 
         st.write('''
 **Fonte:** Brasil.IO atualizado diariamente com base em boletins das secretarias de saúde publicados.
@@ -313,4 +353,6 @@ Toda a documentação da ferramenta está disponível aqui.
 
         
 if __name__ == "__main__":
+
+
     main()
