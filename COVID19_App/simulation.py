@@ -1,5 +1,5 @@
 import streamlit as st
-from models import Colors, Documents, Strategies, SimulatorOutput, KPI 
+from models import BackgroundColor, Document, Strategies, SimulatorOutput, KPI 
 from typing import List
 import utils
 from model import seir
@@ -56,7 +56,7 @@ evitar o colapso do sistema.</i>
                 <a href="%s">github</a> 
                 do projeto. Acesse nossas 
                 <a href="%s">Perguntas Frequentes.</a>
-        </i>''' % (Documents.METHODOLOGY.value, Documents.GITHUB.value, Documents.FAQ.value), unsafe_allow_html=True)
+        </i>''' % (Document.METHODOLOGY.value, Document.GITHUB.value, Document.FAQ.value), unsafe_allow_html=True)
         
         # =======> TESTANDO
 #         st.write('## Qual a situação do seu município?')
@@ -93,7 +93,7 @@ evitar o colapso do sistema.</i>
         e não-SUS. Para excluir a última categoria, precisaríamos estimar também a 
         opulação susdependente. Para mais informações, confira nossa
         <a href="%s" target="blank">metodologia</a>.
-        ''' % (Documents.METHODOLOGY.value), unsafe_allow_html=True)
+        ''' % (Document.METHODOLOGY.value), unsafe_allow_html=True)
 
 
         st.write('''
@@ -117,11 +117,11 @@ evitar o colapso do sistema.</i>
         </div>
         ''', unsafe_allow_html=True)
 
-        utils.generateSimulatorOutput(SimulatorOutput(color=Colors.RED, min_range=24, max_range=25, label='LEITOS'))
+        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.RED, min_range=24, max_range=25, label='LEITOS'))
         
         st.write('<br/>', unsafe_allow_html=True)
 
-        utils.generateSimulatorOutput(SimulatorOutput(color=Colors.ORANGE, min_range=24, max_range=25, label='VENTILADORES'))
+        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.ORANGE, min_range=24, max_range=25, label='VENTILADORES'))
         
 
         st.write('''
@@ -132,11 +132,11 @@ evitar o colapso do sistema.</i>
         </div>
         ''', unsafe_allow_html=True)
 
-        utils.generateSimulatorOutput(SimulatorOutput(color=Colors.GREEN, min_range=24, max_range=25, label='LEITOS'))
+        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.GREEN, min_range=24, max_range=25, label='LEITOS'))
         
         st.write('<br/>', unsafe_allow_html=True)
 
-        utils.generateSimulatorOutput(SimulatorOutput(color=Colors.GREEN, min_range=24, max_range=25, label='VENTILADORES'))
+        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.GREEN, min_range=24, max_range=25, label='VENTILADORES'))
         
         st.write('<br/>', unsafe_allow_html=True)
 

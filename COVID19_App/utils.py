@@ -40,9 +40,7 @@ def generateSimulatorOutput(output: SimulatorOutput) -> None:
         unsafe_allow_html=True)
 
 def generateStrategyCard(strategy: ContainmentStrategy) -> str:
-        background = '{}-bg'.format(strategy.color)
-        code_color = strategy.color + '-span'
-
+        print(strategy.color)
         return '''<div class="scenario-card">
                         <div class="scenario-card-header">
                                 <span class="scenario-card-header-code %s">ESTRATÉGIA %i</span>
@@ -52,7 +50,7 @@ def generateStrategyCard(strategy: ContainmentStrategy) -> str:
                         </div>
                         <img src="%s" class="scenario-card-img"/>
                         <span class="scenario-card-description">%s</span>
-        </div>''' % (code_color, strategy.code, background, strategy.name, strategy.image_url, strategy.description)
+        </div>''' % (strategy.color.value, strategy.code, strategy.background.value, strategy.name, strategy.image_url, strategy.description)
 
 def generateStrategiesSection(strategies: List[ContainmentStrategy]) -> None:
         cards = list(map(generateStrategyCard, strategies))
