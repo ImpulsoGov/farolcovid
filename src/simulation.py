@@ -59,6 +59,14 @@ def generateSimulatorOutput(output: SimulatorOutput) -> None:
         ''' % (output.color.value, output.min_range, output.max_range, output.label),
         unsafe_allow_html=True)
 
+def add_all(x, all_string='Todos'):
+        return [all_string] + list(x)
+
+def filter_frame(_df, name, all_string='Todos'):
+
+        if name == all_string:
+                return _df[[]].sum()
+
 
 # =======> TESTANDO (para funcionar, descomente o código nas linhas 112-116!)
 def run_evolution():
@@ -122,19 +130,35 @@ evitar o colapso do sistema.</i>
 #         # st.line_chart(evolution)
 #         st.plotly_chart(run_evolution())
         # <================
-        st.write('### Selecione seu município abaixo para gerar as projeções')
-        state = st.selectbox('Estado', cities['state_name'].unique())
-        state_cities = cities.query(f'state_name == "{state}"')
-        health_region = st.selectbox('Região SUS', 
-                            state_cities['health_system_region'].unique()
-                            )
-        city = st.selectbox('Município', 
-                            state_cities['city_name'].unique()
-                            )
-        
 
-        generateKPIRow(KPI(label="CASOS CONFIRMADOS", value=53231), 
-                       KPI(label="MORTERS CONFIRMADAS", value=1343))
+        def filter_options(_df, var, col, all_string='Todos'):
+
+                if var == 'Todos':
+                        return _df
+                else:
+                        return _df.query(f'{col} == "{var}"')
+
+        st.write('### Selecione seu município abaixo para gerar as projeções')
+        state_name = st.selectbox('Estado', 
+                        add_all(cities['state_name'].unique()))
+        
+        cities_filtered = filter_options(cities, state_name, 'state_name')
+
+        health_region = st.selectbox('Região SUS', 
+                            add_all(cities_filtered['health_system_region'].unique())
+                            )
+        cities_filtered = filter_options(cities_filtered, health_region, 'health_system_region')
+
+        city_name = st.selectbox('Município', 
+                            add_all(cities_filtered['city_name'].unique())
+                            )
+        cities_filtered = filter_options(cities_filtered, city_name, 'city_name')
+
+        selected_region = cities_filtered.sum(numeric_only=True)
+
+
+        generateKPIRow(KPI(label="CASOS CONFIRMADOS", value=selected_region['number_cases']),
+                       KPI(label="MORTES CONFIRMADAS", value=selected_region['deaths']))
 
         st.write('''
 **Fonte:** Brasil.IO atualizado diariamente com base em boletins das secretarias de saúde publicados.
