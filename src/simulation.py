@@ -1,63 +1,14 @@
 import streamlit as st
-import enum
-
+from models import BackgroundColor, Document, Strategies, SimulatorOutput, KPI 
+from typing import List
+import utils
+from model import seir
 import os
 import plotly.express as px
 import yaml
 
 import loader
 from model import seir
-from models import Colors, Documents, SimulatorOutput, KPI
-
-class Colors(enum.Enum):
-        RED='red-bg'
-        YELLOW='yellow-bg'
-        ORANGE='orange-bg'
-        GREEN='green-bg'
-
-class Documents(enum.Enum):
-        METHODOLOGY='https://docs.google.com/document/d/1C7LyLmeeQVV0A3vRqH03Ru0ABdJ6hCOcv_lYVMPQy2M/edit'
-        FAQ='https://docs.google.com/document/d/1lanC52PjzU2taQISs1kO9mEJPtvwZM4uyvnHL9IalbQ/edit'
-        GITHUB='https://github.com/ImpulsoGov/simulacovid/tree/master/COVID19_App'
-
-
-
-def local_css(file_name):
-    with open(file_name) as f:
-        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
-
-
-def generateKPIRow(kpi1: KPI, kpi2: KPI) -> None:
-        st.write('''
-        <div class='kpi-wrapper'>
-                <div class='kpi-container green-bg'>
-                        <h3>%s:</h3>   
-                        <span class='kpi'>%s</span>    
-                </div>
-                <div class='kpi-container green-bg'>
-                        <h3>%s:</h3>
-                        <span class='kpi'>%s</span>
-                </div>
-        <div>''' % (kpi1.label, '{:,}'.format(kpi1.value), kpi2.label, '{:,}'.format(kpi2.value)), 
-        unsafe_allow_html=True)
-
-def generateSimulatorOutput(output: SimulatorOutput) -> None:
-        st.write('''
-                <div class="simulator-output-wrapper %s">
-                        <h3>entre</h3>
-                        <div class="simulator-output-row">
-                                <div class="simulator-output-row-prediction">
-                                        <span class="simulator-output-row-prediction-value">%i</span>
-                                        <span class="simulator-output-row-prediction-separator">e</span>
-                                        <span class="simulator-output-row-prediction-value">%i</span>
-                                </div>
-                                <span class="simulator-output-row-prediction-label">
-                                        *DIAS SERÁ ATINGIDA A CAPACIDADE MÁXIMA DE %s
-                                </span>
-                        </div> 
-                </div>
-        ''' % (output.color.value, output.min_range, output.max_range, output.label),
-        unsafe_allow_html=True)
 
 def add_all(x, all_string='Todos'):
         return [all_string] + list(x)
@@ -92,14 +43,13 @@ def run_evolution():
 # <================
         
 def main():
-        local_css("style.css")
+        utils.localCSS("style.css")
 
         config = yaml.load(open('configs/config.yaml', 'r'))
         cities = loader.read_data('br', config)    
 
         st.title("SimulaCovid")
         st.subheader('Como seu município pode se preparar para a Covid-19')
-        
 
         st.write('## SimulaCovid é um simulador da demanda por leitos hospitalares e ventiladores.')        
 
@@ -121,7 +71,7 @@ evitar o colapso do sistema.</i>
                 <a href="%s">github</a> 
                 do projeto. Acesse nossas 
                 <a href="%s">Perguntas Frequentes.</a>
-        </i>''' % (Documents.METHODOLOGY.value, Documents.GITHUB.value, Documents.FAQ.value), unsafe_allow_html=True)
+        </i>''' % (Document.METHODOLOGY.value, Document.GITHUB.value, Document.FAQ.value), unsafe_allow_html=True)
         
         # =======> TESTANDO
 #         st.write('## Qual a situação do seu município?')
@@ -157,7 +107,7 @@ evitar o colapso do sistema.</i>
         selected_region = cities_filtered.sum(numeric_only=True)
 
 
-        generateKPIRow(KPI(label="CASOS CONFIRMADOS", value=selected_region['number_cases']),
+        utils.generateKPIRow(KPI(label="CASOS CONFIRMADOS", value=selected_region['number_cases']),
                        KPI(label="MORTES CONFIRMADAS", value=selected_region['deaths']))
 
         st.write('''
@@ -176,14 +126,14 @@ evitar o colapso do sistema.</i>
 ### Seu município tem a seguinte **capacidade hospitalar:**
         ''')
 
-        generateKPIRow(KPI(label="LEITOS", value=53231), KPI(label="VENTILADORES", value=1343))
+        utils.generateKPIRow(KPI(label="LEITOS", value=53231), KPI(label="VENTILADORES", value=1343))
 
         st.write('''
         <b>Fonte:</b> DATASUS CNes, Fevereiro 2020. Incluímos leitos hospitalares da rede SUS 
         e não-SUS. Para excluir a última categoria, precisaríamos estimar também a 
         opulação susdependente. Para mais informações, confira nossa
         <a href="%s" target="blank">metodologia</a>.
-        ''' % (Documents.METHODOLOGY.value), unsafe_allow_html=True)
+        ''' % (Document.METHODOLOGY.value), unsafe_allow_html=True)
 
 
         st.write('''
@@ -207,11 +157,11 @@ evitar o colapso do sistema.</i>
         </div>
         ''', unsafe_allow_html=True)
 
-        generateSimulatorOutput(SimulatorOutput(color=Colors.RED, min_range=24, max_range=25, label='LEITOS'))
+        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.RED, min_range=24, max_range=25, label='LEITOS'))
         
         st.write('<br/>', unsafe_allow_html=True)
 
-        generateSimulatorOutput(SimulatorOutput(color=Colors.ORANGE, min_range=24, max_range=25, label='VENTILADORES'))
+        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.ORANGE, min_range=24, max_range=25, label='VENTILADORES'))
         
 
         st.write('''
@@ -222,48 +172,15 @@ evitar o colapso do sistema.</i>
         </div>
         ''', unsafe_allow_html=True)
 
-        generateSimulatorOutput(SimulatorOutput(color=Colors.GREEN, min_range=24, max_range=25, label='LEITOS'))
+        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.GREEN, min_range=24, max_range=25, label='LEITOS'))
         
         st.write('<br/>', unsafe_allow_html=True)
 
-        generateSimulatorOutput(SimulatorOutput(color=Colors.GREEN, min_range=24, max_range=25, label='VENTILADORES'))
+        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.GREEN, min_range=24, max_range=25, label='VENTILADORES'))
+        
+        st.write('<br/>', unsafe_allow_html=True)
 
-        st.write('# E como me preparo?')
-
-        st.write("""
-        Em Wuhan, na China, onde foi registrado o primeiro caso de Covid-19, **o governo reagiu em fases para controlar a transmissão da doença, expandir sua capacidade de tratar casos graves e críticos e aliviar a pressão no sistema de saúde pública.**
-
-        Este modelo se baseia na sequência de estratégias apresentadas abaixo (veja <a href="%s" target="blank">Metodologia</a>):        
-        """% (Documents.METHODOLOGY), unsafe_allow_html=True)
-
-        st.write("""
-        <i>**ESTRATÉGIA 1:** Mais pessoas escutam falar da Covid-19, com o início da 
-        confirmação de casos. Algumas começam a tomar precauções individuais, mas 
-        **nenhuma medida de restrição de contato é adotada pelas autoridades.**</i>
-        """, unsafe_allow_html=True)
-
-        st.write("""
-        <i>**ESTRATÉGIA 2:** **O governo decreta o fechamento das fronteiras e do comércio não-essencial, além de restringir o transporte público e toda circulação não estritamente necessária**(medidas de restrição) - tomando porém medidas para 
-        garantir o abastecimento de alimentos e remédios nas cidades. O uso de máscaras
-        em espaços públicos se torna obrigatório. Casos confirmados e suspeitos de 
-        Covid-19 são isolados em suas casas.</i>
-        """, unsafe_allow_html=True)
-
-        st.write("""
-        <i>**ESTRATÉGIA 3:** <b>O governo amplia a capacidade de testes e proíbe estritamente
-        o movimento das pessoas não-autorizadas</b>s (lockdown), com forte monitoramento, 
-        mas sem prejuízo ao abastecimetno das cidades de ítens essenciais. Casos 
-        confirmados são isolados em hospitais, escolas e hotéis designados. 
-        Profissionais de saúde recebem equipamentos de proteção individual adequados 
-        e alojamento, para evitar infecção de suas famílias.</i>
-        """, unsafe_allow_html=True)
-
-        st.write("""
-        A Estratégia 3 exigiu um esforço coordenado entre governo e sociedade: foram 
-        parceiros no investimento em expansão de leitos e fornecimento de equipamentos 
-        de saúde. Ao reduzir a transmissão e expandir a capacidade de tratamento, a 
-        cidade conseguiu "virar a curva."
-        """)
+        utils.generateStrategiesSection(Strategies)
 
         st.write("""
 ## Simule o impacto de estratégias semelhantes na capacidade o sistema de saúde em sua cidade:

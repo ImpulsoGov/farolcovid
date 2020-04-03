@@ -1,12 +1,54 @@
 :root {
     --main-green: #1FA592 ;
+    --main-dark-green: #186F72;
     --main-red: #F26D3D;
     --main-orange: #F59954;
     --main-yellow: #F2D335;
+    --main-grey: #C6C5BD;
     --main-white: #fff;
+    --main-margin: 2em;
     --main-padding: 2em;
-    --minor-padding: 1em;
-    --main-border-radius: 15px;
+    --minor-padding: 0.5em;
+    --main-border-radius: 20px;
+    --main-border-radius-pill: 50px;
+}
+
+/* default background colors */
+.red-bg {
+    background-color: var(--main-red);
+}
+
+.green-bg {
+    background-color: var(--main-green);
+}
+
+.yellow-bg {
+    background-color: var(--main-yellow);
+}
+
+.orange-bg {
+    background-color: var(--main-orange);
+}
+
+.dark-green-bg {
+    background-color: var(--main-dark-green);
+}
+
+.grey-bg {
+    background-color: var(--main-grey);
+}
+
+/* default span colors */
+.grey-span {
+    color: var(--main-grey);
+}
+
+.green-span {
+    color: var(--main-green)
+}
+
+.dark-green-span {
+    color: var(--main-dark-green)
 }
 
 h1 {
@@ -21,7 +63,7 @@ h1 {
 }
 
 .scenario {
-    padding: var(--main-padding);
+    padding: var(--minor-padding);
     display: flex;
     justify-content: center;
 }
@@ -95,19 +137,67 @@ h1 {
     color: white;
 }
 
-/* Background color classes */
-.red-bg {
-    background-color: var(--main-red);
+/* Scenario Row */
+
+.scenario-wrapper {
+    background-color: #3A3A34;
+    width: 100%;
+    padding: var(--main-padding);
 }
 
-.green-bg {
-    background-color: var(--main-green);
+.scenario-wrapper h2 {
+    text-decoration: underline;
+    color: var(--main-white);
+}
+.scenario-card {
+    padding: var(--main-padding) var(--minor-padding);
+    border-radius: var(--main-border-radius);
+    background-color: var(--main-white);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: var(--main-margin);
 }
 
-.yellow-bg {
-    background-color: var(--main-yellow);
+.scenario-card-header {    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.orange-bg {
-    background-color: var(--main-orange);
+.scenario-card-header-code {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.scenario-card-header-name-background {
+    margin: var(--main-margin);
+    padding: 12px;
+    border-radius: var(--main-border-radius-pill);
+
+}
+
+.scenario-card-header-name {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--main-white);
+    white-space: nowrap;
+}
+
+.scenario-card-img {
+    width: 200px;
+    height: auto;
+}
+
+.scenario-card-description {
+    margin-top: var(--main-margin);
+    text-align: center;
+}
+
+/* Add later to override default margins */
+.reportview-container .main .block-container {
+    /* padding: 0rem;
+    max-width: 100% */
 }
