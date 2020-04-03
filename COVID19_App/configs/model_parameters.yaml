@@ -1,23 +1,23 @@
-# TODO - population paremeters will change with inputs from simulation
-population_parameters:
-    N: 10000 
-    I: 1000
-    R: 0
-    D: 10
 
-diseases_parameters:
-    # => new values:
-    mild_proportion: 0.8 # 
-    mild_duration: 6 # time from symptoms to hospitalization
-    severe_proportion: 0.15
-    severe_duration: 6 # time from symptoms to ICU admit (12) - time from symptoms to hospitalization
-    critical_proportion: 0.05
-    critical_duration: 8 # time from hospital admit to death (14) - duration of severe infections
-    fatality_ratio: 0.02 # fraction of all symptomatic infected individuals who eventually die
-    transmission_severe: 0.1
-    transmission_critical: 0.1
-    # => our values:
-    doubling_rate: 1.26
-    incubation_period: 6
-    
-estimation_days: 90
+
+brazil:    
+    seir_parameters:
+        # => new values:
+        mild_proportion: 0.8
+        mild_duration: 6 # time from symptoms to hospitalization
+        severe_proportion: 0.15
+        severe_duration: 6 # time from symptoms to ICU admit (12) - time from symptoms to hospitalization
+        critical_proportion: 0.05
+        critical_duration: 8 # time from hospital admit to death (14) - duration of severe infections
+        fatality_ratio: 0.02 # fraction of all symptomatic infected individuals who eventually die
+        transmission_severe: 0.1
+        transmission_critical: 0.1
+        # => our values:
+        doubling_rate: 1.26
+        incubation_period: 6
+        i1_percentage: 0.855
+        i2_percentage: 0.12
+        i3_percentage: 0.025
+        doubling_rate: 1.26
+
+    estimation_days: 90
