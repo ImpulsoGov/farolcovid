@@ -1,0 +1,20 @@
+br:
+    drive_paths:
+        cities_population: https://docs.google.com/spreadsheets/d/1k8mXuUggBuBEghHhhLrLtA-5wa4JsAc-D35S5bNlf24
+        health_infrastructure: https://docs.google.com/spreadsheets/d/1JD9GREVkU_doNqQQvvA_NC18HhoulrxcJLTqxd07508
+    cases:
+        url: https://brasil.io/api/dataset/covid19/caso/data?is_last=True
+        rename:
+            city_ibge_code: city_id
+            date: last_updated
+            confirmed: number_cases
+        drop: [
+            'city',
+            'confirmed_per_100k_inhabitants',
+            'death_rate',
+            'estimated_population_2019',
+            'is_last',
+            'order_for_place',
+            'place_type',
+            'state'
+        ]

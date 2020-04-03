@@ -6,15 +6,12 @@ Conteúdo e códigos baseados no repositório do <a href="https://github.com/als
 # Installation
 
 ```bash
-virtualenv venv
-source venv/bin/activate
-
-pip3 install --upgrade -r requirements.txt
+make
+. venv/bin/activate
 ```	
 
 # Runing the app
 
 ```bash
-cd COVID19_App
-streamlit run app.py
+make serve
 ```

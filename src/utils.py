@@ -40,7 +40,6 @@ def generateSimulatorOutput(output: SimulatorOutput) -> None:
         unsafe_allow_html=True)
 
 def generateStrategyCard(strategy: ContainmentStrategy) -> str:
-        print(strategy.color)
         return '''<div class="scenario-card">
                         <div class="scenario-card-header">
                                 <span class="scenario-card-header-code %s">ESTRATÉGIA %i</span>

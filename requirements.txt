@@ -1,7 +1,10 @@
 streamlit==0.56.0
-pandas==0.25.1
-numpy==1.17.2
+pandas
+numpy
 scipy==1.3.1
 plotly==4.5.4
 tqdm
 pyyaml
+pytest
+ipykernel
+requests
