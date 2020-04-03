@@ -55,7 +55,7 @@ def generateSimulatorOutput(output: SimulatorOutput) -> None:
         unsafe_allow_html=True)
 
 
-# =======> TESTANDO
+# =======> TESTANDO (para funcionar, descomente o código nas linhas 112-116!)
 def run_evolution():
     
     st.sidebar.subheader('Selecione os dados do seu município para rodar o modelo')
@@ -66,7 +66,8 @@ def run_evolution():
     population_params['D'] = st.sidebar.number_input('Mortes confirmadas', 0, 10000, 10, key='D')
     population_params['R'] = st.sidebar.number_input('Pessoas recuperadas', 0, 10000, 0, key='R')
     
-    evolution = seir.entrypoint(population_params, os.getcwd())
+    model_parameters = yaml.load(open(os.getcwd() + '/model_parameters.yaml', 'r'), Loader=yaml.FullLoader)
+    evolution = seir.entrypoint(population_params, model_parameters, initial=True)
     
     # Generate fig
     fig = px.line(evolution.melt('dias'), x='dias', y='value', color='variable')
