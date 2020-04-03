@@ -5,3 +5,4 @@ notebooks/
 *.pyc
 covid_env/
 venv/
+src/configs/gcloud_credentials.json

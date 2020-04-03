@@ -1,8 +1,13 @@
 import streamlit as st
 import enum
-from model import seir
+
 import os
 import plotly.express as px
+import yaml
+
+import loader
+from model import seir
+from models import Colors, Documents, SimulatorOutput, KPI
 
 class Colors(enum.Enum):
         RED='red-bg'
@@ -15,7 +20,7 @@ class Documents(enum.Enum):
         FAQ='https://docs.google.com/document/d/1lanC52PjzU2taQISs1kO9mEJPtvwZM4uyvnHL9IalbQ/edit'
         GITHUB='https://github.com/ImpulsoGov/simulacovid/tree/master/COVID19_App'
 
-from models import Colors, Documents, SimulatorOutput, KPI
+
 
 def local_css(file_name):
     with open(file_name) as f:
@@ -81,6 +86,8 @@ def run_evolution():
 def main():
         local_css("style.css")
 
+        config = yaml.load(open('configs/config.yaml', 'r'))
+        cities = loader.read_data('br', config)    
 
         st.title("SimulaCovid")
         st.subheader('Como seu município pode se preparar para a Covid-19')
@@ -116,9 +123,18 @@ evitar o colapso do sistema.</i>
 #         st.plotly_chart(run_evolution())
         # <================
         st.write('### Selecione seu município abaixo para gerar as projeções')
-        city = st.selectbox('Município', ['Campinas', 'Rio de Janeiro'])
+        state = st.selectbox('Estado', cities['state_name'].unique())
+        state_cities = cities.query(f'state_name == "{state}"')
+        health_region = st.selectbox('Região SUS', 
+                            state_cities['health_system_region'].unique()
+                            )
+        city = st.selectbox('Município', 
+                            state_cities['city_name'].unique()
+                            )
+        
 
-        generateKPIRow(KPI(label="CASOS CONFIRMADOS", value=53231), KPI(label="MORTERS CONFIRMADAS", value=1343))
+        generateKPIRow(KPI(label="CASOS CONFIRMADOS", value=53231), 
+                       KPI(label="MORTERS CONFIRMADAS", value=1343))
 
         st.write('''
 **Fonte:** Brasil.IO atualizado diariamente com base em boletins das secretarias de saúde publicados.
@@ -313,4 +329,6 @@ Toda a documentação da ferramenta está disponível aqui.
 
         
 if __name__ == "__main__":
+
+
     main()
