@@ -1,12 +1,20 @@
+@import url('https://fonts.googleapis.com/css?family=Oswald&display=swap');
+
 :root {
+    --main-header-font-family: 'Oswald', sans-serif;
+    --main-primary: #0097A7;
+    --main-dark: ##3E758A;
+
+
     --main-green: #1FA592 ;
     --main-dark-green: #186F72;
     --main-red: #F26D3D;
     --main-orange: #F59954;
-    --main-yellow: #F2D335;
+    --main-yellow: #F2C94C;
     --main-grey: #C6C5BD;
     --main-white: #fff;
     --main-margin: 2em;
+    --main-item-margin: 1em;
     --main-padding: 2em;
     --minor-padding: 0.5em;
     --main-border-radius: 20px;
@@ -14,6 +22,10 @@
 }
 
 /* default background colors */
+.primary-bg {
+    background-color: var(--main-primary);
+}
+
 .red-bg {
     background-color: var(--main-red);
 }
@@ -51,16 +63,41 @@
     color: var(--main-dark-green)
 }
 
+.white-span {
+    color: var(--main-white);
+}
+
+.primary-span{
+    color: var(--main-primary);
+}
+
+.yellow-span {
+    color: var(--main-yellow)
+}
+
+/* Override default template */
+.row-widget {
+    padding: 0 1em;
+}
+
+.reportview-container .main .block-container {
+    padding: 0rem;
+    max-width: 100%
+}
+
+
 h1 {
     color: var(--main-green);
 }
 
-.info {
+
+/* LEGACY COMPONENT */
+/* .info {
     padding: var(--main-padding);
     background-color:#f2f2f2;
     display: flex;
     justify-content: center;
-}
+} */
 
 .scenario {
     padding: var(--minor-padding);
@@ -68,31 +105,88 @@ h1 {
     justify-content: center;
 }
 
-/* KPI Output - Square Style */
-.kpi-wrapper {
-    display: flex;
-    flex-direction: row; 
-    justify-content: space-between;
-    padding: var(--main-padding);
-
+/* Base components */
+.base-wrapper {
+    padding: 1rem;
+    max-width: 730px;
+    box-sizing: border-box;
 }
 
-.kpi-container {
+.section-header {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-family: var(--main-header-font-family);
+    font-size: 32px;
+    margin: var(--main-margin) 0;
+    margin-top: var(--main-margin);
+}
+
+
+/* Resources Output - Square Style */
+
+.resources-wrapper {
     display: flex;
     flex-direction: column;
-    font-weight: bold;
-    padding: 2em;
-    margin: 1em;
-    border-radius: 15px;
-    flex: 1 1 50%;
+    margin: var(--main-item-margin) 0;
+
 }
 
-.kpi {
-    font-size: 64px;
+
+.resources-title-container {
+    border: medium solid var(--main-yellow);
+    text-align: center;
+    padding: var(--minor-padding) 0;
+
+}
+
+.resources-title {
+    color: var(--main-white);
+    font-size: 22px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.resources-container-wrapper {
+    display: flex;
+    flex-direction: row;
+}
+
+.resource-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: bold;
+    padding: 0.5em 1em;
+    background-color: var(--main-dark);
+    border: 3px solid var(--main-yellow);
+    flex: 1 1 50%;
+    max-width: 50%;
+}
+
+
+.resource-container-value {
+    font-size: 56px;
     font-weight: bold;
     color:var(--main-white);
     
 }
+
+.resource-container-label {
+    color: var(--main-white);
+    font-weight: lighter;
+}
+
+.resource-font {
+    margin: var(--main-item-margin) 0;
+    font-weight: lighter;
+}
+
+@media only screen and (max-width: 375px) {
+    .resource-container-value {
+        font-size: 40px;
+    }
+  }
+
 
 /* Simulation Output - Banner Style */
 .simulator-output-wrapper {
@@ -194,10 +288,4 @@ h1 {
 .scenario-card-description {
     margin-top: var(--main-margin);
     text-align: center;
-}
-
-/* Add later to override default margins */
-.reportview-container .main .block-container {
-    /* padding: 0rem;
-    max-width: 100% */
 }

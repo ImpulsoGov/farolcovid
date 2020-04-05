@@ -22,9 +22,13 @@ class Document(enum.Enum):
     GITHUB='https://github.com/ImpulsoGov/simulacovid/tree/master/COVID19_App'
 
 # Models
-class KPI(NamedTuple):
-    label: str
-    value: int
+
+class ResourceAvailability(NamedTuple):
+    city: str
+    cases: int
+    deaths: int
+    beds: int
+    ventilators: int
 
 class ContainmentStrategy(NamedTuple):
     background: BackgroundColor

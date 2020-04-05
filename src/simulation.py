@@ -1,5 +1,5 @@
 import streamlit as st
-from models import BackgroundColor, Document, Strategies, SimulatorOutput, KPI 
+from models import BackgroundColor, Document, Strategies, SimulatorOutput, ResourceAvailability
 from typing import List
 import utils
 from model import seir
@@ -88,7 +88,12 @@ evitar o colapso do sistema.</i>
                 else:
                         return _df.query(f'{col} == "{var}"')
 
-        st.write('### Selecione seu município abaixo para gerar as projeções')
+        st.write('''
+        <div class="base-wrapper">
+                <span class="section-header">Qual a situação do meu município?</span>
+        </div>
+        ''',  unsafe_allow_html=True)
+        
         state_name = st.selectbox('Estado', 
                         add_all(cities['state_name'].unique()))
         
@@ -106,56 +111,15 @@ evitar o colapso do sistema.</i>
 
         selected_region = cities_filtered.sum(numeric_only=True)
 
+        utils.genResourceAvailabilitySection(ResourceAvailability(city=city_name, 
+                                                                cases=selected_region['number_cases'],  
+                                                                deaths=selected_region['deaths'],
+                                                                beds=300,
+                                                                ventilators=3000))
 
-        utils.generateKPIRow(KPI(label="CASOS CONFIRMADOS", value=selected_region['number_cases']),
-                       KPI(label="MORTES CONFIRMADAS", value=selected_region['deaths']))
-
-        st.write('''
-**Fonte:** Brasil.IO atualizado diariamente com base em boletins das secretarias de saúde publicados.
-        ''')
-
-        st.write('''
-        <div class="info">
-                <span>
-                        <b>Lembramos que podem existir casos não diagnosticados em sua cidade.</b> Sugerimos que consulte o
-                        Checklist para orientações específicas sobre o que fazer antes do primeiro caso diagnosticado.
-                </span>
-        ''', unsafe_allow_html=True)
-
-        st.write('''
-### Seu município tem a seguinte **capacidade hospitalar:**
-        ''')
-
-        utils.generateKPIRow(KPI(label="LEITOS", value=53231), KPI(label="VENTILADORES", value=1343))
-
-        st.write('''
-        <b>Fonte:</b> DATASUS CNes, Fevereiro 2020. Incluímos leitos hospitalares da rede SUS 
-        e não-SUS. Para excluir a última categoria, precisaríamos estimar também a 
-        opulação susdependente. Para mais informações, confira nossa
-        <a href="%s" target="blank">metodologia</a>.
-        ''' % (Document.METHODOLOGY.value), unsafe_allow_html=True)
-
-
-        st.write('''
-        <div class="info">
-                A maioria das pessoas que contraem Covid-19, conseguem se recuperar em casa - 
-                mas uma parte irá desenvolver sintomas graves e precisará de internação em 
-                leitos hospitalares. Outros terão sintomas críticos e precisarão de ventiladores 
-                mecânicos e tratamento intensivo (UTI). Apesar de serem necessários outros 
-                insumos, esses têm sido fatores limitantes na resposta à crise.
-        <div>
-        ''', unsafe_allow_html=True)
 
         st.write('<br/>', unsafe_allow_html=True)
 
-        st.write('''
-        <div class="scenario">
-                <h3>
-                        Assumiremos que 20% destes poderão ser destinados a pacientes com Covid-19 (você poderá ajustar abaixo). 
-                        Caso seu município conte apenas com atitudes sindividuais, **sem políticas de restrição de contato, estima-se que....**
-                </h3>
-        </div>
-        ''', unsafe_allow_html=True)
 
         utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.RED, min_range=24, max_range=25, label='LEITOS'))
         
