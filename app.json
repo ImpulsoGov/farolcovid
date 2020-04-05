@@ -1,0 +1,19 @@
+{
+    "name": "SimulaCovid",
+    "description": "Simulação do COVID-19 nos municípios brasileiros | Brazilian municipalities COVID-19 simuation",
+    "keywords": [
+      "covid",
+      "python",
+      "datascience"
+    ],
+    "stack": "container",
+    "website": "https://coronacidades.org/",
+    "repository": "https://github.com/ImpulsoGov/simulacovid",
+    "success_url": "/",
+    "formation": {
+      "web": {
+        "quantity": 1,
+        "size": "standard-1X"
+      }
+    }
+  }
