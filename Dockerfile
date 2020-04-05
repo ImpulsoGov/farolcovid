@@ -47,4 +47,4 @@ USER ${USER_NAME}
 
 EXPOSE ${STREAMLIT_SERVER_PORT}
 
-ENTRYPOINT ["./entrypoint.sh"]
+CMD ["./entrypoint.sh"]
