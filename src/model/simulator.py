@@ -4,7 +4,9 @@ import plotly.express as px
 import yaml
 from scipy.integrate import odeint
 from tqdm import tqdm
-
+import sys
+sys.path.insert(0,'.')
+# from seir import entrypoint
 from seir import entrypoint
 
 def iterate_simulation(current_state, seir_parameters, phase, initial):
@@ -18,8 +20,9 @@ def iterate_simulation(current_state, seir_parameters, phase, initial):
     return res, current_state
 
 # Get reproduction rate
-def get_r0(simulation_params, bound):
+def get_r0(scenario_parameters, simulation_params, bound):
     
+
     for phase in simulation_params:
         simulation_params[phase]['R0'] = scenario_parameters[bound][simulation_params[phase]['scenario']]['R0']
 
@@ -56,7 +59,9 @@ def run_simulation(population_params, simulation_params):
         
     """
     
-    scenario_parameters = yaml.load(open('../configs/scenario_parameters.yaml', 'r'), Loader=yaml.FullLoader)
+    scenario_parameters = yaml.load(open('./configs/scenario_parameters.yaml', 'r'), Loader=yaml.FullLoader)
+    model_parameters    = yaml.load(open('./configs/model_parameters.yaml', 'r'), Loader=yaml.FullLoader)
+
     model_params = model_parameters['br']['seir_parameters'] # for now with country = br
     
     dfs = {'worst': np.nan, 'best': np.nan}
@@ -65,7 +70,7 @@ def run_simulation(population_params, simulation_params):
     for bound in dfs.keys():
     
         # Get R0s
-        simulation_params = get_r0(simulation_params, bound)
+        simulation_params = get_r0(scenario_parameters, simulation_params, bound)
 
         # Iterate over phases
         df_evolution = pd.DataFrame()

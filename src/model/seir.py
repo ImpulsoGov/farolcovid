@@ -188,6 +188,6 @@ def entrypoint(population_params, model_params, phase, initial=False):
     return result
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     
-    pass
+#     pass
