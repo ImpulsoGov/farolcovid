@@ -19,11 +19,11 @@ docker-build:
 	docker build -t $(IMAGE_TAG) .
 
 docker-run:
-	docker run -p 8501:8501 $(IMAGE_TAG)
+	docker run --rm -p 8501:8501 $(IMAGE_TAG)
 
 docker-build-run: docker-build docker-run
 
 docker-shell:
-	docker run -it \
+	docker run --rm -it \
 		--entrypoint "/bin/bash" \
 		$(IMAGE_TAG)
