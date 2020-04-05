@@ -121,28 +121,7 @@ evitar o colapso do sistema.</i>
         st.write('<br/>', unsafe_allow_html=True)
 
 
-        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.RED, min_range=24, max_range=25, label='LEITOS'))
-        
-        st.write('<br/>', unsafe_allow_html=True)
-
-        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.ORANGE, min_range=24, max_range=25, label='VENTILADORES'))
-        
-
-        st.write('''
-        <div class="scenario">
-                <h3>
-                        Caso o município decrete hoje o isolamento social, <b>e fechando comércios e suspendendo transporte público, além de quarentena para doentes, estima-se que...</b>
-                </h3>
-        </div>
-        ''', unsafe_allow_html=True)
-
-        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.GREEN, min_range=24, max_range=25, label='LEITOS'))
-        
-        st.write('<br/>', unsafe_allow_html=True)
-
-        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.GREEN, min_range=24, max_range=25, label='VENTILADORES'))
-        
-        st.write('<br/>', unsafe_allow_html=True)
+        utils.genSimulationSection(city_name)
 
         utils.generateStrategiesSection(Strategies)
 

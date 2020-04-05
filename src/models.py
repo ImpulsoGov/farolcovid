@@ -1,6 +1,5 @@
-from typing import NamedTuple
+from typing import NamedTuple, List
 import enum
-from typing import List
 
 # Constants
 class BackgroundColor(enum.Enum):
@@ -40,9 +39,10 @@ class ContainmentStrategy(NamedTuple):
 
 class SimulatorOutput(NamedTuple):
     color: BackgroundColor
-    min_range: int
-    max_range: int
-    label: str
+    min_range_beds: int
+    max_range_beds: int
+    min_range_ventilators: int
+    max_range_ventilators: int
 
 Strategies: List[ContainmentStrategy] = [
         ContainmentStrategy(BackgroundColor.GREY, FontColor.GREY, 1, "Não Intervencão", "https://i.imgur.com/pxYFm76.png", "Nenhuma medida de restrição de contato é adotada pelas autoridades."),
