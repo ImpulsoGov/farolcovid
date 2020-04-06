@@ -110,7 +110,6 @@ h1 {
 /* Base components */
 .base-wrapper {
     padding: 1rem;
-    max-width: 730px;
     box-sizing: border-box;
 }
 
@@ -119,6 +118,57 @@ h1 {
     text-transform: uppercase;
     font-family: var(--main-header-font-family);
     font-size: 32px;
+}
+
+/* Hero Section */
+.hero-bg {
+    width: 100%;
+    background-image: url('https://i.imgur.com/6clFZnc.png');
+    background-position:center;
+    background-repeat:no-repeat;
+	background-size:cover;
+}
+
+.logo-bold {
+    font-size: 64px;
+    color: var(--main-primary);
+    font-weight: bold;
+}
+
+.logo-lighter {
+    font-size: 64px;
+    color: var(--main-primary);
+    font-weight: lighter;
+}
+
+.hero-wrapper {
+    display: flex;
+    flex-direction: row;
+}
+
+.hero-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.hero-container-product {
+    text-transform: uppercase;
+    font-size: 96px;
+    font-weight: bold;
+    line-height: 120px;
+}
+
+.hero-container-subtitle {
+    font-weight: lighter;
+    font-size: 36px;
+    max-lines: 2;
+    
+}
+
+.hero-container-image {
+    margin-left: auto;
+    width: 500px;
+    height: 100%;
 }
 
 /* Resources Output - Square Style */

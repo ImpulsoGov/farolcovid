@@ -8,6 +8,19 @@ def localCSS(file_name):
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 
+def genHeroSection():
+        st.write('''<div class="base-wrapper hero-bg">
+                <span class="logo-bold">corona</span><span class="logo-lighter">cidades</span>
+                <div class="hero-wrapper">
+                        <div class="hero-container">
+                                <span class="hero-container-product primary-span">Simula</span>
+                                <span class="hero-container-product primary-span">Covid</span>
+                                <span class="hero-container-subtitle primary-span">Um simulador da demanda por leitos hospitalares e ventiladores.</span>
+                        </div>   
+                        <img class="hero-container-image" src="https://i.imgur.com/w5yVANW.png"/>
+                </div>
+        </div class="base-wrapper>
+        ''', unsafe_allow_html=True)
 def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
         st.write('''
         <div class="primary-bg"> 

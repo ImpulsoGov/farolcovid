@@ -48,31 +48,31 @@ def main():
         config = yaml.load(open('configs/config.yaml', 'r'))
         cities = loader.read_data('br', config)    
 
-        st.title("SimulaCovid")
-        st.subheader('Como seu município pode se preparar para a Covid-19')
+#         st.title("SimulaCovid")
+#         st.subheader('Como seu município pode se preparar para a Covid-19')
 
-        st.write('## SimulaCovid é um simulador da demanda por leitos hospitalares e ventiladores.')        
+#         st.write('## SimulaCovid é um simulador da demanda por leitos hospitalares e ventiladores.')        
 
-        st.write('''<i>
-Usando dados do DataSUS e de casos confirmados, ele estima por quantos dias - até o limite de 90 - 
-durará o estoque desses equipamentos em cada município. Ao explorar diferentes estratégias de resposta 
-à crise, a ferramenta permite que gestores públicos simulem abordagens e planejem seu curso de ação para 
-evitar o colapso do sistema.</i>
-        ''', unsafe_allow_html=True)
+#         st.write('''<i>
+# Usando dados do DataSUS e de casos confirmados, ele estima por quantos dias - até o limite de 90 - 
+# durará o estoque desses equipamentos em cada município. Ao explorar diferentes estratégias de resposta 
+# à crise, a ferramenta permite que gestores públicos simulem abordagens e planejem seu curso de ação para 
+# evitar o colapso do sistema.</i>
+#         ''', unsafe_allow_html=True)
 
 
 
-        st.write('''
-        <br/>
-        <i>
-                Confira nossa
-                <a href="%s">metodologia</a>
-                e o 
-                <a href="%s">github</a> 
-                do projeto. Acesse nossas 
-                <a href="%s">Perguntas Frequentes.</a>
-        </i>''' % (Document.METHODOLOGY.value, Document.GITHUB.value, Document.FAQ.value), unsafe_allow_html=True)
-        
+#         st.write('''
+#         <br/>
+#         <i>
+#                 Confira nossa
+#                 <a href="%s">metodologia</a>
+#                 e o 
+#                 <a href="%s">github</a> 
+#                 do projeto. Acesse nossas 
+#                 <a href="%s">Perguntas Frequentes.</a>
+#         </i>''' % (Document.METHODOLOGY.value, Document.GITHUB.value, Document.FAQ.value), unsafe_allow_html=True)
+        utils.genHeroSection()
         # =======> TESTANDO
 #         st.write('## Qual a situação do seu município?')
 #         st.write('Selecione os dados do seu município para rodar o modelo')
@@ -125,36 +125,6 @@ evitar o colapso do sistema.</i>
 
         utils.generateStrategiesSection(Strategies)
 
-        st.write("""
-## Simule o impacto de estratégias semelhantes na capacidade o sistema de saúde em sua cidade:
-""")
-
-
-        st.write("""
-## Em quantos dias você quer acionar a Estratégia 2, medidas de restrição?
-""")
-        st.number_input('Dias:', 0, 90, 90, key='strategy2')
-
-        st.write("""
-## Em quantos dias você quer acionar a Estratégia 3, lockdown?
-""")
-
-        st.number_input('Dias:', 0, 90, 90, key='strategy3')
-
-        st.write("""
-## A partir desses números, ajuste a capacidade que será alocada na intervenção:?
-""")
-
-        st.write("""
-## Mude o percentual de leitos destinados aos pacientes com Covid-19:
-""")
-        st.number_input('Leitos:', 0, None, 90)
-
-        st.write("""
-## Mude o percentual de ventiladores destinados aos pacientes com Covid-19:
-""")
-
-        st.number_input('Ventiladores:', 0, None, 90)
 
         st.write("""
 # <Simulador da demanda hospitalar>
