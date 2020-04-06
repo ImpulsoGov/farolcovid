@@ -3,12 +3,12 @@ import enum
 
 # Constants
 class BackgroundColor(enum.Enum):
-    RED='red-bg'
-    YELLOW='yellow-bg'
-    ORANGE='orange-bg'
     GREEN='green-bg'
     DARK_GREEN = 'dark-green-bg'
     GREY='grey-bg'
+    LIGHT_BLUE='light-blue-bg'
+    GREY_GRADIENT='grey-gradient-bg'
+    LIGHT_BLUE_GRADIENT='light-blue-gradient-bg '
 
 class FontColor(enum.Enum):
     GREY='grey-span'

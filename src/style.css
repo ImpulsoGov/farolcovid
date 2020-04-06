@@ -25,20 +25,8 @@
     background-color: var(--main-primary);
 }
 
-.red-bg {
-    background-color: var(--main-red);
-}
-
 .green-bg {
     background-color: var(--main-green);
-}
-
-.yellow-bg {
-    background-color: var(--main-yellow);
-}
-
-.orange-bg {
-    background-color: var(--main-orange);
 }
 
 .dark-green-bg {
@@ -53,6 +41,13 @@
     background: linear-gradient(104.07deg, #E3F1FD 0.41%, #C0DFE2 100%);
 }
 
+.light-blue-bg {
+    background-color: #86E7F1;
+}
+
+.light-blue-gradient-bg {
+    background: linear-gradient(284.63deg, #2BD0E1 0%, #86E7F1 101.47%);
+}
 /* default span colors */
 .grey-span {
     color: var(--main-grey);
@@ -124,10 +119,6 @@ h1 {
     text-transform: uppercase;
     font-family: var(--main-header-font-family);
     font-size: 32px;
-}
-
-.section-header-subtitle {
-    font-weight: lighter;
 }
 
 /* Resources Output - Square Style */
@@ -267,7 +258,7 @@ h1 {
 @media only screen and (max-width: 425px) {
 
     .simulator-output-timeframe {
-        font-size: 16px;
+        font-size: 18px;
     }
     .simulator-output-row-prediction-label {
         font-weight: lighter;
@@ -287,7 +278,6 @@ h1 {
 /* Scenario Row */
 
 .scenario-wrapper {
-    background-color: #3A3A34;
     width: 100%;
     padding: var(--main-padding);
 }

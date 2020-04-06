@@ -90,7 +90,7 @@ evitar o colapso do sistema.</i>
 
         st.write('''
         <div class="base-wrapper">
-                <span class="section-header">Qual a situação do meu município?</span>
+                <span class="section-header primary-span">Qual a situação do meu município?</span>
         </div>
         ''',  unsafe_allow_html=True)
         
