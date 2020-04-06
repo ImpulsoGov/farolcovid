@@ -162,13 +162,12 @@ def genStrategyCard(strategy: ContainmentStrategy) -> str:
 def generateStrategiesSection(strategies: List[ContainmentStrategy]) -> None:
         cards = list(map(genStrategyCard, strategies))
         cards = ''.join(cards)
+        print(cards)
         st.write('''
-        <div class="scenario-wrapper primary-bg">
+        <div class="primary-bg">
                 <div class="base-wrapper">
                         <span class="section-header white-span">E como me preparo?</span>
-                        <div class="scenario-cards-container">
-                                %s
-                        </div>
+                        <div class="scenario-cards-container">%s</div>
                 </div>
         </div>
         ''' % cards,
