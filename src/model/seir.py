@@ -10,6 +10,7 @@ def prepare_states(population_params, model_params):
 
     Params
     --------
+
     population_param: dict
            Explicit population parameters:
                     - N: population
@@ -17,8 +18,8 @@ def prepare_states(population_params, model_params):
                     - R: recovered
                     - D: deaths
 
-    model_params: dict
-            Parameters of model dynamic (transmission, progression, recovery and death rates)
+    config: dict
+            General configuration files with rules to estimate implicit parameters
 
     Returns
     --------
@@ -41,28 +42,23 @@ def prepare_states(population_params, model_params):
     
     return initial_pop_params
 
-def prepare_params(population_params, disease_params, reproduction_rate=3):
+def prepare_params(population_params, disease_params, reproduction_rate):
     """
     Estimate non explicity disease parameters
 
     Params
     --------
-    population_param: dict
-           Explicit population parameters:
-                    - N: population
-                    - I: infected
-                    - R: recovered
-                    - D: deaths
 
-    model_params: dict
-            Parameters of model dynamic (transmission, progression, recovery and death rates)
+    disease_params: dict
+        Diseases parameters:
+                   - ...
 
     Returns
     --------
     dict
            Explicit and implicit disease parameters ready to be applied in the `model` function
     """
-
+    
     frac_severe_to_critical = disease_params['i3_percentage'] / (disease_params['i2_percentage'] + disease_params['i3_percentage'])
     frac_critical_to_death = disease_params['fatality_ratio'] / disease_params['i3_percentage']
     
@@ -87,8 +83,7 @@ def prepare_params(population_params, disease_params, reproduction_rate=3):
     
     return parameters
 
-
-def SEIR(y, t, model_params):
+def SEIR(y, t, model_params, initial=False):
     """
     The SEIR model differential equations.
     
@@ -104,7 +99,7 @@ def SEIR(y, t, model_params):
               - R: recovered
               - D: deaths
             
-    model_params: dict
+    model_params: int
            Parameters of model dynamic (transmission, progression, recovery and death rates)
 
     Return
@@ -112,7 +107,7 @@ def SEIR(y, t, model_params):
     pd.DataFrame
             Evolution of population parameters.
     """
-
+        
     S, E, I1, I2, I3, R, D = y
     
     # Exposition of susceptible rate
@@ -142,7 +137,7 @@ def SEIR(y, t, model_params):
     return dSdt, dEdt, dI1dt, dI2dt, dI3dt, dRdt, dDdt
 
 
-def entrypoint(population_params, model_params, initial=False, reproduction_rate=3, n_days=90):
+def entrypoint(population_params, model_params, phase, initial=False):
     """
     Function to receive user input and run model.
     
@@ -159,13 +154,13 @@ def entrypoint(population_params, model_params, initial=False, reproduction_rate
               - D: deaths
 
     model_params: dict
-            Parameters of model dynamic (transmission, progression, recovery and death rates)
+        Parameters of model dynamic (transmission, progression, recovery and death rates)
                                  
-    reproduction_rate: int
-            Basic reproduction rate of the disease.
-            
-    n_days: int
-            Number of days to model.
+    phase: dict
+       Scenario and days to run 
+            - scenario
+            - date
+        
 
     Return
     -------
@@ -174,25 +169,25 @@ def entrypoint(population_params, model_params, initial=False, reproduction_rate
     """
     
     if initial: # Get I1, I2, I3 & E
-        population_params, model_params = prepare_states(population_params, model_params), prepare_params(population_params, model_params)
-    
+        population_params, model_params = prepare_states(population_params, model_params), prepare_params(population_params, model_params, phase['R0'])
+    else:
+        model_params = prepare_params(population_params, model_params, phase['R0'])
+        del population_params['N']
+        # population_params = population_params[:-1]
+        
     # Run model
-    params = {'y0': list(y.values()),
-              't': np.linspace(0, n_days, n_days+1), 
-              'args': (model_params,)}
+    params = {'y0': list(population_params.values()),
+              't': np.linspace(0, phase['n_days'], phase['n_days']+1), 
+              'args': (model_params, initial)}
     
     result = pd.DataFrame(odeint(SEIR, **params), columns=['S', 'E' ,'I1', 'I2', 'I3', 'R', 'D'])
+    result['N'] = result.sum(axis=1)
+    result['scenario'] = phase['scenario']
     result.index.name = 'dias'
     
     return result
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     
-    model_parameters = yaml.load(open('model_parameters.yaml', 'r'), Loader=yaml.FullLoader)
-    user_params = {'N': 10000, # 'city' => filter N (total pop) + I, D (brasil.io cases)
-                   'I': 1000,
-                   'R': 0,
-                   'D': 10}
-    seir_params = model_parameters['brazil']['seir_parameters']
-    result = entrypoint(user_params, seir_params, initial=True, reproduction_rate=3, n_days=90)
+#     pass

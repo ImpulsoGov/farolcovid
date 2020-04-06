@@ -110,20 +110,10 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
         return output.strip('\n\t')
                 
 
-def genSimulationSection(city) -> None:
-        status_quo = genSimulatorOutput(SimulatorOutput(
-                                color=BackgroundColor.GREY_GRADIENT,
-                                min_range_beds=24, 
-                                max_range_beds=25, 
-                                min_range_ventilators=15,
-                                max_range_ventilators=10)) 
+def genSimulationSection(city, worst_case, best_case) -> None:
+        status_quo = genSimulatorOutput(worst_case) 
 
-        restrictions = genSimulatorOutput(SimulatorOutput(
-                                color=BackgroundColor.LIGHT_BLUE_GRADIENT,
-                                min_range_beds=24, 
-                                max_range_beds=25, 
-                                min_range_ventilators=15,
-                                max_range_ventilators=10)) 
+        restrictions = genSimulatorOutput(best_case) 
 
         st.write('''<div class="base-wrapper">
                 <div class="simulator-wrapper">
