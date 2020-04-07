@@ -3,7 +3,7 @@ import sys
 sys.path.insert(0,'./model/')
 
 import streamlit as st
-from models import BackgroundColor, Document, Strategies, SimulatorOutput, KPI 
+from models import BackgroundColor, Document, Strategies, SimulatorOutput, ResourceAvailability
 from typing import List
 import utils
 import plotly.express as px
@@ -100,31 +100,7 @@ def main():
         config = yaml.load(open('configs/config.yaml', 'r'), Loader = yaml.FullLoader)
         cities = loader.read_data('br', config)
 
-        st.title("SimulaCovid")
-        st.subheader('Como seu município pode se preparar para a Covid-19')
-
-        st.write('## SimulaCovid é um simulador da demanda por leitos hospitalares e ventiladores.')        
-
-        st.write('''<i>
-Usando dados do DataSUS e de casos confirmados, ele estima por quantos dias - até o limite de 90 - 
-durará o estoque desses equipamentos em cada município. Ao explorar diferentes estratégias de resposta 
-à crise, a ferramenta permite que gestores públicos simulem abordagens e planejem seu curso de ação para 
-evitar o colapso do sistema.</i>
-        ''', unsafe_allow_html=True)
-
-
-
-        st.write('''
-        <br/>
-        <i>
-                Confira nossa
-                <a href="%s">metodologia</a>
-                e o 
-                <a href="%s">github</a> 
-                do projeto. Acesse nossas 
-                <a href="%s">Perguntas Frequentes.</a>
-        </i>''' % (Document.METHODOLOGY.value, Document.GITHUB.value, Document.FAQ.value), unsafe_allow_html=True)
-        
+        utils.genHeroSection()
         # =======> TESTANDO
 #         st.write('## Qual a situação do seu município?')
 #         st.write('Selecione os dados do seu município para rodar o modelo')
@@ -140,7 +116,12 @@ evitar o colapso do sistema.</i>
                 else:
                         return _df.query(f'{col} == "{var}"')
 
-        st.write('### Selecione seu município abaixo para gerar as projeções')
+        st.write('''
+        <div class="base-wrapper">
+                <span class="section-header primary-span">Qual a situação do meu município?</span>
+        </div>
+        ''',  unsafe_allow_html=True)
+        
         state_name = st.selectbox('Estado', 
                         add_all(cities['state_name'].unique()))
         
@@ -158,102 +139,46 @@ evitar o colapso do sistema.</i>
 
         selected_region = cities_filtered.sum(numeric_only=True)
 
+        utils.genResourceAvailabilitySection(ResourceAvailability(city=city_name, 
+                                                                cases=selected_region['number_cases'],  
+                                                                deaths=selected_region['deaths'],
+                                                                beds=300,
+                                                                ventilators=3000))
 
-        utils.generateKPIRow(KPI(label="CASOS CONFIRMADOS", value=selected_region['number_cases']),
-                       KPI(label="MORTES CONFIRMADAS", value=selected_region['deaths']))
-
-        st.write('''
-**Fonte:** Brasil.IO atualizado diariamente com base em boletins das secretarias de saúde publicados.
-        ''')
-
-        st.write('''
-        <div class="info">
-                <span>
-                        <b>Lembramos que podem existir casos não diagnosticados em sua cidade.</b> Sugerimos que consulte o
-                        Checklist para orientações específicas sobre o que fazer antes do primeiro caso diagnosticado.
-                </span>
-        ''', unsafe_allow_html=True)
-
-        st.write('''
-### Seu município tem a seguinte **capacidade hospitalar:**
-        ''')
-
-        utils.generateKPIRow(KPI(label="LEITOS", value=53231), KPI(label="VENTILADORES", value=1343))
-
-        st.write('''
-        <b>Fonte:</b> DATASUS CNes, Fevereiro 2020. Incluímos leitos hospitalares da rede SUS 
-        e não-SUS. Para excluir a última categoria, precisaríamos estimar também a 
-        opulação susdependente. Para mais informações, confira nossa
-        <a href="%s" target="blank">metodologia</a>.
-        ''' % (Document.METHODOLOGY.value), unsafe_allow_html=True)
-
-
-        st.write('''
-        <div class="info">
-                A maioria das pessoas que contraem Covid-19, conseguem se recuperar em casa - 
-                mas uma parte irá desenvolver sintomas graves e precisará de internação em 
-                leitos hospitalares. Outros terão sintomas críticos e precisarão de ventiladores 
-                mecânicos e tratamento intensivo (UTI). Apesar de serem necessários outros 
-                insumos, esses têm sido fatores limitantes na resposta à crise.
-        <div>
-        ''', unsafe_allow_html=True)
 
         st.write('<br/>', unsafe_allow_html=True)
 
-        st.write('''
-        <div class="scenario">
-                <h3>
-                        Assumiremos que 20% destes poderão ser destinados a pacientes com Covid-19 (você poderá ajustar abaixo). 
-                        Caso seu município conte apenas com atitudes sindividuais, **sem políticas de restrição de contato, estima-se que....**
-                </h3>
-        </div>
-        ''', unsafe_allow_html=True)
-        
+
         ### INITIAL VALUES FOR BEDS AND VENTILATORS
         beds_20_perc = int(selected_region['number_beds']*0.2)
         ventilators_20_perc = int(selected_region['number_ventilators']*0.2)
         
         #WORST SCENARIO SIMULATION        
         dday_beds_worst, dday_beds_best, dday_ventilators_worst, dday_ventilators_best = run_evolution_static(selected_region,
-                                                                                                            days_until_isolation=360,
-                                                                                                            days_until_lockdon=0,
+                                                                                                            days_until_isolation=360,                                                                                   days_until_lockdon=0,
                                                                                                             number_beds=beds_20_perc,
                                                                                                             number_ventilators=ventilators_20_perc)
-        
-        
-		#WORST SCENARIO SIMULATION
-        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.RED, min_range=dday_beds_worst, max_range=dday_beds_best, label='LEITOS'))
-        
-        st.write('<br/>', unsafe_allow_html=True)
+        worst_case = SimulatorOutput(color=BackgroundColor.GREY_GRADIENT,
+                                min_range_beds=dday_beds_worst, 
+                                max_range_beds=dday_beds_best, 
+                                min_range_ventilators=dday_ventilators_worst,
+                                max_range_ventilators=dday_ventilators_best)        
+       
 
-        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.ORANGE, min_range=dday_ventilators_worst, max_range=dday_ventilators_best, label='VENTILADORES'))
-        
-
-        
-        
-        st.write('''
-        <div class="scenario">
-                <h3>
-                        Caso o município decrete hoje o isolamento social, <b>e fechando comércios e suspendendo transporte público, além de quarentena para doentes, estima-se que...</b>
-                </h3>
-        </div>
-        ''', unsafe_allow_html=True)
-        
-        #BEST SCENARIO SIMULATION
+         #BEST SCENARIO SIMULATION
         dday_beds_worst, dday_beds_best, dday_ventilators_worst, dday_ventilators_best = run_evolution_static(selected_region,
                                                                                                             days_until_isolation=1,
                                                                                                             days_until_lockdon=0,
-                                                                                                            number_beds=beds_20_perc,
+                                                                                                        number_beds=beds_20_perc,
                                                                                                             number_ventilators=ventilators_20_perc)
-		#BEST SCENARIO CARDS	
-        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.GREEN, min_range=dday_beds_worst, max_range=dday_beds_best, label='LEITOS'))
-        
-        st.write('<br/>', unsafe_allow_html=True)
-        
-        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.GREEN, min_range=dday_ventilators_worst, max_range=dday_ventilators_best, label='VENTILADORES'))
-        
-        st.write('<br/>', unsafe_allow_html=True)
+        best_case = SimulatorOutput(color=BackgroundColor.LIGHT_BLUE_GRADIENT,
+                                min_range_beds=dday_beds_worst, 
+                                max_range_beds=dday_beds_best, 
+                                min_range_ventilators=dday_ventilators_worst,
+                                max_range_ventilators=dday_ventilators_best)   
 
+        utils.genSimulationSection(city_name, worst_case, best_case)	
+        
         utils.generateStrategiesSection(Strategies)
 
         st.write("""
@@ -287,39 +212,15 @@ evitar o colapso do sistema.</i>
         number_ventilators = st.number_input('Ventiladores:', 0, None, ventilators_20_perc)
         
 
-
-
-        
         fig, dday_beds_worst, dday_beds_best, dday_ventilators_worst, dday_ventilators_best = run_evolution(selected_region,
                                                                                                             days_until_isolation,
-                                                                                                            days_until_lockdon,
-                                                                                                            number_beds,
-                                                                                                            number_ventilators)
+                                                                                                            days_until_lockdon, number_beds,
+                                                                                                number_ventilators)
         st.plotly_chart(fig)
 
-
-        
-        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.GREEN, min_range=dday_beds_worst, max_range=dday_beds_best, label='LEITOS'))
-        
+                
         st.write('<br/>', unsafe_allow_html=True)
 
-        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.GREEN, min_range=dday_ventilators_worst, max_range=dday_ventilators_best, label='VENTILADORES'))
-        
-        st.write('<br/>', unsafe_allow_html=True)
-
-        utils.generateStrategiesSection(Strategies)
-        
-        
-
-        
-        
-        
-        
-        
-        
-        
-        
-        
         
         st.write("""
 # <Simulador da demanda hospitalar>
