@@ -53,13 +53,9 @@ def main():
         cities = loader.read_data('br', config)
 
         user_input = dict()
-        utils.genHeroSection()
 
-        st.write('''
-        <div class="base-wrapper">
-                <span class="section-header primary-span">Qual a situação do meu município?</span>
-        </div>
-        ''',  unsafe_allow_html=True)
+        utils.genHeroSection()
+        utils.genMunicipalityInputSection()
         
         user_input['state'] = st.selectbox('Estado', add_all(cities['state_name'].unique()))
         cities_filtered = filter_options(cities, user_input['state'], 'state_name')
@@ -92,6 +88,8 @@ def main():
                                                                   beds=user_input['n_beds'], 
                                                                   ventilators=user_input['n_ventilators']))
 
+        utils.generateStrategiesSection(Strategies)
+        
         st.write('<br/>', unsafe_allow_html=True)
 
         
@@ -117,7 +115,6 @@ def main():
 
         
         utils.genSimulationSection(choose_place(user_input['city'], user_input['state']), worst_case, best_case)
-        utils.generateStrategiesSection(Strategies)
 
         # SIMULATOR MENU
         user_input = simulator_menu(user_input)

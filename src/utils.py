@@ -21,12 +21,22 @@ def genHeroSection():
                 </div>
         </div class="base-wrapper>
         ''', unsafe_allow_html=True)
+
+def genMunicipalityInputSection() -> None:        
+        st.write('''
+        <div class="base-wrapper">
+                <span class="section-header primary-span">Qual a situação do meu município?</span>
+        </div>
+        ''',  unsafe_allow_html=True)
+
 def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
+        preposition, city = ('', 'Geral') if resources.city == 'Todos' else ('em', resources.city)
+
         st.write('''
         <div class="primary-bg"> 
                 <div class="base-wrapper">
                         <span class="section-header white-span">
-                                Panorama em <span class="yellow-span">%s</span>
+                                Panorama %s <span class="yellow-span">%s</span>
                         </span>
                         <div class="resources-wrapper">
                                 <div class="resources-title-container">
@@ -65,22 +75,38 @@ def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
                 </div>
         </div>
         ''' 
-        %(resources.city, resources.cases, resources.deaths, resources.beds, resources.ventilators)
+        %(preposition, city, resources.cases, resources.deaths, resources.beds, resources.ventilators)
         , unsafe_allow_html=True)
 
 
 def genSimulatorOutput(output: SimulatorOutput) -> str:
         bed_img = 'https://i.imgur.com/27hutU0.png'
         ventilator_icon = 'https://i.imgur.com/8kxC2Fi.png'
+        
+        has_bed_projection = (output.min_range_beds != -1 and  output.max_range_beds != -1)
+        bed_prep = 'entre' if has_bed_projection else 'em'
+        
+        has_ventilator_projection = (output.min_range_ventilators != -1 and output.max_range_ventilators != -1)
+        ventilator_prep = 'entre' if has_ventilator_projection else 'em'
+        
+        if has_bed_projection:
+                bed_projection = '%i <span class="simulator-output-row-prediction-separator">e</span> %i' % (output.min_range_beds, output.max_range_beds)
+        else:
+                bed_projection = 'mais de 90'
+
+        if has_ventilator_projection: 
+                ventilator_projection = '%i <span class="simulator-output-row-prediction-separator">e</span> %i' % (output.min_range_ventilators, output.max_range_ventilators)
+        else:
+                ventilator_projection = 'mais de 90'
 
         output =  '''
         <div>
                 <div class="simulator-container %s">
                         <div class="simulator-output-wrapper">
-                                <span class="simulator-output-timeframe">entre</span>
+                                <span class="simulator-output-timeframe">%s</span>
                                 <div class="simulator-output-row">
                                         <span class="simulator-output-row-prediction-value">
-                                                %i <span class="simulator-output-row-prediction-separator">e</span> %i
+                                                %s
                                         </span>  
                                 </div> 
                                 <span class="simulator-output-row-prediction-label">
@@ -92,10 +118,10 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
                 <br />
                 <div class="simulator-container %s">
                         <div class="simulator-output-wrapper">
-                                <span class="simulator-output-timeframe">entre</span>
+                                <span class="simulator-output-timeframe">%s</span>
                                 <div class="simulator-output-row">
                                         <span class="simulator-output-row-prediction-value">
-                                                %i <span class="simulator-output-row-prediction-separator">e</span> %i
+                                                %s
                                         </span>  
                                 </div> 
                                 <span class="simulator-output-row-prediction-label">
@@ -104,21 +130,23 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
                         </div>
                         <img src="%s" class="simulator-output-image"/>
                 </div>
-        </div>''' % (output.color.value, output.min_range_beds, output.max_range_beds, bed_img,
-                     output.color.value, output.min_range_ventilators, output.max_range_ventilators, ventilator_icon)
+        </div>''' % (output.color.value, bed_prep, bed_projection, bed_img,
+                     output.color.value, ventilator_prep, ventilator_projection, ventilator_icon)
 
         return output.strip('\n\t')
                 
 
-def genSimulationSection(city, worst_case, best_case) -> None:
-        status_quo = genSimulatorOutput(worst_case) 
+def genSimulationSection(city: str, worst_case: SimulatorOutput, best_case: SimulatorOutput) -> None:
 
+        status_quo = genSimulatorOutput(worst_case) 
         restrictions = genSimulatorOutput(best_case) 
+
+        preposition, city = ('', 'Geral') if city == 'Todos' else ('em', city)
 
         st.write('''<div class="base-wrapper">
                 <div class="simulator-wrapper">
                         <span class="section-header primary-span">
-                                Projeção em <span class="yellow-span">%s</span>
+                                Projeção %s <span class="yellow-span">%s</span>
                         </span>
                         <div class="simulation-scenario-header-container">
                                 <span class="simulator-scenario-header grey-bg">
@@ -126,15 +154,17 @@ def genSimulationSection(city, worst_case, best_case) -> None:
                                 </span>
                         </div>
                         %s
+                        <br/>
+                        <br/>
                         <div class="simulation-scenario-header-container">
-                                <span class="simulator-scenario-header light-blue-bg">
+                                <span class="simulator-scenario-header lightblue-bg">
                                         Cenário 2: Medidas-Restritivas
                                 </span>
                         </div>
                         %s
                 </div>
         </div>
-        ''' % (city, status_quo, restrictions), unsafe_allow_html=True)
+        ''' % (preposition, city, status_quo, restrictions), unsafe_allow_html=True)
 
 def genStrategyCard(strategy: ContainmentStrategy) -> str:
         return '''
@@ -152,7 +182,6 @@ def genStrategyCard(strategy: ContainmentStrategy) -> str:
 def generateStrategiesSection(strategies: List[ContainmentStrategy]) -> None:
         cards = list(map(genStrategyCard, strategies))
         cards = ''.join(cards)
-        print(cards)
         st.write('''
         <div class="primary-bg">
                 <div class="base-wrapper">

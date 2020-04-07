@@ -111,7 +111,7 @@ def get_dday(dfs,col,resource_number):
         if max(df[col]) > resource_number:
             dday[case] = df[df[col] > resource_number].index[0]
         else:
-            dday[case] = 666 # change here!
+            dday[case] = -1 # change here!
     
     return dday
 

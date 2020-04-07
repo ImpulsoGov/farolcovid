@@ -1,15 +1,17 @@
 @import url('https://fonts.googleapis.com/css?family=Oswald&display=swap');
 
+
 :root {
     --main-header-font-family: 'Oswald', sans-serif;
     --main-primary: #0097A7;
-    --main-dark: ##3E758A;
+    --main-dark: #3E758A;
+    --main-light: #00E7FF;
     --main-green: #1FA592 ;
     --main-dark-green: rgb(0, 2, 2);
     --main-red: #F26D3D;
     --main-orange: #F59954;
     --main-yellow: #F2C94C;
-    --main-grey: #c4c4c4;
+    --main-grey: #A8BFD2;
     --main-white: #fff;
     --main-black: #252729;
     --main-margin: 2em;
@@ -25,12 +27,8 @@
     background-color: var(--main-primary);
 }
 
-.green-bg {
-    background-color: var(--main-green);
-}
-
-.dark-green-bg {
-    background-color: var(--main-dark-green);
+.darkblue-bg {
+    background-color: var(--main-dark);
 }
 
 .grey-bg {
@@ -38,15 +36,15 @@
 }
 
 .grey-gradient-bg {
-    background: linear-gradient(104.07deg, #E3F1FD 0.41%, #C0DFE2 100%);
+    background:  linear-gradient(104.07deg, #E3F1FD 0.41%, #C0DFE2 100%);
 }
 
-.light-blue-bg {
-    background-color: #86E7F1;
+.lightblue-bg {
+    background-color: var(--main-light);
 }
 
 .light-blue-gradient-bg {
-    background: linear-gradient(284.63deg, #2BD0E1 0%, #86E7F1 101.47%);
+    background: linear-gradient(284.63deg, #00E7FF 0%, #A8F7FF 101.47%);
 }
 /* default span colors */
 .grey-span {
@@ -57,9 +55,16 @@
     color: var(--main-green)
 }
 
-.dark-green-span {
-    color: var(--main-dark-green)
+.lightblue-span {
+    color: var(--main-light)
 }
+
+.darkblue-span {
+    color: var(--main-dark);
+}
+/* .dark-green-span {
+    color: var(--main-dark-green)
+} */
 
 .white-span {
     color: var(--main-white);
@@ -109,9 +114,16 @@ h1 {
 
 /* Base components */
 .base-wrapper {
-    padding: 1rem;
+    padding: 3rem;
     box-sizing: border-box;
 }
+
+@media only screen and (max-width: 375px) {
+    .base-wrapper {
+        padding: 1em;
+    }
+  }
+
 
 .section-header {
     font-weight: bold;
@@ -206,7 +218,6 @@ h1 {
     align-items: center;
     font-weight: bold;
     padding: 0.5em 1em;
-    background-color: var(--main-dark);
     border: 3px solid var(--main-yellow);
     flex: 1 1 50%;
     max-width: 50%;
@@ -230,7 +241,7 @@ h1 {
     font-weight: lighter;
 }
 
-@media only screen and (max-width: 375px) {
+@media only screen and (max-width: 425px) {
     .resource-container-value {
         font-size: 40px;
     }
@@ -262,6 +273,7 @@ h1 {
     padding: var(--main-padding);
     border-radius: var(--main-border-radius);
     align-items: center;
+    max-width: 730px;
 }
 
 .simulator-output-wrapper {
@@ -327,16 +339,6 @@ h1 {
 
 /* Scenario Row */
 
-/* .scenario-wrapper {
-    width: 100%;
-    padding: var(--main-padding);
-} */
-
-.scenario-wrapper h2 {
-    text-decoration: underline;
-    color: var(--main-white);
-}
-
 .scenario-card {
     width: 250px;
     padding: var(--main-padding) var(--minor-padding);
@@ -353,6 +355,7 @@ h1 {
         display: flex;
         flex-direction: row;
         justify-content: space-evenly;
+    }
 }
 
 .scenario-card-header {    
@@ -375,7 +378,7 @@ h1 {
 
 .scenario-card-header-name {
     text-align: center;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     text-transform: uppercase;
     color: var(--main-white);
@@ -383,8 +386,16 @@ h1 {
 }
 
 .scenario-card-img {
-    width: 200px;
-    height: auto;
+    width: 150px;
+    height: 150px;
+    /* height: auto; */
+}
+
+@media only screen and (min-width: 768px) {
+    .scenario-card-img {
+        width: 200px;
+        height: auto;
+    }
 }
 
 .scenario-card-description {
