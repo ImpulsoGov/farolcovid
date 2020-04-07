@@ -1,3 +1,24 @@
+simulator:
+    max_days: 90
+    scenarios:
+        worst:
+            nothing: 
+                R0: 3.97
+            isolation: 
+                R0: 1.31
+            lockdown:
+                R0: 0.37
+            test_delay: 0
+
+        best:
+            nothing:
+                R0: 3.74
+            isolation:
+                R0: 1.21
+            lockdown:
+                R0: 0.28
+            test_delay: 0
+
 br:
     drive_paths:
         cities_population: https://docs.google.com/spreadsheets/d/1k8mXuUggBuBEghHhhLrLtA-5wa4JsAc-D35S5bNlf24
@@ -18,3 +39,21 @@ br:
             'place_type',
             'state'
         ]
+    seir_parameters:
+        # => new values:
+        mild_proportion: 0.8
+        mild_duration: 6 # time from symptoms to hospitalization
+        severe_proportion: 0.15
+        severe_duration: 6 # time from symptoms to ICU admit (12) - time from symptoms to hospitalization
+        critical_proportion: 0.05
+        critical_duration: 8 # time from hospital admit to death (14) - duration of severe infections
+        fatality_ratio: 0.02 # fraction of all symptomatic infected individuals who eventually die
+        transmission_severe: 0.1
+        transmission_critical: 0.1
+        # => our values:
+        doubling_rate: 1.26
+        incubation_period: 6
+        i1_percentage: 0.855
+        i2_percentage: 0.12
+        i3_percentage: 0.025
+        doubling_rate: 1.26
