@@ -1,46 +1,144 @@
 import streamlit as st
-from models import SimulatorOutput, KPI, ContainmentStrategy
+from models import SimulatorOutput, ContainmentStrategy, ResourceAvailability, BackgroundColor
 from typing import List
+import re
 
 def localCSS(file_name):
     with open(file_name) as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 
-def generateKPIRow(kpi1: KPI, kpi2: KPI) -> None:
-        st.write('''
-        <div class='kpi-wrapper'>
-                <div class='kpi-container green-bg'>
-                        <h3>%s:</h3>   
-                        <span class='kpi'>%s</span>    
+def genHeroSection():
+        st.write('''<div class="base-wrapper hero-bg">
+                <span class="logo-bold">corona</span><span class="logo-lighter">cidades</span>
+                <div class="hero-wrapper">
+                        <div class="hero-container">
+                                <span class="hero-container-product primary-span">Simula</span>
+                                <span class="hero-container-product primary-span">Covid</span>
+                                <span class="hero-container-subtitle primary-span">Um simulador da demanda por leitos hospitalares e ventiladores.</span>
+                        </div>   
+                        <img class="hero-container-image" src="https://i.imgur.com/w5yVANW.png"/>
                 </div>
-                <div class='kpi-container green-bg'>
-                        <h3>%s:</h3>
-                        <span class='kpi'>%s</span>
-                </div>
-        <div>''' % (kpi1.label, '{:,}'.format(kpi1.value), kpi2.label, '{:,}'.format(kpi2.value)), 
-        unsafe_allow_html=True)
-
-def generateSimulatorOutput(output: SimulatorOutput) -> None:
+        </div class="base-wrapper>
+        ''', unsafe_allow_html=True)
+def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
         st.write('''
-                <div class="simulator-output-wrapper %s">
-                        <h3>entre</h3>
-                        <div class="simulator-output-row">
-                                <div class="simulator-output-row-prediction">
-                                        <span class="simulator-output-row-prediction-value">%i</span>
-                                        <span class="simulator-output-row-prediction-separator">e</span>
-                                        <span class="simulator-output-row-prediction-value">%i</span>
+        <div class="primary-bg"> 
+                <div class="base-wrapper">
+                        <span class="section-header white-span">
+                                Panorama em <span class="yellow-span">%s</span>
+                        </span>
+                        <div class="resources-wrapper">
+                                <div class="resources-title-container">
+                                        <span class="resources-title">Casos de Coronavírus</span>
                                 </div>
-                                <span class="simulator-output-row-prediction-label">
-                                        *DIAS SERÁ ATINGIDA A CAPACIDADE MÁXIMA DE %s
+                                <div class="resources-container-wrapper">
+                                        <div class="resource-container"> 
+                                                <span class='resource-container-value'>%i</span>  
+                                                <span class='resource-container-label'>confirmados</span>  
+                                        </div>
+                                        <div class="resource-container"> 
+                                                <span class='resource-container-value'>%i</span>  
+                                                <span class='resource-container-label'>mortes</span>  
+                                        </div>
+                                </div>
+                                <span class="resource-font"><b>Fonte:</b> Brasil.IO atualizado diariamente com base em boletins das secretarias de saúde publicados.</span>
+                        </div>
+                        <div class="resources-wrapper">
+                                <div class="resources-title-container">
+                                        <span class="resources-title">Casos de Coronavírus</span>
+                                </div>
+                                <div class="resources-container-wrapper">
+                                        <div class="resource-container"> 
+                                                <span class='resource-container-value'>%i</span>  
+                                                <span class='resource-container-label'>leitos</span>  
+                                        </div>
+                                        <div class="resource-container"> 
+                                                <span class='resource-container-value'>%i</span>  
+                                                <span class='resource-container-label'>ventiladores</span>  
+                                        </div>
+                                </div>
+                                <span class="resource-font"><b>Fonte:</b> 
+                                        DATASUS CNes, Fevereiro 2020. Incluímos leitos hospitalares da rede SUS e não-SUS. Para excluir a última categoria, precisaríamos estimar também a população susdependente. Para mais informações, confira nossa metodologia.                                
                                 </span>
-                        </div> 
+                        </div>
                 </div>
-        ''' % (output.color.value, output.min_range, output.max_range, output.label),
-        unsafe_allow_html=True)
+        </div>
+        ''' 
+        %(resources.city, resources.cases, resources.deaths, resources.beds, resources.ventilators)
+        , unsafe_allow_html=True)
 
-def generateStrategyCard(strategy: ContainmentStrategy) -> str:
-        return '''<div class="scenario-card">
+
+def genSimulatorOutput(output: SimulatorOutput) -> str:
+        bed_img = 'https://i.imgur.com/27hutU0.png'
+        ventilator_icon = 'https://i.imgur.com/8kxC2Fi.png'
+
+        output =  '''
+        <div>
+                <div class="simulator-container %s">
+                        <div class="simulator-output-wrapper">
+                                <span class="simulator-output-timeframe">entre</span>
+                                <div class="simulator-output-row">
+                                        <span class="simulator-output-row-prediction-value">
+                                                %i <span class="simulator-output-row-prediction-separator">e</span> %i
+                                        </span>  
+                                </div> 
+                                <span class="simulator-output-row-prediction-label">
+                                        dias será atingida a capacidade máxima de <b>leitos</b>
+                                </span>
+                        </div>
+                        <img src="%s" class="simulator-output-image"/>
+                </div>
+                <br />
+                <div class="simulator-container %s">
+                        <div class="simulator-output-wrapper">
+                                <span class="simulator-output-timeframe">entre</span>
+                                <div class="simulator-output-row">
+                                        <span class="simulator-output-row-prediction-value">
+                                                %i <span class="simulator-output-row-prediction-separator">e</span> %i
+                                        </span>  
+                                </div> 
+                                <span class="simulator-output-row-prediction-label">
+                                        dias será atingida a capacidade máxima de <b>ventiladores</b>
+                                </span>
+                        </div>
+                        <img src="%s" class="simulator-output-image"/>
+                </div>
+        </div>''' % (output.color.value, output.min_range_beds, output.max_range_beds, bed_img,
+                     output.color.value, output.min_range_ventilators, output.max_range_ventilators, ventilator_icon)
+
+        return output.strip('\n\t')
+                
+
+def genSimulationSection(city, worst_case, best_case) -> None:
+        status_quo = genSimulatorOutput(worst_case) 
+
+        restrictions = genSimulatorOutput(best_case) 
+
+        st.write('''<div class="base-wrapper">
+                <div class="simulator-wrapper">
+                        <span class="section-header primary-span">
+                                Projeção em <span class="yellow-span">%s</span>
+                        </span>
+                        <div class="simulation-scenario-header-container">
+                                <span class="simulator-scenario-header grey-bg">
+                                        Cenário 1: Não Intervenção
+                                </span>
+                        </div>
+                        %s
+                        <div class="simulation-scenario-header-container">
+                                <span class="simulator-scenario-header light-blue-bg">
+                                        Cenário 2: Medidas-Restritivas
+                                </span>
+                        </div>
+                        %s
+                </div>
+        </div>
+        ''' % (city, status_quo, restrictions), unsafe_allow_html=True)
+
+def genStrategyCard(strategy: ContainmentStrategy) -> str:
+        return '''
+        <div class="scenario-card">
                         <div class="scenario-card-header">
                                 <span class="scenario-card-header-code %s">ESTRATÉGIA %i</span>
                                 <div class="scenario-card-header-name-background %s">
@@ -52,12 +150,15 @@ def generateStrategyCard(strategy: ContainmentStrategy) -> str:
         </div>''' % (strategy.color.value, strategy.code, strategy.background.value, strategy.name, strategy.image_url, strategy.description)
 
 def generateStrategiesSection(strategies: List[ContainmentStrategy]) -> None:
-        cards = list(map(generateStrategyCard, strategies))
-
+        cards = list(map(genStrategyCard, strategies))
+        cards = ''.join(cards)
+        print(cards)
         st.write('''
-        <div class="scenario-wrapper">
-                <h2><b>E COMO ME PREPARO?</b></h2>
-                %s
+        <div class="primary-bg">
+                <div class="base-wrapper">
+                        <span class="section-header white-span">E como me preparo?</span>
+                        <div class="scenario-cards-container">%s</div>
+                </div>
         </div>
-        ''' % ''.join(cards),
+        ''' % cards,
         unsafe_allow_html= True)

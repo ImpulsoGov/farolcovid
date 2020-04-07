@@ -1,15 +1,14 @@
-from typing import NamedTuple
+from typing import NamedTuple, List
 import enum
-from typing import List
 
 # Constants
 class BackgroundColor(enum.Enum):
-    RED='red-bg'
-    YELLOW='yellow-bg'
-    ORANGE='orange-bg'
     GREEN='green-bg'
     DARK_GREEN = 'dark-green-bg'
     GREY='grey-bg'
+    LIGHT_BLUE='light-blue-bg'
+    GREY_GRADIENT='grey-gradient-bg'
+    LIGHT_BLUE_GRADIENT='light-blue-gradient-bg '
 
 class FontColor(enum.Enum):
     GREY='grey-span'
@@ -22,9 +21,13 @@ class Document(enum.Enum):
     GITHUB='https://github.com/ImpulsoGov/simulacovid/tree/master/COVID19_App'
 
 # Models
-class KPI(NamedTuple):
-    label: str
-    value: int
+
+class ResourceAvailability(NamedTuple):
+    city: str
+    cases: int
+    deaths: int
+    beds: int
+    ventilators: int
 
 class ContainmentStrategy(NamedTuple):
     background: BackgroundColor
@@ -36,9 +39,10 @@ class ContainmentStrategy(NamedTuple):
 
 class SimulatorOutput(NamedTuple):
     color: BackgroundColor
-    min_range: int
-    max_range: int
-    label: str
+    min_range_beds: int
+    max_range_beds: int
+    min_range_ventilators: int
+    max_range_ventilators: int
 
 Strategies: List[ContainmentStrategy] = [
         ContainmentStrategy(BackgroundColor.GREY, FontColor.GREY, 1, "Não Intervencão", "https://i.imgur.com/pxYFm76.png", "Nenhuma medida de restrição de contato é adotada pelas autoridades."),
