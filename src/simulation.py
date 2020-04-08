@@ -61,7 +61,7 @@ def main():
         cities_filtered = filter_options(cities, user_input['state'], 'state_name')
         
         user_input['region'] = st.selectbox('Região SUS', add_all(cities_filtered['health_system_region'].unique()))
-        cities_filtered = filter_options(cities, user_input['region'], 'health_system_region')
+        cities_filtered = filter_options(cities_filtered, user_input['region'], 'health_system_region')
         
         user_input['city'] = st.selectbox('Município', add_all(cities_filtered['city_name'].unique()))
         cities_filtered = filter_options(cities, user_input['city'], 'city_name')
