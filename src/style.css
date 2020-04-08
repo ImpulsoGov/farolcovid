@@ -106,6 +106,10 @@
     color: var(--main-white);
 }
 
+.reportview-container .markdown-text-container a:hover {
+    color: var(--main-primary);
+} 
+
 .fullScreenFrame {
     background-color: var(--main-light-grey);
     width: 100%;
@@ -328,9 +332,10 @@
     font-size: 18px;
 }
 
-.btn-ambassador :hover {
+.btn-ambassador:hover {
     color: var(--main-primary);
     background-color: white;
+    text-decoration: none;
 }
 
 /* Simulation Output - Banner Style */
