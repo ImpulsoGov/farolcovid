@@ -127,7 +127,9 @@
     }
 }
 
-
+.st-cp {
+    border-color: var(--main-primary);
+}
 /* LEGACY COMPONENT */
 /* .info {
     padding: var(--main-padding);
@@ -193,6 +195,12 @@
     flex-direction: column;
 }
 
+.hero-container-content {
+    margin-left: 3em;
+    display: flex;
+    flex-direction: column;
+}
+
 .hero-container-product {
     font-family: var(--main-header-font-family);
     text-transform: uppercase;
@@ -235,6 +243,11 @@
         line-height: 50px;
     }
 
+    .hero-container-content {
+        margin-left: 1em;
+    }
+    
+
     .hero-container-subtitle {
         margin-top: 0.5rem;
         font-size: 24px;
@@ -253,6 +266,11 @@
 .locality-name {
     animation-name: fadein;
     animation-duration: 4s;
+}
+
+.resource-header-container {
+    display:flex; 
+    flex-direction:row
 }
 
 .resources-wrapper {
@@ -299,7 +317,7 @@
     font-weight: bold;
     color:var(--main-white);   
     animation-name: fadein;
-    animation-duration: 3s; 
+    animation-duration: 5s; 
 }
 
 .resource-container-label {
@@ -313,9 +331,38 @@
     color: var(--main-white);
 }
 
+
+.btn-wpp {
+    border: 1px solid var(--main-white);
+    box-sizing: border-box;
+    border-radius: 15px;
+    width: 250px;
+    padding: 0.5em;
+    text-transform: uppercase;
+    font-family: var(--main-header-font-family);
+    background-color: var(--main-primary);
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    font-size: 18px;
+    animation-name: fadein;
+    animation-duration: 3s;
+    margin-left: auto;
+}
+
+
 @media only screen and (max-width: 425px) {
     .resource-container-value {
         font-size: 40px;
+    }
+
+    .resource-header-container {
+        flex-direction: column;
+        margin-top: 1em;
+    }
+    .btn-wpp {
+        margin-left: 0;
+        margin-top: var(--main-item-margin);
     }
   }
 
@@ -341,12 +388,12 @@
     color: var(--main-white);
     background-color: var(--main-primary);
     font-weight: bold;
-    margin-top: 1em;
     text-align: center;
     text-decoration: none;
     font-size: 18px;
     animation-name: fadein;
     animation-duration: 3s;
+    margin-top: 1em;
 }
 
 .btn-ambassador:hover {
@@ -455,7 +502,7 @@
     align-items: center;
 }
 
-@media only screen and (min-width: 768px) {
+@media only screen and (min-width: 1024px) {
     .scenario-cards-container {
         display: flex;
         flex-direction: row;

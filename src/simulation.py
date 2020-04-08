@@ -27,27 +27,26 @@ def choose_place(city, state):
     return city
 
 def simulator_menu(user_input):
-        st.sidebar.header("""Simulador de demanda hospitalar""")
         st.sidebar.subheader("""Simule o impacto de estratégias de isolamento em sua cidade:""")
 
-        user_input['strategy']['isolation'] = st.sidebar.number_input('Em quantos dias você quer acionar a Estratégia 2, medidas de restrição?', 0, 90, 90, key='strategy2')
+        user_input['strategy']['isolation'] = st.sidebar.number_input('Em quantos dias você quer acionar a Estratégia 2, medidas restritivas?', 0, 90, 90, key='strategy2')
 
 
-        user_input['strategy']['lockdown'] = st.sidebar.number_input('Em quantos dias você quer acionar a Estratégia 3, lockdown?', 0, 90, 90, key='strategy3')
+        user_input['strategy']['lockdown'] = st.sidebar.number_input('Em quantos dias você quer acionar a Estratégia 3, quarentena?', 0, 90, 90, key='strategy3')
         
-        st.sidebar.subheader("""A partir desses números, ajuste a capacidade que será alocada na intervenção:""")
+        st.sidebar.subheader("""Ajuste a capacidade que será alocada na intervenção:""")
 
         total_beds = user_input['n_beds']
-        user_input['n_beds'] = st.sidebar.number_input('Mude o percentual de leitos destinados aos pacientes com Covid-19:', 0, None, total_beds)
+        user_input['n_beds'] = st.sidebar.number_input('Mude o número de leitos destinados aos pacientes com Covid-19:', 0, None, total_beds)
 
         total_ventilators = user_input['n_ventilators']
-        user_input['n_ventilators'] = st.sidebar.number_input('Mude o percentual de ventiladores destinados aos pacientes com Covid-19:', 0, None, total_ventilators)
+        user_input['n_ventilators'] = st.sidebar.number_input('Mude o número de ventiladores destinados aos pacientes com Covid-19:', 0, None, total_ventilators)
         
         return user_input
         
 def main():
         
-        utils.localCSS("style.css")
+        utils.localCSS('style.css')
 
         config = yaml.load(open('configs/config.yaml', 'r'), Loader = yaml.FullLoader)
         cities = loader.read_data('br', config)
@@ -89,7 +88,6 @@ def main():
                                                                   beds=user_input['n_beds'], 
                                                                   ventilators=user_input['n_ventilators']))
 
-        utils.generateStrategiesSection(Strategies)
 
         st.write('<br/>', unsafe_allow_html=True)
 
@@ -116,6 +114,8 @@ def main():
 
         
         utils.genSimulationSection(choose_place(user_input['city'], user_input['state']), worst_case, best_case)
+        
+        utils.generateStrategiesSection(Strategies)
 
         # SIMULATOR MENU
         user_input = simulator_menu(user_input)
@@ -123,12 +123,17 @@ def main():
         # SIMULATOR SCENARIOS: BEDS & RESPIRATORS
         fig, dday_beds, dday_ventilators = simulator.run_evolution(user_input)        
         
-        st.write('<div class="lightgrey-bg"><div class="base-wrapper"><span class="section-header primary-span">Evolucão diária da demanda hospitalar</span></div></div>', unsafe_allow_html=True)
+        st.write('<div class="lightgrey-bg"><div class="base-wrapper"><span class="section-header primary-span">Simulador de demanda hospitalar</span></div></div>', unsafe_allow_html=True)
         
         # PLOT SCENARIOS EVOLUTION
         st.plotly_chart(fig)
+        utils.genChartSimulationSection(SimulatorOutput(color=BackgroundColor.GREY_GRADIENT,
+                        min_range_beds=dday_beds['worst'], 
+                        max_range_beds=dday_beds['best'], 
+                        min_range_ventilators=dday_ventilators['worst'],
+                        max_range_ventilators=dday_ventilators['best']))
 
-        utils.genLogosSection()
+        utils.genFooter()
         
 if __name__ == "__main__":
     main()
