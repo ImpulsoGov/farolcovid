@@ -24,10 +24,21 @@ def genHeroSection():
         </div class="base-wrapper>
         ''', unsafe_allow_html=True)
 
-def genMunicipalityInputSection() -> None:        
+def genStateInputSectionHeader() -> None:        
         st.write('''
         <div class="base-wrapper">
                 <span class="section-header primary-span">Etapa 1: Selecione o seu Estado</span>
+        </div>
+        ''',  unsafe_allow_html=True)
+
+
+def genMunicipalityInputSection() -> None:        
+        st.write('''
+        <div class="base-wrapper">
+                <div style="display: flex; flex-direction: column"> 
+                        <span class="section-header primary-span">Etapa 2: Selecione Município ou Região SUS</span>
+                        <i>Se o seu município possui poucos ou nenhum leito/ventilador, é indicado analisar a partir da regional SUS.</i>
+                </div>
         </div>
         ''',  unsafe_allow_html=True)
 

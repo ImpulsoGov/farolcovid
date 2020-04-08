@@ -65,17 +65,13 @@ def main():
         user_input = dict()
 
         utils.genHeroSection()
-        utils.genMunicipalityInputSection()
+        utils.genStateInputSectionHeader()
         
 
         user_input['state'] = st.selectbox('Estado', add_all(cities['state_name'].unique()))
         cities_filtered = filter_options(cities, user_input['state'], 'state_name')
         
-        st.write('''
-        <div class="base-wrapper">
-                <span class="section-header primary-span">Etapa 2: Selecione Município ou Região SUS</span>
-        </div>
-        ''',  unsafe_allow_html=True)
+        utils.genMunicipalityInputSection()
 
         user_input['region'] = st.selectbox('Região SUS', add_all(cities_filtered['health_system_region'].unique()))
         cities_filtered = filter_options(cities_filtered, user_input['region'], 'health_system_region')
