@@ -8,8 +8,9 @@ class BackgroundColor(enum.Enum):
     GREY='grey-bg'
     LIGHT_BLUE='lightblue-bg'
     GREY_GRADIENT='grey-gradient-bg'
-    LIGHT_BLUE_GRADIENT='light-blue-gradient-bg '
+    LIGHT_BLUE_GRADIENT='light-blue-gradient-bg'
     DARK_BLUE='darkblue-bg'
+    SIMULATOR_CARD_BG='simulator-card-bg'
 
 class FontColor(enum.Enum):
     GREY='grey-span'
@@ -28,7 +29,7 @@ class Logo(enum.Enum):
     ARAPYAU='https://i.imgur.com/SjsMK2A.jpg'
 
 class Link(enum.Enum):
-    AMBASSADOR_FORM='https://docs.google.com/forms/d/1Vz1s09JUGm74Qd_kxdWAzW3S1YTzPon5tN1IffENM8E/edit'
+    AMBASSADOR_FORM='https://forms.gle/iPFE7T6Wrq4JzoEw9'
 
 # Models
 class ResourceAvailability(NamedTuple):
@@ -55,6 +56,6 @@ class SimulatorOutput(NamedTuple):
 
 Strategies: List[ContainmentStrategy] = [
         ContainmentStrategy(BackgroundColor.GREY, FontColor.GREY, 1, "Não Intervenção", "https://i.imgur.com/pxYFm76.png", "Nenhuma medida de restrição de contato é adotada pelas autoridades."),
-        ContainmentStrategy(BackgroundColor.LIGHT_BLUE, FontColor.LIGHT_BLUE, 2, "Medidas-Restritivas", "https://i.imgur.com/W0JI4AE.png", "Fechamento das fronteiras e do comércio não-essencial, além de restringir o transporte público e toda circulação não estritamente necessária."),
+        ContainmentStrategy(BackgroundColor.LIGHT_BLUE, FontColor.LIGHT_BLUE, 2, "Medidas Restritivas", "https://i.imgur.com/W0JI4AE.png", "Fechamento das fronteiras e do comércio não-essencial, além de restringir o transporte público e toda circulação não estritamente necessária."),
         ContainmentStrategy(BackgroundColor.DARK_BLUE, FontColor.DARK_BLUE, 3, "Quarentena", "https://i.imgur.com/FjHaC7A.png", "O governo amplia a capacidade de testes e proíbe estritamente o movimento das pessoas não-autorizadas (lockdown).")
 ]

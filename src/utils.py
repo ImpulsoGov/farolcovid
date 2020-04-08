@@ -13,8 +13,10 @@ def genHeroSection():
                 <span class="logo-bold">corona</span><span class="logo-lighter">cidades</span>
                 <div class="hero-wrapper">
                         <div class="hero-container">
-                                <span class="hero-container-product primary-span">Simula<br/>Covid</span>
-                                <span class="hero-container-subtitle primary-span">Um simulador da demanda por leitos hospitalares e ventiladores.</span>
+                                <div class="hero-container-content">
+                                        <span class="hero-container-product primary-span">Simula<br/>Covid</span>
+                                        <span class="hero-container-subtitle primary-span">Um simulador da demanda por leitos hospitalares e ventiladores.</span>
+                                </div>
                         </div>   
                         <img class="hero-container-image" src="https://i.imgur.com/w5yVANW.png"/>
                 </div>
@@ -29,17 +31,25 @@ def genMunicipalityInputSection() -> None:
         ''',  unsafe_allow_html=True)
 
 def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
-        preposition, city = ('', 'Geral') if resources.city == 'Todos' else ('em', resources.city)
-
+        city = 'Geral' if resources.city == 'Todos' else resources.city
+        msg = '''
+        🚨*Boletim CoronaCidades*🚨%%0a%%0a
+        Aqui na minha cidade (%s) temos:%%0a%%0a
+        - %i casos confirmados de coronavírus 😷%%0a
+        - O município tem %i leitos e %i ventiladores para UTI destinados à Covid 🏥%%0a%%0a
+        E o seu município, como está? 👨🏻‍⚕👩🏻‍⚕%%0a
+        Simule aqui: 👉🏼www.simulacovid.coronacidades.org👈🏼''' % (city, resources.cases, resources.beds, resources.ventilators)
+        
         st.write('''
         <div class="primary-bg"> 
                 <div class="base-wrapper">
-                        <span class="section-header white-span">
-                                Panorama %s <span class="locality-name yellow-span">%s</span>
-                        </span>
+                        <div class="resource-header-container">
+                                <span class="section-header white-span">Panorama <span class="locality-name yellow-span">%s</span></span>
+                                <a class="btn-wpp" href="whatsapp://send?text=%s" target="blank">Compartilhar no Whatsapp</a>
+                        </div>
                         <div class="resources-wrapper">
                                 <div class="resources-title-container">
-                                        <span class="resources-title">Ao todo são</span>
+                                        <span class="resources-title">Situacão do seu município</span>
                                 </div>
                                 <div class="resources-container-wrapper">
                                         <div class="resource-container"> 
@@ -55,7 +65,7 @@ def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
                         </div>
                         <div class="resources-wrapper">
                                 <div class="resources-title-container">
-                                        <span class="resources-title">A capacidade hospitalar é</span>
+                                        <span class="resources-title">Capacidade hospitalar destinada à COVID</span>
                                 </div>
                                 <div class="resources-container-wrapper">
                                         <div class="resource-container"> 
@@ -79,13 +89,13 @@ def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
                 </div>
         </div>
         ''' 
-        %(preposition, city, resources.cases, resources.deaths, resources.beds, resources.ventilators, Link.AMBASSADOR_FORM.value)
+        %(city, msg, resources.cases, resources.deaths, resources.beds, resources.ventilators, Link.AMBASSADOR_FORM.value)
         , unsafe_allow_html=True)
 
 
 def genSimulatorOutput(output: SimulatorOutput) -> str:
         bed_img = 'https://i.imgur.com/27hutU0.png'
-        ventilator_icon = 'https://i.imgur.com/8kxC2Fi.png'
+        ventilator_icon = 'https://i.imgur.com/V419ZRI.png'
         
         has_bed_projection = (output.min_range_beds != -1 and  output.max_range_beds != -1)
         bed_prep = 'entre' if has_bed_projection else 'em'
@@ -150,11 +160,11 @@ def genSimulationSection(city: str, worst_case: SimulatorOutput, best_case: Simu
         st.write('''<div class="base-wrapper">
                 <div class="simulator-wrapper">
                         <span class="section-header primary-span">
-                                Projeção %s <span class="yellow-span">%s</span>
+                                Em quanto tempo vamos atingir a capacidade <span class="yellow-span">hospitalar</span>?
                         </span>
                         <div class="simulation-scenario-header-container">
                                 <span class="simulator-scenario-header grey-bg">
-                                        Cenário 1: Não Intervenção
+                                        Sem Intervenção Governamental
                                 </span>
                         </div>
                         %s
@@ -162,13 +172,13 @@ def genSimulationSection(city: str, worst_case: SimulatorOutput, best_case: Simu
                         <br/>
                         <div class="simulation-scenario-header-container">
                                 <span class="simulator-scenario-header lightblue-bg">
-                                        Cenário 2: Medidas-Restritivas
+                                        Com Medidas Restritivas
                                 </span>
                         </div>
                         %s
                 </div>
         </div>
-        ''' % (preposition, city, status_quo, restrictions), unsafe_allow_html=True)
+        ''' % ( status_quo, restrictions), unsafe_allow_html=True)
 
 def genStrategyCard(strategy: ContainmentStrategy) -> str:
         return '''
@@ -187,21 +197,45 @@ def generateStrategiesSection(strategies: List[ContainmentStrategy]) -> None:
         cards = list(map(genStrategyCard, strategies))
         cards = ''.join(cards)
         st.write('''
-        <div class="lightgrey-bg">
+        <div class="primary-bg">
                 <div class="base-wrapper">
-                        <span class="section-header primary-span">E como me preparo?</span>
+                        <span class="section-header white-span">E como meu município pode se preparar?</span>
                         <div class="scenario-cards-container">%s</div>
                 </div>
         </div>
         ''' % cards,
         unsafe_allow_html= True)
 
-def genLogosSection() -> None:
-        st.write('''
-                <div class="logo-wrapper magenta-bg">
-                        <img class="logo-img" src="%s"/>
-                        <div class="logo-section">
-                                <img class="logo-img" src="%s"/>
-                                <img class="logo-img" src="%s"/>
+def genChartSimulationSection(simulation: SimulatorOutput) -> None:
+
+        sim = genSimulatorOutput(simulation) 
+
+        st.write('''<div class="lightgrey-bg">
+                <div class="base-wrapper">
+                        <span class="chart-simulator-instructions section-header">Ajuste os valores da simulação no menu à esquerda</span>
+                        <div class="simulator-wrapper">
+                                %s
                         </div>
-                </div>''' % (Logo.IMPULSO.value, Logo.CORONACIDADES.value, Logo.ARAPYAU.value), unsafe_allow_html=True)
+                </div>
+        </div>
+        ''' % sim, unsafe_allow_html=True)
+
+def genFooter() -> None:
+        st.write('''
+        <div class="magenta-bg">
+                <div class="base-wrapper">
+                        <div class="logo-wrapper">
+                                <span>A presente ferramenta, voluntária, parte de estudos referenciados já publicados e considera os dados de saúde pública dos municípios brasileiros disponibilizados no DataSus.</span>
+                                <br/>
+                                <span>Os cenários projetados são meramente indicativos e dependem de variáveis que aqui não podem ser consideradas. Trata-se de mera contribuição à elaboração de cenários por parte dos municípios e não configura qualquer obrigação ou responsabilidade perante as decisões efetivadas. Saiba mais em nossa metodologia.</span>
+                                <br/>
+                                <span>Estamos em constante desenvolvimento e queremos ouvir sua opinião sobre a ferramenta - caso tenha sugestões ou comentários, entre em contato via o chat ao lado. Caso seja gestor público e necessite de apoio para preparo de seu município, acesse a Checklist e confira o site do CoronaCidades.</span>
+                                <br/>
+                                <img class="logo-img" src="%s"/>
+                                <div class="logo-section">
+                                        <img class="logo-img" src="%s"/>
+                                        <img class="logo-img" src="%s"/>
+                                </div>
+                        </div>'
+                </div>
+        </div>''' % (Logo.IMPULSO.value, Logo.CORONACIDADES.value, Logo.ARAPYAU.value), unsafe_allow_html=True)
