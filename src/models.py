@@ -10,6 +10,7 @@ class BackgroundColor(enum.Enum):
     GREY_GRADIENT='grey-gradient-bg'
     LIGHT_BLUE_GRADIENT='light-blue-gradient-bg'
     DARK_BLUE='darkblue-bg'
+    SIMULATOR_CARD_BG='simulator-card-bg'
 
 class FontColor(enum.Enum):
     GREY='grey-span'

@@ -136,7 +136,7 @@ def main():
         
         # PLOT SCENARIOS EVOLUTION
         st.plotly_chart(fig)
-        utils.genChartSimulationSection(SimulatorOutput(color=BackgroundColor.GREY_GRADIENT,
+        utils.genChartSimulationSection(SimulatorOutput(color=BackgroundColor.SIMULATOR_CARD_BG,
                         min_range_beds=dday_beds['worst'], 
                         max_range_beds=dday_beds['best'], 
                         min_range_ventilators=dday_ventilators['worst'],

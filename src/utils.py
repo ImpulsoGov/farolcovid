@@ -210,10 +210,9 @@ def genChartSimulationSection(simulation: SimulatorOutput) -> None:
 
         sim = genSimulatorOutput(simulation) 
 
-        st.write('''
-        <div class="green-gradient-bg">
+        st.write('''<div class="lightgrey-bg">
                 <div class="base-wrapper">
-                        <span>Rode a simulação ajustando os dados no meu lateral no lado esquerdo</span>
+                        <span class="chart-simulator-instructions section-header">Ajuste os valores da simulação no menu à esquerda</span>
                         <div class="simulator-wrapper">
                                 %s
                         </div>
