@@ -57,6 +57,10 @@
 .light-blue-gradient-bg {
     background: linear-gradient(284.63deg, #00E7FF 0%, #A8F7FF 101.47%);
 }
+
+.green-gradient-bg {
+    background: linear-gradient(284.63deg, #5AF2D6 0%, #CEFFF6 101.47%);
+}
 /* default span colors */
 .grey-span {
     color: var(--main-grey);
@@ -595,3 +599,36 @@
 .sidebar-collapse-control::after {
     content: "Menu";
   }
+
+
+.profiles-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.profile {
+    padding: var(--main-item-margin);
+    display:flex;
+    align-items: center;
+    flex-direction: column;
+    flex: 1 0 30%;
+    flex-wrap: wrap;
+}
+
+.profile-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 100px;
+}
+
+.profile-name {
+    text-align: center;
+    font-size: 18px;
+}
+
+.collaborator-container {
+    display: flex;
+    flex-direction: column;
+
+}

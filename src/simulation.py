@@ -3,10 +3,13 @@ import sys
 sys.path.insert(0,'./model/')
 
 import streamlit as st
+from streamlit import caching
 from models import BackgroundColor, Document, Strategies, SimulatorOutput, ResourceAvailability
 from typing import List
 import utils
 import plotly.express as px
+from datetime import datetime
+import math
 import yaml
 import numpy as np
 import loader
@@ -43,13 +46,19 @@ def simulator_menu(user_input):
         user_input['n_ventilators'] = st.sidebar.number_input('Mude o número de ventiladores destinados aos pacientes com Covid-19:', 0, None, total_ventilators)
         
         return user_input
-        
+
+def refresh_rate(config):
+        dt = (math.floor(datetime.now().minute/config['refresh_rate'])*config['refresh_rate'])
+        return datetime.now().replace(minute=dt,second=0, microsecond=0)
+
 def main():
-        
-        utils.localCSS('style.css')
+        utils.localCSS("style.css")
+ 
+        if datetime.now().hour < 1:
+                caching.clear_cache()
 
         config = yaml.load(open('configs/config.yaml', 'r'), Loader = yaml.FullLoader)
-        cities = loader.read_data('br', config)
+        cities = loader.read_data('br', config, refresh_rate=refresh_rate(config))
 
         user_input = dict()
 
@@ -61,9 +70,9 @@ def main():
         
         user_input['region'] = st.selectbox('Região SUS', add_all(cities_filtered['health_system_region'].unique()))
         cities_filtered = filter_options(cities_filtered, user_input['region'], 'health_system_region')
-        
+
         user_input['city'] = st.selectbox('Município', add_all(cities_filtered['city_name'].unique()))
-        cities_filtered = filter_options(cities, user_input['city'], 'city_name')
+        cities_filtered = filter_options(cities_filtered, user_input['city'], 'city_name')
 
         selected_region = cities_filtered.sum(numeric_only=True)       
         

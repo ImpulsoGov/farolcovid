@@ -78,7 +78,7 @@ def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
                                         </div>
                                 </div>
                                 <span class="resource-font"><b>Fonte:</b> 
-                                        DATASUS CNes, Fevereiro 2020. Incluímos leitos hospitalares da rede SUS e não-SUS.                             
+                                        DATASUS CNes, Fevereiro 2020. Incluímos um quinto dos leitos hospitalares da rede SUS e não-SUS. Para mais informações, confira nossa metodologia.                                
                                 </span>
                                 <div class="ambassador-container">
                                         <span class="ambassador-question white-span bold">Esse dado parece desatualizado? Venha ser parte do nosso time de embaixadores!</span>
@@ -95,7 +95,7 @@ def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
 
 def genSimulatorOutput(output: SimulatorOutput) -> str:
         bed_img = 'https://i.imgur.com/27hutU0.png'
-        ventilator_icon = 'https://i.imgur.com/8kxC2Fi.png'
+        ventilator_icon = 'https://i.imgur.com/V419ZRI.png'
         
         has_bed_projection = (output.min_range_beds != -1 and  output.max_range_beds != -1)
         bed_prep = 'entre' if has_bed_projection else 'em'
@@ -211,8 +211,9 @@ def genChartSimulationSection(simulation: SimulatorOutput) -> None:
         sim = genSimulatorOutput(simulation) 
 
         st.write('''
-        <div class="lightgrey-bg">
+        <div class="green-gradient-bg">
                 <div class="base-wrapper">
+                        <span>Rode a simulação ajustando os dados no meu lateral no lado esquerdo</span>
                         <div class="simulator-wrapper">
                                 %s
                         </div>

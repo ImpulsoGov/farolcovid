@@ -8,7 +8,7 @@ class BackgroundColor(enum.Enum):
     GREY='grey-bg'
     LIGHT_BLUE='lightblue-bg'
     GREY_GRADIENT='grey-gradient-bg'
-    LIGHT_BLUE_GRADIENT='light-blue-gradient-bg '
+    LIGHT_BLUE_GRADIENT='light-blue-gradient-bg'
     DARK_BLUE='darkblue-bg'
 
 class FontColor(enum.Enum):
