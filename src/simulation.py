@@ -79,11 +79,11 @@ def main():
         user_input['city'] = st.selectbox('Município', add_all(cities_filtered['city_name'].unique()))
         cities_filtered = filter_options(cities_filtered, user_input['city'], 'city_name')
 
-        selected_region = cities_filtered.sum(numeric_only=True)       
+        selected_region = cities_filtered.sum(numeric_only=True)   
         
         # MENU OPTIONS: Input population params
         st.sidebar.subheader('Mude os dados de COVID-19 do seu município caso necessário')
-        
+
         user_input['population_params'] = {#'N': st.sidebar.number_input('População', 0, None, int(N0), key='N'),
                      'N': selected_region['population'],
                      'I': st.sidebar.number_input('Casos confirmados', 0, None, int(selected_region['number_cases'])),
@@ -109,6 +109,8 @@ def main():
         
         # DEFAULT WORST SCENARIO  
         user_input['strategy'] = {'isolation': 90, 'lockdown': 90}
+        user_input['population_params']['I'] = [user_input['population_params']['I'] if user_input['population_params']['I'] != 0 else 1][0]
+
         _, dday_beds, dday_ventilators = simulator.run_evolution(user_input)
         
         worst_case = SimulatorOutput(color=BackgroundColor.GREY_GRADIENT,
@@ -138,8 +140,18 @@ def main():
         # SIMULATOR SCENARIOS: BEDS & RESPIRATORS
         fig, dday_beds, dday_ventilators = simulator.run_evolution(user_input)        
         
-        st.write('<div class="lightgrey-bg"><div class="base-wrapper"><span class="section-header primary-span">Simulador de demanda hospitalar</span></div></div>', unsafe_allow_html=True)
-        
+        # st.write('<div class="lightgrey-bg"><div class="base-wrapper"><span class="section-header primary-span">Simulador de demanda hospitalar</span></div></div>', unsafe_allow_html=True)
+        st.write('''
+        <div class="lightgrey-bg">
+                <div class="base-wrapper">
+                        <div style="display: flex; flex-direction: column"> 
+                                <span class="section-header primary-span">Simulador de demanda hospitalar</span>
+                                <i>Ajuste os valores no menu à esquerda para testar a evolução com diferentes estratégias.</i>
+                        </div>
+                </div>
+        </div>
+        ''',  unsafe_allow_html=True)
+
         utils.genChartSimulationSection(SimulatorOutput(color=BackgroundColor.SIMULATOR_CARD_BG,
                         min_range_beds=dday_beds['worst'], 
                         max_range_beds=dday_beds['best'], 
@@ -148,6 +160,18 @@ def main():
 
 
         # PLOT SCENARIOS EVOLUTION
+        st.write('''
+                <div class="lightgrey-bg">
+                        <div class="base-wrapper">
+                                <div style="display: flex; flex-direction: column"> 
+                                        <span class="chart-simulator-instructions subsection-header">EVOLUÇÃO DIÁRIA DA DEMANDA HOSPITALAR</span><br>
+                                        <i>Veja como mudanças na estratégia adotada afetam a necessidade de internação em leitos 
+                                        hospitalares e de ventiladores<br> na sua cidade ao longo dos dias. <b>A sua demanda a cada dia deve ficar 
+                                        entre os valores mínimo e máximo estimados no gráfico.</b></i>
+                                </div>
+                        </div>
+                </div>''',  unsafe_allow_html=True)
+
         st.plotly_chart(fig)
         
         utils.genFooter()
