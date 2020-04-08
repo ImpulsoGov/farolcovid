@@ -68,7 +68,7 @@ def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
                                         </div>
                                 </div>
                                 <span class="resource-font"><b>Fonte:</b> 
-                                        DATASUS CNes, Fevereiro 2020. Incluímos leitos hospitalares da rede SUS e não-SUS. Para excluir a última categoria, precisaríamos estimar também a população susdependente. Para mais informações, confira nossa metodologia.                                
+                                        DATASUS CNes, Fevereiro 2020. Incluímos um quinto dos leitos hospitalares da rede SUS e não-SUS. Para mais informações, confira nossa metodologia.                                
                                 </span>
                                 <div class="ambassador-container">
                                         <span class="ambassador-question white-span bold">Esse dado parece desatualizado? Venha ser parte do nosso time de embaixadores!</span>

@@ -17,7 +17,7 @@ simulator:
                 R0: 1.21
             lockdown:
                 R0: 0.28
-            test_delay: 0
+            test_delay: 4
 
 br:
     drive_paths:
