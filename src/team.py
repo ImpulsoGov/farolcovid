@@ -12,6 +12,7 @@ def main():
     utils.localCSS("style.css")
 
     st.write('''
+    <div class="base-wrapper">
             <h1 class="primary-span">Quem Somos</h1>
             <div class="profiles-container">
             <div class="profile">
@@ -46,4 +47,5 @@ def main():
             <span>H. F. Barbosa, Mestre em Relações Internacionais pela Universidade da Califórnia, San Diego</span>
             <span>Teresa Soter, mestranda em Sociologia na Oxford University</span>
         </div>
+    </div>
 ''' % (ana, diego, fernanda, saru, carabetta, luiz), unsafe_allow_html=True)
