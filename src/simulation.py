@@ -134,14 +134,16 @@ def main():
         
         st.write('<div class="lightgrey-bg"><div class="base-wrapper"><span class="section-header primary-span">Simulador de demanda hospitalar</span></div></div>', unsafe_allow_html=True)
         
-        # PLOT SCENARIOS EVOLUTION
-        st.plotly_chart(fig)
         utils.genChartSimulationSection(SimulatorOutput(color=BackgroundColor.SIMULATOR_CARD_BG,
                         min_range_beds=dday_beds['worst'], 
                         max_range_beds=dday_beds['best'], 
                         min_range_ventilators=dday_ventilators['worst'],
                         max_range_ventilators=dday_ventilators['best']))
 
+
+        # PLOT SCENARIOS EVOLUTION
+        st.plotly_chart(fig)
+        
         utils.genFooter()
         
 if __name__ == "__main__":
