@@ -6,13 +6,10 @@
     --main-primary: #0097A7;
     --main-dark: #3E758A;
     --main-light: #00E7FF;
-    --main-green: #1FA592 ;
-    --main-dark-green: rgb(0, 2, 2);
-    --main-red: #F26D3D;
-    --main-orange: #F59954;
     --main-yellow: #F2C94C;
     --main-grey: #A8BFD2;
     --main-light-grey: #f0f9fc;
+    --main-magenta: #fffbfa;
     --main-white: #fff;
     --main-black: #252729;
     --main-margin: 2em;
@@ -39,6 +36,10 @@
     background-color: var(--main-grey);
 }
 
+.magenta-bg {
+    background-color: var(--main-magenta);
+}
+
 .grey-gradient-bg {
     background:  linear-gradient(104.07deg, #E3F1FD 0.41%, #C0DFE2 100%);
 }
@@ -53,10 +54,6 @@
 /* default span colors */
 .grey-span {
     color: var(--main-grey);
-}
-
-.green-span {
-    color: var(--main-green)
 }
 
 .lightblue-span {
@@ -187,6 +184,7 @@
 }
 
 .hero-container-product {
+    font-family: var(--main-header-font-family);
     text-transform: uppercase;
     font-size: 80px;
     font-weight: bold;
@@ -220,11 +218,21 @@
     }
     
     .hero-container-product {
+        margin-top: var(--main-item-margin);
         font-size: 48px;
+        line-height: 50px;
     }
 
     .hero-container-subtitle {
+        margin-top: 0.5rem;
         font-size: 24px;
+    }
+
+
+    .hero-container-image {
+        margin-left: auto;
+        width: 350px;
+        height: 100%;
     }
 }
 
@@ -272,8 +280,7 @@
 .resource-container-value {
     font-size: 56px;
     font-weight: bold;
-    color:var(--main-white);
-    
+    color:var(--main-white);    
 }
 
 .resource-container-label {
@@ -418,6 +425,21 @@
 
 /* Scenario Row */
 
+.scenario-cards-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+@media only screen and (min-width: 768px) {
+    .scenario-cards-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+    }
+}
+
+
 .scenario-card {
     width: 250px;
     padding: var(--main-padding) var(--minor-padding);
@@ -427,14 +449,6 @@
     flex-direction: column;
     align-items: center;
     margin-top: var(--main-margin);
-}
-
-@media only screen and (min-width: 768px) {
-    .scenario-cards-container {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-evenly;
-    }
 }
 
 .scenario-card-header {    
@@ -465,8 +479,8 @@
 }
 
 .scenario-card-img {
-    width: 150px;
-    height: 150px;
+    width: 200px;
+    height: auto;
     /* height: auto; */
 }
 
@@ -487,7 +501,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: #fffbfa;
 }
 
 .logo-section {

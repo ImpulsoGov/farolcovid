@@ -71,8 +71,8 @@ def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
                                         DATASUS CNes, Fevereiro 2020. Incluímos leitos hospitalares da rede SUS e não-SUS. Para excluir a última categoria, precisaríamos estimar também a população susdependente. Para mais informações, confira nossa metodologia.                                
                                 </span>
                                 <div class="ambassador-container">
-                                        <span class="ambassador-question white-span bold">Quer contribuir com a atualização dos dados da plataforma? Venha ser parte do nosso time de embaixadores!</span>
-                                        <span class="white-span">O CoronaCidades está montando uma rede para manter o SimulaCovid mais atualizado possível e nossas projeções mais úteis pra tomada de decisão na sua cidade.</span>
+                                        <span class="ambassador-question white-span bold">Esse dado parece desatualizado? Venha ser parte do nosso time de embaixadores!</span>
+                                        <span class="white-span">Estamos montando uma rede para manter o SimulaCovid sempre atualizado e nossas projeções serem úteis para tomada de decisão na sua cidade!</span>
                                         <a class="btn-ambassador" href="%s" target="blank">Quero ser embaixador</a>
                                 </div>
                         </div>
@@ -198,7 +198,7 @@ def generateStrategiesSection(strategies: List[ContainmentStrategy]) -> None:
 
 def genLogosSection() -> None:
         st.write('''
-                <div class="logo-wrapper">
+                <div class="logo-wrapper magenta-bg">
                         <img class="logo-img" src="%s"/>
                         <div class="logo-section">
                                 <img class="logo-img" src="%s"/>
