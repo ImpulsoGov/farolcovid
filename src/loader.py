@@ -58,8 +58,8 @@ def _read_cases_data(country, config):
 
     return df
 
-@st.cache
-def read_data(country, config):
+@st.cache(allow_output_mutation=True)
+def read_data(country, config, refresh_rate):
 
     cases = _read_cases_data(country, config)
     cities = _read_cities_data(country, config)

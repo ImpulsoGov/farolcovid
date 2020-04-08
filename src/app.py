@@ -8,24 +8,29 @@ from streamlit import caching
 
 import model_description as md
 import fontes as ft
+import team as tm
 import simulation as sm
+from models import Logo
 
 def main():
-    pic = "https://static1.squarespace.com/static/5d86962ef8b1bc58c1dcaa0b/t/5ddad475ee3ebb607ae3d629/1584997792692/?format=1500w"
+    #TODO adjust logo src
+    pic = Logo.IMPULSO.value
     st.sidebar.image(pic, use_column_width=False, width=100, caption=None)
-    page = st.sidebar.selectbox("Menu", ["COVID19 no seu Município","Descição do Modelo","Fontes"])
 
-    if page == "Descição do Modelo":
+    page = st.sidebar.selectbox("Menu", ["COVID19 no seu Município", "Metodologia", "Quem somos?"])
+
+
+    if page == "Metodologia":
         if __name__ == "__main__":
             md.main()
 
-    elif page=="Fontes":
-        if __name__ == "__main__":
-            ft.main()
-        
     elif page == "COVID19 no seu Município":        
           if __name__ == "__main__":
-            sm.main()          
+            sm.main()    
+
+    elif page == "Quem somos?":        
+          if __name__ == "__main__":
+            tm.main()               
             
  
 if __name__ == "__main__":
