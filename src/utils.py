@@ -35,7 +35,7 @@ def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
         <div class="primary-bg"> 
                 <div class="base-wrapper">
                         <span class="section-header white-span">
-                                Panorama %s <span class="yellow-span">%s</span>
+                                Panorama %s <span class="locality-name yellow-span">%s</span>
                         </span>
                         <div class="resources-wrapper">
                                 <div class="resources-title-container">

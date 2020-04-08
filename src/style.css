@@ -20,6 +20,12 @@
     --main-border-radius-pill: 50px;
 }
 
+/* keyframes */
+@keyframes fadein {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
 /* default background colors */
 .primary-bg {
     background-color: var(--main-primary);
@@ -193,6 +199,8 @@
     font-size: 80px;
     font-weight: bold;
     line-height: 80px;
+    animation-name: fadein;
+    animation-duration: 4s;
 }
 
 .hero-container-subtitle {
@@ -242,6 +250,11 @@
 
 /* Resources Output - Square Style */
 
+.locality-name {
+    animation-name: fadein;
+    animation-duration: 4s;
+}
+
 .resources-wrapper {
     display: flex;
     flex-direction: column;
@@ -284,7 +297,9 @@
 .resource-container-value {
     font-size: 56px;
     font-weight: bold;
-    color:var(--main-white);    
+    color:var(--main-white);   
+    animation-name: fadein;
+    animation-duration: 3s; 
 }
 
 .resource-container-label {
@@ -330,6 +345,8 @@
     text-align: center;
     text-decoration: none;
     font-size: 18px;
+    animation-name: fadein;
+    animation-duration: 3s;
 }
 
 .btn-ambassador:hover {
@@ -396,6 +413,8 @@
     font-size: 48px;
     font-weight: bold;
     word-wrap: no-wrap;   
+    animation-name: fadein;
+    animation-duration: 5s;
 }
 
 .simulator-output-row-prediction-separator {
