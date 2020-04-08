@@ -38,7 +38,7 @@ def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
         🚨 *BOLETIM CoronaCidades:*  {locality} - {datetime.now().strftime('%d/%m')}  🚨%0a%0a
         😷 *{int(resources.cases)}* casos confirmados e *{int(resources.deaths)}* mortes%0a%0a
         🏥 Hoje estão disponíveis *{resources.beds}* leitos e *{resources.ventilators}* ventiladores destinados à Covid %0a%0a
-        👉 _Acompanhe e simule a situacão do seu municipio_: http://simulacovid.coronacidades.org ''' 
+        👉 _Acompanhe e simule a situação do seu município_: http://simulacovid.coronacidades.org ''' 
         
         st.write('''
         <div class="primary-bg"> 
