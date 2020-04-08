@@ -83,6 +83,11 @@
     color: var(--main-black);
 }
 
+/* useful classes */
+.bold {
+    font-weight: bold;
+}
+
 /* Override default template */
 .row-widget {
     padding: 0 3em;
@@ -100,8 +105,19 @@
 }
 
 
-h1 {
-    color: var(--main-green);
+.reportview-container .markdown-text-container a {
+    color: var(--main-white);
+}
+
+.fullScreenFrame {
+    background-color: var(--main-light-grey);
+    width: 100%;
+}
+
+@media only screen and (min-width: 768px) {
+    .fullScreenFrame {
+        padding: 0 3rem;
+    }
 }
 
 
@@ -268,6 +284,7 @@ h1 {
 .resource-font {
     margin: var(--main-item-margin) 0;
     font-weight: lighter;
+    color: var(--main-white);
 }
 
 @media only screen and (max-width: 425px) {
@@ -276,6 +293,38 @@ h1 {
     }
   }
 
+
+.ambassador-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1em;
+}
+
+.ambassador-question {
+    font-size: 18px;
+}
+
+.btn-ambassador {
+    border: 1px solid var(--main-white);
+    box-sizing: border-box;
+    border-radius: 15px;
+    width: 250px;
+    padding: 0.5em;
+    text-transform: uppercase;
+    font-family: var(--main-header-font-family);
+    color: var(--main-white);
+    background-color: var(--main-primary);
+    font-weight: bold;
+    margin-top: 1em;
+    text-align: center;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.btn-ambassador :hover {
+    color: var(--main-primary);
+    background-color: white;
+}
 
 /* Simulation Output - Banner Style */
 .simulator-wrapper {
@@ -293,6 +342,7 @@ h1 {
     font-size: 24px;
     padding: 0 var(--minor-padding);
     border-radius: 5px;
+    
 }
 
 
@@ -430,17 +480,6 @@ h1 {
 .scenario-card-description {
     margin-top: var(--main-margin);
     text-align: center;
-}
-
-.fullScreenFrame {
-    background-color: var(--main-light-grey);
-    width: 100%;
-}
-
-@media only screen and (min-width: 768px) {
-    .fullScreenFrame {
-        padding: 0 3rem;
-    }
 }
 
 .logo-wrapper {

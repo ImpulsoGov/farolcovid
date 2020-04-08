@@ -1,5 +1,5 @@
 import streamlit as st
-from models import SimulatorOutput, ContainmentStrategy, ResourceAvailability, BackgroundColor, Logo
+from models import SimulatorOutput, ContainmentStrategy, ResourceAvailability, BackgroundColor, Logo, Link
 from typing import List
 import re
 
@@ -70,11 +70,16 @@ def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
                                 <span class="resource-font"><b>Fonte:</b> 
                                         DATASUS CNes, Fevereiro 2020. Incluímos leitos hospitalares da rede SUS e não-SUS. Para excluir a última categoria, precisaríamos estimar também a população susdependente. Para mais informações, confira nossa metodologia.                                
                                 </span>
+                                <div class="ambassador-container">
+                                        <span class="ambassador-question white-span bold">Quer contribuir com a atualização dos dados da plataforma? Venha ser parte do nosso time de embaixadores!</span>
+                                        <span class="white-span">O CoronaCidades está montando uma rede para manter o SimulaCovid mais atualizado possível e nossas projeções mais úteis pra tomada de decisão na sua cidade.</span>
+                                        <a class="btn-ambassador" href="%s" target="blank">Quero ser embaixador</a>
+                                </div>
                         </div>
                 </div>
         </div>
         ''' 
-        %(preposition, city, resources.cases, resources.deaths, resources.beds, resources.ventilators)
+        %(preposition, city, resources.cases, resources.deaths, resources.beds, resources.ventilators, Link.AMBASSADOR_FORM.value)
         , unsafe_allow_html=True)
 
 
@@ -192,7 +197,6 @@ def generateStrategiesSection(strategies: List[ContainmentStrategy]) -> None:
         unsafe_allow_html= True)
 
 def genLogosSection() -> None:
-        print("https://i.imgur.com/BamxSJE.png")
         st.write('''
                 <div class="logo-wrapper">
                         <img class="logo-img" src="%s"/>

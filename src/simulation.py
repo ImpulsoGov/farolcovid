@@ -81,6 +81,7 @@ def main():
         user_input['n_beds'] = int(selected_region['number_beds']*0.2)
         user_input['n_ventilators'] = int(selected_region['number_ventilators']*0.2)
         
+        st.write('<br/>', unsafe_allow_html=True)
         # >>>> CHECK city: city or state?
         utils.genResourceAvailabilitySection(ResourceAvailability(city=choose_place(user_input['city'], user_input['state']), 
                                                                   cases=selected_region['number_cases'],
