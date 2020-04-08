@@ -24,9 +24,10 @@ def filter_options(_df, var, col, all_string='Todos'):
     else:
             return _df.query(f'{col} == "{var}"')
         
-def choose_place(city, state):
-    if not city:
-        return state
+def choose_place(city, region):
+    if city == 'Todos':
+        return region + ' (Região SUS)' if region != 'Todos' else 'Todas as regiões SUS'
+        # return region + ' (Região SUS)'
     return city
 
 def simulator_menu(user_input):
@@ -65,9 +66,16 @@ def main():
         utils.genHeroSection()
         utils.genMunicipalityInputSection()
         
+
         user_input['state'] = st.selectbox('Estado', add_all(cities['state_name'].unique()))
         cities_filtered = filter_options(cities, user_input['state'], 'state_name')
         
+        st.write('''
+        <div class="base-wrapper">
+                <span class="section-header primary-span">Etapa 2: Selecione Município ou Região SUS</span>
+        </div>
+        ''',  unsafe_allow_html=True)
+
         user_input['region'] = st.selectbox('Região SUS', add_all(cities_filtered['health_system_region'].unique()))
         cities_filtered = filter_options(cities_filtered, user_input['region'], 'health_system_region')
 
@@ -90,8 +98,10 @@ def main():
         user_input['n_ventilators'] = int(selected_region['number_ventilators']*0.2)
         
         st.write('<br/>', unsafe_allow_html=True)
+
+        print(user_input)
         # >>>> CHECK city: city or state?
-        utils.genResourceAvailabilitySection(ResourceAvailability(city=choose_place(user_input['city'], user_input['state']), 
+        utils.genResourceAvailabilitySection(ResourceAvailability(locality=choose_place(user_input['city'], user_input['region']), 
                                                                   cases=selected_region['number_cases'],
                                                                   deaths=selected_region['deaths'], 
                                                                   beds=user_input['n_beds'], 
@@ -122,7 +132,7 @@ def main():
                         max_range_ventilators=dday_ventilators['best'])
 
         
-        utils.genSimulationSection(choose_place(user_input['city'], user_input['state']), worst_case, best_case)
+        utils.genSimulationSection(choose_place(user_input['city'], user_input['region']), worst_case, best_case)
         
         utils.generateStrategiesSection(Strategies)
 

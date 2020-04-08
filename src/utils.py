@@ -26,19 +26,18 @@ def genHeroSection():
 def genMunicipalityInputSection() -> None:        
         st.write('''
         <div class="base-wrapper">
-                <span class="section-header primary-span">Qual a situação do meu município?</span>
+                <span class="section-header primary-span">Etapa 1: Selecione o seu Estado</span>
         </div>
         ''',  unsafe_allow_html=True)
 
 def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
-        city = 'Geral' if resources.city == 'Todos' else resources.city
+        city = 'Geral' if resources.locality == 'Todos' else resources.locality
         msg = '''
-        🚨*Boletim CoronaCidades*🚨%%0a%%0a
-        Aqui na minha cidade (%s) temos:%%0a%%0a
+        🚨*Boletim CoronaCidades: %s*🚨%%0a%%0as
         - %i casos confirmados de coronavírus 😷%%0a
         - O município tem %i leitos e %i ventiladores para UTI destinados à Covid 🏥%%0a%%0a
         E o seu município, como está? 👨🏻‍⚕👩🏻‍⚕%%0a
-        Simule aqui: 👉🏼www.simulacovid.coronacidades.org👈🏼''' % (city, resources.cases, resources.beds, resources.ventilators)
+        Simule aqui: 👉🏼www.simulacovid.coronacidades.org👈🏼''' % (str.upper(city), resources.cases, resources.beds, resources.ventilators)
         
         st.write('''
         <div class="primary-bg"> 

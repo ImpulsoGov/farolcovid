@@ -33,7 +33,7 @@ class Link(enum.Enum):
 
 # Models
 class ResourceAvailability(NamedTuple):
-    city: str
+    locality: str
     cases: int
     deaths: int
     beds: int
