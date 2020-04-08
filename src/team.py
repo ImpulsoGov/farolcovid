@@ -37,7 +37,7 @@ def main():
             </div>
             <div class="profile">
                 <img class="profile-photo" src="%s"/>
-                <span class="profile-name">Luiz Felipe Fernandes, Graduado em Ciência da Computação pela UFI</span>
+                <span class="profile-name">Luiz Felipe Fernandes, Gruduado em Sistemas de Informação pela UNIFEI</span>
             </div>
         </div>
         <div class="collaborator-container">
