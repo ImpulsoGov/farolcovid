@@ -12,6 +12,7 @@ def main():
     utils.localCSS("style.css")
 
     st.write('''
+    <div class="base-wrapper">
             <h1 class="primary-span">Quem Somos</h1>
             <div class="profiles-container">
             <div class="profile">
@@ -36,7 +37,7 @@ def main():
             </div>
             <div class="profile">
                 <img class="profile-photo" src="%s"/>
-                <span class="profile-name">Luiz Felipe Fernandes, Graduado em Ciência da Computação pela UFI</span>
+                <span class="profile-name">Luiz Felipe Costa, Graduado em Sistemas de Informação pela UNIFEI</span>
             </div>
         </div>
         <div class="collaborator-container">
@@ -46,4 +47,5 @@ def main():
             <span>H. F. Barbosa, Mestre em Relações Internacionais pela Universidade da Califórnia, San Diego</span>
             <span>Teresa Soter, mestranda em Sociologia na Oxford University</span>
         </div>
+    </div>
 ''' % (ana, diego, fernanda, saru, carabetta, luiz), unsafe_allow_html=True)

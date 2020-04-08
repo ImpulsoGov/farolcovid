@@ -49,7 +49,7 @@ def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
         🚨 *BOLETIM CoronaCidades:*  {locality} - {datetime.now().strftime('%d/%m')}  🚨%0a%0a
         😷 *{int(resources.cases)}* casos confirmados e *{int(resources.deaths)}* mortes%0a%0a
         🏥 Hoje estão disponíveis *{resources.beds}* leitos e *{resources.ventilators}* ventiladores destinados à Covid %0a%0a
-        👉 _Acompanhe e simule a situação do seu município_: http://simulacovid.coronacidades.org ''' 
+        👉 _Acompanhe e simule a situação do seu município acessando o *SimulaCovid* aqui_: https://coronacidades.org/ ''' 
         
         st.write('''
         <div class="primary-bg"> 
@@ -223,7 +223,7 @@ def genChartSimulationSection(simulation: SimulatorOutput) -> None:
 
         st.write('''<div class="lightgrey-bg">
                 <div class="base-wrapper">
-                        <span class="chart-simulator-instructions section-header">Ajuste os valores da simulação no menu à esquerda</span>
+                        <span class="chart-simulator-instructions subsection-header">A partir das estratégias escolhidas...</span>
                         <div class="simulator-wrapper">
                                 %s
                         </div>
