@@ -16,16 +16,14 @@ def main():
     #TODO adjust logo src
     pic = Logo.IMPULSO.value
     st.sidebar.image(pic, use_column_width=False, width=100, caption=None)
-    page = st.sidebar.selectbox("Menu", ["COVID19 no seu Município","Descrição do Modelo","Fontes", "Quem somos?"])
 
-    if page == "Descição do Modelo":
+    page = st.sidebar.selectbox("Menu", ["COVID19 no seu Município", "Metodologia", "Quem somos?"])
+
+
+    if page == "Metodologia":
         if __name__ == "__main__":
             md.main()
 
-    elif page=="Fontes":
-        if __name__ == "__main__":
-            ft.main()
-        
     elif page == "COVID19 no seu Município":        
           if __name__ == "__main__":
             sm.main()    

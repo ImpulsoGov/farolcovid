@@ -24,10 +24,11 @@ def filter_options(_df, var, col, all_string='Todos'):
     else:
             return _df.query(f'{col} == "{var}"')
         
-def choose_place(city, region):
+def choose_place(city, region, state):
+    if city == 'Todos' and region == 'Todos':
+        return state + ' (Estado)' if state != 'Todos' else 'Brasil'
     if city == 'Todos':
         return region + ' (Região SUS)' if region != 'Todos' else 'Todas as regiões SUS'
-        # return region + ' (Região SUS)'
     return city
 
 def simulator_menu(user_input):
@@ -99,9 +100,8 @@ def main():
         
         st.write('<br/>', unsafe_allow_html=True)
 
-        print(user_input)
         # >>>> CHECK city: city or state?
-        utils.genResourceAvailabilitySection(ResourceAvailability(locality=choose_place(user_input['city'], user_input['region']), 
+        utils.genResourceAvailabilitySection(ResourceAvailability(locality=choose_place(user_input['city'], user_input['region'], user_input['state']), 
                                                                   cases=selected_region['number_cases'],
                                                                   deaths=selected_region['deaths'], 
                                                                   beds=user_input['n_beds'], 
@@ -132,7 +132,7 @@ def main():
                         max_range_ventilators=dday_ventilators['best'])
 
         
-        utils.genSimulationSection(choose_place(user_input['city'], user_input['region']), worst_case, best_case)
+        utils.genSimulationSection(choose_place(user_input['city'], user_input['region'], user_input['state']), worst_case, best_case)
         
         utils.generateStrategiesSection(Strategies)
 

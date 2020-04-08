@@ -1,4 +1,5 @@
 import streamlit as st
+from datetime import datetime
 from models import SimulatorOutput, ContainmentStrategy, ResourceAvailability, BackgroundColor, Logo, Link
 from typing import List
 import re
@@ -31,13 +32,13 @@ def genMunicipalityInputSection() -> None:
         ''',  unsafe_allow_html=True)
 
 def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
-        city = 'Geral' if resources.locality == 'Todos' else resources.locality
-        msg = '''
-        🚨*Boletim CoronaCidades: %s*🚨%%0a%%0as
-        - %i casos confirmados de coronavírus 😷%%0a
-        - O município tem %i leitos e %i ventiladores para UTI destinados à Covid 🏥%%0a%%0a
-        E o seu município, como está? 👨🏻‍⚕👩🏻‍⚕%%0a
-        Simule aqui: 👉🏼www.simulacovid.coronacidades.org👈🏼''' % (str.upper(city), resources.cases, resources.beds, resources.ventilators)
+        locality = 'Brasil' if resources.locality == 'Todos' else resources.locality
+
+        msg = f'''
+        🚨 *BOLETIM CoronaCidades:*  {locality} - {datetime.now().strftime('%d/%m')}  🚨%0a%0a
+        😷 *{int(resources.cases)}* casos confirmados e *{int(resources.deaths)}* mortes%0a%0a
+        🏥 Hoje estão disponíveis *{resources.beds}* leitos e *{resources.ventilators}* ventiladores destinados à Covid %0a%0a
+        👉 _Acompanhe e simule a situacão do seu municipio_: http://simulacovid.coronacidades.org ''' 
         
         st.write('''
         <div class="primary-bg"> 
@@ -88,7 +89,7 @@ def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
                 </div>
         </div>
         ''' 
-        %(city, msg, resources.cases, resources.deaths, resources.beds, resources.ventilators, Link.AMBASSADOR_FORM.value)
+        %(locality, msg, resources.cases, resources.deaths, resources.beds, resources.ventilators, Link.AMBASSADOR_FORM.value)
         , unsafe_allow_html=True)
 
 
