@@ -1,275 +1,133 @@
+import os
+import sys
+sys.path.insert(0,'./model/')
+
 import streamlit as st
-from models import BackgroundColor, Document, Strategies, SimulatorOutput, KPI 
+from models import BackgroundColor, Document, Strategies, SimulatorOutput, ResourceAvailability
 from typing import List
 import utils
-from model import seir
-import os
 import plotly.express as px
 import yaml
-
+import numpy as np
 import loader
-from model import seir
+from model import simulator
 
 def add_all(x, all_string='Todos'):
         return [all_string] + list(x)
+            
+def filter_options(_df, var, col, all_string='Todos'):
+    if var == 'Todos':
+            return _df
+    else:
+            return _df.query(f'{col} == "{var}"')
+        
+def choose_place(city, state):
+    if not city:
+        return state
+    return city
 
-def filter_frame(_df, name, all_string='Todos'):
+def simulator_menu(user_input):
+        st.sidebar.header("""Simulador de demanda hospitalar""")
+        st.sidebar.subheader("""Simule o impacto de estratégias de isolamento em sua cidade:""")
 
-        if name == all_string:
-                return _df[[]].sum()
+        user_input['strategy']['isolation'] = st.sidebar.number_input('Em quantos dias você quer acionar a Estratégia 2, medidas de restrição?', 0, 90, 90, key='strategy2')
 
 
-# =======> TESTANDO (para funcionar, descomente o código nas linhas 112-116!)
-def run_evolution():
-    
-    st.sidebar.subheader('Selecione os dados do seu município para rodar o modelo')
+        user_input['strategy']['lockdown'] = st.sidebar.number_input('Em quantos dias você quer acionar a Estratégia 3, lockdown?', 0, 90, 90, key='strategy3')
+        
+        st.sidebar.subheader("""A partir desses números, ajuste a capacidade que será alocada na intervenção:""")
 
-    population_params = dict()
-    population_params['N'] = st.sidebar.number_input('População', 0, 10000, 10000, key='N')
-    population_params['I'] = st.sidebar.number_input('Casos confirmados', 0, 10000, 1000, key='I')
-    population_params['D'] = st.sidebar.number_input('Mortes confirmadas', 0, 10000, 10, key='D')
-    population_params['R'] = st.sidebar.number_input('Pessoas recuperadas', 0, 10000, 0, key='R')
-    
-    model_parameters = yaml.load(open(os.getcwd() + '/model_parameters.yaml', 'r'), Loader=yaml.FullLoader)
-    evolution = seir.entrypoint(population_params, model_parameters, initial=True)
-    
-    # Generate fig
-    fig = px.line(evolution.melt('dias'), x='dias', y='value', color='variable')
-    fig.update_layout({'plot_bgcolor': 'rgba(0, 0, 0, 0)', 
-                       'paper_bgcolor': 'rgba(0, 0, 0, 0)',
-                       'yaxis_title': 'Número de pessoas'})
+        total_beds = user_input['n_beds']
+        user_input['n_beds'] = st.sidebar.number_input('Mude o percentual de leitos destinados aos pacientes com Covid-19:', 0, None, total_beds)
 
-    return fig
-# <================
+        total_ventilators = user_input['n_ventilators']
+        user_input['n_ventilators'] = st.sidebar.number_input('Mude o percentual de ventiladores destinados aos pacientes com Covid-19:', 0, None, total_ventilators)
+        
+        return user_input
         
 def main():
+        
         utils.localCSS("style.css")
 
-        config = yaml.load(open('configs/config.yaml', 'r'))
-        cities = loader.read_data('br', config)    
+        config = yaml.load(open('configs/config.yaml', 'r'), Loader = yaml.FullLoader)
+        cities = loader.read_data('br', config)
 
-        st.title("SimulaCovid")
-        st.subheader('Como seu município pode se preparar para a Covid-19')
+        user_input = dict()
 
-        st.write('## SimulaCovid é um simulador da demanda por leitos hospitalares e ventiladores.')        
-
-        st.write('''<i>
-Usando dados do DataSUS e de casos confirmados, ele estima por quantos dias - até o limite de 90 - 
-durará o estoque desses equipamentos em cada município. Ao explorar diferentes estratégias de resposta 
-à crise, a ferramenta permite que gestores públicos simulem abordagens e planejem seu curso de ação para 
-evitar o colapso do sistema.</i>
-        ''', unsafe_allow_html=True)
-
-
-
-        st.write('''
-        <br/>
-        <i>
-                Confira nossa
-                <a href="%s">metodologia</a>
-                e o 
-                <a href="%s">github</a> 
-                do projeto. Acesse nossas 
-                <a href="%s">Perguntas Frequentes.</a>
-        </i>''' % (Document.METHODOLOGY.value, Document.GITHUB.value, Document.FAQ.value), unsafe_allow_html=True)
+        utils.genHeroSection()
+        utils.genMunicipalityInputSection()
         
-        # =======> TESTANDO
-#         st.write('## Qual a situação do seu município?')
-#         st.write('Selecione os dados do seu município para rodar o modelo')
-
-#         # st.line_chart(evolution)
-#         st.plotly_chart(run_evolution())
-        # <================
-
-        def filter_options(_df, var, col, all_string='Todos'):
-
-                if var == 'Todos':
-                        return _df
-                else:
-                        return _df.query(f'{col} == "{var}"')
-
-        st.write('### Selecione seu município abaixo para gerar as projeções')
-        state_name = st.selectbox('Estado', 
-                        add_all(cities['state_name'].unique()))
+        user_input['state'] = st.selectbox('Estado', add_all(cities['state_name'].unique()))
+        cities_filtered = filter_options(cities, user_input['state'], 'state_name')
         
-        cities_filtered = filter_options(cities, state_name, 'state_name')
-
-        health_region = st.selectbox('Região SUS', 
-                            add_all(cities_filtered['health_system_region'].unique())
-                            )
-        cities_filtered = filter_options(cities_filtered, health_region, 'health_system_region')
-
-        city_name = st.selectbox('Município', 
-                            add_all(cities_filtered['city_name'].unique())
-                            )
-        cities_filtered = filter_options(cities_filtered, city_name, 'city_name')
-
-        selected_region = cities_filtered.sum(numeric_only=True)
-
-
-        utils.generateKPIRow(KPI(label="CASOS CONFIRMADOS", value=selected_region['number_cases']),
-                       KPI(label="MORTES CONFIRMADAS", value=selected_region['deaths']))
-
-        st.write('''
-**Fonte:** Brasil.IO atualizado diariamente com base em boletins das secretarias de saúde publicados.
-        ''')
-
-        st.write('''
-        <div class="info">
-                <span>
-                        <b>Lembramos que podem existir casos não diagnosticados em sua cidade.</b> Sugerimos que consulte o
-                        Checklist para orientações específicas sobre o que fazer antes do primeiro caso diagnosticado.
-                </span>
-        ''', unsafe_allow_html=True)
-
-        st.write('''
-### Seu município tem a seguinte **capacidade hospitalar:**
-        ''')
-
-        utils.generateKPIRow(KPI(label="LEITOS", value=53231), KPI(label="VENTILADORES", value=1343))
-
-        st.write('''
-        <b>Fonte:</b> DATASUS CNes, Fevereiro 2020. Incluímos leitos hospitalares da rede SUS 
-        e não-SUS. Para excluir a última categoria, precisaríamos estimar também a 
-        opulação susdependente. Para mais informações, confira nossa
-        <a href="%s" target="blank">metodologia</a>.
-        ''' % (Document.METHODOLOGY.value), unsafe_allow_html=True)
-
-
-        st.write('''
-        <div class="info">
-                A maioria das pessoas que contraem Covid-19, conseguem se recuperar em casa - 
-                mas uma parte irá desenvolver sintomas graves e precisará de internação em 
-                leitos hospitalares. Outros terão sintomas críticos e precisarão de ventiladores 
-                mecânicos e tratamento intensivo (UTI). Apesar de serem necessários outros 
-                insumos, esses têm sido fatores limitantes na resposta à crise.
-        <div>
-        ''', unsafe_allow_html=True)
-
-        st.write('<br/>', unsafe_allow_html=True)
-
-        st.write('''
-        <div class="scenario">
-                <h3>
-                        Assumiremos que 20% destes poderão ser destinados a pacientes com Covid-19 (você poderá ajustar abaixo). 
-                        Caso seu município conte apenas com atitudes sindividuais, **sem políticas de restrição de contato, estima-se que....**
-                </h3>
-        </div>
-        ''', unsafe_allow_html=True)
-
-        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.RED, min_range=24, max_range=25, label='LEITOS'))
+        user_input['region'] = st.selectbox('Região SUS', add_all(cities_filtered['health_system_region'].unique()))
+        cities_filtered = filter_options(cities, user_input['region'], 'health_system_region')
         
-        st.write('<br/>', unsafe_allow_html=True)
+        user_input['city'] = st.selectbox('Município', add_all(cities_filtered['city_name'].unique()))
+        cities_filtered = filter_options(cities, user_input['city'], 'city_name')
 
-        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.ORANGE, min_range=24, max_range=25, label='VENTILADORES'))
+        selected_region = cities_filtered.sum(numeric_only=True)       
         
-
-        st.write('''
-        <div class="scenario">
-                <h3>
-                        Caso o município decrete hoje o isolamento social, <b>e fechando comércios e suspendendo transporte público, além de quarentena para doentes, estima-se que...</b>
-                </h3>
-        </div>
-        ''', unsafe_allow_html=True)
-
-        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.GREEN, min_range=24, max_range=25, label='LEITOS'))
+        # MENU OPTIONS: Input population params
+        st.sidebar.subheader('Mude os dados de COVID-19 do seu município caso necessário')
         
-        st.write('<br/>', unsafe_allow_html=True)
+        user_input['population_params'] = {#'N': st.sidebar.number_input('População', 0, None, int(N0), key='N'),
+                     'N': selected_region['population'],
+                     'I': st.sidebar.number_input('Casos confirmados', 0, None, int(selected_region['number_cases'])),
+                     'D': st.sidebar.number_input('Mortes confirmadas', 0, None, int(selected_region['deaths'])),
+                     'R': st.sidebar.number_input('Pessoas recuperadas', 0, None, 0)}
 
-        utils.generateSimulatorOutput(SimulatorOutput(color=BackgroundColor.GREEN, min_range=24, max_range=25, label='VENTILADORES'))
+        # INITIAL VALUES FOR BEDS AND VENTILATORS
+        user_input['n_beds'] = int(selected_region['number_beds']*0.2)
+        user_input['n_ventilators'] = int(selected_region['number_ventilators']*0.2)
         
-        st.write('<br/>', unsafe_allow_html=True)
+        # >>>> CHECK city: city or state?
+        utils.genResourceAvailabilitySection(ResourceAvailability(city=choose_place(user_input['city'], user_input['state']), 
+                                                                  cases=selected_region['number_cases'],
+                                                                  deaths=selected_region['deaths'], 
+                                                                  beds=user_input['n_beds'], 
+                                                                  ventilators=user_input['n_ventilators']))
 
         utils.generateStrategiesSection(Strategies)
 
-        st.write("""
-## Simule o impacto de estratégias semelhantes na capacidade o sistema de saúde em sua cidade:
-""")
-
-
-        st.write("""
-## Em quantos dias você quer acionar a Estratégia 2, medidas de restrição?
-""")
-        st.number_input('Dias:', 0, 90, 90, key='strategy2')
-
-        st.write("""
-## Em quantos dias você quer acionar a Estratégia 3, lockdown?
-""")
-
-        st.number_input('Dias:', 0, 90, 90, key='strategy3')
-
-        st.write("""
-## A partir desses números, ajuste a capacidade que será alocada na intervenção:?
-""")
-
-        st.write("""
-## Mude o percentual de leitos destinados aos pacientes com Covid-19:
-""")
-        st.number_input('Leitos:', 0, None, 90)
-
-        st.write("""
-## Mude o percentual de ventiladores destinados aos pacientes com Covid-19:
-""")
-
-        st.number_input('Ventiladores:', 0, None, 90)
-
-        st.write("""
-# <Simulador da demanda hospitalar>
-""")
-
-
-        st.write("""
-A presente ferramenta, voluntária, parte de estudos referenciados já 
-publicados e considera os dados de saúde pública dos municípios brasileiros 
-disponibilizados no DataSus.
-""")
-
-        st.write("""
-Os cenários projetados são meramente indicativos e dependem de variáveis
- que aqui não podem ser consideradas. Trata-se de mera contribuição à 
- elaboração de cenários por parte dos municípios e não configura qualquer 
- obrigação ou responsabilidade perante as decisões efetivadas. Saiba mais em 
- nossa metodologia.
-""")
-
-        st.write("""
-Estamos em constante desenvolvimento e queremos ouvir sua opinião sobre a 
-ferramenta - caso tenha sugestões ou comentários, entre em contato via o chat 
-ao lado. Caso seja gestor público e necessite de apoio para preparo de seu 
-município, acesse a Checklist e confira o site do CoronaCidades.
-""")
-
-        st.write("""
-Esta plataforma foi desenvolvida por:
-
-João Carabetta, Mestre em Matemática Aplicada pela FGV
-Fernanda Scovino, Graduada em Matemática Aplicada pela FGV
-Diego Oliveira, Mestre em Física Aplicada pela Unicamp
-Ana Paula Pellegrino, Doutoranda em Ciência Política da Georgetown University
-""")
-
-        st.write("""
-    < IMAGE IMPULSO >
-""")
-
-        st.write("""
-   com colaboração de:
-
-Fátima Marinho, Doutora em Epidemiologia e Medicina Preventiva pela USP e 
-professora da Faculdade de Medicina da Universidade de Minas Gerais
-Sarah Barros Leal, Médica e Mestranda em Saúde Global na University College London
-H. F. Barbosa, Mestre em Relações Internacionais pela Universidade da Califórnia, San Diego
-Teresa Soter, mestranda em Sociologia na Oxford University
-
-Toda a documentação da ferramenta está disponível aqui.
-""")
-
-        st.write("""
-    < IMAGES IMPULSO ARAPYAU CORONACIDADES>
-""")
+        st.write('<br/>', unsafe_allow_html=True)
 
         
+        # DEFAULT WORST SCENARIO  
+        user_input['strategy'] = {'isolation': 90, 'lockdown': 90}
+        _, dday_beds, dday_ventilators = simulator.run_evolution(user_input)
+        
+        worst_case = SimulatorOutput(color=BackgroundColor.GREY_GRADIENT,
+                        min_range_beds=dday_beds['worst'], 
+                        max_range_beds=dday_beds['best'], 
+                        min_range_ventilators=dday_ventilators['worst'],
+                        max_range_ventilators=dday_ventilators['best'])
+        
+        # DEFAULT BEST SCENARIO
+        user_input['strategy'] = {'isolation': 90, 'lockdown': 0}
+        _, dday_beds, dday_ventilators = simulator.run_evolution(user_input)
+        
+        best_case = SimulatorOutput(color=BackgroundColor.LIGHT_BLUE_GRADIENT,
+                        min_range_beds=dday_beds['worst'], 
+                        max_range_beds=dday_beds['best'], 
+                        min_range_ventilators=dday_ventilators['worst'],
+                        max_range_ventilators=dday_ventilators['best'])
+
+        
+        utils.genSimulationSection(choose_place(user_input['city'], user_input['state']), worst_case, best_case)
+
+        # SIMULATOR MENU
+        user_input = simulator_menu(user_input)
+
+        # SIMULATOR SCENARIOS: BEDS & RESPIRATORS
+        fig, dday_beds, dday_ventilators = simulator.run_evolution(user_input)        
+        
+        st.write('<div class="lightgrey-bg"><div class="base-wrapper"><span class="section-header primary-span">Evolucão diária da demanda hospitalar</span></div></div>', unsafe_allow_html=True)
+        
+        # PLOT SCENARIOS EVOLUTION
+        st.plotly_chart(fig)
+
+        utils.genLogosSection()
+        
 if __name__ == "__main__":
-
-
     main()
