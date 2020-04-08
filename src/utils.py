@@ -1,4 +1,5 @@
 import streamlit as st
+from datetime import datetime
 from models import SimulatorOutput, ContainmentStrategy, ResourceAvailability, BackgroundColor, Logo, Link
 from typing import List
 import re
@@ -31,14 +32,13 @@ def genMunicipalityInputSection() -> None:
         ''',  unsafe_allow_html=True)
 
 def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
-        city = 'Geral' if resources.city == 'Todos' else resources.city
-        msg = '''
-        🚨*Boletim CoronaCidades*🚨%%0a%%0a
-        Aqui na minha cidade (%s) temos:%%0a%%0a
-        - %i casos confirmados de coronavírus 😷%%0a
-        - O município tem %i leitos e %i ventiladores para UTI destinados à Covid 🏥%%0a%%0a
-        E o seu município, como está? 👨🏻‍⚕👩🏻‍⚕%%0a
-        Simule aqui: 👉🏼www.simulacovid.coronacidades.org👈🏼''' % (city, resources.cases, resources.beds, resources.ventilators)
+        city = 'Brasil' if resources.city == 'Todos' else resources.city
+
+        msg = f'''
+        🚨 *BOLETIM CoronaCidades:*  {city} - {datetime.now().strftime('%d/%m')}  🚨%0a%0a
+        😷 *{int(resources.cases)}* casos confirmados e *{int(resources.deaths)}* mortes%0a%0a
+        🏥 Hoje estão disponíveis *{resources.beds}* leitos e *{resources.ventilators}* ventiladores destinados à Covid %0a%0a
+        👉 _Acompanhe e simule a situacão do seu municipio_: http://simulacovid.coronacidades.org ''' 
         
         st.write('''
         <div class="primary-bg"> 
