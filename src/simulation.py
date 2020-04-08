@@ -89,7 +89,7 @@ def main():
                                                                   ventilators=user_input['n_ventilators']))
 
         utils.generateStrategiesSection(Strategies)
-        
+
         st.write('<br/>', unsafe_allow_html=True)
 
         
@@ -120,71 +120,14 @@ def main():
         user_input = simulator_menu(user_input)
 
         # SIMULATOR SCENARIOS: BEDS & RESPIRATORS
-        fig, dday_beds, dday_ventilators = simulator.run_evolution(user_input)
+        fig, dday_beds, dday_ventilators = simulator.run_evolution(user_input)        
         
-        st.write('<br/>', unsafe_allow_html=True)
+        st.write('<div class="lightgrey-bg"><div class="base-wrapper"><span class="section-header primary-span">Evolucão diária da demanda hospitalar</span></div></div>', unsafe_allow_html=True)
         
         # PLOT SCENARIOS EVOLUTION
         st.plotly_chart(fig)
-        
-        st.write('<br/>', unsafe_allow_html=True)
-        
-        # FINAL TEXT
-        st.write("""
-# <Simulador da demanda hospitalar>
-""")
 
-
-        st.write("""
-A presente ferramenta, voluntária, parte de estudos referenciados já 
-publicados e considera os dados de saúde pública dos municípios brasileiros 
-disponibilizados no DataSus.
-""")
-
-        st.write("""
-Os cenários projetados são meramente indicativos e dependem de variáveis
- que aqui não podem ser consideradas. Trata-se de mera contribuição à 
- elaboração de cenários por parte dos municípios e não configura qualquer 
- obrigação ou responsabilidade perante as decisões efetivadas. Saiba mais em 
- nossa metodologia.
-""")
-
-        st.write("""
-Estamos em constante desenvolvimento e queremos ouvir sua opinião sobre a 
-ferramenta - caso tenha sugestões ou comentários, entre em contato via o chat 
-ao lado. Caso seja gestor público e necessite de apoio para preparo de seu 
-município, acesse a Checklist e confira o site do CoronaCidades.
-""")
-
-        st.write("""
-Esta plataforma foi desenvolvida por:
-
-João Carabetta, Mestre em Matemática Aplicada pela FGV
-Fernanda Scovino, Graduada em Matemática Aplicada pela FGV
-Diego Oliveira, Mestre em Física Aplicada pela Unicamp
-Ana Paula Pellegrino, Doutoranda em Ciência Política da Georgetown University
-""")
-
-        st.write("""
-    < IMAGE IMPULSO >
-""")
-
-        st.write("""
-   com colaboração de:
-
-Fátima Marinho, Doutora em Epidemiologia e Medicina Preventiva pela USP e 
-professora da Faculdade de Medicina da Universidade de Minas Gerais
-Sarah Barros Leal, Médica e Mestranda em Saúde Global na University College London
-H. F. Barbosa, Mestre em Relações Internacionais pela Universidade da Califórnia, San Diego
-Teresa Soter, mestranda em Sociologia na Oxford University
-
-Toda a documentação da ferramenta está disponível aqui.
-""")
-
-        st.write("""
-    < IMAGES IMPULSO ARAPYAU CORONACIDADES>
-""")
-
+        utils.genLogosSection()
         
 if __name__ == "__main__":
     main()

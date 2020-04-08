@@ -133,7 +133,7 @@ def plot_fig(t, cols):
                                      hovertemplate=None, #'%{y:.0f} no dia %{x}',
                                      mode='lines', line=dict(color=cols[i_type]['color'], width=3)))
 
-    fig.update_layout(template='plotly_white', title_text='Evolução da demanda hospitalar', 
+    fig.update_layout(template='plotly_white', 
                       legend_orientation="h", legend=dict(x=0, y=-.2, font=dict(size=14)),
                       hovermode='x')
     

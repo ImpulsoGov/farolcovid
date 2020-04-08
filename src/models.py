@@ -21,8 +21,13 @@ class Document(enum.Enum):
     FAQ='https://docs.google.com/document/d/1lanC52PjzU2taQISs1kO9mEJPtvwZM4uyvnHL9IalbQ/edit'
     GITHUB='https://github.com/ImpulsoGov/simulacovid/tree/master/COVID19_App'
 
-# Models
 
+class Logo(enum.Enum):
+    IMPULSO='https://i.imgur.com/zp9QCDU.png'
+    CORONACIDADES='https://i.imgur.com/BamxSJE.png'
+    ARAPYAU='https://i.imgur.com/SjsMK2A.jpg'
+
+# Models
 class ResourceAvailability(NamedTuple):
     city: str
     cases: int

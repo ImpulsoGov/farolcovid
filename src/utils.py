@@ -1,5 +1,5 @@
 import streamlit as st
-from models import SimulatorOutput, ContainmentStrategy, ResourceAvailability, BackgroundColor
+from models import SimulatorOutput, ContainmentStrategy, ResourceAvailability, BackgroundColor, Logo
 from typing import List
 import re
 
@@ -13,8 +13,7 @@ def genHeroSection():
                 <span class="logo-bold">corona</span><span class="logo-lighter">cidades</span>
                 <div class="hero-wrapper">
                         <div class="hero-container">
-                                <span class="hero-container-product primary-span">Simula</span>
-                                <span class="hero-container-product primary-span">Covid</span>
+                                <span class="hero-container-product primary-span">Simula<br/>Covid</span>
                                 <span class="hero-container-subtitle primary-span">Um simulador da demanda por leitos hospitalares e ventiladores.</span>
                         </div>   
                         <img class="hero-container-image" src="https://i.imgur.com/w5yVANW.png"/>
@@ -40,12 +39,12 @@ def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
                         </span>
                         <div class="resources-wrapper">
                                 <div class="resources-title-container">
-                                        <span class="resources-title">Casos de Coronavírus</span>
+                                        <span class="resources-title">Ao todo são</span>
                                 </div>
                                 <div class="resources-container-wrapper">
                                         <div class="resource-container"> 
                                                 <span class='resource-container-value'>%i</span>  
-                                                <span class='resource-container-label'>confirmados</span>  
+                                                <span class='resource-container-label'>casos confirmados</span>  
                                         </div>
                                         <div class="resource-container"> 
                                                 <span class='resource-container-value'>%i</span>  
@@ -56,7 +55,7 @@ def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
                         </div>
                         <div class="resources-wrapper">
                                 <div class="resources-title-container">
-                                        <span class="resources-title">Casos de Coronavírus</span>
+                                        <span class="resources-title">A capacidade hospitalar é</span>
                                 </div>
                                 <div class="resources-container-wrapper">
                                         <div class="resource-container"> 
@@ -183,11 +182,22 @@ def generateStrategiesSection(strategies: List[ContainmentStrategy]) -> None:
         cards = list(map(genStrategyCard, strategies))
         cards = ''.join(cards)
         st.write('''
-        <div class="primary-bg">
+        <div class="lightgrey-bg">
                 <div class="base-wrapper">
-                        <span class="section-header white-span">E como me preparo?</span>
+                        <span class="section-header primary-span">E como me preparo?</span>
                         <div class="scenario-cards-container">%s</div>
                 </div>
         </div>
         ''' % cards,
         unsafe_allow_html= True)
+
+def genLogosSection() -> None:
+        print("https://i.imgur.com/BamxSJE.png")
+        st.write('''
+                <div class="logo-wrapper">
+                        <img class="logo-img" src="%s"/>
+                        <div class="logo-section">
+                                <img class="logo-img" src="%s"/>
+                                <img class="logo-img" src="%s"/>
+                        </div>
+                </div>''' % (Logo.IMPULSO.value, Logo.CORONACIDADES.value, Logo.ARAPYAU.value), unsafe_allow_html=True)

@@ -12,6 +12,7 @@
     --main-orange: #F59954;
     --main-yellow: #F2C94C;
     --main-grey: #A8BFD2;
+    --main-light-grey: #f0f9fc;
     --main-white: #fff;
     --main-black: #252729;
     --main-margin: 2em;
@@ -31,6 +32,9 @@
     background-color: var(--main-dark);
 }
 
+.lightgrey-bg {
+    background-color: var(--main-light-grey);
+}
 .grey-bg {
     background-color: var(--main-grey);
 }
@@ -62,9 +66,6 @@
 .darkblue-span {
     color: var(--main-dark);
 }
-/* .dark-green-span {
-    color: var(--main-dark-green)
-} */
 
 .white-span {
     color: var(--main-white);
@@ -84,7 +85,13 @@
 
 /* Override default template */
 .row-widget {
-    padding: 0 1em;
+    padding: 0 3em;
+}
+
+@media only screen and (max-width: 425px) {
+    .row-widget {
+        padding: 0 1em;
+    }
 }
 
 .reportview-container .main .block-container {
@@ -118,11 +125,11 @@ h1 {
     box-sizing: border-box;
 }
 
-@media only screen and (max-width: 375px) {
+@media only screen and (max-width: 425px) {
     .base-wrapper {
         padding: 1em;
     }
-  }
+}
 
 
 .section-header {
@@ -165,9 +172,9 @@ h1 {
 
 .hero-container-product {
     text-transform: uppercase;
-    font-size: 96px;
+    font-size: 80px;
     font-weight: bold;
-    line-height: 120px;
+    line-height: 80px;
 }
 
 .hero-container-subtitle {
@@ -181,6 +188,28 @@ h1 {
     margin-left: auto;
     width: 500px;
     height: 100%;
+}
+
+@media only screen and (max-width: 425px) {
+    .hero-wrapper {
+        flex-direction: column
+    }
+
+    .logo-bold {
+        font-size: 48px;
+    }
+
+    .logo-lighter {
+        font-size: 48px;
+    }
+    
+    .hero-container-product {
+        font-size: 48px;
+    }
+
+    .hero-container-subtitle {
+        font-size: 24px;
+    }
 }
 
 /* Resources Output - Square Style */
@@ -401,4 +430,34 @@ h1 {
 .scenario-card-description {
     margin-top: var(--main-margin);
     text-align: center;
+}
+
+.fullScreenFrame {
+    background-color: var(--main-light-grey);
+    width: 100%;
+}
+
+@media only screen and (min-width: 768px) {
+    .fullScreenFrame {
+        padding: 0 3rem;
+    }
+}
+
+.logo-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #fffbfa;
+}
+
+.logo-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.logo-img {
+    width: 250px;
+    height: auto;
 }
