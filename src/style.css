@@ -404,7 +404,7 @@
 
 /* Simulation Output - Banner Style */
 .chart-simulator-instructions {
-    margin: 2em var(--main-item-margin);
+    margin: 2em 0;
 }
 
 .simulator-wrapper {

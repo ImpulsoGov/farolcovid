@@ -29,7 +29,7 @@ class Logo(enum.Enum):
     ARAPYAU='https://i.imgur.com/SjsMK2A.jpg'
 
 class Link(enum.Enum):
-    AMBASSADOR_FORM='https://docs.google.com/forms/d/1Vz1s09JUGm74Qd_kxdWAzW3S1YTzPon5tN1IffENM8E/edit'
+    AMBASSADOR_FORM='https://forms.gle/iPFE7T6Wrq4JzoEw9'
 
 # Models
 class ResourceAvailability(NamedTuple):
