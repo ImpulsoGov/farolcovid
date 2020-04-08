@@ -513,3 +513,14 @@
     width: 250px;
     height: auto;
 }
+
+.sidebar-collapse-control {
+    background-color: var(--main-primary);
+    padding: 1em;
+    color: white;
+}
+
+
+.sidebar-collapse-control::after {
+    content: "Menu";
+  }
