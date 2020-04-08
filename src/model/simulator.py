@@ -124,12 +124,12 @@ def plot_fig(t, cols):
         i_type = col.split('_')[0]
 
         if 'best' in col:
-            fig.add_trace(go.Scatter(x=t.index, y=t[col], name=cols[i_type]['name'], showlegend=False, fill=None, 
+            fig.add_trace(go.Scatter(x=t.index, y=t[col].astype(int), name=cols[i_type]['name'], showlegend=False, fill=None, 
                                      hovertemplate=None, #'%{y:.0f} no dia %{x}', 
                                      mode='lines', line=dict(color=cols[i_type]['color'], width=3)))
 
         else:
-            fig.add_trace(go.Scatter(x=t.index, y=t[col], name=cols[i_type]['name'], fill='tonexty',
+            fig.add_trace(go.Scatter(x=t.index, y=t[col].astype(int), name=cols[i_type]['name'], fill='tonexty',
                                      hovertemplate=None, #'%{y:.0f} no dia %{x}',
                                      mode='lines', line=dict(color=cols[i_type]['color'], width=3)))
     
