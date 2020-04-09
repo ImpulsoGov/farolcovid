@@ -33,6 +33,8 @@ def decide_scenario(user_strategy):
     
     if user_strategy['isolation'] < user_strategy['lockdown']:
         return ['nothing', 'isolation', 'lockdown']
+    elif user_strategy['isolation'] == user_strategy['lockdown']: # lockdown only
+        return ['nothing', 'lockdown', 'lockdown']
     else:
         return ['nothing', 'lockdown', 'isolation']
 
