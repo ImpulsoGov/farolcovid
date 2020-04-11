@@ -5,11 +5,9 @@ import yaml
 from scipy.integrate import odeint
 from tqdm import tqdm
 import sys
-sys.path.insert(0,'.')
+# sys.path.insert(0,'.')
 # from seir import entrypoint
-from seir import entrypoint
-
-default_params = yaml.load(open('./configs/config.yaml', 'r'), Loader=yaml.FullLoader)
+from model.seir import entrypoint
 
 def iterate_simulation(current_state, seir_parameters, phase, initial):
     """
@@ -38,7 +36,7 @@ def decide_scenario(user_strategy):
     else:
         return ['nothing', 'lockdown', 'isolation']
 
-def run_simulation(population_params, strategy_params):
+def run_simulation(population_params, strategy_params, default_params):
     """
     Run simulation phases and return hospital demand.
     
@@ -155,9 +153,9 @@ def plot_fig(t, cols):
     
     return fig
 
-def run_evolution(user_input):
+def run_evolution(user_input, config):
     
-    dfs = run_simulation(user_input['population_params'], user_input['strategy'])
+    dfs = run_simulation(user_input['population_params'], user_input['strategy'], config)
     
     cols = {'I2': {'name': 'Demanda por leitos', 'color': '#F2C94C', 
                   'resource_name': 'Capacidade de leitos', 'capacity': user_input['n_beds']}, 
