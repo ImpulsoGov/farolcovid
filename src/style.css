@@ -640,3 +640,34 @@ header>.toolbar { /* Hide toolbar menu */
     display: flex;
     flex-direction: column;
 }
+
+/* question FAB */
+
+.float-header {
+    font-weight: bold !important;
+    color: var(--main-primary);
+    font-size: 10px;
+    margin-top: 2px;
+    margin-left: -25px !important;
+    width: 100px;
+}
+  
+.float{
+    position:fixed;
+    width:45px;
+    height:45px;
+    bottom:65px;
+    right:40px;
+    background: var(--main-primary);
+    color:#FFF;
+    border-radius:50px;
+    text-align: center;
+    font-size:30px;
+    box-shadow: 2px 2px 3px #999;
+    z-index:100;
+    padding-top: 0px;
+}
+  
+.float:hover {
+    text-decoration: none;
+}

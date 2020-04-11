@@ -55,6 +55,7 @@ def refresh_rate(config):
 
 def main():
         utils.localCSS("style.css")
+        utils.localCSS("icons.css")
  
         if datetime.now().hour < 1:
                 caching.clear_cache()
@@ -148,6 +149,7 @@ def main():
         # PLOT SCENARIOS EVOLUTION
         st.plotly_chart(fig)
         
+        utils.genWhatsappButton()
         utils.genFooter()
         
 if __name__ == "__main__":

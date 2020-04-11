@@ -49,7 +49,8 @@ def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
         🚨 *BOLETIM CoronaCidades:*  {locality} - {datetime.now().strftime('%d/%m')}  🚨%0a%0a
         😷 *{int(resources.cases)}* casos confirmados e *{int(resources.deaths)}* mortes%0a%0a
         🏥 Hoje estão disponíveis *{resources.beds}* leitos e *{resources.ventilators}* ventiladores destinados à Covid %0a%0a
-        👉 _Acompanhe e simule a situação do seu município acessando o *SimulaCovid* aqui_: https://coronacidades.org/ ''' 
+        👉 _Acompanhe e simule a situação do seu município acessando o *SimulaCovid* aqui_: https://coronacidades.org/ %0a%0a
+        Tem algum dado desatualizado? Clique no link acima, entre no SimulaCovid, e entre no  ''' 
         
         st.write('''
         <div class="primary-bg"> 
@@ -251,3 +252,16 @@ def genFooter() -> None:
                         </div>'
                 </div>
         </div>''' % (Logo.IMPULSO.value, Logo.CORONACIDADES.value, Logo.ARAPYAU.value), unsafe_allow_html=True)
+
+
+def genWhatsappButton() -> None:
+        
+        msg = f'Olá Equipe Coronacidades. Vocês podem me ajuda com uma dúvida?'
+        phone = '+5511964373097'
+        url = 'whatsapp://send?text={}&phone=${}'.format(msg, phone)
+        st.write(''' 
+         <a href="%s" class="float" target="_blank" id="messenger">
+                <i class="material-icons">question_answer</i>
+                <p class="float-header">Dúvidas?</p></a>
+        ''' % url,  unsafe_allow_html=True)
+        
