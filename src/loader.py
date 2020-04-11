@@ -4,8 +4,6 @@ import streamlit as st
 
 def _download_from_drive(url):
 
-    print(url + '/export?format=csv&id')
-
     return pd.read_csv(url + '/export?format=csv&id')
 
 def _get_credentials():

@@ -4,6 +4,7 @@ notebooks/
 */.DS_Store
 *.pyc
 covid_env/
+venvanalysis/
 .DS_Store
 venv/
 src/configs/gcloud_credentials.json

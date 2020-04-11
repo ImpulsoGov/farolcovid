@@ -111,7 +111,7 @@ def main():
         user_input['strategy'] = {'isolation': 90, 'lockdown': 90}
         user_input['population_params']['I'] = [user_input['population_params']['I'] if user_input['population_params']['I'] != 0 else 1][0]
 
-        _, dday_beds, dday_ventilators = simulator.run_evolution(user_input)
+        _, dday_beds, dday_ventilators = simulator.run_evolution(user_input, config)
         
         worst_case = SimulatorOutput(color=BackgroundColor.GREY_GRADIENT,
                         min_range_beds=dday_beds['worst'], 
@@ -121,7 +121,7 @@ def main():
         
         # DEFAULT BEST SCENARIO
         user_input['strategy'] = {'isolation': 90, 'lockdown': 0}
-        _, dday_beds, dday_ventilators = simulator.run_evolution(user_input)
+        _, dday_beds, dday_ventilators = simulator.run_evolution(user_input, config)
         
         best_case = SimulatorOutput(color=BackgroundColor.LIGHT_BLUE_GRADIENT,
                         min_range_beds=dday_beds['worst'], 
@@ -138,7 +138,7 @@ def main():
         user_input = simulator_menu(user_input)
 
         # SIMULATOR SCENARIOS: BEDS & RESPIRATORS
-        fig, dday_beds, dday_ventilators = simulator.run_evolution(user_input)        
+        fig, dday_beds, dday_ventilators = simulator.run_evolution(user_input, config)        
         
         # st.write('<div class="lightgrey-bg"><div class="base-wrapper"><span class="section-header primary-span">Simulador de demanda hospitalar</span></div></div>', unsafe_allow_html=True)
         st.write('''
