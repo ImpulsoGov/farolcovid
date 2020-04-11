@@ -225,7 +225,7 @@ def genChartSimulationSection(simulation: SimulatorOutput) -> None:
         st.write('''<div class="lightgrey-bg">
                 <div class="base-wrapper"><span class="section-header primary-span">Simulador de demanda hospitalar</span></div>
                 <div class="base-wrapper">
-                        <span class="chart-simulator-instructions section-header">Ajuste os valores da simulação no menu à esquerda</span>
+                        <span class="chart-simulator-instructions subsection-header">A partir das estratégias escolhidas...</span>
                         <div class="simulator-wrapper">
                                 %s
                         </div>

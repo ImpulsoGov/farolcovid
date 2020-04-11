@@ -33,6 +33,8 @@ def decide_scenario(user_strategy):
     
     if user_strategy['isolation'] < user_strategy['lockdown']:
         return ['nothing', 'isolation', 'lockdown']
+    elif user_strategy['isolation'] == user_strategy['lockdown']: # lockdown only
+        return ['nothing', 'lockdown', 'lockdown']
     else:
         return ['nothing', 'lockdown', 'isolation']
 
@@ -138,10 +140,10 @@ def plot_fig(t, cols):
                                 showlegend=False, hovertemplate=None, mode='lines',
                                 line=dict(color=cols[i_type]['color'], width=6, dash="dash")))
 
-    fig.update_layout(title="<b>EVOLUÇÃO DIÁRIA DA DEMANDA HOSPITALAR</b>", titlefont=dict(size=30, family='Oswald, sans-serif'), 
+    fig.update_layout(#title="<b>EVOLUÇÃO DIÁRIA DA DEMANDA HOSPITALAR</b>", titlefont=dict(size=24, family='Oswald, sans-serif'), 
                     paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
                     legend_orientation="h", legend=dict(x=0, y=-.2, font=dict(size=18, family='Oswald, sans-serif')),
-                    hovermode='x', 
+                    hovermode="x", 
                     autosize=False, width=1000, height=800)
     
     fig.update_xaxes(title="dias", tickfont=dict(size=16, family='Oswald, sans-serif'),

@@ -97,6 +97,10 @@
     font-weight: bold;
 }
 
+.italic {
+    font-weight: italic;
+}
+
 /* Override default template */
 .row-widget {
     padding: 0 3em;
@@ -151,18 +155,30 @@ header>.toolbar { /* Hide toolbar menu */
     box-sizing: border-box;
 }
 
+/* Base components
+.bigger-wrapper {
+    padding: 5rem;
+    box-sizing: border-box;
+} */
+
 @media only screen and (max-width: 425px) {
     .base-wrapper {
         padding: 1.2em;
     }
 }
 
-
 .section-header {
     font-weight: bold;
     text-transform: uppercase;
     font-family: var(--main-header-font-family);
     font-size: 32px;
+}
+
+.subsection-header {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-family: var(--main-header-font-family);
+    font-size: 24px;
 }
 
 /* Hero Section */
@@ -416,7 +432,7 @@ header>.toolbar { /* Hide toolbar menu */
 
 /* Simulation Output - Banner Style */
 .chart-simulator-instructions {
-    margin: 2em 0;
+    margin: 0 0;
 }
 
 .simulator-wrapper {
