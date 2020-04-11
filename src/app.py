@@ -13,8 +13,6 @@ import simulation as sm
 from models import Logo
 
 def main():
-    st.sidebar.markdown('# **CoronaCidades**')
-
     page = st.sidebar.selectbox("Menu", ["COVID19 no seu Município", "Metodologia", "Quem somos?"])
 
 
