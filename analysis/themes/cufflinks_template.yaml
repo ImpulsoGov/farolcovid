@@ -1,0 +1,40 @@
+layout:
+    height: 500
+    legend:
+      bgcolor: white
+      bordercolor: '#444'
+      borderwidth: 0
+      font: {size: 12}
+      itemclick: toggle
+      itemdoubleclick: toggleothers
+      itemsizing: trace
+      traceorder: normal
+    paper_bgcolor: white
+    plot_bgcolor: white
+    titlefont: {color: '#4D5663', size: 17}
+    title_x: 0.5
+    width: 700
+    xaxis:
+      automargin: true
+      gridcolor: '#E1E5ED'
+      linecolor: black
+      mirror: ticks
+      showline: true
+      tickfont: {size: 15}
+      titlefont: 
+          size: 16 
+          color: 'grey10'
+      zerolinecolor: black
+      zerolinewidth: 2
+    yaxis:
+      automargin: true
+      gridcolor: '#E1E5ED'
+      linecolor: black
+      mirror: ticks
+      showline: true
+      tickfont: {size: 15}
+      titlefont: 
+          size: 16
+          color: 'grey10'
+      zerolinecolor: black
+      zerolinewidth: 2
