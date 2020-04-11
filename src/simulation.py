@@ -137,9 +137,7 @@ def main():
 
         # SIMULATOR SCENARIOS: BEDS & RESPIRATORS
         fig, dday_beds, dday_ventilators = simulator.run_evolution(user_input)        
-        
-        st.write('<div class="lightgrey-bg"><div class="base-wrapper"><span class="section-header primary-span">Simulador de demanda hospitalar</span></div></div>', unsafe_allow_html=True)
-        
+                
         utils.genChartSimulationSection(SimulatorOutput(color=BackgroundColor.SIMULATOR_CARD_BG,
                         min_range_beds=dday_beds['worst'], 
                         max_range_beds=dday_beds['best'], 
