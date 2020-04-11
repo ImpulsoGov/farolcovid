@@ -52,4 +52,9 @@ make create-env-analysis
 
 # Ative o ambiente
 . venvanalysis/bin/activate
+
+# Abra o jupyter
+jupyter notebook
+
+# Mude o kernel do notebook para venvanalysis
 ```
