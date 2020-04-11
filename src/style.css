@@ -137,6 +137,10 @@
     justify-content: center;
 }
 
+header>.toolbar { /* Hide toolbar menu */
+    visibility: hidden;
+}
+
 /* Base components */
 .base-wrapper {
     padding: 3rem;
