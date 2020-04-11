@@ -131,7 +131,7 @@ def main():
         
         utils.genSimulationSection(choose_place(user_input['city'], user_input['region'], user_input['state']), worst_case, best_case)
         
-        utils.generateStrategiesSection(Strategies)
+        utils.genStrategiesSection(Strategies)
 
         # SIMULATOR MENU
         user_input = simulator_menu(user_input)

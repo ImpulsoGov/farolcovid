@@ -205,7 +205,7 @@ def genStrategyCard(strategy: ContainmentStrategy) -> str:
                         <span class="scenario-card-description">%s</span>
         </div>''' % (strategy.color.value, strategy.code, strategy.background.value, strategy.name, strategy.image_url, strategy.description)
 
-def generateStrategiesSection(strategies: List[ContainmentStrategy]) -> None:
+def genStrategiesSection(strategies: List[ContainmentStrategy]) -> None:
         cards = list(map(genStrategyCard, strategies))
         cards = ''.join(cards)
         st.write('''

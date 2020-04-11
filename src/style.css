@@ -607,8 +607,13 @@ header>.toolbar { /* Hide toolbar menu */
 
 .sidebar-collapse-control::after {
     content: "Menu";
-  }
+}
 
+.team-logo {
+    width: 200px;
+    height: auto;
+    margin-left: auto;
+}
 
 .profiles-container {
     display: flex;

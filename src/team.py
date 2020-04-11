@@ -1,5 +1,6 @@
 import streamlit as st
 import utils
+from models import  Logo
 
 def main():
     ana = 'https://media-exp1.licdn.com/dms/image/C4E03AQGdLO2wZpvasA/profile-displayphoto-shrink_200_200/0?e=1591833600&v=beta&t=BsnUsaEI-eLrn_oxLf7cEyXKGx2_7OBJZ9suUrRev_8'
@@ -11,8 +12,11 @@ def main():
 
     utils.localCSS("style.css")
 
+    logo = Logo.IMPULSO.value
+
     st.write('''
     <div class="base-wrapper">
+        <img class="team-logo" src="%s" />
             <h1 class="primary-span">Quem Somos</h1>
             <div class="profiles-container">
             <div class="profile">
@@ -48,4 +52,4 @@ def main():
             <span>Teresa Soter, mestranda em Sociologia na Oxford University</span>
         </div>
     </div>
-''' % (ana, diego, fernanda, saru, carabetta, luiz), unsafe_allow_html=True)
+''' % (logo, ana, diego, fernanda, saru, carabetta, luiz), unsafe_allow_html=True)
