@@ -4,6 +4,11 @@ from models import SimulatorOutput, ContainmentStrategy, ResourceAvailability, B
 from typing import List
 import re
 
+def make_clickable(text, link):
+    # target _blank to open new window
+    # extract clickable text to display for your link
+        return f'<a target="_blank" href="{link}">{text}</a>'
+
 def localCSS(file_name):
     with open(file_name) as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
