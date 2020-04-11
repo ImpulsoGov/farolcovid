@@ -178,6 +178,10 @@
     font-weight: lighter;
 }
 
+.logo-link {
+    text-decoration: none  !important;
+}
+
 .hero-wrapper {
     display: flex;
     flex-direction: row;

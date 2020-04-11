@@ -11,7 +11,7 @@ def localCSS(file_name):
 
 def genHeroSection():
         st.write('''<div class="base-wrapper hero-bg">
-                <span class="logo-bold">corona</span><span class="logo-lighter">cidades</span>
+                <a href="https://coronacidades.org/" target="blank" class="logo-link"><span class="logo-bold">corona</span><span class="logo-lighter">cidades</span></a>
                 <div class="hero-wrapper">
                         <div class="hero-container">
                                 <div class="hero-container-content">
