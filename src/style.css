@@ -574,6 +574,10 @@ header>.toolbar { /* Hide toolbar menu */
         width: 200px;
         height: auto;
     }
+
+    .scenario-card {
+        height: 500px
+    }
 }
 
 .scenario-card-description {
