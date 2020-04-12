@@ -93,6 +93,7 @@ def run_simulation(population_params, strategy_params, default_params):
                                                         simulation_params[phase], initial=False)
             df_evolution = df_evolution.append(res[1:])
 
+        df_evolution = df_evolution[default_params['simulator']['scenarios'][bound]['test_delay']:]
         df_evolution = df_evolution.reset_index(drop=True)
         df_evolution.index += 1
         df_evolution.index.name = 'dias'
