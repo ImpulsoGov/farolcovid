@@ -97,6 +97,10 @@
     font-weight: bold;
 }
 
+.italic {
+    font-weight: italic;
+}
+
 /* Override default template */
 .row-widget {
     padding: 0 3em;
@@ -137,6 +141,14 @@
     justify-content: center;
 }
 
+header>.toolbar { /* Hide toolbar menu */
+    visibility: hidden;
+}
+
+
+.Widget>label {
+    font-size: 1rem;
+}
 /* Base components */
 .base-wrapper {
     padding: 3rem;
@@ -151,7 +163,7 @@
 
 @media only screen and (max-width: 425px) {
     .base-wrapper {
-        padding: 1em;
+        padding: 1.2em;
     }
 }
 
@@ -188,6 +200,10 @@
     font-size: 64px;
     color: var(--main-primary);
     font-weight: lighter;
+}
+
+.logo-link {
+    text-decoration: none  !important;
 }
 
 .hero-wrapper {
@@ -578,6 +594,10 @@
         width: 200px;
         height: auto;
     }
+
+    .scenario-card {
+        height: 500px
+    }
 }
 
 .scenario-card-description {
@@ -611,8 +631,13 @@
 
 .sidebar-collapse-control::after {
     content: "Menu";
-  }
+}
 
+.team-logo {
+    width: 200px;
+    height: auto;
+    margin-left: auto;
+}
 
 .profiles-container {
     display: flex;
@@ -643,4 +668,35 @@
 .collaborator-container {
     display: flex;
     flex-direction: column;
+}
+
+/* question FAB */
+
+.float-header {
+    font-weight: bold !important;
+    color: var(--main-primary);
+    font-size: 10px;
+    margin-top: 2px;
+    margin-left: -25px !important;
+    width: 100px;
+}
+  
+.float{
+    position:fixed;
+    width:45px;
+    height:45px;
+    bottom:65px;
+    right:40px;
+    background: var(--main-primary);
+    color:#FFF;
+    border-radius:50px;
+    text-align: center;
+    font-size:30px;
+    box-shadow: 2px 2px 3px #999;
+    z-index:100;
+    padding-top: 0px;
+}
+  
+.float:hover {
+    text-decoration: none;
 }
