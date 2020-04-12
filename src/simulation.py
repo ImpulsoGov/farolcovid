@@ -55,6 +55,7 @@ def refresh_rate(config):
 
 def main():
         utils.localCSS("style.css")
+        utils.localCSS("icons.css")
  
         if datetime.now().hour < 1:
                 caching.clear_cache()
@@ -111,7 +112,7 @@ def main():
         user_input['strategy'] = {'isolation': 90, 'lockdown': 90}
         user_input['population_params']['I'] = [user_input['population_params']['I'] if user_input['population_params']['I'] != 0 else 1][0]
 
-        _, dday_beds, dday_ventilators = simulator.run_evolution(user_input)
+        _, dday_beds, dday_ventilators = simulator.run_evolution(user_input, config)
         
         worst_case = SimulatorOutput(color=BackgroundColor.GREY_GRADIENT,
                         min_range_beds=dday_beds['worst'], 
@@ -121,7 +122,7 @@ def main():
         
         # DEFAULT BEST SCENARIO
         user_input['strategy'] = {'isolation': 90, 'lockdown': 0}
-        _, dday_beds, dday_ventilators = simulator.run_evolution(user_input)
+        _, dday_beds, dday_ventilators = simulator.run_evolution(user_input, config)
         
         best_case = SimulatorOutput(color=BackgroundColor.LIGHT_BLUE_GRADIENT,
                         min_range_beds=dday_beds['worst'], 
@@ -132,26 +133,14 @@ def main():
         
         utils.genSimulationSection(choose_place(user_input['city'], user_input['region'], user_input['state']), worst_case, best_case)
         
-        utils.generateStrategiesSection(Strategies)
+        utils.genStrategiesSection(Strategies)
 
         # SIMULATOR MENU
         user_input = simulator_menu(user_input)
 
         # SIMULATOR SCENARIOS: BEDS & RESPIRATORS
-        fig, dday_beds, dday_ventilators = simulator.run_evolution(user_input)        
-        
-        # st.write('<div class="lightgrey-bg"><div class="base-wrapper"><span class="section-header primary-span">Simulador de demanda hospitalar</span></div></div>', unsafe_allow_html=True)
-        st.write('''
-        <div class="lightgrey-bg">
-                <div class="base-wrapper">
-                        <div style="display: flex; flex-direction: column"> 
-                                <span class="section-header primary-span">Simulador de demanda hospitalar</span>
-                                <i>Ajuste os valores no menu à esquerda para testar a evolução com diferentes estratégias.</i>
-                        </div>
-                </div>
-        </div>
-        ''',  unsafe_allow_html=True)
-
+        fig, dday_beds, dday_ventilators = simulator.run_evolution(user_input, config) 
+                
         utils.genChartSimulationSection(SimulatorOutput(color=BackgroundColor.SIMULATOR_CARD_BG,
                         min_range_beds=dday_beds['worst'], 
                         max_range_beds=dday_beds['best'], 
@@ -174,6 +163,7 @@ def main():
 
         st.plotly_chart(fig)
         
+        utils.genWhatsappButton()
         utils.genFooter()
         
 if __name__ == "__main__":

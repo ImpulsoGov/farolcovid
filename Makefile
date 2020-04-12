@@ -7,6 +7,12 @@ create-env:
 			pip3 install --upgrade -r requirements.txt; \
 			python -m ipykernel install --user --name=venv
 
+create-env-analysis:
+	virtualenv venvanalysis
+	source venvanalysis/bin/activate; \
+			pip3 install --upgrade -r requirements-analysis.txt; \
+			python -m ipykernel install --user --name=venvanalysis
+
 update-env:
 	source venv/bin/activate; \
 			pip3 install --upgrade -r requirements.txt;

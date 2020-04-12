@@ -1,259 +1,328 @@
 import streamlit as st
 import pandas as pd
+from utils import make_clickable
 
 def main():
+
+    st.header("EM CONSTRUÇÃO...")
+
+    st.header("Simulação de Demanda Hospilatar")
+    
+    st.subheader("Resumo")
+
+    st.write(
+        """
+        Esta ferramenta utiliza uma variação do modelo epidemiológico SEIR para estimar a demanda por leitos hospitalares e ventiladores nos municípios brasileiros de pacientes com Covid-19. 
+        Permitimos a simulação do impacto de 3 estratégias de contenção da transmissão na sociedade, baseados na resposta do governo e da sociedade.  
+        Cada estratégia está associada a um número básico de reprodução distinto da Covid-19 (aproximadamente o número de novas pessoas infectadas por uma pessoa que já está doente). 
+        As taxas foram estimadas por estudo da evolução da transmissão em Wuhan, na China, sob diferentes políticas de restrição de contato, protocolos de tratamento e de testagem. 
+        Assim, ao indicar quando cada uma entrará em vigor no município selecionado, é possível simular a evolução da doença associada à sequência de estratégias indicada.
+        """
+    )
+
+    st.subheader("Cálculo")
+
+    st.write(
+        """
+        Queremos calcular em quantos dias a demanda por equipamentos hospitalares devido ao Covid-19 passará a oferta. 
+        Neste caso, os equipamentos hospitalares $(e)$ são dividios em leitos $(l)$, necessários para casos severos da doença,
+        e ventiladores $(v)$, necessários para casos críticos.
+
+        A demanda por equipamento $$\mathcal{D}^e(t)$$ é dada pelo número de casos graves e críticos em $t$, que por sua vez é estimado através de um modelo epidemiológico. 
+        A oferta $$\mathcal{O}^e(t)$$ é determinada pelo número de equipamentos que o município tem a disposição para pacientes de Covid-19. 
+        Essa também é dinâmica pois os municípios estão, por exemplo, construindo leitos e remanejando cirurgias. 
+        
+        A capacidade é atingida quando $$\mathcal{D}^e(t) = \mathcal{O}^e(t)$$. Logo, buscamos obter o menor $$t$$ no qual essa igualdade é satisfeita.
+        """
+    )
+
+    st.latex('t^* = min \{t [dias] : \mathcal{D}^e(t) = \mathcal{O}^e(t)\}')
+
+    st.write(
+        """
+        A demanda está em função dos **estados populacionais**, **parâmetros da doença** e **parâmetros da reação do governo e sociedade**. 
+        Os estados populacionais dependem da população do município e qual estágio de contágio está a doença. Os parâmetro da doença dizem respeito a transmissibilidade e ao tempo de progressão dos diferentes estágios da doença. 
+        Os parâmetros reação do governo e sociedade são relacionados ao tempo de testagem, taxa de subnotificação e cobertura da vacinação, que por sua vez influenciam determinados parâmetros da doença. 
+        Por exemplo, a transmissibilidade da doença pode variar de acordo com o nível de distanciamento social. 
+        A taxa básica de reprodução ($$R_0$$), em especial, é dependente da transmissibilidade da doença, e portanto, da reação do governo e sociedade. 
+        
+        Neste exercício, com a escolha de diferentes estratégias, são escolhidos diferentes $$R_0$$. 
+        Esses valores foram baseados nas estimativas realizadas em Wuhan dada as diferentes estratégias adotadas pelo governo local [(Wang et. al, 2020 [1])](https://www.medrxiv.org/content/10.1101/2020.03.03.20030593v1). 
+        Assim, podemos projetar diferentes curvas de demanda dada a população do município. 
+        As próximas duas seções, Capacidade Hospitalar e Modelo Epidemiológico, apresentam os modelos para a oferta e demanda de equipamentos hospitalares. 
+        Finalmente, a seção Fontes de Dados mostra de onde extraímos os dados e como estamos nos organizando para atualizar a oferta de equipamentos hospitalares.
+        """
+    )
+
+    st.header("Capacidade Hospitalar (Oferta)")
+
+    st.write(
+        """
+        Os equipamentos hospitalares que consideramos para esse exercício são os ventiladores e leitos hospitalares. 
+        
+        - **Leitos**
+        
+        A quantidade de leitos por municípios soma tanto leitos hospitalares da rede do Sistema Único de Saúde quanto da rede não-SUS. 
+        Avaliamos que ambas estariam envolvidas no esforço de resposta à crise. 
+        Para usar por base apenas a rede SUS, seria necessário filtrar a população SUS-dependente de cada município.
+
+        O número de leitos utilizado inclui leitos complementares. 
+        Retiramos os de tratamento intensivo, já que nossa medida de possibilidade de adaptação para essa modalidade são os equipamentos. 
+
+        Consideramos, na simulação inicial, que apenas $20\%$ dos leitos registrados no Cadastro Nacional de Estabelecimentos Hospitalares 
+        estariam disponíveis para alocação de pacientes da Covid-19 que necessitem de internação. 
+        Esse número está dentro do parâmetro recomendado pela Agência Nacional de Saúde Suplementar (ANS), 
+        de manutenção da taxa de ocupação de hospitalar entre $75\%$ e $85\%$, 
+        ainda que saibamos que há grande variação nesse percentual nas realidades locais de cada município (ANS, 2012).
+
+        Caso um percentual maior ou menor esteja alocado para pacientes com Covid-19, é possível ajustar a quantidade de leitos alocados para a simulação.
+
+        - **Ventiladores**
+        ...
+
+        Caso um percentual maior ou menor esteja alocado para pacientes com Covid-19, é possível ajustar a quantidade de ventiladores alocados para a simulação.
+
+        """
+    )
+
+    st.header("Modelo epidemiológico (Demanda)")    
+
+    st.subheader("Sobre o modelo")
+
+    st.write("""
+    Utilizamos o modelo epidemiológico SEIR (Suscetíveis, Expostos, Infectados e Removidos) adaptado segundo o 
+    modelo desenvolvido por [Alison Hill](https://alhill.shinyapps.io/COVID19seir/) para calcular a disseminação e 
+    evolução clínica do COVID-19. De acordo com esse modelo, uma população é dividida em diferentes estados populacionais, 
+    grupos mutuamente excludentes de indivíduos:
+
+    - Suscetíveis ($S$): aqueles que não têm imunidade à doença, estes se tornam expostos à doença a uma taxa $\\beta_i$ 
+    devido ao contato com indivíduos infetados $I_i$;
+    
+    - Expostos ($E$): aqueles que entram em contato com a doença e desenvolvem ou não sintomas, mas ainda não transmitem infecção.
+    Esses indivíduos expostos progridem para o primeiro estágio de infecção ($I_1$), leve, a uma taxa $\sigma$.
+    
+    - Infectados ($I$): são aqueles que desenvolvem sintomas e transmitem a doença a uma taxa $\\beta_i$. Os casos de infecção são separados em diferentes estágios de gravidade:
+      - Leve ($I_1$): aquele que não necessita de hospitalização, progride para o estado severo a uma taxa $p_1$, ou se recupera a uma taxa $\gamma_1$;
+      - Severo ($I_2$): aquele que necessita de hospitalização, progride para o estado crítico a uma taxa $p_1$, ou se recupera a uma taxa $\gamma_2$;
+      - Grave ($I_3$): aquele que além de hospitalização, necessita de tratamento intensivo com equipamento de ventiladores. 
+      Chegando ao caso grave, o indivíduo pode se recuperar a uma taxa $\gamma_3$ ou o quadro pode levar à morte com uma taxa $\mu$;
+    
+    - Recuperados ($R$): aqueles que, após o curso da doença, se recuperam e desenvolvem imunidade - não retornam ao estado suscetível.
+    - Mortos ($D$): indivíduos que morrem pelo agravamento da infecção.
+""")
+
     pic = open('imgs/model_graph', 'r').read()
     st.image(pic, use_column_width=True, caption=None)
+    st.write('*Fonte: [Alison Hill](https://alhill.shinyapps.io/COVID19seir/)*')
+
+    st.write('Conforme a descrição acima, o conjunto de equações que determina a dinâmica do modelo é dado por:')
+    st.latex("\\frac{dS}{dt} = - (β_1 I_1 + β_2 I_2 + β_3 I_3) S")
+    st.latex("\\frac{dE}{dt} = (β_1 I_1 + β_2 I_2 + β_3 I_3) S - \sigma E")
+    st.latex("\\frac{dI_1}{dt} = \sigma E - (γ_1 + p_1) I_1")
+    st.latex("\\frac{dI_2}{dt} = p_1 I_1 - (γ_2 + p_2) I_2")
+    st.latex("\\frac{dI_3}{dt} = p_2 I_2 - (γ_3 + p_3) I_3")
+    st.latex("\\frac{dR}{dt} = γ_1 I_1 + γ_2 I_2 + γ_3 I_3")
+    st.latex("\\frac{dD}{dt} = μ I_3")
+
+    st.subheader('Parâmetros da doença')
+
+    st.write('- **Número básico de reprodução ($R0$)**')
+    st.write(
+        """
+        O número básico de reprodução da doença nos remete ao número médio de pessoas que uma pessoa doente consegue infectar. 
+        Esse é um número característico da doença, que costuma ser estimado de forma retroativa conforme o avanço da doença. 
+        Para simular diferentes estratégias, utilizamos $R0s$ estimados em Wuhan no estudo de [(Wang et. al, 2020 [1])](https://www.medrxiv.org/content/10.1101/2020.03.03.20030593v1) para cada medida adotada pelo governo local.
+        """)
+
+    st.write('- **Taxas de progressão ($p_i, \\sigma$) e mortalidade ($\\mu$)**')
+    st.write(
+        """
+        As taxas de progressão da doença representam o grau no qual um indivíduo avança nos estados de infecção da doença. 
+        Inicialmente, um indivíduo exposto avança para o primeiro estado de infeção, leve ($I_1$) a uma taxa $\\sigma$.
+        Uma vez infectado, o indivíduo progride para estados mais graves da doença a uma taxa $p_1$ - de leve para severo - 
+        e $p_2$ - de severo para crítico. Assume-se que a infecção avança gradualmente, ou seja, uma infeção leve deve passar 
+        pelo estado severo para chegar ao crítico. Por fim, os casos críticos acarretam na morte de indivíduos a uma taxa $\\mu$.
+        """
+    )
+
+    df = pd.read_csv('https://docs.google.com/spreadsheets/d/1wvg1KFWZp4WhYVI4Gw_82bL_je_2WZHNLCcSnx95MTI/gviz/tq?tqx=out:csv&sheet=Taxas_de_progressao')
+    df.index = ['' for i in range(len(df))]
+    st.table(df)
+
+
+    st.write('- **Taxas de recuperação ($\\gamma_i$)**')
+    st.write(
+        """
+        As taxas de recuperação da doença representam o grau no qual um indivíduo se recupera em qualquer estado de gravidade.
+        Assume-se que, uma vez recuperado, esse indivíduo não contrai mais a doença, não retornando ao estado de suscetível.
+        """
+    )
+
+    df = pd.read_csv('https://docs.google.com/spreadsheets/d/1wvg1KFWZp4WhYVI4Gw_82bL_je_2WZHNLCcSnx95MTI/gviz/tq?tqx=out:csv&sheet=Taxas_de_recuperacao')
+    df.index = ['' for i in range(len(df))]
+    st.table(df)
+
+    st.write('- **Taxas de transmissão ($\\beta_i$)**')
+    st.write(
+        """
+        As taxas de transmissão dizem respeito ao potencial de infecção de indivíduos infectados em contato a indivíduos suscetíveis.
+        Para casos severos ($\\beta_2$) e críticos ($\\beta_3$), as taxas de transmissão desses indivíduos são referentes 
+        à transmissão interna nos hospitais, de pacientes para profissionais da saúde. Segundo estudos realizados na China 
+        e Itália [(Wang et. al, 2020 [2])](https://doi.org/10.1016/j.jhin.2020.03.002), esse grupo é afetado de forma desproporcional, 
+        sendo observado cerca de $5\%$ e $10\%$ de profissionais da saúde dentre o total de casos notificados, respectivamente.
+        """)
+
+
+    st.write("- **Cálculo das taxas**")
+
+    st.write(
+        """
+        As taxas não são observadas diretamente. Logo, utilizamos parâmetros observados na literatura para o cálculo das mesmas.
+        Os parâmetros de referência são descritos na tabela abaixo.
+        """)
+
+    df = pd.read_csv('https://docs.google.com/spreadsheets/d/1wvg1KFWZp4WhYVI4Gw_82bL_je_2WZHNLCcSnx95MTI/export?format=csv&id').fillna('-')# .set_index('Descrição', drop=True)
+    df.index = ['' for i in range(len(df))]
+    st.table(df)
+
+
+    st.subheader('Parâmetros de reação da sociedade e governo')
     
-    st.write("""
-    Esta ferramenta utiliza uma variação do modelo epidemiológico SEIR para estimar a demanda
-    por leitos hospitalares e ventiladores nos municípios brasileiros. 
-    Trabalhamos com 3 estratégias distintas, baseados na resposta do governo 
-    e da sociedade em relação a medidas de restrição de contato. Cada 
-    estratégia está associada a uma taxa de infecção distinta da Covid-19 
-    (quantas novas pessoas serão infectadas por uma pessoa que já está doente,
-    ao longo da evolução de seu quadro)  As taxas foram estimadas por estudos
-    em diferentes momentos. Assim, ao indicar quando cada uma entrará em 
-    vigor no município selecionado, é possível simular a evolução da doença
-    associada à sequência de estratégias indicada.
+    st.write(
+    """
+    - **Subnotificação ($$\\alpha$$)**
 
-    O objetivo do simulador é chamar atenção para o potencial impacto de 
-    políticas públicas desenhadas para responder à crise e contribuir com a 
-    elaboração de cenários para os processos decisórios locais diante da 
-    expansão da Covid-19 no Brasil. Ressaltamos, porém, que cada cidade possui 
-    dinâmicas de circulação e contato social próprias, além de particularidades 
-    demográficas e disponibilidade de equipamentos de saúde. Por isso, preferimos 
-    trabalhar com margens de erro e calcular janelas temporais.
+    Ainda não temos relatórios sobre a subnotificação de casos de Covid-19 no Brasil. 
+    Estudos consultados variam ao abordar a questão: [(Wang et. al, 2020 [1])](https://www.medrxiv.org/content/10.1101/2020.03.03.20030593v1) consideram subnotificação de $50\%$ (2020), 
+    enquanto  [Li et al. (2020)](?) calculam que apenas $14\%$ dos casos de pessoas infectadas foram reportados, 
+    com intervalo de confiança de $10-18\%$. Os dois artigos consideram que casos não-notificados não tem sintomas graves e que não serão hospitalizados.
 
-    Pelo pouco tempo de circulação, ainda não há números de referência 
-    estabelecidos sobre a transmissão do vírus SARS COV-2, o "Coronavírus." 
-    A partir de dados brasileiros de referência de transmissão, pretendemos 
-    elaborar nova versão da ferramenta. A análise também não considera o 
-    desenvolvimento de medidas de mitigação como vacinas e medicamentos anti-virais.
+    O protocolo de testagem no Brasil submete somente aquelas pessoas com sintomas graves o suficiente para buscarem um hospital. 
+    Além disso, há crescente documentação da falta de testes para todos os que chegam com suspeita de coronavírus. 
+    O protocolo técnico de tratamento médico é o mesmo, independente do diagnóstico preciso. 
+    Porém, isso quer dizer que nem todos os casos não-notificados no Brasil são leves ou moderados: 
+    podem haver pessoas sendo hospitalizadas com Covid-19 mas que não são testadas e, por isso, não constam no registro. 
+    Têm sido recorrentes, inclusive, relatos sobre o aumento atípico no número de internações por doenças respiratórias.
+
+    Por isso, ainda que tenhamos montado a estrutura do modelo para incluir uma taxa de notificação, 
+    consideramos a mesma como 1, de maneira a não diminuir a pressão sobre o sistema de saúde causado pelo percentual 
+    de casos notificados que precisam de hospitalização.
+
+    - **Tempo de diagnóstico ($$\\tau$$)**
+
+    O tempo de diagnóstico é o tempo entre a execução do teste até o resultado. 
+    Esse tempo varia de acordo com a capacidade do estado e clínicas privadas de realizar testes em escala. 
+    Mas, varia com o tipo de teste que é feito. 
+    O tempo de diagnóstico é importante pois ele é o ‘atraso’ em que estamos inicializando o modelo. 
+    Por exemplo, se o tempo de diagnóstico é de 1 semana, então os casos confirmados hoje, são, 
+    na verdade pacientes que estavam apresentando sintomas há uma semana. 
+    Dependendo do tempo de diagnóstico, pacientes podem estar recuperados ou mortos até a doença ser confirmada.
+    Portanto, essa variável nos diz quão atualizado estão os dados com relação à situação real da doença no município.
     """)
+    
+    st.subheader("Inicialização dos estados")
+    st.write(
+        """
+        Para simular a evolução da doença, determinamos os valores iniciais de cada estado populacional do modelo.
+        """)
 
+    st.write(
+        """
+        - **Infectados (I)**: o total de infectados inicialmente é dado pelo número de casos reportados do município (ver Fontes). 
+        Este valor pode ser modificado pelo usuário nos controles laterais para a simulação.
+        Esse total é separado pela estimativa do percentual de indivíduos em cada estágio de gravidade da 
+        doença: segundo [CDC(2020)](https://www.cdc.gov/mmwr/volumes/69/wr/mm6912e2.htm?s_cid=mm6912e2_w), a quantidade de casos severos 
+        ($I_2$) e críticos ($I_3$) é dada por $12\%$ e $2.5\%$ dos total de infectados, respectivamente, 
+        sendo os demais $85.5\%$ casos leves ($I_1$).
+        """
+    )
+
+    st.latex("I_1(0) = \\frac{\gamma_1}{\gamma_1 + p_1} I(0)")
+    st.latex("I_2(0) = \\frac{\gamma_2}{\gamma_2 + p_2} I(0)")
+    st.latex("I_3(0) = \\frac{\gamma_3}{\gamma_3 + \mu} I(0)")
+    st.latex("\\text{sendo }\\frac{\gamma_1}{\gamma_1 + p_1} + \\frac{\gamma_2}{\gamma_2 + p_2} + \\frac{\gamma_3}{\gamma_3 + \mu} = 1")
+
+    st.write(
+            """
+        Para municípios que não possuem casos confirmados em boletins oficiais, conforme 
+        reportado no Brasil.io, simulamos os números a partir do primeiro caso. 
+        Isso quer dizer que, ao selecionar unidades de análise mais altas, portanto, 
+        como as regionais de saúde ou os estados, você está simulando um cenário 
+        onde todos os municípios têm ao menos um caso confirmado.
+            """
+    )
+
+    st.write(
+        """
+        - **Expostos (E)**: dado o número inicial de infectados leves ($I_1$) calculado acima, calculamos $E(0)$ 
+        discretizando a equação $\\frac{dI_1}{dt}$ em $t=1$, conforme mostrado abaixo. Dado que o número de casos 
+        dobra a cada 3 dias **(??)**, aproximamos $I_1(1) \\approx \sqrt[3]{2} \\times I(0) \\approx 1.26 I(0)$.
+        """
+    )
+    # st.latex("I_1(1) - I_1(0) = \sigma E(0) - \gamma I_1(0) \\rightarrow E(0) =\\frac{ I_1(1) + (\gamma - 1)I_1(0)}{\sigma}")
+    st.latex("E(0) \\approx \\frac{ I(1) - I(0)}{\sigma} \\approx \\frac{0.26}{\sigma} \\times I(0)")
+
+
+    st.write(
+        """
+        - **Recuperados (R)**: iniciamos o modelo sem indivíduos recuperados por padrão. 
+        Este valor pode ser modificado pelo usuário nos controles laterais para a simulação.
+
+        - **Mortos (D)**: iniciamos esse estado com o total de mortes reportado pelo município com os dados do Brasil.io.
+        Este valor pode ser modificado pelo usuário nos controles laterais para a simulação.
+
+        - **Suscetíveis (S)**: o número de indivíduos suscetíveis inicial é dado pelo restante da polucação do município
+        que não se encontra em nenhum dos estados acima.
+        """
+    )
+
+    st.latex("S(0) = N - I(0) - E(0) - R(0) - D(0)")
+
+    st.subheader("Simulação das estratégias")
+
+    st.write(
+        """
+        Como dito acima, as estratégias se diferenciam pela taxa de reprodução atribuída a cada uma. Conforme o estudo de 
+        As estimações de [(Wang et. al, 2020 [1])](https://www.medrxiv.org/content/10.1101/2020.03.03.20030593v1) com dados empíricos 
+        da disseminação da COVID-19 em Wuhan no período de pouco mais de um mês estão dispostas abaixo.
+        """
+    )
+
+    df = pd.read_csv('https://docs.google.com/spreadsheets/d/1wvg1KFWZp4WhYVI4Gw_82bL_je_2WZHNLCcSnx95MTI/gviz/tq?tqx=out:csv&sheet=Taxas_de_reproducao')# .set_index('Descrição', drop=True)
+    df.index = ['' for i in range(len(df))]
+    st.table(df)
+
+    st.write("""
+        Optamos por adotar as números básicos de reprodução reportadas em Wang et al. (2020) por ser estudo realizado com base em análise epidemiológica 
+        de 26.000 casos de Covid-19 diagnosticados. Ainda que haja problemas com a analogia entre dinâmicas de contágio e aderência a decretos 
+        públicos entre o Brasil e a China, escolhemos essa referência por ela ter sido calculada a partir de dados observados, não sendo resultante de simulação, 
+        como Ferguson et al. (2020). Essa também é uma análise que secciona os R0 de acordo com as políticas públicas adotadas no período, 
+        possibilitando que façamos a simulação desses diferentes cenários para os municípios brasileiros. 
+        Entretanto, ainda não se tem certeza de que a mudança na velocidade da infecção da população se deveu apenas às mudanças políticas, 
+        embora pelo tamanho das intervenções isso seja muito provável.
+        """)
+    
     st.header('Fonte de Dados')
-
     st.write("""
     Os dados iniciais utilizados na ferramenta foram coletados de:
     """)
 
-    st.table(pd.DataFrame([
-    {'Dado': 'Projeção de População',
-    'Fonte': 'IBGE',
-    'Data de Coleta': '2020-03-29',
-    'URL': 'https://www.ibge.gov.br/apps/populacao/projecao/'},
-    {'Dado': 'Leitos por Município',
-    'Fonte': 'DATASUS CNES',
-    'Data de Coleta': '2020-03-29',
-    'URL': 'http://tabnet.datasus.gov.br/cgi/deftohtm.exe?cnes/cnv/leiintbr.def'},
-    {'Dado': 'Ventiladores por município',
-    'Fonte': 'DATASUS CNES',
-    'Data de Coleta': '2020-03-29',
-    'URL': 'http://tabnet.datasus.gov.br/cgi/deftohtm.exe?cnes/cnv/equipobr.def'},
-    {'Dado': 'Projeção de População',
-    'Fonte': 'Brasil.io',
-    'Data de Coleta': 'Diariamente',
-    'URL': 'https://brasil.io/dataset/covid19/boletim'},
-    ]))
+    df = pd.read_csv('https://docs.google.com/spreadsheets/d/1wvg1KFWZp4WhYVI4Gw_82bL_je_2WZHNLCcSnx95MTI/gviz/tq?tqx=out:csv&sheet=Fontes')
 
+    # link is the column with hyperlinks
+    df['Fonte'] = df[['URL', 'Fonte']].apply(lambda row: make_clickable(row['Fonte'], row['URL']), 1)
+    st.write(df.drop('URL', axis=1).to_html(escape=False), unsafe_allow_html=True)
+
+    st.subheader('Programa de Embaixadores')
     st.write("""
     Para essa versão, também integraremos dados atualizados enviados pelos 
     nossos Embaixadores. Este será devidamente identificado como sendo contribuição 
     do Embaixador ou como input do programa - quando a pessoa preferir colaborar 
-    de maneira anônima. Para ser um embaixador, inscreva-se [aqui](https://forms.gle/iPFE7T6Wrq4JzoEw9)
-
-    A quantidade de leitos por municípios soma tanto leitos hospitalares da rede 
-    do Sistema Único de Saúde quanto da rede não-SUS. Avaliamos que ambas estariam 
-    envolvidas no esforço de resposta à crise. Para usar por base apenas a rede 
-    SUS, seria necessário filtrar a população SUS-dependente de cada município.
-
-    O número de leitos que usamos como base para nossos cálculos inclui leitos 
-    complementares. Retiramos os de tratamento intensivo, já que nossa medida 
-    de possibilidade de adaptação para essa modalidade é a disponibilidade de 
-    ventiladores. 
-
-    Consideramos, na simulação inicial, que apenas 20% dos leitos registrados 
-    no Cadastro Nacional de Estabelecimentos Hospitalares estariam disponíveis 
-    para alocação de pacientes da Covid-19 que necessitem de internação. Esse 
-    número cai dentro do parâmetro recomendado pela Agência Nacional de Saúde 
-    Suplementar (ANS), de manutenção da taxa de ocupação de hospitalar entre 
-    75 e 85%, ainda que saibamos que há grande variação nesse percentual nas 
-    realidades locais de cada município (ANS, 2012). 
-
-    Caso um percentual maior ou menor esteja alocado para pacientes com Covid-19, 
-    é possível ajustar a quantidade de leitos alocados para a simulação final.
-
-    Para municípios que não tem casos confirmados em boletins oficiais, conforme 
-    reportado no Brasil.io, simulamos os números a partir do primeiro caso. 
-    Isso quer dizer que, ao selecionar unidades de análise mais altas, portanto, 
-    como as regionais de saúde ou os estados, você está simulando um cenário 
-    onde todos os municípios têm ao menos um caso confirmado. O mesmo ocorre com 
-    simulações ao nível da regional de saúde - que consideram haver ao menos um 
-    caso ativo em cada cidade.
-
-    Os números de casos confirmados são atualizados diariamente, depois da 
-    atualização no Brasil.io, que busca suas informações em boletins epidemiológicos 
-    estaduais 
-
-    Sabemos que há diferenças entre os números divulgados pelos estados e aqueles 
-    publicados pela gestão municipal. Por isso, permitimos que o gestor também 
-    ajuste esse número na hora da simulação. Isso também permite ao gestor somar 
-    o número de casos suspeitos, que ainda aguardam confirmação. Esse número 
-    também pode ser reportado em nosso programa de [Embaixadores](https://forms.gle/iPFE7T6Wrq4JzoEw9)
-    e será devidamente creditado quando esta for a fonte.
+    de maneira anônima. 
+    
+    **Para se tornar um embaixador, inscreva-se [aqui](https://forms.gle/iPFE7T6Wrq4JzoEw9)**
     """
     )
-
-    st.header("EM CONSTRUÇÃO...")
-
-    st.header("MODELO")
-    st.write("""
-    Utilizamos um modelo epidemiológico compartimental, baseado no modelo SEIR 
-    clássico, para descrever a disseminação e progressão clínica do COVID-19. 
-    Uma boa cartilha para esse tipo de modelo está disponível na [Wikipedia 
-    (em inglês)](https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology). 
-    É importante rastrear os diferentes resultados clínicos da infecção, uma 
-    vez que eles exigem níveis diferentes de recursos de saúde para cuidar e 
-    podem ser testados e isolados em taxas diferentes. Susceptível ($S$) 
-    indivíduos infectados começam em uma classe $E$ exposta, onde são 
-    assintomáticos e não transmitem infecção. A taxa de progressão do estágio 
-    exposto para o estágio infectado $I$, onde o indivíduo é sintomático e 
-    infeccioso, ocorre a uma taxa. As descrições clínicas dos diferentes 
-    estágios da infecção são fornecidas abaixo. Os indivíduos infectados 
-    começam com infecção leve ($I_1$), da qual eles se recuperam, na taxa 
-    $γ_1$ ou progredir para infecção grave ($I_2$), à taxa $p_1$. A infecção 
-    grave resolve na taxa $γ_2$ ou progride para um estágio crítico ($I_3$) na 
-    taxa $p_2$. Indivíduos com infecção crítica se recuperam na taxa $γ_3$ e 
-    morra na taxa $μ$. Os indivíduos recuperados são rastreados pela classe 
-    $R$ e são assumidos como protegidos contra reinfecções por toda a vida. Os
-    indivíduos podem transmitir a infecção em qualquer estágio, embora com 
-    taxas diferentes. A taxa de transmissão no estágio $i$ é descrito por $β_i$.""")
-    st.write('### Equações')
-    st.latex("\dot{S} = - β_1 I_1 S_1 - β_2 I_2 S_2 - β_3 I_3 S_3")
-    st.latex("\dot{E} = β_1 I_1 S_1 + β_2 I_2 S_2 + β_3 I_3 S_3 - aE")
-    st.latex("\dot{I_1} = aE - γ_1 I_1 - p_1 I_1")
-    st.latex("\dot{I_2} = p_1 I_1 - γ_2 I_2 - p_2 I_2")
-    st.latex("\dot{I_3} = p_2 I_2 - γ_3 I_3 - p_3 I_3")
-    st.latex("\dot{R} = γ_1 I_1 + γ_2 I_2 + γ_3 I_3")
-    st.latex("\dot{D} = μ I_3")
-        
-    st.write("""### Variáveis
-* $S$: Indivíduos Suscetíveis
-* $E$: Indivíduos Expostos - infectados, mas ainda não infecciosos ou sintomáticos
-* $I_i$: Indivíduos infectados na classe de gravidade $i$. A gravidade aumenta com $i$ e assumimos que os indivíduos devem passar por todas as classes anteriores
-  * $I_1$: Infecção leve (hospitalização não é necessária) - Mild Infection
-  * $I_2$: Infecção grave (hospitalização necessária) - Severe infection
-  * $I_3$: Infecção crítica (cuidados na UTI necessária) - Critical infection
-* $R$: Indivíduos que se recuperaram da doença e agora estão imunes
-* $D$: Indivíduos mortos
-* $N=S+E+I_1+I_2+I_3+R+D$ Tamanho total da população (constante)
-
-### Parâmetros
-* $βi$ taxa na qual indivíduos infectados da classe $I_i$ entram em contato com suscetíveis e os infectam
-* $a$ taxa de progressão da classe exposta para a infectada
-* $\gamma_i$ taxa na qual indivíduos infectados da classe $I_i$ se recuperam da doença e se tornam imunes
-* $p_i$ taxa na qual indivíduos infectados da classe $I_i$ avançam para a classe $I_{I + 1}$
-* $\mu$ taxa de mortalidade de indivíduos na fase mais grave da doença
-
-Todas as taxas são por dia
-
-### Estágios clínicos
-* Infecção leve - Esses indivíduos apresentam sintomas como febre e tosse e podem apresentar pneumonia leve. A hospitalização não é necessária (embora em muitos países esses indivíduos também sejam hospitalizados)
-* Infecção grave - Esses indivíduos apresentam pneumonia mais grave que causa dispnéia, frequência respiratória <30 / min, saturação sanguínea de oxigênio <93%, pressão parcial de oxigênio arterial para fração da razão inspirada de oxigênio <300 e / ou infiltrações pulmonares> 50% dentro de 24 a 48 horas. Hospitalização e oxigênio suplementar são geralmente necessários.
-* Infecção crítica - Esses indivíduos apresentam insuficiência respiratória, choque séptico e / ou disfunção ou falha de múltiplos órgãos. O tratamento em uma UTI, geralmente com ventilação mecânica, é necessário.
-
-### Relacionando observações clínicas aos parâmetros do modelo
-Para determinar os parâmetros do modelo consistentes com os dados clínicos atuais, coletamos os seguintes valores a partir dos valores do controle deslizante escolhidos pelo usuário e, em seguida, usamos as fórmulas abaixo para relacioná-los aos parâmetros de taxa no modelo. Observe que as entradas do controle deslizante para intervalos de tempo são durações médias.
-
-* IncubPeriod: período médio de incubação, dias
-* DurMildInf: duração média de infecções leves, dias
-* FracMild: fração média de infecções (sintomáticas) que são leves
-* FracSevere: fração média de infecções (sintomáticas) graves
-* FracCritical: fração média de infecções (sintomáticas) críticas
-* CFR: Taxa de mortalidade de casos (fração de infecções que eventualmente resultam em morte)
-* DurHosp: Duração média da hospitalização para indivíduos com infecção grave / crítica, dias
-* TimeICUDeath: Tempo médio de internação na UTI até o óbito, dias
-
-(Nota g=$γ$)""")
-        
-    st.code("""a=1/IncubPeriod
-
-g1=(1/DurMildInf)*FracMild
-p1=(1/DurMildInf)-g1
-
-p2=(1/DurHosp)*(FracCritical/(FracSevere+FracCritical))
-g2=(1/DurHosp)-p2
-
-u=(1/TimeICUDeath)*(CFR/FracCritical)
-g3=(1/TimeICUDeath)-u""")
-        
-    st.write("""
-### Taxa Básica de reprodução
-
-Ideia: $R_0$ é a soma de: 
-* 1.  o número médio de infecções secundárias geradas de um indivíduo em estágio $I_1$
-* 2.  a probabilidade de um indivíduo infectado progredir para $I_2$ multiplicado pelo número médio de infecções secundárias geradas a partir de um indivíduo em estágio $I_2$
-* 3.  a probabilidade de um indivíduo infectado progredir para $I_3$ multiplicado pelo número médio de infecções secundárias geradas a partir de um indivíduo em estágio$I_3$""")
-
-    st.latex("R_0 = N \\frac{β_1}{p_1 + γ_1} + \\frac{p_1}{p_1 + γ_1} \\left (\\frac{Nβ_2}{p_2 + γ_2} + \\frac{p_2}{p_2 + γ_2}\\frac{Nβ_3}{μ + γ_3}\\right )")
-    st.latex(" = N \\frac{1}{p_1 + γ_1} \\left (β_1+\\frac{p_1}{p_2 + γ_2}\\left (β_2+β_3\\frac{p_2}{μ + γ_3}\\right )\\right )")
-        
-    st.write("""Cálculos usando a matriz de próxima geração fornecem os mesmos resultados.
-
-### Taxa de crescimento epidêmico precoce
-No início da epidemia, antes do esgotamento dos suscetíveis, a epidemia cresce a uma taxa exponencial $r$, que também pode ser descrito com o tempo de duplicação $T_2=ln(2)/r$. Durante esta fase, todas as classes infectadas crescem na mesma proporção entre si e nas mortes e indivíduos recuperados. O número acumulado de infecções que ocorreram desde o início do surto também cresce na mesma proporção. Essa taxa pode ser calculada a partir do valor próprio dominante do sistema linearizado de equações no limite em que $S = N$.
-
-Durante esta fase de crescimento exponencial inicial, haverá uma proporção fixa de indivíduos entre qualquer par de compartimentos. Essa taxa esperada pode ser usada para estimar a quantidade de subnotificação de dados. Por exemplo, podemos pensar que todas as mortes são relatadas, mas que algumas infecções leves podem não ser relatadas, uma vez que esses pacientes podem não procurar atendimento médico ou podem não ser priorizados para o teste. Essas proporções têm valores esperados no modelo para um conjunto fixo de parâmetros. Eles podem ser calculados encontrando o vetor próprio correspondente ao valor próprio dominante ($r$) para o sistema linearizado descrito acima. As razões que divergem desses valores sugerem: a) subnotificação de casos relativos a óbitos ou b) diferenças locais nos parâmetros clínicos da progressão da doença. As razões esperadas são:""")
-    st.latex("\\frac{I_3}{D} = \\frac{r}{μ}")
-    st.latex("\\frac{I_2}{D} = \\frac{(μ+γ_3+r)}{p_2}\\frac{r}{μ}")
-    st.latex("\\frac{I_1}{D} = \\frac{(p_2+γ_2+r)}{p_1}\\frac{(μ+γ_3+r)}{p_2}\\frac{r}{μ}")
-    st.latex("\\frac{Total de sintomáticos}{D} = \\sum{I_i} = \\frac{r}{μ}\\left [1+\\frac{(p_2+γ_2+r)}{p_1}\\right ]")
-    st.latex("\\frac{E}{D} = \\frac{(p_1+γ_1+r)}{a}\\frac{(p_2+γ_2+r)}{p_1}\\frac{(μ+γ_3+r)}{p_2}\\frac{r}{μ}")
-    st.write("""### Premissas
-* Este modelo é formulado como um sistema de equações diferenciais e, portanto, o resultado representa os valores esperados de cada quantidade. Ele não leva em consideração eventos estocásticos ou relata a variação esperada nas variáveis, que podem ser grandes.
-* Os indivíduos devem passar por um estágio leve antes de atingir um estágio grave ou crítico
-* Os indivíduos devem passar por um estágio grave antes de atingir um estágio crítico
-* Somente indivíduos em um estágio crítico morrem
-* Todos os indivíduos têm taxas de transmissão e suscetibilidade à infecção iguais
-
-### Atualizações
-#### 27 de Março de 2020
-
-* O modelo agora inclui a possibilidade de infecção assintomática. Depois de deixar o $E$ classe, uma fração $f$ indivíduos desenvolvem infecção assintomática (digite $I_0$ classe), enquanto a fração restante $1-f$ desenvolver infecção sintomática (digite $I_1$ classe). A infecção assintomática nunca progride para estágios mais graves. A taxa de recuperação da infecção assintomática é $γ_0$. Indivíduos infectados assintomáticos podem transmitir a outros na taxa $β_0$. Os controles deslizantes originais que controlam as frações de infecções leves versus graves versus críticas agora têm a interpretação como sendo a fração de infecções sintomáticas que entram em cada um desses estágios.
-* O modelo agora também inclui a possibilidade de indivíduos expostos que ainda não desenvolveram sintomas ainda poderem transmitir o vírus ("transmissão pré-sintomática"). Para modelar isso, dividimos o $E$ classe em duas classes separadas, $E_0$ (sem sintomas ou transmissão) e $E_1$ (sem sintomas, mas pode transmitir). A taxa de saída de $E_0$ é $a_0$ e de $E_1$ é $a_1$.
-* Agora incluímos a opção de sazonalidade nas taxas de transmissão. Todas as taxas de transmissão são modificadas por um fator $σ(t)=1+ϵcos(2π(t-ϕ))$ onde $ϵ∈ [0,1]$ é a amplitude relativa das oscilações sazonais e e $ϕ∈ [-∞, ∞]$ é a fase e determina o tempo (em anos) do pico na transmissão em relação ao tempo em que a simulação começa. Os valores que o usuário insere para as taxas de transmissão são interpretados como as taxas no tempo zero da simulação. Esta entrada será igual ao pico de transmissão se $ϕ=0$, como a transmissão mínima de se $ϕ=365/4∼90$ e como a transmissão no tempo médio se $ϕ=365/2∼180$, por exemplo.
-
-As equações atualizadas do modelo são""")
-    st.latex("\\dot{S}=-(β_eE_1+β_0I_0+β_1I_1+β_2I_2+β_3I_3)Sσ(t)")
-    st.latex("\\dot{E_0}=-(β_eE_1+β_0I_0+β_1I_1+β_2I_2+β_3I_3)Sσ(t)-a_0E_0")
-    st.latex("\\dot{E_1}=a_0E_0-a_1E")
-    st.latex("\\dot{I_0}=fa_1E_1-γ_0I_0")
-    st.latex("\\dot{I_1}=(1-f)a_1E_1-(γ_1p_1)I_1")
-    st.latex("\\dot{I_2}=p_1I_1-(γ_2p_2)I_2")
-    st.latex("\\dot{I_3}=p_2I_2-(γ_3μ)I_3")
-    st.latex("\\dot{R}=γ_0I_0+γ_1I_1+γ_2I_2+γ_3I_3")
-    st.latex("\\dot{D}=μI_3")
-    st.write("""As entradas deslizantes extras são
-
-FracAsym: Fração de todas as infecções assintomáticas
-PresymPeriod: Duração da fase infecciosa do período de incubação
-DurAsym: Duração da infecção assintomática
-E a fórmula para extrair as constantes de taxa dessas entradas é""")
-    st.code("""a1=1/PresymPeriod
-a0=(IncubPeriod-PresymPeriod)^(-1)
-f=FracAsym
-g0=1/DurAsym""")
-    st.write("""A taxa reprodutiva básica torna-se""")
-    st.latex("R_0=N\\left [\\frac{β_e}{a_1}+f\\frac{β_0}{γ_0}+(1-f)\\frac{1}{p_1+γ_1}\\left (β_1+\\frac{p_1}{p_2+γ_2}\\left (β_2+β_3\\frac{p_2}{μ+γ_3}\\right )\\right )\\right ]")
-    st.write("""### Parâmetros de taxa do modelo dinâmico
-Esses parâmetros podem ser alterados usando os controles deslizantes das outras guias. Os valores nesta tabela representam os valores atuais escolhidos pelos controles deslizantes. Observe que as taxas de transmissão escolhidas pelos controles deslizantes são sempre dimensionadas por $N$, de modo que $β * N$ é constante conforme $N$ alterar.""")
-    parametros = pd.DataFrame({"variável":['b1*N','b2*N','b3*N','a','g1','g2','g3','p1','p2','u','N'],"valor (/dia)":[0.5,0.1,0.1,0.200,0.133,0.125,0.075,0.033,0.042,0.050,1000.000]})
-    st.table(parametros)
-    st.write("""### Proporções de casos durante a fase inicial de crescimento
-Esses valores são calculados com base nos parâmetros atuais do modelo""")
-    fase_inicial = pd.DataFrame({"Razão":['E0:D','E1:D','I0:D','I1:D','I2:D','I3:D','R:D'],"Valor":[239.7,0.0,0.0,157.7,17.3,2.7,170.3]})
-    st.table(fase_inicial)
         
 if __name__ == "__main__":
     main()

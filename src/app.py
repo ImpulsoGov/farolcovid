@@ -13,10 +13,6 @@ import simulation as sm
 from models import Logo
 
 def main():
-    #TODO adjust logo src
-    pic = Logo.IMPULSO.value
-    st.sidebar.image(pic, use_column_width=False, width=100, caption=None)
-
     page = st.sidebar.selectbox("Menu", ["COVID19 no seu Município", "Metodologia", "Quem somos?"])
 
 

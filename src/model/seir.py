@@ -99,7 +99,7 @@ def SEIR(y, t, model_params, initial=False):
               - R: recovered
               - D: deaths
             
-    model_params: int
+    model_params: dict
            Parameters of model dynamic (transmission, progression, recovery and death rates)
 
     Return
