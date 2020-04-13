@@ -25,33 +25,29 @@ def filter_options(_df, var, col, all_string='Todos'):
             return _df.query(f'{col} == "{var}"')
         
 def choose_place(city, region, state):
+    if city == 'Todos' and region == 'Todos' and state == 'Todos':
+        return 'Brasil'
     if city == 'Todos' and region == 'Todos':
         return state + ' (Estado)' if state != 'Todos' else 'Brasil'
     if city == 'Todos':
         return region + ' (Região SUS)' if region != 'Todos' else 'Todas as regiões SUS'
     return city
 
-def simulator_menu(user_input):
-        st.sidebar.subheader("""Simule o impacto de estratégias de isolamento em sua cidade:""")
-
-        user_input['strategy']['isolation'] = st.sidebar.number_input('Em quantos dias você quer acionar a Estratégia 2, medidas restritivas?', 0, 90, 90, key='strategy2')
-
-
-        user_input['strategy']['lockdown'] = st.sidebar.number_input('Em quantos dias você quer acionar a Estratégia 3, quarentena?', 0, 90, 90, key='strategy3')
-        
-        st.sidebar.subheader("""Ajuste a capacidade que será alocada na intervenção:""")
-
-        total_beds = user_input['n_beds']
-        user_input['n_beds'] = st.sidebar.number_input('Mude o número de leitos destinados aos pacientes com Covid-19:', 0, None, total_beds)
-
-        total_ventilators = user_input['n_ventilators']
-        user_input['n_ventilators'] = st.sidebar.number_input('Mude o número de ventiladores destinados aos pacientes com Covid-19:', 0, None, total_ventilators)
-        
-        return user_input
-
 def refresh_rate(config):
         dt = (math.floor(datetime.now().minute/config['refresh_rate'])*config['refresh_rate'])
         return datetime.now().replace(minute=dt,second=0, microsecond=0)
+
+def initialize_params(user_input, selected_region):
+        user_input['population_params'] = {#'N': st.sidebar.number_input('População', 0, None, int(N0), key='N'),
+                     'N': selected_region['population'],
+                     'I': int(selected_region['number_cases']),
+                     'D': int(selected_region['deaths']),
+                     'R': 0}
+
+        # INITIAL VALUES FOR BEDS AND VENTILATORS
+        user_input['n_beds'] = int(selected_region['number_beds']*0.2)
+        user_input['n_ventilators'] = int(selected_region['number_ventilators']*0.2)
+        return user_input
 
 def main():
         utils.localCSS("style.css")
@@ -81,29 +77,24 @@ def main():
         cities_filtered = filter_options(cities_filtered, user_input['city'], 'city_name')
 
         selected_region = cities_filtered.sum(numeric_only=True)   
-        
-        # MENU OPTIONS: Input population params
-        st.sidebar.subheader('Mude os dados de COVID-19 do seu município caso necessário')
 
-        user_input['population_params'] = {#'N': st.sidebar.number_input('População', 0, None, int(N0), key='N'),
-                     'N': selected_region['population'],
-                     'I': st.sidebar.number_input('Casos confirmados', 0, None, int(selected_region['number_cases'])),
-                     'D': st.sidebar.number_input('Mortes confirmadas', 0, None, int(selected_region['deaths'])),
-                     'R': st.sidebar.number_input('Pessoas recuperadas', 0, None, 0)}
+        # pick locality according to hierarchy
+        locality = choose_place(user_input['city'], user_input['region'], user_input['state'])
 
-        # INITIAL VALUES FOR BEDS AND VENTILATORS
-        user_input['n_beds'] = int(selected_region['number_beds']*0.2)
-        user_input['n_ventilators'] = int(selected_region['number_ventilators']*0.2)
-        
+        # initialize default parameters for models
+        user_input = initialize_params(user_input, selected_region)
+
         st.write('<br/>', unsafe_allow_html=True)
 
-        # >>>> CHECK city: city or state?
-        utils.genResourceAvailabilitySection(ResourceAvailability(locality=choose_place(user_input['city'], user_input['region'], user_input['state']), 
-                                                                  cases=selected_region['number_cases'],
-                                                                  deaths=selected_region['deaths'], 
-                                                                  beds=user_input['n_beds'], 
-                                                                  ventilators=user_input['n_ventilators']))
+        utils.genInputCustomizationSectionHeader(locality)
 
+        user_input['population_params']['I'] = st.number_input('Número de casos confirmados:', 0, None, int(selected_region['number_cases']))
+        user_input['population_params']['D'] = st.number_input('Número de mortes:', 0, None, int(selected_region['deaths']))
+
+        total_beds = user_input['n_beds']
+        user_input['n_beds'] = st.number_input('Número de leitos destinados aos pacientes com Covid-19:', 0, None, total_beds)
+        total_ventilators = user_input['n_ventilators']
+        user_input['n_ventilators'] = st.number_input('Número de ventiladores destinados aos pacientes com Covid-19:', 0, None, total_ventilators)
 
         st.write('<br/>', unsafe_allow_html=True)
 
@@ -130,39 +121,39 @@ def main():
                         min_range_ventilators=dday_ventilators['worst'],
                         max_range_ventilators=dday_ventilators['best'])
 
-        
-        utils.genSimulationSection(choose_place(user_input['city'], user_input['region'], user_input['state']), worst_case, best_case)
+        utils.genSimulationSection(locality, worst_case, best_case)
         
         utils.genStrategiesSection(Strategies)
 
-        # SIMULATOR MENU
-        user_input = simulator_menu(user_input)
 
+        st.write('''
+        <div class="base-wrapper">
+                <span class="section-header primary-span">Etapa 4: Simule estratégias e veja o resultado da intervenção</span>
+                <br />
+                <span>Agora é a hora de planejar como você pode melhor se preparar para evitar a sobrecarga hospitalar. Veja como mudanças na estratégia adotada afetam a necessidade de internação em leitos.</span>
+        </div>''', unsafe_allow_html=True)
+
+        user_input['strategy']['isolation'] = st.number_input('Em quantos dias você quer acionar a Estratégia 2, medidas restritivas?', 0, 90, 90, key='strategy2')
+
+        user_input['strategy']['lockdown'] = st.number_input('Em quantos dias você quer acionar a Estratégia 3, quarentena?', 0, 90, 90, key='strategy3')
+        
+        st.write('<br/><br/>', unsafe_allow_html=True)
+        
         # SIMULATOR SCENARIOS: BEDS & RESPIRATORS
         fig, dday_beds, dday_ventilators = simulator.run_evolution(user_input, config) 
-                
+
         utils.genChartSimulationSection(SimulatorOutput(color=BackgroundColor.SIMULATOR_CARD_BG,
                         min_range_beds=dday_beds['worst'], 
                         max_range_beds=dday_beds['best'], 
                         min_range_ventilators=dday_ventilators['worst'],
-                        max_range_ventilators=dday_ventilators['best']))
+                        max_range_ventilators=dday_ventilators['best']), fig)
 
-
-        # PLOT SCENARIOS EVOLUTION
-        st.write('''
-                <div class="lightgrey-bg">
-                        <div class="base-wrapper">
-                                <div style="display: flex; flex-direction: column"> 
-                                        <span class="chart-simulator-instructions subsection-header">EVOLUÇÃO DIÁRIA DA DEMANDA HOSPITALAR</span><br>
-                                        <i>Veja como mudanças na estratégia adotada afetam a necessidade de internação em leitos 
-                                        hospitalares e de ventiladores<br> na sua cidade ao longo dos dias. <b>A sua demanda a cada dia deve ficar 
-                                        entre os valores mínimo e máximo estimados no gráfico.</b></i>
-                                </div>
-                        </div>
-                </div>''',  unsafe_allow_html=True)
-
-        st.plotly_chart(fig)
-        
+        # >>>> CHECK city: city or state?
+        utils.genResourceAvailabilitySection(ResourceAvailability(locality=locality, 
+                                                                  cases=selected_region['number_cases'],
+                                                                  deaths=selected_region['deaths'], 
+                                                                  beds=user_input['n_beds'], 
+                                                                  ventilators=user_input['n_ventilators']))
         utils.genWhatsappButton()
         utils.genFooter()
         

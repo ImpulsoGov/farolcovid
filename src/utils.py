@@ -42,20 +42,26 @@ def genMunicipalityInputSection() -> None:
         <div class="base-wrapper">
                 <div style="display: flex; flex-direction: column"> 
                         <span class="section-header primary-span">Etapa 2: Selecione seu Município ou Região SUS</span>
-                        <i>Se seu município não possui unidade de tratamento intensivo, sugerimos simular a situação da sua regional. Não recomendamos a simulação a nível estadual</i>
+                        <span>Se seu município não possui unidade de tratamento intensivo, sugerimos simular a situação da sua regional. Não recomendamos a simulação a nível estadual.</span>
                 </div>
         </div>
         ''',  unsafe_allow_html=True)
 
-def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
-        locality = 'Brasil' if resources.locality == 'Todos' else resources.locality
+def genInputCustomizationSectionHeader(locality: str) -> None:
+        st.write('''
+        <div class="base-wrapper">
+                <span class="section-header primary-span">Etapa 3: Verifique os dados disponíveis <span class="yellow-span">(%s)</span></span>
+                <br />
+                <span>Usamos os dados do Brasil.io e DataSUS, mas é possível que eles dados estejam um pouco desatualizados. Se estiverem, é só ajustar os valores abaixo para continuar a simulação.</span>
+                <br />
+        </div>''' % locality, unsafe_allow_html=True)
 
+def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
         msg = f'''
-        🚨 *BOLETIM CoronaCidades:*  {locality} - {datetime.now().strftime('%d/%m')}  🚨%0a%0a
+        🚨 *BOLETIM CoronaCidades:*  {resources.locality} - {datetime.now().strftime('%d/%m')}  🚨%0a%0a
         😷 *{int(resources.cases)}* casos confirmados e *{int(resources.deaths)}* mortes%0a%0a
         🏥 Hoje estão disponíveis *{resources.beds}* leitos e *{resources.ventilators}* ventiladores destinados à Covid %0a%0a
-        👉 _Acompanhe e simule a situação do seu município acessando o *SimulaCovid* aqui_: https://coronacidades.org/ %0a%0a
-        Tem algum dado desatualizado? Clique no link acima, entre no SimulaCovid, e entre no  ''' 
+        👉 _Acompanhe e simule a situação do seu município acessando o *SimulaCovid* aqui_: https://coronacidades.org/ ''' 
         
         st.write('''
         <div class="primary-bg"> 
@@ -106,7 +112,8 @@ def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
                 </div>
         </div>
         ''' 
-        %(locality, msg, resources.cases, resources.deaths, resources.beds, resources.ventilators, Link.AMBASSADOR_FORM.value)
+        %(resources.locality, msg, resources.cases, 
+        resources.deaths, resources.beds, resources.ventilators, Link.AMBASSADOR_FORM.value)
         , unsafe_allow_html=True)
 
 
@@ -167,35 +174,40 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
         return output.strip('\n\t')
                 
 
-def genSimulationSection(city: str, worst_case: SimulatorOutput, best_case: SimulatorOutput) -> None:
+def genSimulationSection(locality: str, worst_case: SimulatorOutput, best_case: SimulatorOutput) -> None:
 
         status_quo = genSimulatorOutput(worst_case) 
         restrictions = genSimulatorOutput(best_case) 
 
-        preposition, city = ('', 'Geral') if city == 'Todos' else ('em', city)
-
-        st.write('''<div class="base-wrapper">
-                <div class="simulator-wrapper">
-                        <span class="section-header primary-span">
-                                Em quanto tempo será atingida a capacidade <span class="yellow-span">hospitalar</span>?
-                        </span>
-                        <div class="simulation-scenario-header-container">
-                                <span class="simulator-scenario-header grey-bg">
-                                        Sem Políticas de Restrição
+        st.write('''
+        <div class="lightgrey-bg">
+                <div class="base-wrapper">
+                        <div class="simulator-wrapper">
+                                <span class="section-header primary-span">
+                                        <span  class="yellow-span">%s</span>
+                                        <br/>
+                                        Daqui a quantos dias será atingida a capacidade <span class="yellow-span">hospitalar</span>?
                                 </span>
+                                <br/>
+                                <br/>
+                                <div class="simulation-scenario-header-container">
+                                        <span class="simulator-scenario-header grey-bg">
+                                                Sem Políticas de Restrição
+                                        </span>
+                                </div>
+                                %s
+                                <br/>
+                                <br/>
+                                <div class="simulation-scenario-header-container">
+                                        <span class="simulator-scenario-header lightblue-bg">
+                                                Com Medidas de Isolamento Social
+                                        </span>
+                                </div>
+                                %s
                         </div>
-                        %s
-                        <br/>
-                        <br/>
-                        <div class="simulation-scenario-header-container">
-                                <span class="simulator-scenario-header lightblue-bg">
-                                        Com Medidas de Isolamento Social
-                                </span>
-                        </div>
-                        %s
                 </div>
         </div>
-        ''' % ( status_quo, restrictions), unsafe_allow_html=True)
+        ''' % (locality, status_quo, restrictions), unsafe_allow_html=True)
 
 def genStrategyCard(strategy: ContainmentStrategy) -> str:
         return '''
@@ -216,27 +228,37 @@ def genStrategiesSection(strategies: List[ContainmentStrategy]) -> None:
         st.write('''
         <div class="primary-bg">
                 <div class="base-wrapper">
-                        <span class="section-header white-span">E como meu município pode reagir?</span>
+                        <span class="section-header white-span">E como podemos reagir?</span>
                         <div class="scenario-cards-container">%s</div>
                 </div>
         </div>
         ''' % cards,
         unsafe_allow_html= True)
 
-def genChartSimulationSection(simulation: SimulatorOutput) -> None:
+def genChartSimulationSection(simulation: SimulatorOutput, fig) -> None:
 
         sim = genSimulatorOutput(simulation) 
 
         st.write('''<div class="lightgrey-bg">
-                <div class="base-wrapper"><span class="section-header primary-span">Simulador de demanda hospitalar</span></div>
                 <div class="base-wrapper">
-                        <span class="chart-simulator-instructions subsection-header">A partir das estratégias escolhidas...</span>
+                        <div class="simulator-header">
+                                <span class="section-header primary-span">Simulador de demanda hospitalar</span>
+                                <span class="chart-simulator-instructions subsection-header">A partir das estratégias escolhidas...</span>
+                        </div>
                         <div class="simulator-wrapper">
                                 %s
+                        </div>
+                         <div style="display: flex; flex-direction: column; margin-top: 5em"> 
+                                <span class="chart-simulator-instructions subsection-header">EVOLUÇÃO DIÁRIA DA DEMANDA HOSPITALAR</span><br>
+                                <span class="italic"><span class="bold">A sua demanda a cada dia deve ficar 
+                                entre os valores mínimo e máximo estimados no gráfico.</span class="bold"></span>
                         </div>
                 </div>
         </div>
         ''' % sim, unsafe_allow_html=True)
+
+        st.plotly_chart(fig)
+
 
 def genFooter() -> None:
         st.write('''
@@ -260,7 +282,6 @@ def genFooter() -> None:
 
 
 def genWhatsappButton() -> None:
-        
         msg = f'Olá Equipe Coronacidades. Vocês podem me ajuda com uma dúvida?'
         phone = '+5511964373097'
         url = 'whatsapp://send?text={}&phone=${}'.format(msg, phone)
