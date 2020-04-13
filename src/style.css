@@ -101,6 +101,10 @@
     font-weight: italic;
 }
 
+
+.hide {
+    visibility: hide;
+}
 /* Override default template */
 .row-widget {
     padding: 0 3em;
@@ -175,9 +179,9 @@ header>.toolbar { /* Hide toolbar menu */
 }
 
 .subsection-header {
-    font-weight: bold;
-    text-transform: uppercase;
-    font-family: var(--main-header-font-family);
+    /* font-weight: bold; */
+    /* text-transform: uppercase; */
+    /* font-family: var(--main-header-font-family); */
     font-size: 24px;
 }
 
@@ -433,6 +437,12 @@ header>.toolbar { /* Hide toolbar menu */
 /* Simulation Output - Banner Style */
 .chart-simulator-instructions {
     margin: 0 0;
+}
+
+.simulator-header {
+    margin-top: 1em;
+    display: flex;
+    flex-direction: column;
 }
 
 .simulator-wrapper {
@@ -699,4 +709,10 @@ header>.toolbar { /* Hide toolbar menu */
   
 .float:hover {
     text-decoration: none;
+}
+
+/* Act Now Section */
+.act-now-wrapper {
+    display: flex;
+    flex-direction: column;
 }
