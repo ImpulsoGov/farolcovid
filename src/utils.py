@@ -116,7 +116,6 @@ def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
         resources.deaths, resources.beds, resources.ventilators, Link.AMBASSADOR_FORM.value)
         , unsafe_allow_html=True)
 
-
 def genSimulatorOutput(output: SimulatorOutput) -> str:
         bed_img = 'https://i.imgur.com/27hutU0.png'
         ventilator_icon = 'https://i.imgur.com/V419ZRI.png'
@@ -208,6 +207,20 @@ def genSimulationSection(locality: str, worst_case: SimulatorOutput, best_case: 
                 </div>
         </div>
         ''' % (locality, status_quo, restrictions), unsafe_allow_html=True)
+
+def genActNowSection(locality, worst_case):
+        display = '' if any(value != -1 for value in [worst_case.min_range_beds, worst_case.max_range_beds, worst_case.min_range_ventilators, worst_case.max_range_ventilators]) else 'hide'
+
+        st.write('''
+        <div class="lightgrey-bg %s">
+                <div class="base-wrapper">
+                        <div class="act-now-wrapper">
+                        <span class="section-header primary-span"><span class="yellow-span">%s | </span> Você precisa agir agora </span>
+                        <span>Para prevenir uma sobrecarga hospitalar, é preciso implementar uma estratégia de contenção. Quanto antes você agir, mais vidas consegue salvar.</span>
+                        </div>
+                </div>
+        </div>
+        ''' % (display, locality),  unsafe_allow_html=True)
 
 def genStrategyCard(strategy: ContainmentStrategy) -> str:
         return '''

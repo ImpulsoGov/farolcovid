@@ -123,6 +123,7 @@ def main():
 
         utils.genSimulationSection(locality, worst_case, best_case)
         
+        utils.genActNowSection(locality, worst_case)
         utils.genStrategiesSection(Strategies)
 
 
