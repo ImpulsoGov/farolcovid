@@ -4,8 +4,6 @@ from utils import make_clickable
 
 def main():
 
-    st.header("EM CONSTRUÇÃO...")
-
     st.header("Simulação de Demanda Hospilatar")
     
     st.subheader("Resumo")
@@ -228,8 +226,16 @@ def main():
 
     st.write(
         """
-        - **Infectados (I)**: o total de infectados inicialmente é dado pelo número de casos reportados do município (ver Fontes). 
-        Este valor pode ser modificado pelo usuário nos controles laterais para a simulação.
+        - **Infectados (I)**: o total de infectados inicialmente é dado pelo número de casos ativos, $I_0$.
+        A fonte utilizada atualmente reporta somente o número acumulado de casos e mortes. Portanto,
+        é necessário calcular o número de casos ativos. Dado que sabemos o tempo de progressão da doença ($\delta T$), 
+        os casos ativos serão todos os casos reportados entre o intervalo $t_f - \delta T$ e $t_i$, onde $t_i$ é o dia
+        de início da simulação. Assim, se $I_r(t)$ é o número de casos reportados em $t$, o número de casos ativos é
+        $I(0) = \sum_{t=t_i - \delta T}^{t_i} I_r(t)$.
+
+        Estamos considerando $\delta T$ como a soma do tempo de progressão dos casos
+        leve, severo e crítico.
+
         Esse total é separado pela estimativa do percentual de indivíduos em cada estágio de gravidade da 
         doença: segundo [CDC(2020)](https://www.cdc.gov/mmwr/volumes/69/wr/mm6912e2.htm?s_cid=mm6912e2_w), a quantidade de casos severos 
         ($I_2$) e críticos ($I_3$) é dada por $12\%$ e $2.5\%$ dos total de infectados, respectivamente, 
@@ -265,12 +271,11 @@ def main():
 
     st.write(
         """
-        - **Recuperados (R)**: iniciamos o modelo sem indivíduos recuperados por padrão. 
-        Este valor pode ser modificado pelo usuário nos controles laterais para a simulação.
-
         - **Mortos (D)**: iniciamos esse estado com o total de mortes reportado pelo município com os dados do Brasil.io.
-        Este valor pode ser modificado pelo usuário nos controles laterais para a simulação.
 
+        - **Recuperados (R)**: sabendo o acumulado histórico de casos, o número mortes ($D$) e o número de casos ativos ($I(0)$),
+        então $R = \sum_{t=t_0}^{t_f} - I(0) - D$
+        
         - **Suscetíveis (S)**: o número de indivíduos suscetíveis inicial é dado pelo restante da polucação do município
         que não se encontra em nenhum dos estados acima.
         """
