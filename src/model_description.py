@@ -5,6 +5,8 @@ from utils import make_clickable
 def main():
 
     st.header("Simulação de Demanda Hospilatar")
+
+    st.write('v1.1')
     
     st.subheader("Resumo")
 
