@@ -26,11 +26,13 @@ br:
         cities_population: https://docs.google.com/spreadsheets/d/1k8mXuUggBuBEghHhhLrLtA-5wa4JsAc-D35S5bNlf24
         health_infrastructure: https://docs.google.com/spreadsheets/d/1JD9GREVkU_doNqQQvvA_NC18HhoulrxcJLTqxd07508
     cases:
-        url: https://brasil.io/api/dataset/covid19/caso/data?is_last=True
+        url: https://data.brasil.io/dataset/covid19/caso_full.csv.gz
         rename:
-            city_ibge_code: city_id
-            date: last_updated
-            confirmed: number_cases
+            city_ibge_code: 'city_id'
+            date: 'last_updated'
+            last_available_deaths: 'deaths'
+            new_confirmed: 'number_cases'
+            recovered: 'recovered'
         drop: [
             'city',
             'confirmed_per_100k_inhabitants',

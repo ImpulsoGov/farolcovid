@@ -42,7 +42,7 @@ def initialize_params(user_input, selected_region):
                      'N': selected_region['population'],
                      'I': int(selected_region['number_cases']),
                      'D': int(selected_region['deaths']),
-                     'R': 0}
+                     'R': int(selected_region['recovered'])}
 
         # INITIAL VALUES FOR BEDS AND VENTILATORS
         user_input['n_beds'] = int(selected_region['number_beds']*0.2)
@@ -89,6 +89,7 @@ def main():
         utils.genInputCustomizationSectionHeader(locality)
 
         user_input['population_params']['I'] = st.number_input('Número de casos confirmados:', 0, None, int(selected_region['number_cases']))
+        user_input['population_params']['R'] = st.number_input('Número de recuperados:', 0, None, int(selected_region['recovered']))
         user_input['population_params']['D'] = st.number_input('Número de mortes:', 0, None, int(selected_region['deaths']))
 
         total_beds = user_input['n_beds']
