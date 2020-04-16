@@ -235,7 +235,8 @@ def main():
         de início da simulação. Assim, se $I^t$ é o número de novos casos reportados em $t$, o número de casos ativos é dado por
         $I(0) = \sum_{t=t_i - \delta T}^{t_i} I^t$.
 
-        Considerando $\delta T$ como a soma do tempo de progressão dos casos leve, severo e crítico.
+        Considerando $\delta T$ como a soma do tempo de progressão somente dos casos severo e crítico pois assumimos subnotificação dos casos leves, 
+        ainda sim podemos estar superestimando os casos ativos por não considerar dentre eles os recuperados durante esse período de progressão.
 
         Esse total é separado pela estimativa do percentual de indivíduos em cada estágio de gravidade da 
         doença: segundo [CDC(2020)](https://www.cdc.gov/mmwr/volumes/69/wr/mm6912e2.htm?s_cid=mm6912e2_w), a quantidade de casos severos 
@@ -275,7 +276,8 @@ def main():
         - **Mortos (D)**: iniciamos esse estado com o total de mortes reportado pelo município com os dados do Brasil.io.
 
         - **Recuperados (R)**: sabendo o acumulado histórico de casos, o número mortes ($D$) e o número de casos ativos ($I(0)$),
-        então $R = \sum_{t=t_0}^{t_i} - I(0) - D$
+        então $R = \sum_{t=t_0}^{t_i} - I(0) - D$. Como é possível o número de ativos estar superestimado, por construção o número 
+        de recuperados estaria subestimado - nos casos em que o cálculo dos recuperados não é consistente (negativo), assumimos $R(0) = 0$.
         
         - **Suscetíveis (S)**: o número de indivíduos suscetíveis inicial é dado pelo restante da polucação do município
         que não se encontra em nenhum dos estados acima.

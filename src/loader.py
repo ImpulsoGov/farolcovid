@@ -54,8 +54,7 @@ def _read_cases_data(country, config):
         cases_params = config['br']['cases']
         df = df.rename(columns=cases_params['rename'])
 
-        infectious_period = config['br']['seir_parameters']['mild_duration'] + \
-                            config['br']['seir_parameters']['severe_duration'] + \
+        infectious_period = config['br']['seir_parameters']['severe_duration'] + \
                             config['br']['seir_parameters']['critical_duration']
         
         df['last_updated'] = pd.to_datetime(df['last_updated'])
