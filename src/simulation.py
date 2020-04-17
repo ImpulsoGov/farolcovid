@@ -88,7 +88,7 @@ def main():
 
         utils.genInputCustomizationSectionHeader(locality)
 
-        user_input['population_params']['I'] = st.number_input('Número de casos confirmados:', 0, None, int(selected_region['number_cases']))
+        user_input['population_params']['I'] = st.number_input('Número de casos ativos:', 0, None, int(selected_region['number_cases']))
         user_input['population_params']['R'] = st.number_input('Número de recuperados:', 0, None, int(selected_region['recovered']))
         user_input['population_params']['D'] = st.number_input('Número de mortes:', 0, None, int(selected_region['deaths']))
 
