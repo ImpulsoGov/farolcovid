@@ -86,12 +86,13 @@ def run_simulation(population_params, strategy_params, default_params):
                 res, current_state = iterate_simulation(population_params, 
                                                         default_params['br']['seir_parameters'], 
                                                         simulation_params[phase], initial=True)
+                df_evolution = df_evolution.append(res) # consider 1st day
 
             else:
                 res, current_state = iterate_simulation(current_state, 
                                                         default_params['br']['seir_parameters'], 
                                                         simulation_params[phase], initial=False)
-            df_evolution = df_evolution.append(res[1:])
+                df_evolution = df_evolution.append(res[1:])
 
         df_evolution = df_evolution[default_params['simulator']['scenarios'][bound]['test_delay']:]
         df_evolution = df_evolution.reset_index(drop=True)
