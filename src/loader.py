@@ -3,41 +3,14 @@ import numpy as np
 import requests
 import streamlit as st
 import datetime
+import subprocess
 
 def _download_from_drive(url):
 
-    return pd.read_csv(url + '/export?format=csv&id')
+    response = subprocess.run(['curl', '-o', 'temp.csv', url + '/export?format=csv&id'],
+                    check=True, text=True)
 
-def _get_credentials():
-    
-    scope = ['https://spreadsheets.google.com/feeds',
-             'https://www.googleapis.com/auth/drive']
-
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(
-             'configs/gcloud-credentials.json', scope) 
-
-    gc = gspread.authorize(credentials) 
-
-    return credentials, gc
-
-def _read_sheets_tables():
-    
-    credentials, gc = _get_credentials()
-
-    gc = gspread.authorize(credentials)
-    
-    wks = gc.open('regions_metadata')
-
-    datasets = {}
-    for w in wks.worksheets():
-
-        data = w.get_all_values()
-
-        headers = data.pop(0)
-
-        datasets[w.title] = pd.DataFrame(data, columns=headers)
-
-    return datasets
+    return pd.read_csv('temp.csv')
 
 def _read_cities_data(country, config):
 
