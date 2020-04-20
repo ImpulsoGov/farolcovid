@@ -19,7 +19,7 @@ ADD ./requirements.txt ${USER_HOME}/
 RUN set -x \
     # Install OS libs
     && apt-get update \
-    && apt-get install -y virtualenv python3 \
+    && apt-get install -y virtualenv python3 curl \
     # Add user
     && useradd -M -u 1000 -s /bin/sh -d ${USER_HOME} ${USER_NAME} \
     && mkdir -p ${USER_HOME} \
