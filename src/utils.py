@@ -31,13 +31,9 @@ def genHeroSection():
         ''', unsafe_allow_html=True)
 
 def genVideoTutorial():
-        st.write('''
-        <div class="lightgrey-bg">
-                <div class="base-wrapper">
-                        <span class="section-header primary-span">Entenda como usar!</span>
-                </div>
-        </div>
-        ''', unsafe_allow_html=True)
+        st.write('''<div class="base-wrapper">
+                        <span class="section-header primary-span">Antes de começar: entenda como usar!</span>
+                </div>''', unsafe_allow_html=True)
         st.video(Link.YOUTUBE_TUTORIAL.value)
 
 def genStateInputSectionHeader() -> None:        
