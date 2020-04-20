@@ -96,10 +96,6 @@ def main():
 
         utils.genInputCustomizationSectionHeader(locality)
 
-        user_input['population_params']['I'] = st.number_input('Número de casos ativos:', 0, None, int(selected_region['number_cases']))
-        user_input['population_params']['R'] = st.number_input('Número de recuperados:', 0, None, int(selected_region['recovered']))
-        user_input['population_params']['D'] = st.number_input('Número de mortes:', 0, None, int(selected_region['deaths']))
-
         total_beds = user_input['n_beds']
         user_input['n_beds'] = st.number_input(
                 'Número de leitos destinados aos pacientes com Covid-19:'
@@ -117,6 +113,11 @@ def main():
         #         sources[['author_number_ventilators', 'last_updated_number_ventilators']].\
         #                 drop_duplicates()
         # )
+
+        user_input['population_params']['R'] = int(selected_region['recovered'])
+        user_input['population_params']['D'] = st.number_input('Número de mortes:', 0, None, int(selected_region['deaths']))
+        user_input['population_params']['I'] = st.number_input('Número de casos ativos:', 0, None, int(selected_region['number_cases']))
+        utils.genAmbassadorSection()
 
         st.write('<br/>', unsafe_allow_html=True)
 

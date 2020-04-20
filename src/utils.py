@@ -38,7 +38,7 @@ def genVideoTutorial():
         </div>
         ''', unsafe_allow_html=True)
         st.video(Link.YOUTUBE_TUTORIAL.value)
-        
+
 def genStateInputSectionHeader() -> None:        
         st.write('''
         <div class="base-wrapper">
@@ -66,6 +66,16 @@ def genInputCustomizationSectionHeader(locality: str) -> None:
                 <br />
         </div>''' % locality, unsafe_allow_html=True)
 
+def genAmbassadorSection() -> None:
+        st.write('''
+        <div class="base-wrapper">
+                <div class="ambassador-container">
+                        <span class="ambassador-question bold">Você teve que atualizar algum dos dados acima? Você tem informações mais recentes e pode colaborar conosco?</span>
+                        <span>Estamos montando uma rede para manter o SimulaCovid sempre atualizado e nossas projeções serem úteis para tomada de decisão na sua cidade. Venha ser parte do nosso time de embaixadores!</span>
+                        <a class="btn-ambassador" href="%s" target="blank">Quero ser embaixador</a>
+                </div>
+        </div>
+        ''', unsafe_allow_html=True)
 def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
         msg = f'''
         🚨 *BOLETIM CoronaCidades:*  {resources.locality} - {datetime.now().strftime('%d/%m')}  🚨%0a%0a
