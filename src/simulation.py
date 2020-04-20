@@ -116,9 +116,10 @@ def main():
                 f'Número de ventiladores destinados aos pacientes com Covid-19 (fonte: {source_ventilators.author_number_ventilators}, atualizado: {source_ventilators.last_updated_number_ventilators}):'
                 , 0, None, total_ventilators)
 
-        user_input['population_params']['R'] = int(selected_region['recovered'])
         user_input['population_params']['D'] = st.number_input('Número de mortes:', 0, None, int(selected_region['deaths']))
         user_input['population_params']['I'] = st.number_input('Número de casos ativos:', 0, None, int(selected_region['number_cases']))
+        user_input['population_params']['R'] = st.number_input('Número de recuperados:', 0, None, int(selected_region['recovered']))
+
         utils.genAmbassadorSection()
 
         st.write('<br/>', unsafe_allow_html=True)
