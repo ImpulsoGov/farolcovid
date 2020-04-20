@@ -211,7 +211,7 @@ def genSimulationSection(locality: str, resources: ResourceAvailability, worst_c
         msg = f'''
         🚨 *BOLETIM SimulaCovid:*  {resources.locality} - {datetime.now().strftime('%d/%m')}  🚨%0a%0a
         🏥 Considerando que {resources.locality} tem *{resources.beds}* leitos 🛏️ e *{resources.ventilators}* ventiladores ⚕ %0a%0a
-        😷 Se não houver isolamento social, {resources.locality} poderia atingir a sua capacidade hospitalar em *{no_quarentine}* dias{date_proj}%0a%0a
+        😷 Na ausência, {resources.locality} poderia atingir a sua capacidade hospitalar em *{no_quarentine}* dias{date_proj}%0a%0a
         👉 _Acompanhe e simule a situação do seu município acessando o *SimulaCovid* aqui_: https://coronacidades.org/ ''' 
         
         status_quo = genSimulatorOutput(worst_case) 
@@ -288,27 +288,48 @@ def genStrategiesSection(strategies: List[ContainmentStrategy]) -> None:
         ''' % cards,
         unsafe_allow_html= True)
 
-def genChartSimulationSection(simulation: SimulatorOutput, fig) -> None:
+def genChartSimulationSection(time2sd: int, time2lockdown: int, simulation: SimulatorOutput, fig) -> None:
 
-        sim = genSimulatorOutput(simulation) 
+        simulation = genSimulatorOutput(simulation) 
+        sd_date = (datetime.now() + timedelta(days=int(time2sd))).strftime("%d/%m")
+        lockdown_date = (datetime.now() + timedelta(days=int(time2lockdown))).strftime("%d/%m")
+
+        simulation_description = ''
+        print(time2lockdown)
+        print(time2sd)
+        if time2lockdown <= time2sd:
+                
+                if time2lockdown == 0:
+                        simulation_description = f'Começando a quarentena <b>hoje</b> ({lockdown_date}):'
+                else:
+                        simulation_description = f'Começando a quarentena em <b>{time2lockdown}</b> dias ({lockdown_date}):'
+        else: # lockdown after social distancing
+                if time2sd == 0:
+                        simulation_description = f'Começando o isolamento social <b>hoje</b>  ({sd_date}) e a quarentena em <b>{time2lockdown}</b> dias ({lockdown_date}):'
+                else:
+                        simulation_description = f'Começando o isolamento social em <b>{time2sd}</b> dias ({sd_date}) e a quarentena em <b>{time2lockdown}</b> dias ({lockdown_date}):'
+                
 
         st.write('''<div class="lightgrey-bg">
                 <div class="base-wrapper">
                         <div class="simulator-header">
-                                <span class="section-header primary-span">Simulador de demanda hospitalar</span>
-                                <span class="chart-simulator-instructions subsection-header">A partir das estratégias escolhidas...</span>
+                                <span class="section-header primary-span">Aqui está o resultado da sua simulação</span>
+                                <span class="chart-simulator-instructions subsection-header">%s</span>
                         </div>
                         <div class="simulator-wrapper">
                                 %s
                         </div>
                          <div style="display: flex; flex-direction: column; margin-top: 5em"> 
-                                <span class="chart-simulator-instructions subsection-header">EVOLUÇÃO DIÁRIA DA DEMANDA HOSPITALAR</span><br>
-                                <span class="italic"><span class="bold">A sua demanda a cada dia deve ficar 
-                                entre os valores mínimo e máximo estimados no gráfico.</span class="bold"></span>
+                                <span class="section-header primary-span">Visão detalhada da sua simulação</span><br>
+                                <span style="border-radius: 15px; border: dashed 2px  #F2C94C; padding: 1em">
+                                        <b>NOTA:</b> 
+                                        Para evitar uma sobrecarga hospitalar, a sua demanda (a curva 📈) deve ficar sempre abaixo da respectiva linhas tracejadas (a reta horizontal ➖).
+                                        Em outras palavras, a quantidade de pessoas que precisam ser internadas por dia não deve ultrapassar o número de equipamentos disponíveis.
+                                </span>
                         </div>
                 </div>
         </div>
-        ''' % sim, unsafe_allow_html=True)
+        ''' % (simulation_description, simulation), unsafe_allow_html=True)
 
         st.plotly_chart(fig)
 

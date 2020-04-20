@@ -173,11 +173,14 @@ def main():
         # SIMULATOR SCENARIOS: BEDS & RESPIRATORS
         fig, dday_beds, dday_ventilators = simulator.run_evolution(user_input, config) 
 
-        utils.genChartSimulationSection(SimulatorOutput(color=BackgroundColor.SIMULATOR_CARD_BG,
-                        min_range_beds=dday_beds['worst'], 
-                        max_range_beds=dday_beds['best'], 
-                        min_range_ventilators=dday_ventilators['worst'],
-                        max_range_ventilators=dday_ventilators['best']), fig)
+        utils.genChartSimulationSection(user_input['strategy']['isolation'], 
+                                        user_input['strategy']['lockdown'], 
+                                        SimulatorOutput(color=BackgroundColor.SIMULATOR_CARD_BG,
+                                                min_range_beds=dday_beds['worst'], 
+                                                max_range_beds=dday_beds['best'], 
+                                                min_range_ventilators=dday_ventilators['worst'],
+                                                max_range_ventilators=dday_ventilators['best']), 
+                                        fig)
 
         # >>>> CHECK city: city or state?
         # utils.genResourceAvailabilitySection(ResourceAvailability(locality=locality, 
