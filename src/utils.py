@@ -281,7 +281,7 @@ def genStrategiesSection(strategies: List[ContainmentStrategy]) -> None:
         st.write('''
         <div class="primary-bg">
                 <div class="base-wrapper">
-                        <span class="section-header white-span">E como podemos reagir?</span>
+                        <span class="section-header white-span">E como você pode reagir?</span>
                         <div class="scenario-cards-container">%s</div>
                 </div>
         </div>
