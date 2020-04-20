@@ -159,7 +159,7 @@ def main():
 
         st.write('''
         <div class="base-wrapper">
-                <span class="section-header primary-span">Etapa 4: Simule o resultado de possíveis intervenção</span>
+                <span class="section-header primary-span">Etapa 4: Simule o resultado de possíveis intervenções</span>
                 <br />
                 <span>Agora é a hora de planejar como você pode melhor se preparar para evitar a sobrecarga hospitalar. Veja como mudanças na estratégia adotada afetam a necessidade de internação em leitos.</span>
         </div>''', unsafe_allow_html=True)
