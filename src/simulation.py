@@ -15,6 +15,8 @@ import numpy as np
 import loader
 from model import simulator
 
+FIXED = datetime.now().minute
+
 def add_all(x, all_string='Todos'):
         return [all_string] + list(x)
             
@@ -45,25 +47,25 @@ def initialize_params(user_input, selected_region):
                      'R': int(selected_region['recovered'])}
 
         # INITIAL VALUES FOR BEDS AND VENTILATORS
-        user_input['n_beds'] = int(selected_region['number_beds']*0.2)
-        user_input['n_ventilators'] = int(selected_region['number_ventilators']*0.2)
+        user_input['n_beds'] = int(selected_region['number_beds'])
+        user_input['n_ventilators'] = int(selected_region['number_ventilators'])
         return user_input
 
 def main():
         utils.localCSS("style.css")
         utils.localCSS("icons.css")
- 
-        if datetime.now().hour < 1:
-                caching.clear_cache()
 
         config = yaml.load(open('configs/config.yaml', 'r'), Loader = yaml.FullLoader)
+
+        if abs(datetime.now().minute - FIXED) > config['refresh_rate']:
+                caching.clear_cache()
+
         cities = loader.read_data('br', config, refresh_rate=refresh_rate(config))
 
         user_input = dict()
 
         utils.genHeroSection()
         utils.genStateInputSectionHeader()
-        
 
         user_input['state'] = st.selectbox('Estado', add_all(cities['state_name'].unique()))
         cities_filtered = filter_options(cities, user_input['state'], 'state_name')
@@ -76,7 +78,10 @@ def main():
         user_input['city'] = st.selectbox('Município', add_all(cities_filtered['city_name'].unique()))
         cities_filtered = filter_options(cities_filtered, user_input['city'], 'city_name')
 
-        selected_region = cities_filtered.sum(numeric_only=True)   
+        sources = cities_filtered[[c for c in cities_filtered.columns 
+                                if (('author' in c) or ('last_updated' in c))]]
+ 
+        selected_region = cities_filtered.sum(numeric_only=True)
 
         # pick locality according to hierarchy
         locality = choose_place(user_input['city'], user_input['region'], user_input['state'])
@@ -93,9 +98,22 @@ def main():
         user_input['population_params']['D'] = st.number_input('Número de mortes:', 0, None, int(selected_region['deaths']))
 
         total_beds = user_input['n_beds']
-        user_input['n_beds'] = st.number_input('Número de leitos destinados aos pacientes com Covid-19:', 0, None, total_beds)
+        user_input['n_beds'] = st.number_input(
+                'Número de leitos destinados aos pacientes com Covid-19:'
+                , 0, None, total_beds)
+        # st.write(
+        #         sources[['author_number_beds', 'last_updated_number_beds']].\
+        #                 drop_duplicates()
+        # )
+
         total_ventilators = user_input['n_ventilators']
-        user_input['n_ventilators'] = st.number_input('Número de ventiladores destinados aos pacientes com Covid-19:', 0, None, total_ventilators)
+        user_input['n_ventilators'] = st.number_input(
+                'Número de ventiladores destinados aos pacientes com Covid-19:'
+                , 0, None, total_ventilators)
+        # st.write(
+        #         sources[['author_number_ventilators', 'last_updated_number_ventilators']].\
+        #                 drop_duplicates()
+        # )
 
         st.write('<br/>', unsafe_allow_html=True)
 

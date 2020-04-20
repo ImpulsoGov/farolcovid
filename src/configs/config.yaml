@@ -1,4 +1,4 @@
-refresh_rate: 60
+refresh_rate: 5 # minutes
 
 simulator:
     max_days: 90
@@ -25,6 +25,10 @@ br:
     drive_paths:
         cities_population: https://docs.google.com/spreadsheets/d/1k8mXuUggBuBEghHhhLrLtA-5wa4JsAc-D35S5bNlf24
         health_infrastructure: https://docs.google.com/spreadsheets/d/1JD9GREVkU_doNqQQvvA_NC18HhoulrxcJLTqxd07508
+        embaixadores: https://docs.google.com/spreadsheets/d/1CASa-MdJS_o2tffWlIS--FSskSxhJUw3pA1L5AGIe04
+    health:
+        initial_proportion: 0.2
+        source: 'SUS'
     cases:
         url: https://data.brasil.io/dataset/covid19/caso_full.csv.gz
         rename:
@@ -42,6 +46,21 @@ br:
             'order_for_place',
             'place_type',
             'state'
+        ]
+    columns:
+        health: [
+            'number_ventilators',
+            'number_beds',
+            'number_icu_beds'
+        ]
+        cases: [
+            'n_casos',
+            'n_mortes',
+        ]
+        final: [
+            'city_id',
+            'last_updated',
+            'author',
         ]
     seir_parameters:
         # => new values:
