@@ -14,6 +14,7 @@ import yaml
 import numpy as np
 import loader
 from model import simulator
+from pandas import Timestamp
 
 FIXED = datetime.now().minute
 
@@ -97,22 +98,23 @@ def main():
         utils.genInputCustomizationSectionHeader(locality)
 
         total_beds = user_input['n_beds']
+
+        source_beds = sources[['author_number_beds', 'last_updated_number_beds']].\
+                        drop_duplicates().iloc[0]
+        source_beds.last_updated_number_beds = source_beds.last_updated_number_beds.strftime('%d/%m')
+
         user_input['n_beds'] = st.number_input(
-                'Número de leitos destinados aos pacientes com Covid-19:'
+                f'Número de leitos destinados aos pacientes com Covid-19 (fonte: {source_beds.author_number_beds}, atualizado: {source_beds.last_updated_number_beds})'
                 , 0, None, total_beds)
-        # st.write(
-        #         sources[['author_number_beds', 'last_updated_number_beds']].\
-        #                 drop_duplicates()
-        # )
 
         total_ventilators = user_input['n_ventilators']
+        source_ventilators = sources[['author_number_ventilators', 'last_updated_number_ventilators']].\
+                drop_duplicates().iloc[0]
+        source_ventilators.last_updated_number_ventilators = source_ventilators.last_updated_number_ventilators.strftime('%d/%m')
+
         user_input['n_ventilators'] = st.number_input(
-                'Número de ventiladores destinados aos pacientes com Covid-19:'
+                f'Número de ventiladores destinados aos pacientes com Covid-19 (fonte: {source_ventilators.author_number_ventilators}, atualizado: {source_ventilators.last_updated_number_ventilators}):'
                 , 0, None, total_ventilators)
-        # st.write(
-        #         sources[['author_number_ventilators', 'last_updated_number_ventilators']].\
-        #                 drop_duplicates()
-        # )
 
         user_input['population_params']['R'] = int(selected_region['recovered'])
         user_input['population_params']['D'] = st.number_input('Número de mortes:', 0, None, int(selected_region['deaths']))
