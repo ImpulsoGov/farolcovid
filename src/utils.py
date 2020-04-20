@@ -309,7 +309,7 @@ def genFooter() -> None:
         <div class="magenta-bg">
                 <div class="base-wrapper">
                         <div class="logo-wrapper">
-                                <span>A presente ferramenta, voluntária, parte de estudos referenciados já publicados e considera os dados de saúde pública dos municípios brasileiros disponibilizados no DataSus.</span>
+                                <span>A presente ferramenta, voluntária, parte de estudos referenciados já publicados e considera os dados de saúde pública dos municípios brasileiros disponibilizados no DataSus. O repositório do projeto pode ser acessado no nosso <a class="github-link" href="">Github</a></span>
                                 <br/>
                                 <span>Os cenários projetados são meramente indicativos e dependem de variáveis que aqui não podem ser consideradas. Trata-se de mera contribuição à elaboração de cenários por parte dos municípios e não configura qualquer obrigação ou responsabilidade perante as decisões efetivadas. Saiba mais em nossa metodologia.</span>
                                 <br/>

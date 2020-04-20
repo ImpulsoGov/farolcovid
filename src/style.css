@@ -729,3 +729,8 @@ header>.toolbar { /* Hide toolbar menu */
     display: flex;
     flex-direction: column;
 }
+
+.github-link {
+    color: var(--main-primary) !important;
+    text-decoration: underline;
+}
