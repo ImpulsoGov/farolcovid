@@ -141,10 +141,10 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
         bed_img = 'https://i.imgur.com/27hutU0.png'
         ventilator_icon = 'https://i.imgur.com/V419ZRI.png'
         
-        has_bed_projection = (output.min_range_beds != -1 and  output.max_range_beds != -1)
+        has_bed_projection = output.min_range_beds != -1
         bed_prep = 'entre' if has_bed_projection else 'em'
         
-        has_ventilator_projection = (output.min_range_ventilators != -1 and output.max_range_ventilators != -1)
+        has_ventilator_projection = output.min_range_ventilators != -1
         ventilator_prep = 'entre' if has_ventilator_projection else 'em'
         
         if has_bed_projection:
