@@ -65,6 +65,9 @@ def main():
         user_input = dict()
 
         utils.genHeroSection()
+
+        utils.genVideoTutorial()
+
         utils.genStateInputSectionHeader()
 
         user_input['state'] = st.selectbox('Estado', add_all(cities['state_name'].unique()))
