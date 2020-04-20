@@ -364,6 +364,10 @@ header>.toolbar { /* Hide toolbar menu */
     color: var(--main-white);
 }
 
+.wpp-header {
+    margin-top: 1em;
+    font-size: 18px;
+}
 
 .btn-wpp {
     border: 1px solid var(--main-white);
@@ -380,7 +384,7 @@ header>.toolbar { /* Hide toolbar menu */
     font-size: 18px;
     animation-name: fadein;
     animation-duration: 3s;
-    margin-left: auto;
+    margin-top: 1.5em;
 }
 
 .btn-wpp:hover {
@@ -462,6 +466,7 @@ header>.toolbar { /* Hide toolbar menu */
 
 .simulation-scenario-header-container {
     margin: var(--main-item-margin) 0;
+    display: flex;
 }
 
 .simulator-scenario-header {

@@ -144,7 +144,12 @@ def main():
                         min_range_ventilators=dday_ventilators['worst'],
                         max_range_ventilators=dday_ventilators['best'])
 
-        utils.genSimulationSection(locality, worst_case, best_case)
+        resources = ResourceAvailability(locality=locality, 
+                                        cases=selected_region['number_cases'],
+                                        deaths=selected_region['deaths'], 
+                                        beds=user_input['n_beds'], 
+                                        ventilators=user_input['n_ventilators'])
+        utils.genSimulationSection(locality, resources, worst_case, best_case)
         
         utils.genActNowSection(locality, worst_case)
         utils.genStrategiesSection(Strategies)
@@ -173,11 +178,11 @@ def main():
                         max_range_ventilators=dday_ventilators['best']), fig)
 
         # >>>> CHECK city: city or state?
-        utils.genResourceAvailabilitySection(ResourceAvailability(locality=locality, 
-                                                                  cases=selected_region['number_cases'],
-                                                                  deaths=selected_region['deaths'], 
-                                                                  beds=user_input['n_beds'], 
-                                                                  ventilators=user_input['n_ventilators']))
+        # utils.genResourceAvailabilitySection(ResourceAvailability(locality=locality, 
+        #                                                           cases=selected_region['number_cases'],
+        #                                                           deaths=selected_region['deaths'], 
+        #                                                           beds=user_input['n_beds'], 
+        #                                                           ventilators=user_input['n_ventilators']))
         utils.genWhatsappButton()
         utils.genFooter()
         

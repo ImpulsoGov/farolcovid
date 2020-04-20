@@ -76,6 +76,7 @@ def genAmbassadorSection() -> None:
                 </div>
         </div>
         ''', unsafe_allow_html=True)
+
 def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
         msg = f'''
         🚨 *BOLETIM CoronaCidades:*  {resources.locality} - {datetime.now().strftime('%d/%m')}  🚨%0a%0a
@@ -193,8 +194,17 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
         return output.strip('\n\t')
                 
 
-def genSimulationSection(locality: str, worst_case: SimulatorOutput, best_case: SimulatorOutput) -> None:
+def genSimulationSection(locality: str, resources: ResourceAvailability, worst_case: SimulatorOutput, best_case: SimulatorOutput) -> None:
+        no_quarentine = 'mais de 90' if(worst_case.max_range_beds == -1 and worst_case.max_range_ventilators == -1) else  min(worst_case.max_range_beds, worst_case.max_range_ventilators) 
+        quarentine = 'mais de 90' if (best_case.max_range_beds == -1 and best_case.max_range_ventilators == -1) else  min(worst_case.max_range_beds, worst_case.max_range_ventilators) 
 
+        msg = f'''
+        🚨 *SIMULAÇÃO SimulaCovid:*  {resources.locality} - {datetime.now().strftime('%d/%m')}  🚨%0a%0a
+        🏥 Considerando que {resources.locality} tem *{resources.beds}* leitos 🛏️ e *{resources.ventilators}* ventiladores ⚕ %0a%0a
+        😷 Sem isolamento social, {resources.locality} pode atingir a capacidade hospitalar em *{no_quarentine}* dias %0a%0a
+        😷 Com isolamento social, {resources.locality} pode atingir a capacidade hospitalar em *{quarentine}* dias %0a%0a
+        👉 _Acompanhe e simule a situação do seu município acessando o *SimulaCovid* aqui_: https://coronacidades.org/ ''' 
+        
         status_quo = genSimulatorOutput(worst_case) 
         restrictions = genSimulatorOutput(best_case) 
 
@@ -223,10 +233,11 @@ def genSimulationSection(locality: str, worst_case: SimulatorOutput, best_case: 
                                         </span>
                                 </div>
                                 %s
+                                <a class="btn-wpp" href="whatsapp://send?text=%s" target="blank">Compartilhar no Whatsapp</a>
                         </div>
                 </div>
         </div>
-        ''' % (locality, status_quo, restrictions), unsafe_allow_html=True)
+        ''' % (locality, status_quo, restrictions, msg), unsafe_allow_html=True)
 
 def genActNowSection(locality, worst_case):
         display = '' if any(value != -1 for value in [worst_case.min_range_beds, worst_case.max_range_beds, worst_case.min_range_ventilators, worst_case.max_range_ventilators]) else 'hide'
