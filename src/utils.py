@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import datetime
+from datetime import timedelta
 from models import SimulatorOutput, ContainmentStrategy, ResourceAvailability, BackgroundColor, Logo, Link
 from typing import List
 import re
@@ -148,14 +149,24 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
         ventilator_prep = 'entre' if has_ventilator_projection else 'em'
         
         if has_bed_projection:
-                bed_projection = '%i <span class="simulator-output-row-prediction-separator">e</span> %i' % (output.min_range_beds, output.max_range_beds)
+                bed_min_range_date = (datetime.now() + timedelta(days=int(output.min_range_beds))).strftime("%d/%m")
+                bed_max_range_date =(datetime.now() + timedelta(days=int(output.max_range_beds))).strftime("%d/%m")
+                bed_projection = f'''{output.min_range_beds}
+                        <span class="simulator-output-row-prediction-separator">e</span> 
+                        {output.max_range_beds} '''
+                bed_rng = f' ({bed_min_range_date} - {bed_max_range_date}) '
         else:
                 bed_projection = 'mais de 90'
+                bed_rng = f''
 
         if has_ventilator_projection: 
+                ventilator_min_range_date = (datetime.now() + timedelta(days=int(output.min_range_ventilators))).strftime("%d/%m")
+                ventilator_max_range_date =(datetime.now() + timedelta(days=int(output.max_range_ventilators))).strftime("%d/%m")
                 ventilator_projection = '%i <span class="simulator-output-row-prediction-separator">e</span> %i' % (output.min_range_ventilators, output.max_range_ventilators)
+                ventilator_rng =  f' ({ventilator_min_range_date} - {ventilator_max_range_date}) '
         else:
                 ventilator_projection = 'mais de 90'
+                ventilator_rng = ''
 
         output =  '''
         <div>
@@ -168,7 +179,7 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
                                         </span>  
                                 </div> 
                                 <span class="simulator-output-row-prediction-label">
-                                        dias será atingida a capacidade máxima de <b>leitos</b>
+                                        dias%s será atingida a capacidade máxima de <b>leitos</b>
                                 </span>
                         </div>
                         <img src="%s" class="simulator-output-image"/>
@@ -183,13 +194,13 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
                                         </span>  
                                 </div> 
                                 <span class="simulator-output-row-prediction-label">
-                                        dias será atingida a capacidade máxima de <b>ventiladores</b>
+                                        dias%s será atingida a capacidade máxima de <b>ventiladores</b>
                                 </span>
                         </div>
                         <img src="%s" class="simulator-output-image"/>
                 </div>
-        </div>''' % (output.color.value, bed_prep, bed_projection, bed_img,
-                     output.color.value, ventilator_prep, ventilator_projection, ventilator_icon)
+        </div>''' % (output.color.value, bed_prep, bed_projection, bed_rng, bed_img, 
+                     output.color.value, ventilator_prep, ventilator_projection, ventilator_rng, ventilator_icon)
 
         return output.strip('\n\t')
                 
