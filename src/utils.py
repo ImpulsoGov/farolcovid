@@ -295,8 +295,6 @@ def genChartSimulationSection(time2sd: int, time2lockdown: int, simulation: Simu
         lockdown_date = (datetime.now() + timedelta(days=int(time2lockdown))).strftime("%d/%m")
 
         simulation_description = ''
-        print(time2lockdown)
-        print(time2sd)
         if time2lockdown <= time2sd:
                 
                 if time2lockdown == 0:
