@@ -30,6 +30,7 @@ class Logo(enum.Enum):
 
 class Link(enum.Enum):
     AMBASSADOR_FORM='https://forms.gle/iPFE7T6Wrq4JzoEw9'
+    YOUTUBE_TUTORIAL='https://www.youtube.com/watch?v=-4Y0wHMmWAs'
 
 # Models
 class ResourceAvailability(NamedTuple):

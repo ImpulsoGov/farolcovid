@@ -110,8 +110,24 @@
     padding: 0 3em;
 }
 
+.stSlider {
+    padding: 0 3em;
+}
+
+iframe {
+    max-height: 75vh !important;
+    padding: 0 3em;
+}
 @media only screen and (max-width: 425px) {
     .row-widget {
+        padding: 0 1em;
+    }
+
+    .stSlider {
+        padding: 0 1em;
+    }
+
+    iframe {
         padding: 0 1em;
     }
 }
@@ -356,6 +372,10 @@ header>.toolbar { /* Hide toolbar menu */
     color: var(--main-white);
 }
 
+.wpp-header {
+    margin-top: 1em;
+    font-size: 18px;
+}
 
 .btn-wpp {
     border: 1px solid var(--main-white);
@@ -372,7 +392,7 @@ header>.toolbar { /* Hide toolbar menu */
     font-size: 18px;
     animation-name: fadein;
     animation-duration: 3s;
-    margin-left: auto;
+    margin-top: 1.5em;
 }
 
 .btn-wpp:hover {
@@ -454,6 +474,7 @@ header>.toolbar { /* Hide toolbar menu */
 
 .simulation-scenario-header-container {
     margin: var(--main-item-margin) 0;
+    display: flex;
 }
 
 .simulator-scenario-header {
@@ -715,4 +736,9 @@ header>.toolbar { /* Hide toolbar menu */
 .act-now-wrapper {
     display: flex;
     flex-direction: column;
+}
+
+.github-link {
+    color: var(--main-primary) !important;
+    text-decoration: underline;
 }
