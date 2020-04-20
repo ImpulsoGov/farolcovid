@@ -76,7 +76,7 @@ def genAmbassadorSection() -> None:
                         <a class="btn-ambassador" href="%s" target="blank">Quero ser embaixador</a>
                 </div>
         </div>
-        ''', unsafe_allow_html=True)
+        ''' % Link.AMBASSADOR_FORM.value, unsafe_allow_html=True)
 
 def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
         msg = f'''
@@ -142,10 +142,10 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
         bed_img = 'https://i.imgur.com/27hutU0.png'
         ventilator_icon = 'https://i.imgur.com/V419ZRI.png'
         
-        has_bed_projection = output.min_range_beds != -1
+        has_bed_projection = (output.min_range_beds != -1 and  output.max_range_beds != -1)
         bed_prep = 'entre' if has_bed_projection else 'em'
         
-        has_ventilator_projection = output.min_range_ventilators != -1
+        has_ventilator_projection = (output.min_range_ventilators != -1 and output.max_range_ventilators != -1)
         ventilator_prep = 'entre' if has_ventilator_projection else 'em'
         
         if has_bed_projection:
@@ -207,13 +207,15 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
 
 def genSimulationSection(locality: str, resources: ResourceAvailability, worst_case: SimulatorOutput, best_case: SimulatorOutput) -> None:
         no_quarentine = 'mais de 90' if(worst_case.max_range_beds == -1 and worst_case.max_range_ventilators == -1) else  min(worst_case.max_range_beds, worst_case.max_range_ventilators) 
-        quarentine = 'mais de 90' if (best_case.max_range_beds == -1 and best_case.max_range_ventilators == -1) else  min(worst_case.max_range_beds, worst_case.max_range_ventilators) 
+        date_proj = ''
+        if no_quarentine != 'mais de 90':
+                proj = (datetime.now() + timedelta(days=int(no_quarentine))).strftime("%d/%m")
+                date_proj = f' *({proj})* '
 
         msg = f'''
-        🚨 *SIMULAÇÃO SimulaCovid:*  {resources.locality} - {datetime.now().strftime('%d/%m')}  🚨%0a%0a
+        🚨 *BOLETIM SimulaCovid:*  {resources.locality} - {datetime.now().strftime('%d/%m')}  🚨%0a%0a
         🏥 Considerando que {resources.locality} tem *{resources.beds}* leitos 🛏️ e *{resources.ventilators}* ventiladores ⚕ %0a%0a
-        😷 Sem isolamento social, {resources.locality} pode atingir a capacidade hospitalar em *{no_quarentine}* dias %0a%0a
-        😷 Com isolamento social, {resources.locality} pode atingir a capacidade hospitalar em *{quarentine}* dias %0a%0a
+        😷 Se não existirem medidas de isolamento sociais, {resources.locality} poderia atingir a sua capacidade hospitalar em *{no_quarentine}* dias{date_proj}%0a%0a
         👉 _Acompanhe e simule a situação do seu município acessando o *SimulaCovid* aqui_: https://coronacidades.org/ ''' 
         
         status_quo = genSimulatorOutput(worst_case) 
