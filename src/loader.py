@@ -9,8 +9,7 @@ from copy import deepcopy
 
 def _download_from_drive(url):
 
-    response = subprocess.run(['curl', '-o', 'temp.csv', url + '/export?format=csv&id'],
-                    check=True, text=True)
+    response = subprocess.run(['curl', '-o', 'temp.csv', url + '/export?format=csv&id'])
 
     return pd.read_csv('temp.csv')
 
