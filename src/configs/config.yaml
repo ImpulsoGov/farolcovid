@@ -35,18 +35,22 @@ br:
             city_ibge_code: 'city_id'
             date: 'last_updated'
             last_available_deaths: 'deaths'
-            new_confirmed: 'number_cases'
-            recovered: 'recovered'
+            last_available_confirmed: 'confirmed_cases'
+            new_confirmed: 'daily_cases'
+            daily_cases_sum: 'infectious_period_cases'
         drop: [
             'city',
-            'confirmed_per_100k_inhabitants',
-            'death_rate',
             'estimated_population_2019',
             'is_last',
-            'order_for_place',
+            'is_repeated',
+            'last_available_confirmed_per_100k_inhabitants',
+            'last_available_date',
+            'last_available_death_rate',
+            'new_deaths',
             'place_type',
-            'state'
+            # 'state'
         ]
+        notification_window_days: 7
     columns:
         health: [
             'number_ventilators',
