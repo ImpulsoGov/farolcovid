@@ -422,12 +422,12 @@ def main():
         - **Expostos (E)**: dado o número inicial de infectados leves ($I_1$)
           calculado acima, calculamos $E(0)$ discretizando a equação
           $\\frac{dI_1}{dt}$ em $t=1$, conforme mostrado abaixo. Dado que o
-          número de casos dobra a cada 3 dias **(??)**, aproximamos $I_1(1)
-          \\approx \sqrt[3]{2} \\times I(0) \\approx 1.26 I(0)$.
+          número de casos dobra a cada 5 dias (Our World in Data, 2020), aproximamos $I_1(1)
+          \\approx \sqrt[5]{2} \\times I(0) \\approx 1.15 I(0)$.
         """
     )
     # st.latex("I_1(1) - I_1(0) = \sigma E(0) - \gamma I_1(0) \\rightarrow E(0) =\\frac{ I_1(1) + (\gamma - 1)I_1(0)}{\sigma}")
-    st.latex("E(0) \\approx \\frac{ I(1) - I(0)}{\sigma} \\approx \\frac{0.26}{\sigma} \\times I(0)")
+    st.latex("E(0) \\approx \\frac{ I(1) - I(0)}{\sigma} \\approx \\frac{0.15}{\sigma} \\times I(0)")
 
 
     st.write(
@@ -566,6 +566,8 @@ def main():
         Hill, A, 2020. Model Description. Modelling COVID-19 Spread vs Healthcare Capacity. Disponível em: https://alhill.shinyapps.io/COVID19seir/
 
         Li, R., Pei, S., Chen, B., Song, Y., Zhang, T., Yang, W., & Shaman, J., 2020. Substantial undocumented infection facilitates the rapid dissemination of novel coronavirus (SARS-CoV2). Science, 3221(March), eabb3221. DOI: https://doi.org/10.1126/science.abb3221
+
+        Max Roser, Hannah Ritchie, Esteban Ortiz-Ospina and Joe Hasell (2020) - "Coronavirus Disease (COVID-19)". Published online at OurWorldInData.org. Retrieved from: 'https://ourworldindata.org/coronavirus' [Online Resource]
 
         Walker, P.G., Whittaker, C., Watson, O., Baguelin, M., Ainslie, K.E.C., Bhatia, S., Bhatt, S., Boonyasiri, A., Boyd, O., Cattarino, L. and Cucunubá, Z., 2020. The global impact of COVID-19 and strategies for mitigation and suppression. Imperial College London, doi: https://doi. org/10.25561/77735.
 
