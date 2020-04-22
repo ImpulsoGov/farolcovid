@@ -6,7 +6,7 @@ def main():
 
     st.header("Metodologia")
 
-    st.write('v1.1')
+    st.write('v1.2')
 
     st.write(
         """
