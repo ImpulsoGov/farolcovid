@@ -201,7 +201,7 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
         return output.strip('\n\t')
                 
 
-def genSimulationSection(locality: str, resources: ResourceAvailability, worst_case: SimulatorOutput, best_case: SimulatorOutput) -> None:
+def genSimulationSection(active_cases: int, locality: str, resources: ResourceAvailability, worst_case: SimulatorOutput, best_case: SimulatorOutput) -> None:
         no_quarentine = 'mais de 90' if(worst_case.max_range_beds == -1 and worst_case.max_range_ventilators == -1) else  min(worst_case.max_range_beds, worst_case.max_range_ventilators) 
         date_proj = ''
         if no_quarentine != 'mais de 90':
@@ -238,7 +238,7 @@ def genSimulationSection(locality: str, resources: ResourceAvailability, worst_c
                                 <br/>
                                 <div class="simulation-scenario-header-container">
                                         <span class="simulator-scenario-header lightblue-bg">
-                                                Com Medidas de Isolamento Social
+                                                Com Medidas Restritivas (Isolamento Social)
                                         </span>
                                 </div>
                                 %s
