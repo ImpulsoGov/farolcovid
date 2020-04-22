@@ -40,12 +40,24 @@ def refresh_rate(config):
         dt = (math.floor(datetime.now().minute/config['refresh_rate'])*config['refresh_rate'])
         return datetime.now().replace(minute=dt,second=0, microsecond=0)
 
-def initialize_params(user_input, selected_region):
-        user_input['population_params'] = {#'N': st.sidebar.number_input('População', 0, None, int(N0), key='N'),
+def calculate_recovered(user_input, selected_region, notification_rate):
+
+        confirmed_adjusted = selected_region['confirmed_cases'].sum()/notification_rate
+        
+        user_input['population_params']['R'] = confirmed_adjusted - user_input['population_params']['I'] - user_input['population_params']['D']
+        
+        if user_input['population_params']['R'] < 0:
+                user_input['population_params']['R'] = confirmed_adjusted - user_input['population_params']['D']
+        
+        return user_input
+
+def initialize_params(user_input, selected_region, notification_rate):
+        
+        user_input['population_params'] = {
                      'N': selected_region['population'],
-                     'I': int(selected_region['number_cases']),
-                     'D': int(selected_region['deaths']),
-                     'R': int(selected_region['recovered'])}
+                     'I': int(selected_region['infectious_period_cases']),
+                     'D': int(selected_region['deaths'])}
+                     #'R': int(selected_region['recovered'])}
 
         # INITIAL VALUES FOR BEDS AND VENTILATORS
         user_input['n_beds'] = int(selected_region['number_beds'])
@@ -83,24 +95,25 @@ def main():
         cities_filtered = filter_options(cities_filtered, user_input['city'], 'city_name')
 
         sources = cities_filtered[[c for c in cities_filtered.columns 
-                                if (('author' in c) or ('last_updated' in c))]]
+                                if (('author' in c) or ('last_updated_' in c))]]
  
         selected_region = cities_filtered.sum(numeric_only=True)
+        last_update_cases = cities_filtered['last_updated'].max().strftime('%d/%m')
+        notification_rate = round(cities_filtered['notification_rate'].mean(), 4)
 
         # pick locality according to hierarchy
         locality = choose_place(user_input['city'], user_input['region'], user_input['state'])
 
         # initialize default parameters for models
-        user_input = initialize_params(user_input, selected_region)
+        user_input = initialize_params(user_input, selected_region, notification_rate)
 
         st.write('<br/>', unsafe_allow_html=True)
 
         utils.genInputCustomizationSectionHeader(locality)
 
+        # USER INPUTS
         total_beds = user_input['n_beds']
-
-        source_beds = sources[['author_number_beds', 'last_updated_number_beds']].\
-                        drop_duplicates().iloc[0]
+        source_beds = sources[['author_number_beds', 'last_updated_number_beds']].drop_duplicates().iloc[0]
         source_beds.last_updated_number_beds = source_beds.last_updated_number_beds.strftime('%d/%m')
 
         user_input['n_beds'] = st.number_input(
@@ -108,27 +121,34 @@ def main():
                 , 0, None, total_beds)
 
         total_ventilators = user_input['n_ventilators']
-        source_ventilators = sources[['author_number_ventilators', 'last_updated_number_ventilators']].\
-                drop_duplicates().iloc[0]
+        source_ventilators = sources[['author_number_ventilators', 'last_updated_number_ventilators']].drop_duplicates().iloc[0]
         source_ventilators.last_updated_number_ventilators = source_ventilators.last_updated_number_ventilators.strftime('%d/%m')
 
         user_input['n_ventilators'] = st.number_input(
                 f'Número de ventiladores destinados aos pacientes com Covid-19 (fonte: {source_ventilators.author_number_ventilators}, atualizado: {source_ventilators.last_updated_number_ventilators}):'
                 , 0, None, total_ventilators)
 
-        user_input['population_params']['D'] = st.number_input('Número de mortes:', 0, None, int(selected_region['deaths']))
-        user_input['population_params']['I'] = st.number_input('Número de casos ativos:', 0, None, int(selected_region['number_cases']))
-        user_input['population_params']['R'] = st.number_input('Número de recuperados:', 0, None, int(selected_region['recovered']))
+        user_input['population_params']['D'] = st.number_input('Mortes confirmadas:', 0, None, int(selected_region['deaths']))
+        
+        infectious_period = config['br']['seir_parameters']['severe_duration'] + config['br']['seir_parameters']['critical_duration']
+        st.write(f'''<div class="base-wrapper">
+                O número de casos publicado no seu município ou região é {int(selected_region['confirmed_cases'].sum())} em {last_update_cases}. 
+                Assumimos que somente novos casos dos últimos {infectious_period} dias estão ativos hoje - ou seja, consideramos {int(selected_region['infectious_period_cases'].sum())} casos ativos.
+                <b>Estimamos que no seu estado ou município apenas {round(100*notification_rate, 2)}% dos casos ativos sejam notificados.</b> 
+                <br><br>Caso queira, você pode mudar o total de casos considerados para a simulação abaixo.
+                </div>''', unsafe_allow_html=True)
+
+        user_input['population_params']['I'] = st.number_input('Casos ativos estimados:', 0, None, int(user_input['population_params']['I'] / notification_rate))
+        
+        user_input = calculate_recovered(user_input, selected_region, notification_rate)
 
         utils.genAmbassadorSection()
 
         st.write('<br/>', unsafe_allow_html=True)
 
-        
         # DEFAULT WORST SCENARIO  
         user_input['strategy'] = {'isolation': 90, 'lockdown': 90}
         user_input['population_params']['I'] = [user_input['population_params']['I'] if user_input['population_params']['I'] != 0 else 1][0]
-
         _, dday_beds, dday_ventilators = simulator.run_evolution(user_input, config)
         
         worst_case = SimulatorOutput(color=BackgroundColor.GREY_GRADIENT,
@@ -138,7 +158,7 @@ def main():
                         max_range_ventilators=dday_ventilators['best'])
         
         # DEFAULT BEST SCENARIO
-        user_input['strategy'] = {'isolation': 90, 'lockdown': 0}
+        user_input['strategy'] = {'isolation': 0, 'lockdown': 90}
         _, dday_beds, dday_ventilators = simulator.run_evolution(user_input, config)
         
         best_case = SimulatorOutput(color=BackgroundColor.LIGHT_BLUE_GRADIENT,
@@ -148,11 +168,12 @@ def main():
                         max_range_ventilators=dday_ventilators['best'])
 
         resources = ResourceAvailability(locality=locality, 
-                                        cases=selected_region['number_cases'],
+                                        cases=selected_region['active_cases'],
                                         deaths=selected_region['deaths'], 
                                         beds=user_input['n_beds'], 
                                         ventilators=user_input['n_ventilators'])
-        utils.genSimulationSection(locality, resources, worst_case, best_case)
+        
+        utils.genSimulationSection(int(user_input['population_params']['I']), locality, resources, worst_case, best_case)
         
         utils.genActNowSection(locality, worst_case)
         utils.genStrategiesSection(Strategies)
