@@ -132,10 +132,10 @@ def main():
         
         infectious_period = config['br']['seir_parameters']['severe_duration'] + config['br']['seir_parameters']['critical_duration']
         st.write(f'''<div class="base-wrapper">
-                O número de casos publicado no seu município ou região é {int(selected_region['confirmed_cases'].sum())} em {last_update_cases}. 
-                Assumimos que somente novos casos dos últimos {infectious_period} dias estão ativos hoje - ou seja, consideramos {int(selected_region['infectious_period_cases'].sum())} casos ativos.
-                <b>Estimamos que no seu estado ou município apenas {round(100*notification_rate, 2)}% dos casos ativos sejam notificados.</b> 
-                <br><br>Caso queira, você pode mudar o total de casos considerados para a simulação abaixo.
+                O número de casos confirmados oficialmente no seu município ou regional de saúde é de {int(selected_region['confirmed_cases'].sum())} em {last_update_cases}. 
+                Assumimos que todos os novos casos dos últimos {infectious_period} dias estão ativos hoje - ou seja, consideramos {int(selected_region['infectious_period_cases'].sum())} casos ativos.
+                <b>Estimamos que apenas {round(100*notification_rate, 2)}% dos casos ativos sejam notificados.</b> 
+                <br><br>Caso queira, você pode mudar o total de casos ativos [total - (mortes + recuperados)] considerados para a simulação abaixo:
                 </div>''', unsafe_allow_html=True)
 
         user_input['population_params']['I'] = st.number_input('Casos ativos estimados:', 0, None, int(user_input['population_params']['I'] / notification_rate))

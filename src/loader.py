@@ -36,7 +36,7 @@ def _get_active_cases(df, window_period, cases_params):
 def _get_notification_rate(group, config):
     
     daily_adjust = group['deaths'] / config['br']['seir_parameters']['fatality_ratio']
-    notification_rate = np.mean(group['infectious_period_cases'] / daily_adjust)
+    notification_rate = np.mean(group['confirmed_cases'] / daily_adjust)
     
     return notification_rate
 
