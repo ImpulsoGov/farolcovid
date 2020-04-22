@@ -99,7 +99,7 @@ def main():
  
         selected_region = cities_filtered.sum(numeric_only=True)
         last_update_cases = cities_filtered['last_updated'].max().strftime('%d/%m')
-        notification_rate = round(cities_filtered['notification_rate'].mean(), 4)
+        notification_rate = round(cities_filtered['notification_rate'].mean(), 0)
 
         # pick locality according to hierarchy
         locality = choose_place(user_input['city'], user_input['region'], user_input['state'])
