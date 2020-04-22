@@ -5,7 +5,7 @@ from models import  Logo
 def main():
     ana = 'https://media-exp1.licdn.com/dms/image/C4E03AQGdLO2wZpvasA/profile-displayphoto-shrink_200_200/0?e=1591833600&v=beta&t=BsnUsaEI-eLrn_oxLf7cEyXKGx2_7OBJZ9suUrRev_8'
     carabetta = 'https://media-exp1.licdn.com/dms/image/C4D03AQF8rJe40DpQqA/profile-displayphoto-shrink_200_200/0?e=1591833600&v=beta&t=6smhmNk7Ppktq5cX4vxhD4x-A6mMTdZnIAEu5DlV18g'
-    fernanda = 'https://media-exp1.licdn.com/dms/image/C4D03AQGC8DFEF9bPvw/profile-displayphoto-shrink_200_200/0?e=1591833600&v=beta&t=jMI1q3A3nBKBpcbe9SjBHAkJ-B41p5ugr2weE9ntAxs'
+    fernanda = 'https://media-exp1.licdn.com/dms/image/C4D03AQFveYuReCqBVg/profile-displayphoto-shrink_200_200/0?e=1593043200&v=beta&t=14iMvOQdBESRi2OmsqmAdDBWVh0xdb_77Tw_dUycAto'
     saru = 'https://media-exp1.licdn.com/dms/image/C5603AQHB6rggvacwQw/profile-displayphoto-shrink_200_200/0?e=1591833600&v=beta&t=jj_atUnkJJm8SDKB1GQBF5n8bM-8dUKsTJE1Nsph3qE'
     diego = 'https://media-exp1.licdn.com/dms/image/C4D03AQGc03RUyqn7rQ/profile-displayphoto-shrink_200_200/0?e=1591833600&v=beta&t=VQeYTDAIkwXnCBISvvBne6GO-hOnHUu70s35OwcH4RE'
     luiz = 'https://media-exp1.licdn.com/dms/image/C4E03AQHSVHQ8br4SoQ/profile-displayphoto-shrink_200_200/0?e=1591833600&v=beta&t=rzj5_o4-AXYpcLG2EN6xOaB_c8-Ki-HQSIBUArD_ZxM'
