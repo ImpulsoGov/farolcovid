@@ -94,8 +94,6 @@ def _read_cases_data(country, config):
         df = df[df['is_last'] == True].drop(cases_params['drop'], 1)
         df['city_id'] = df['city_id'].astype(int)
 
-        print(df.columns)
-
     return df
 
 def _remove_accents(text):
