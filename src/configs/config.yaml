@@ -1,4 +1,4 @@
-refresh_rate: 5 # minutes
+refresh_rate: 999999 # minutes
 
 simulator:
     max_days: 90

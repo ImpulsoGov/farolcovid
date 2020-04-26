@@ -190,6 +190,8 @@ def _get_supplies(cities, updates, country, config):
 @st.cache(allow_output_mutation=True)
 def read_data(country, config, refresh_rate):
 
+    return pd.read_csv('raw_data.csv')
+
     cases = _read_cases_data(country, config)
     
 
@@ -218,9 +220,8 @@ def read_data(country, config, refresh_rate):
         # merge cities
         df = df.merge(cases, on='city_id', how='left')
 
-
+    df.to_csv('raw_data.csv', index=False)
     return df
 
 if __name__ == "__main__":
-
     pass
