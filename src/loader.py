@@ -190,7 +190,10 @@ def _get_supplies(cities, updates, country, config):
 @st.cache(allow_output_mutation=True)
 def read_data(country, config, refresh_rate):
 
-    return pd.read_csv('raw_data.csv')
+    df = pd.read_csv('raw_data.csv')
+    df[[c for c in df.columns if 'last_updated' in c]] = df[[c for c in df.columns if 'last_updated' in c]].apply(pd.to_datetime)
+
+    return  df
 
     cases = _read_cases_data(country, config)
     
