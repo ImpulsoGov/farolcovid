@@ -73,8 +73,8 @@ def main():
 
         config = yaml.load(open('configs/config.yaml', 'r'), Loader = yaml.FullLoader)
 
-        if abs(datetime.now().minute - FIXED) > config['refresh_rate']:
-                caching.clear_cache()
+        # if abs(datetime.now().minute - FIXED) > config['refresh_rate']:
+        #         caching.clear_cache()
 
         cities = loader.read_data('br', config, refresh_rate=refresh_rate(config))
 
