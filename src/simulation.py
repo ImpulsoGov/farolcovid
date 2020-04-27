@@ -138,6 +138,7 @@ def main():
 
         user_input['population_params']['D'] = st.number_input('Mortes confirmadas:', 0, None, int(selected_region['deaths']))
         
+        # GET INFECTED CASES
         infectious_period = config['br']['seir_parameters']['severe_duration'] + config['br']['seir_parameters']['critical_duration']
         
         if selected_region['confirmed_cases'] == 0:
@@ -158,6 +159,7 @@ def main():
 
                 user_input['population_params']['I'] = st.number_input('Casos ativos estimados:', 0, None, int(user_input['population_params']['I'] / notification_rate))
         
+        # CALCULATE RECOVERED CASES
         user_input = calculate_recovered(user_input, selected_region, notification_rate)
 
         utils.genAmbassadorSection()
