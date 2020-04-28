@@ -28,7 +28,8 @@ make serve
 
 # Execute o servidor com API local. 
 # Para isso, você terá que subir a API do simulacovid-datasource
-# Use `make server-build-run`
+# 1. Para subir o servidor local: `make server-build-run`
+# 2. Abra outro terminal e rode para subir os dados: `make loader-build-run`
 make serve-local
 ```
 
