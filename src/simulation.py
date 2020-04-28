@@ -42,48 +42,39 @@ def refresh_rate(config):
 
 def calculate_recovered(user_input, selected_region, notification_rate):
 
-        if user_input['population_params']['I'] == 1: # when simulating 1st case
+        confirmed_adjusted = int(selected_region[['confirmed_cases']].sum()/notification_rate)
+
+        if confirmed_adjusted == 0: # dont have any cases yet
                 user_input['population_params']['R'] = 0
                 return user_input
 
-        confirmed_adjusted = selected_region['confirmed_cases'].sum()/notification_rate
         user_input['population_params']['R'] = confirmed_adjusted - user_input['population_params']['I'] - user_input['population_params']['D']
-        
+
         if user_input['population_params']['R'] < 0:
                 user_input['population_params']['R'] = confirmed_adjusted - user_input['population_params']['D']
         
-        return user_input
-
-def initialize_params(user_input, selected_region, notification_rate):
-        
-        user_input['population_params'] = {
-                     'N': selected_region['population'],
-                     'I': int(selected_region['infectious_period_cases']),
-                     'D': int(selected_region['deaths'])}
-                     #'R': int(selected_region['recovered'])}
-
-        # INITIAL VALUES FOR BEDS AND VENTILATORS
-        user_input['n_beds'] = int(selected_region['number_beds'])
-        user_input['n_ventilators'] = int(selected_region['number_ventilators'])
         return user_input
 
 def main():
         utils.localCSS("style.css")
         utils.localCSS("icons.css")
 
-        config = yaml.load(open('configs/config.yaml', 'r'), Loader = yaml.FullLoader)
 
-        # if abs(datetime.now().minute - FIXED) > config['refresh_rate']:
-        #         caching.clear_cache()
-
-        cities = loader.read_data('br', config, refresh_rate=refresh_rate(config))
-
-        user_input = dict()
-
+        # HEADER
         utils.genHeroSection()
-
         utils.genVideoTutorial()
 
+
+        # GET DATA
+        config = yaml.load(open('configs/config.yaml', 'r'), Loader = yaml.FullLoader)
+        # if abs(datetime.now().minute - FIXED) > config['refresh_rate']:
+        #         caching.clear_cache()
+        cities = loader.read_data('br', config, refresh_rate=refresh_rate(config))
+
+
+        # REGION/CITY USER INPUT
+        user_input = dict()
+        
         utils.genStateInputSectionHeader()
 
         user_input['state'] = st.selectbox('Estado', add_all(cities['state_name'].unique()))
@@ -97,27 +88,32 @@ def main():
         user_input['city'] = st.selectbox('Município', add_all(cities_filtered['city_name'].unique()))
         cities_filtered = filter_options(cities_filtered, user_input['city'], 'city_name')
 
-        sources = cities_filtered[[c for c in cities_filtered.columns 
-                                if (('author' in c) or ('last_updated_' in c))]]
+        sources = cities_filtered[[c for c in cities_filtered.columns if (('author' in c) or ('last_updated_' in c))]]
  
         selected_region = cities_filtered.sum(numeric_only=True)
-        
+
+
+        # GET LAST UPDATE DATE
         if not np.all(cities_filtered['last_updated'].isna()):
                 last_update_cases = cities_filtered['last_updated'].max().strftime('%d/%m')
 
-        notification_rate = round(cities_filtered['notification_rate'].mean(), 4)
+
+        # GET NOTIFICATION RATE
+        if len(cities_filtered) > 1: # pega taxa do estado quando +1 municipio selecionado
+                notification_rate = round(cities_filtered['state_notification_rate'].mean(), 4)
+
+        else:
+                notification_rate = round(cities_filtered['notification_rate'].values[0], 4)
 
         # pick locality according to hierarchy
         locality = choose_place(user_input['city'], user_input['region'], user_input['state'])
-
-        # initialize default parameters for models
-        user_input = initialize_params(user_input, selected_region, notification_rate)
 
         st.write('<br/>', unsafe_allow_html=True)
 
         utils.genInputCustomizationSectionHeader(locality)
 
-        # USER INPUTS
+
+        # SOURCES USER INPUT
         source_beds = sources[['author_number_beds', 'last_updated_number_beds']].drop_duplicates()
         authors_beds = source_beds.author_number_beds.str.cat(sep=', ')
 
@@ -130,15 +126,18 @@ def main():
 
         user_input['n_beds'] = st.number_input(
                 f"Número de leitos destinados aos pacientes com Covid-19 (fonte: {authors_beds}, atualizado: {source_beds.last_updated_number_beds.max().strftime('%d/%m')})"
-                , 0, None, user_input['n_beds'])
+                , 0, None,  int(selected_region['number_beds']))
 
         user_input['n_ventilators'] = st.number_input(
                 f"Número de ventiladores destinados aos pacientes com Covid-19 (fonte: {authors_ventilators}, atualizado: {source_ventilators.last_updated_number_ventilators.max().strftime('%d/%m')}):"
-                , 0, None, user_input['n_ventilators'])
+                , 0, None, int(selected_region['number_ventilators']))
 
+
+        # POP USER INPUTS
+        user_input['population_params'] = {'N': int(selected_region['population'])}
         user_input['population_params']['D'] = st.number_input('Mortes confirmadas:', 0, None, int(selected_region['deaths']))
         
-        # GET INFECTED CASES
+        # get infected cases
         infectious_period = config['br']['seir_parameters']['severe_duration'] + config['br']['seir_parameters']['critical_duration']
         
         if selected_region['confirmed_cases'] == 0:
@@ -150,20 +149,22 @@ def main():
                 user_input['population_params']['I'] = st.number_input('Casos ativos estimados:', 0, None, 1)
 
         else:
+                user_input['population_params']['I'] = int(selected_region['infectious_period_cases'] / notification_rate)
+
                 st.write(f'''<div class="base-wrapper">
                 O número de casos confirmados oficialmente no seu município ou regional de saúde é de {int(selected_region['confirmed_cases'].sum())} em {last_update_cases}. 
                 Dada a progressão clínica da doença (em média, {infectious_period} dias) e a taxa de notificação ajustada para a região ({round(100*notification_rate, 2)}%), 
-                <b>estimamos que o número de casos ativos é de {int(user_input['population_params']['I'] / notification_rate)}</b>.
+                <b>estimamos que o número de casos ativos é de {user_input['population_params']['I']}</b>.
                 <br><br>Caso queria, você pode mudar esse número para a simulação abaixo:
                         </div>''', unsafe_allow_html=True)
 
-                user_input['population_params']['I'] = st.number_input('Casos ativos estimados:', 0, None, int(user_input['population_params']['I'] / notification_rate))
+                user_input['population_params']['I'] = st.number_input('Casos ativos estimados:', 0, None, user_input['population_params']['I'])
         
-        # CALCULATE RECOVERED CASES
+        # calculate recovered cases
         user_input = calculate_recovered(user_input, selected_region, notification_rate)
-
+        
+        # AMBASSADOR SECTION
         utils.genAmbassadorSection()
-
         st.write('<br/>', unsafe_allow_html=True)
 
         # DEFAULT WORST SCENARIO  
@@ -224,12 +225,6 @@ def main():
                                                 max_range_ventilators=dday_ventilators['best']), 
                                         fig)
 
-        # >>>> CHECK city: city or state?
-        # utils.genResourceAvailabilitySection(ResourceAvailability(locality=locality, 
-        #                                                           cases=selected_region['number_cases'],
-        #                                                           deaths=selected_region['deaths'], 
-        #                                                           beds=user_input['n_beds'], 
-        #                                                           ventilators=user_input['n_ventilators']))
         utils.genWhatsappButton()
         utils.genFooter()
         
