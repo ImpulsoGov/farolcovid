@@ -23,8 +23,13 @@ sudo apt-get install -y make
 # Crie o virtualenv
 make create-env
 
-# Execute o servidor
+# Execute o servidor com API externa
 make serve
+
+# Execute o servidor com API local. 
+# Para isso, você terá que subir a API do simulacovid-datasource
+# Use `make server-build-run`
+make serve-local
 ```
 
 Utilizando o Docker (Linux)
