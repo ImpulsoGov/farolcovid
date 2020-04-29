@@ -153,7 +153,7 @@ def main():
 
                 st.write(f'''<div class="base-wrapper">
                 O número de casos confirmados oficialmente no seu município ou regional de saúde é de {int(selected_region['confirmed_cases'].sum())} em {last_update_cases}. 
-                Dada a progressão clínica da doença (em média, {infectious_period} dias) e a taxa de notificação ajustada para a região ({round(100*notification_rate, 2)}%), 
+                Dada a progressão clínica da doença (em média, {infectious_period} dias) e a taxa de notificação ajustada para a região ({round(100*notification_rate, 0)}%), 
                 <b>estimamos que o número de casos ativos é de {user_input['population_params']['I']}</b>.
                 <br><br>Caso queria, você pode mudar esse número para a simulação abaixo:
                         </div>''', unsafe_allow_html=True)
