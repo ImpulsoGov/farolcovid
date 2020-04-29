@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import streamlit as st
 import os
 
@@ -13,6 +14,9 @@ def read_data(country, config, refresh_rate):
     print(url)
 
     df = pd.read_csv(url)
+    
+    # convert to datetime
+    df['last_updated'] = df['last_updated'].replace('0', np.nan)
     df[[c for c in df.columns if 'last_updated' in c]] = df[[c for c in df.columns if 'last_updated' in c]].apply(pd.to_datetime)
 
     return  df
