@@ -28,7 +28,7 @@ docker-build:
 	docker build -t $(IMAGE_TAG) .
 
 docker-run:
-	docker run -it --rm -p 8501:8501 $(IMAGE_TAG)
+	docker run -d --restart=unless-stopped -p 80:8501 $(IMAGE_TAG)
 
 docker-build-run: docker-build docker-run
 
