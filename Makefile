@@ -18,7 +18,10 @@ update-env:
 			pip3 install --upgrade -r requirements.txt;
 
 serve:
-	source venv/bin/activate; cd src; streamlit run app.py
+	source venv/bin/activate; cd src; export IS_LOCAL=FALSE; streamlit run app.py
+
+serve-local:
+	source venv/bin/activate; cd src; export IS_LOCAL=TRUE; streamlit run app.py
 
 # Docker
 docker-build:
