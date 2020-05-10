@@ -70,7 +70,8 @@ def main():
         # if abs(datetime.now().minute - FIXED) > config['refresh_rate']:
         #         caching.clear_cache()
         cities = loader.read_data('br', config, refresh_rate=refresh_rate(config))
-
+        cities = cities[cities['is_last'] == True]
+        
 
         # REGION/CITY USER INPUT
         user_input = dict()
