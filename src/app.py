@@ -13,7 +13,7 @@ import simulation as sm
 from models import Logo
 
 def main():
-    page = st.sidebar.selectbox("Menu", ["COVID19 no seu Município", "Metodologia", "Quem somos?"])
+    page = st.sidebar.radio("Menu", ["COVID19 no seu Município", "Metodologia", "Quem somos?"])
 
 
     if page == "Metodologia":
