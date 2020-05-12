@@ -226,11 +226,15 @@ def main():
     st.write('- **Taxas de progressão ($p_i, \\sigma$) e mortalidade ($\\mu$)**')
     st.write(
         """
-        As taxas de progressão da doença representam o grau no qual um indivíduo avança nos estados de infecção da doença. 
-        Inicialmente, um indivíduo exposto avança para o primeiro estado de infeção, leve ($I_1$) a uma taxa $\\sigma$.
-        Uma vez infectado, o indivíduo progride para estados mais graves da doença a uma taxa $p_1$ - de leve para severo - 
-        e $p_2$ - de severo para crítico. Assume-se que a infecção avança gradualmente, ou seja, uma infeção leve deve passar 
-        pelo estado severo para chegar ao crítico. Por fim, os casos críticos acarretam na morte de indivíduos a uma taxa $\\mu$.
+        As taxas de progressão da doença representam o grau no qual um indivíduo
+        avança nos estados de infecção da doença. Inicialmente, um indivíduo
+        exposto avança para o primeiro estado de infeção, leve ($I_1$) a uma
+        taxa $\\sigma$. Uma vez infectado, o indivíduo progride para estados
+        mais graves da doença a uma taxa $p_1$ - de leve para severo - e $p_2$ -
+        de severo para crítico. Assume-se que a infecção avança gradualmente, ou
+        seja, uma infeção leve deve passar pelo estado severo para chegar ao
+        crítico. Por fim, os casos críticos acarretam na morte de indivíduos a
+        uma taxa $\\mu$.
         """
     )
 
@@ -242,8 +246,10 @@ def main():
     st.write('- **Taxas de recuperação ($\\gamma_i$)**')
     st.write(
         """
-        As taxas de recuperação da doença representam o grau no qual um indivíduo se recupera em qualquer estado de gravidade.
-        Assume-se que, uma vez recuperado, esse indivíduo não contrai mais a doença, não retornando ao estado de suscetível.
+        As taxas de recuperação da doença representam o grau no qual um
+        indivíduo se recupera em qualquer estado de gravidade. Assume-se que,
+        uma vez recuperado, esse indivíduo não contrai mais a doença, não
+        retornando ao estado de suscetível.
         """
     )
 
@@ -254,21 +260,34 @@ def main():
     st.write('- **Taxas de transmissão ($\\beta_i$)**')
     st.write(
         """
-        As taxas de transmissão dizem respeito ao potencial de infecção de indivíduos infectados em contato a indivíduos suscetíveis.
-        Para casos severos ($\\beta_2$) e críticos ($\\beta_3$), as taxas de transmissão desses indivíduos são referentes 
-        à transmissão interna nos hospitais, de pacientes para profissionais da saúde. Segundo estudos realizados na China 
-        e Itália (Wang et. al, 2020 [2]), esse grupo é afetado de forma desproporcional, 
-        sendo observado cerca de $5\%$ e $10\%$ de profissionais da saúde dentre o total de casos notificados, respectivamente.
+        As taxas de transmissão dizem respeito ao potencial de infecção de
+        indivíduos infectados em contato a indivíduos suscetíveis. Para casos
+        severos ($\\beta_2$) e críticos ($\\beta_3$), as taxas de transmissão
+        desses indivíduos são referentes à transmissão interna nos hospitais, de
+        pacientes para profissionais da saúde. Segundo estudos realizados na
+        China e Itália (Wang et. al, 2020 [2]), esse grupo é afetado de forma
+        desproporcional, sendo observado cerca de $5\%$ e $10\%$ de
+        profissionais da saúde dentre o total de casos notificados,
+        respectivamente. 
+
+        Calculamos esses valores através da equação da taxa de reprodução básica
+        de Hill (2020), assumindo que apenas $10\%$ do valor do $R_0$ deve-se a
+        transmissões de infectados severvos ou críticos(refente a $\\beta_2,
+        \\beta_3$) e que infectados severos transmitem a uma mesma taxa de
+        infectados críticos, ambos hospitalizados ($\\beta_2 = \\beta_3$).
         """
     )
+
+    st.latex("R_0  = N\\frac{\\beta_1}{p_1+\gamma_1} + N\\frac{p_1}{p_1 + \gamma_1} \left( \\frac{\\beta_2}{p_2+\gamma_2} + \\frac{p_2}{p_2 + \gamma_2} \\frac{\\beta_3}{\mu+\gamma_3}\\right)")
 
 
     st.write("- **Cálculo das taxas**")
 
     st.write(
         """
-        As taxas não são observadas diretamente. Logo, utilizamos parâmetros observados na literatura para o cálculo das mesmas.
-        Os parâmetros de referência são descritos na tabela abaixo.
+        As taxas não são observadas diretamente. Logo, utilizamos parâmetros
+        observados na literatura para o cálculo das mesmas. Os parâmetros de
+        referência são descritos na tabela abaixo.
         """
     )
 
