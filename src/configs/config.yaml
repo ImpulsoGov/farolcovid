@@ -25,7 +25,7 @@ br:
     data_endpoints:
         raw: 
             external: http://datasource.coronacidades.org:7000/v1/raw/csv
-            local: http://localhost:80/v1/raw/csv
+            local: http://localhost:7000/v1/raw/csv
     drive_paths:
         cities_population: https://docs.google.com/spreadsheets/d/1k8mXuUggBuBEghHhhLrLtA-5wa4JsAc-D35S5bNlf24
         health_infrastructure: https://docs.google.com/spreadsheets/d/1JD9GREVkU_doNqQQvvA_NC18HhoulrxcJLTqxd07508
