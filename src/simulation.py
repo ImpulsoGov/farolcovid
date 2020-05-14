@@ -70,7 +70,8 @@ def main():
         # if abs(datetime.now().minute - FIXED) > config['refresh_rate']:
         #         caching.clear_cache()
         cities = loader.read_data('br', config, refresh_rate=refresh_rate(config))
-
+        # Getting cities (1) with cases & (2) without cases
+        cities = cities[(cities['is_last'] == True) | (cities['last_updated'].isnull())]
 
         # REGION/CITY USER INPUT
         user_input = dict()
@@ -102,6 +103,8 @@ def main():
         if len(cities_filtered) > 1: # pega taxa do estado quando +1 municipio selecionado
                 notification_rate = round(cities_filtered['state_notification_rate'].mean(), 4)
 
+        elif np.isnan(cities_filtered['notification_rate'].values):
+                notification_rate = 1
         else:
                 notification_rate = round(cities_filtered['notification_rate'].values[0], 4)
 
