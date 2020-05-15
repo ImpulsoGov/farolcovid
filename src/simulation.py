@@ -67,11 +67,7 @@ def main():
 
         # GET DATA
         config = yaml.load(open('configs/config.yaml', 'r'), Loader = yaml.FullLoader)
-        # if abs(datetime.now().minute - FIXED) > config['refresh_rate']:
-        #         caching.clear_cache()
         cities = loader.read_data('br', config, refresh_rate=refresh_rate(config))
-        # Getting cities (1) with cases & (2) without cases
-        cities = cities[(cities['is_last'] == True) | (cities['last_updated'].isnull())]
 
         # REGION/CITY USER INPUT
         user_input = dict()
