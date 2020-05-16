@@ -1,13 +1,21 @@
+# Analysis
 notebooks/
 analysis/data/*
 .ipynb_checkpoints/
-*/.DS_Store
+
+# Store files
+.DS_Store
+.vscode
 *.pyc
+
+# Venv
 covid_env/
 venvanalysis/
-.DS_Store
 venv/
-src/configs/gcloud_credentials.json
-src/cities_static.csv
 .venv/
+
+# Data & credentials
+src/configs/gcloud_credentials.json
+src/configs/secrets.yaml
+src/cities_static.csv
 src/temp.csv
