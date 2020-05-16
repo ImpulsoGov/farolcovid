@@ -67,7 +67,8 @@ def main():
 
         # GET DATA
         config = yaml.load(open('configs/config.yaml', 'r'), Loader = yaml.FullLoader)
-        cities = loader.read_data('br', config, refresh_rate=refresh_rate(config))
+        cities = loader.read_data('br', config, endpoint=config['br']['api']['endpoints']['simulacovid'])
+
 
         # REGION/CITY USER INPUT
         user_input = dict()

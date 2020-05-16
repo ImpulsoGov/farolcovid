@@ -113,7 +113,7 @@ def main():
 
     config = yaml.load(open('configs/config.yaml', 'r'), Loader = yaml.FullLoader)
 
-    df = loader.read_data('br', config, refresh_rate=1)
+    df = loader.read_data('br', config, endpoint=config['br']['api']['endpoints']['analysis'])
 
     st.write(
         """
