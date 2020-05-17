@@ -19,6 +19,9 @@
     --minor-padding: 0.5em;
     --main-border-radius: 20px;
     --main-border-radius-pill: 50px;
+    --main-red-alert: #FF5F6B;
+    --main-green-alert: #17A700;
+    --main-yellow-alert:  #F2C94C;
 }
 
 /* keyframes */
@@ -92,6 +95,30 @@
     color: var(--main-black);
 }
 
+.yellow-alert {
+    color: var(--main-yellow-alert);
+}
+
+.yellow-alert-bg {
+    background-color: var(--main-yellow-alert);
+}
+
+.red-alert {
+    color: var(--main-red-alert);
+}
+
+.red-alert-bg {
+    background-color: var(--main-red-alert);
+}
+
+.green-alert {
+    color: var(--main-green-alert);
+}
+
+.green-alert-bg {
+    background-color: var(--main-green-alert);
+}
+
 /* useful classes */
 .bold {
     font-weight: bold;
@@ -104,6 +131,26 @@
 
 .hide {
     visibility: hide;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-row {
+    flex-direction: row;
+}
+
+.flex-column {
+    flex-direction: column;
+}
+
+.flex-space-between {
+    justify-content: space-between;
+}
+
+.header {
+    font-family: var(--main-header-font-family);
 }
 /* Override default template */
 .row-widget {
@@ -741,4 +788,21 @@ header>.toolbar { /* Hide toolbar menu */
 .github-link {
     color: var(--main-primary) !important;
     text-decoration: underline;
+}
+
+/* CENTRAL COVID */
+.alert-banner {
+    width: 100vw;
+    height: 400px;
+}
+
+.indicator-card {
+    margin-top: 200px;
+    padding: var(--main-padding);
+    width: 300px;
+    height: 300px;
+    border-radius: var(--main-border-radius);
+    opacity: 0.95;
+    background-color: white;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }

@@ -7,6 +7,8 @@ import pandas as pd
 from simulator import run_evolution
 from simulation import calculate_recovered, filter_options
 import utils
+import simulation as sm
+from models import IndicatorCards
 
 # Dados da projeção de capacidade de leitos
 def dday_city(params, selected_region, config, supply_type="n_beds"):
@@ -33,8 +35,11 @@ def dday_city(params, selected_region, config, supply_type="n_beds"):
     
     return dday_beds["best"], dday_beds["worst"]
 
-def main():
+# def getAlertLevel(indicators):
 
+def main():
+    utils.localCSS("style.css")
+    utils.genHeroSection("Central", "Como sua comunidade pode reagir à crise?")
     # GET DATA
     config = yaml.load(open('configs/config.yaml', 'r'), Loader = yaml.FullLoader)
     cities = loader.read_data('br', config, endpoint=config['br']['api']['endpoints']['simulacovid'])
@@ -50,17 +55,19 @@ def main():
 
     # REGION/CITY USER INPUT
     user_input = dict()
-    indicators = dict()
+    indicators = IndicatorCards
 
     level = st.selectbox('Nível', ["Estadual", "Municipal"])
 
     if level == "Estadual":
         user_input['state'] = st.selectbox('Estado', cities['state_name'].unique())
         cities_filtered = filter_options(cities, user_input['state'], 'state_name')
+        locality = user_input['state']
 
     if level == "Municipal":
         user_input['city'] = st.selectbox('Município', cities['city_name'].unique())
         cities_filtered = filter_options(cities, user_input['city'], 'city_name')
+        locality = user_input['city']
 
     selected_region = cities_filtered.sum(numeric_only=True)
 
@@ -77,22 +84,22 @@ def main():
             user_input["notification_rate"] = round(cities_filtered['notification_rate'], 4)
             rt = df_rt_cities[df_rt_cities["city_id"] == cities_filtered["city_id"].iloc[0]]
 
-    if len(rt) < 1:
+    if len(rt) < 1: #TODO in case no RT edge case
         st.write("Rt: Sua cidade não possui casos suficiente para o cálculo!")
     else:
-        indicators["rt_high"] = rt.iloc[-1]["Rt_high_95"]
-        indicators["rt_low"] = rt.iloc[-1]["Rt_low_95"]
+        indicators["rt"] = indicators["rt"]._replace(metric=f'{str(rt.iloc[-1]["Rt_low_95"])} a {str(rt.iloc[-1]["Rt_high_95"])}')
+        indicators['subnotification_rate'] = indicators["subnotification_rate"]._replace(metric=(1.0 - user_input["notification_rate"]))
 
-        st.write(" ".join(["Rt: entre", str(indicators["rt_low"]), "e" , str(indicators["rt_high"])]))
+    # Populating base indicator template
+    dday_beds_best, dday_beds_worst = dday_city(user_input, selected_region, config, supply_type="n_beds")
+    indicators['hospital_capacity'] = indicators['hospital_capacity']._replace(metric=f'''{str(dday_beds_worst)} e {str(dday_beds_best)}''')
 
-
-    # GET DDAY BEDS
-    indicators["dday_beds_best"], indicators["dday_beds_worst"] = dday_city(user_input, selected_region, config, supply_type="n_beds")
-    st.write(" ".join(["Dias para capacidade: entre", str(indicators["dday_beds_worst"]), "e", str(indicators["dday_beds_best"])]))
+    utils.genKPISection(locality=locality, overall_risk="alto", indicators=indicators)
 
     # INDICATORS
     # sources = cities_filtered[[c for c in cities_filtered.columns if (('author' in c) or ('last_updated_' in c))]]
-    st.write("Você está aqui!")
+    # st.write("Você está aqui!")
+    # sm.main() 
 
 if __name__ == "__main__":
     main()

@@ -1,10 +1,11 @@
 import streamlit as st
 from datetime import datetime
 from datetime import timedelta
-from models import SimulatorOutput, ContainmentStrategy, ResourceAvailability, BackgroundColor, Logo, Link
-from typing import List
+from models import SimulatorOutput, ContainmentStrategy, ResourceAvailability, BackgroundColor, Logo, Link, Indicator
+from typing import List, Dict
 import re
 
+'''Helper Functions'''
 def make_clickable(text, link):
     # target _blank to open new window
     # extract clickable text to display for your link
@@ -15,14 +16,25 @@ def localCSS(file_name):
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 
-def genHeroSection():
-        st.write('''<div class="base-wrapper hero-bg">
+def choose_place(city, region, state):
+    if city == 'Todos' and region == 'Todos' and state == 'Todos':
+        return 'Brasil'
+    if city == 'Todos' and region == 'Todos':
+        return state + ' (Estado)' if state != 'Todos' else 'Brasil'
+    if city == 'Todos':
+        return region + ' (Região SUS)' if region != 'Todos' else 'Todas as regiões SUS'
+    return city
+
+'''View Components CentralCOVID'''
+
+def genHeroSection(title: str, subtitle: str):
+        st.write(f'''<div class="base-wrapper hero-bg">
                 <a href="https://coronacidades.org/" target="blank" class="logo-link"><span class="logo-bold">corona</span><span class="logo-lighter">cidades</span></a>
                 <div class="hero-wrapper">
                         <div class="hero-container">
                                 <div class="hero-container-content">
-                                        <span class="hero-container-product primary-span">Simula<br/>Covid</span>
-                                        <span class="hero-container-subtitle primary-span">Um simulador da demanda por leitos hospitalares e ventiladores.</span>
+                                        <span class="hero-container-product primary-span">{title}<br/>Covid</span>
+                                        <span class="hero-container-subtitle primary-span">{subtitle}</span>
                                 </div>
                         </div>   
                         <img class="hero-container-image" src="https://i.imgur.com/w5yVANW.png"/>
@@ -30,6 +42,33 @@ def genHeroSection():
         </div>
         ''', unsafe_allow_html=True)
 
+def genIndicatorCard(indicator: Indicator):
+        return f'''<div class="indicator-card flex flex-column">
+                        <span class="header">{indicator.header}</span>
+                        <span>{indicator.caption}</span>
+                        <span>{indicator.metric}<span> {indicator.unit}</span></span>
+                        <span>Médio</span>
+                        <div class="flex flex-row flex-justify-space-between"> 
+                                <div>Semana passada:<span>1.2-1.4</span></div>
+                                <span>Tendência: piorar</span>
+                        </div>
+                </div>
+        '''
+
+def genKPISection(locality: str, overall_risk: str, indicators: Dict[str, Indicator]):
+        cards = list(map(genIndicatorCard, indicators.values()))
+        print(cards)
+        cards = ''.join(cards)
+
+        st.write(f'''
+         <div class="alert-banner red-alert-bg flex flex-column">
+                <span class="white-span header">{locality}</span>
+                <span class="white-span">Risco {overall_risk} de reabertura</span>
+                <div class="flex flex-row">{cards}</div>
+        </div>
+        ''', unsafe_allow_html=True)
+
+'''View Components SimulaCovid'''
 def genVideoTutorial():
         st.write('''<div class="base-wrapper">
                         <span class="section-header primary-span">Antes de começar: entenda como usar!</span>

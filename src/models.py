@@ -1,4 +1,4 @@
-from typing import NamedTuple, List
+from typing import NamedTuple, List, Dict
 import enum
 
 # Constants
@@ -32,7 +32,20 @@ class Link(enum.Enum):
     AMBASSADOR_FORM='https://forms.gle/iPFE7T6Wrq4JzoEw9'
     YOUTUBE_TUTORIAL='https://www.youtube.com/watch?v=-4Y0wHMmWAs'
 
+class Alert(enum.Enum):
+    NONE="gray-alert"
+    LOW='green-alert'
+    MEDIUM='yellow-alert'
+    HIGH='red-alert'
+
 # Models
+class Indicator(NamedTuple):
+    header: str
+    caption: str
+    unit: str
+    metric: str = ""
+    risk: Alert = Alert.NONE.value
+
 class ResourceAvailability(NamedTuple):
     locality: str
     cases: int
@@ -60,3 +73,10 @@ Strategies: List[ContainmentStrategy] = [
         ContainmentStrategy(BackgroundColor.LIGHT_BLUE, FontColor.LIGHT_BLUE, 2, "Medidas Restritivas", "https://i.imgur.com/W0JI4AE.png", "Fechamento das fronteiras e do comércio não-essencial. Restrição do transporte público e toda circulação não estritamente necessária."),
         ContainmentStrategy(BackgroundColor.DARK_BLUE, FontColor.DARK_BLUE, 3, "Quarentena", "https://i.imgur.com/FjHaC7A.png", "O governo amplia a capacidade de testes e proíbe estritamente o movimento das pessoas não-autorizadas (lockdown).")
 ]
+
+IndicatorCards: Dict[str, Indicator] = {
+    'rt': Indicator(header="Ritmo de Contágio", caption="Cada contaminado infecta em média", unit="pessoas"),
+    'subnotification_rate': Indicator(header="Taxa de Subnotificação", caption="A cada 10 pessoas infectadas, somente", unit="são identificadas"),
+    'hospital_capacity': Indicator(header="Capacidade Hospitalar", caption="A capacidade hospitalar será atingida em", unit="dias"),
+    # 'social_distancing': Indicator(header="Isolamento Social", caption="Ficaram em casa cerca de", unit="das pessoas")
+}

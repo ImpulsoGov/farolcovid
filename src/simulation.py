@@ -27,15 +27,6 @@ def filter_options(_df, var, col, all_string='Todos'):
     else:
             return _df.query(f'{col} == "{var}"')
         
-def choose_place(city, region, state):
-    if city == 'Todos' and region == 'Todos' and state == 'Todos':
-        return 'Brasil'
-    if city == 'Todos' and region == 'Todos':
-        return state + ' (Estado)' if state != 'Todos' else 'Brasil'
-    if city == 'Todos':
-        return region + ' (Região SUS)' if region != 'Todos' else 'Todas as regiões SUS'
-    return city
-
 def refresh_rate(config):
         dt = (math.floor(datetime.now().minute/config['refresh_rate'])*config['refresh_rate'])
         return datetime.now().replace(minute=dt,second=0, microsecond=0)
@@ -61,7 +52,7 @@ def main():
 
 
         # HEADER
-        utils.genHeroSection()
+        utils.genHeroSection("Simula", "Um simulador da demanda por leitos hospitalares e ventiladores.")
         utils.genVideoTutorial()
 
 
@@ -106,7 +97,7 @@ def main():
                 notification_rate = round(cities_filtered['notification_rate'].values[0], 4)
 
         # pick locality according to hierarchy
-        locality = choose_place(user_input['city'], user_input['region'], user_input['state'])
+        locality = utils.choose_place(user_input['city'], user_input['region'], user_input['state'])
 
         st.write('<br/>', unsafe_allow_html=True)
 
