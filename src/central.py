@@ -8,7 +8,7 @@ from simulator import run_evolution
 from simulation import calculate_recovered, filter_options
 import utils
 import simulation as sm
-from models import IndicatorCards
+from models import IndicatorType, IndicatorCards, Alert, RiskLabel
 
 # Dados da projeção de capacidade de leitos
 def dday_city(params, selected_region, config, supply_type="n_beds"):
@@ -35,14 +35,42 @@ def dday_city(params, selected_region, config, supply_type="n_beds"):
     
     return dday_beds["best"], dday_beds["worst"]
 
-# def get_alert_level(indicators):
-#     if indicators["rt"].metric 
+def get_overall_alert_level(indicators):
+    if indicators["rt"].metric < 1.0 and \
+        indicators["hospital_capacity"] > 30 and \
+        indicators["subnotification_rate"] < 0.5: 
+        return Alert.LOW
+    
+    elif (indicators["rt"].metric >= 1.0 and indicators["rt"].metric <= 1.2) and indicators["hospital_capacity"] > 30 and indicators["subnotification_rate"] < 0.5: 
+        return Alert.MEDIUM
+    else:
+        return Alert.HIGH
 
-def update_indicator(indicator, metric, display):
+def get_indicator_alert(name, indicator):
+    if name == IndicatorType.RT.name:
+        if indicator < 1.0:
+            return Alert.LOW.name
+        elif (indicator >= 1.0 and indicator <= 1.2):
+            return Alert.MEDIUM.name
+        else:
+            return Alert.HIGH.name
+    elif name == IndicatorType.HOSPITAL_CAPACITY.name:
+        if indicator < 30:
+            return Alert.HIGH.name
+        elif indicator >= 30 and indicator <= 60:
+            return Alert.MEDIUM.name
+        else:
+            return Alert.LOW.name
+    else:
+        return Alert.NONE.name
+        
+def update_indicator(key, indicator, metric, display):
     indicator.metric = metric
     indicator.display = display
+    indicator.risk = get_indicator_alert(key, metric)
+    indicator.risk_label= RiskLabel(indicator.risk).value
+
     return indicator
-    # return indicator._replace(metric=metric, display=display)
 
 def main():
     utils.localCSS("style.css")
@@ -94,14 +122,14 @@ def main():
     if len(rt) < 1: #TODO in case no RT edge case
         st.write("Rt: Sua cidade não possui casos suficiente para o cálculo!")
     else:
-        indicators["rt"] = update_indicator(indicators["rt"], metric=(rt.iloc[-1]["Rt_most_likely"]), display=f'{str(round(rt.iloc[-1]["Rt_low_95"], 1))} - {str(round(rt.iloc[-1]["Rt_high_95"], 1))}')
-        indicators['subnotification_rate'] = update_indicator(indicators["subnotification_rate"], metric=(1.0 - user_input["notification_rate"]), display=int((1.0 - user_input["notification_rate"]) * 10))
+        indicators["rt"] = update_indicator(IndicatorType.RT.name, indicators["rt"], metric=(rt.iloc[-1]["Rt_most_likely"]), display=f'{str(round(rt.iloc[-1]["Rt_low_95"], 1))} - {str(round(rt.iloc[-1]["Rt_high_95"], 1))}')
+        indicators['subnotification_rate'] = update_indicator(IndicatorType.SUBNOTIFICATION_RATE.name, indicators["subnotification_rate"], metric=(1.0 - user_input["notification_rate"]), display=int((1.0 - user_input["notification_rate"]) * 10))
 
     # Populating base indicator template
     dday_beds_best, dday_beds_worst = dday_city(user_input, selected_region, config, supply_type="n_beds")
-    indicators['hospital_capacity'] = update_indicator(indicators['hospital_capacity'], metric=((dday_beds_worst + dday_beds_best) / 2), display=f'''{str(dday_beds_worst)} e {str(dday_beds_best)}''')
+    indicators['hospital_capacity'] = update_indicator(IndicatorType.HOSPITAL_CAPACITY.name, indicators['hospital_capacity'], metric=((dday_beds_worst + dday_beds_best) / 2), display=f'''{str(dday_beds_worst)} e {str(dday_beds_best)}''')
 
-    utils.genKPISection(locality=locality, overall_risk="alto", indicators=indicators)
+    utils.genKPISection(locality=locality, alert=get_overall_alert_level(indicators), indicators=indicators)
 
     # INDICATORS
     # sources = cities_filtered[[c for c in cities_filtered.columns if (('author' in c) or ('last_updated_' in c))]]

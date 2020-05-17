@@ -119,6 +119,10 @@
     background-color: var(--main-green-alert);
 }
 
+.hide-bg {
+    display: hidden;
+}
+
 /* useful classes */
 .p1 {
     font-size: 48px;
@@ -874,7 +878,7 @@ header>.toolbar { /* Hide toolbar menu */
 }
 
 .risk-pill {
-    width: 100px;
+    width: 125px;
     text-align: center;
     border-radius: 5px;
 }

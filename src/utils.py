@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import datetime
 from datetime import timedelta
-from models import SimulatorOutput, ContainmentStrategy, ResourceAvailability, BackgroundColor, Logo, Link, Indicator
+from models import SimulatorOutput, ContainmentStrategy, ResourceAvailability, BackgroundColor, Logo, Link, Indicator, Alert, RiskBackground, RiskLabel
 from typing import List, Dict
 import re
 
@@ -47,8 +47,8 @@ def genIndicatorCard(indicator: Indicator):
                         <span class="header p3">{indicator.header}</span>
                         <span class="p4">{indicator.caption}</span>
                         <span class="bold p2">{indicator.display}<span class="bold p4"> {indicator.unit}</span></span>
-                        <div class="{indicator.risk}-bg risk-pill">
-                                <span class="white-span p4 bold">Alto</span>
+                        <div class="{RiskBackground(indicator.risk).name}-alert-bg risk-pill">
+                                <span class="white-span p4 bold">{RiskLabel(indicator.risk).name}</span>
                         </div>
                         <div class="flex flex-row flex-justify-space-between mt"> 
                                 <div class="br flex flex-column text-align-center pr">
@@ -63,16 +63,15 @@ def genIndicatorCard(indicator: Indicator):
                 </div>
         '''
 
-def genKPISection(locality: str, overall_risk: str, indicators: Dict[str, Indicator]):
+def genKPISection(locality: str, alert: Alert, indicators: Dict[str, Indicator]):
         cards = list(map(genIndicatorCard, indicators.values()))
-        print(cards)
         cards = ''.join(cards)
 
         st.write(f'''
-         <div class="alert-banner red-alert-bg">
+         <div class="alert-banner {RiskBackground(alert.name).name}-alert-bg">
                 <div class="base-wrapper flex flex-column" style="margin-top: 100px;">
                         <span class="white-span header p1">{locality}</span>
-                        <span class="white-span p3">Risco {overall_risk} de reabertura</span>
+                        <span class="white-span p3">Risco {alert.value} de reabertura</span>
                         <div class="flex flex-row">{cards}</div>
                 </div>
         </div>

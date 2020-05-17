@@ -33,26 +33,41 @@ class Link(enum.Enum):
     YOUTUBE_TUTORIAL='https://www.youtube.com/watch?v=-4Y0wHMmWAs'
 
 class Alert(enum.Enum):
-    NONE="gray-alert"
-    LOW='green-alert'
-    MEDIUM='yellow-alert'
-    HIGH='red-alert'
+    NONE=""
+    LOW='baixo'
+    MEDIUM='médio'
+    HIGH='alto'
+ 
+
+class IndicatorType(enum.Enum):
+    RT='rt'
+    SUBNOTIFICATION_RATE='subnotification_rate'
+    HOSPITAL_CAPACITY='hospital_capacity'
+    SOCIAL_ISOLATION='social_isolation'
+
+
+class RiskLabel(enum.Enum):
+    Nada=Alert.NONE.name
+    Bom=Alert.LOW.name
+    Insatisfatório=Alert.MEDIUM.name
+    Ruim=Alert.HIGH.name
+
+class RiskBackground(enum.Enum):
+    hide=Alert.NONE.name
+    green=Alert.LOW.name
+    yellow=Alert.MEDIUM.name
+    red=Alert.HIGH.name
 
 # Models
 class Indicator():
-    def __init__(self, header, caption, unit, metric=-1, display="", risk=Alert.HIGH.value):
+    def __init__(self, header, caption, unit, metric=-1, display="", risk=Alert.HIGH.value, risk_label=""):
         self.header = header
         self.caption = caption
         self.unit = unit
         self.metric = metric
         self.display = display
         self.risk = risk
-    # header: str
-    # caption: str
-    # unit: str
-    # metric: int = -1,
-    # display: str = "",
-    # risk: Alert = Alert.HIGH.value
+        self.risk_label = risk_label
 
 class ResourceAvailability(NamedTuple):
     locality: str
@@ -83,8 +98,8 @@ Strategies: List[ContainmentStrategy] = [
 ]
 
 IndicatorCards: Dict[str, Indicator] = {
-    'rt': Indicator(header="Ritmo de Contágio", caption="Cada contaminado infecta em média", unit="pessoas"),
-    'subnotification_rate': Indicator(header="Taxa de Subnotificação", caption="A cada 10 pessoas infectadas, somente", unit="são identificadas"),
-    'hospital_capacity': Indicator(header="Capacidade Hospitalar", caption="A capacidade hospitalar será atingida em", unit="dias"),
+    IndicatorType.RT.value: Indicator(header="Ritmo de Contágio", caption="Cada contaminado infecta em média", unit="pessoas"),
+    IndicatorType.SUBNOTIFICATION_RATE.value: Indicator(header="Taxa de Subnotificação", caption="A cada 10 pessoas infectadas, somente", unit="são identificadas"),
+    IndicatorType.HOSPITAL_CAPACITY.value: Indicator( header="Capacidade Hospitalar", caption="A capacidade hospitalar será atingida em", unit="dias"),
     # 'social_distancing': Indicator(header="Isolamento Social", caption="Ficaram em casa cerca de", unit="das pessoas")
 }
