@@ -22,10 +22,12 @@ simulator:
             test_delay: 4
 
 br:
-    data_endpoints:
-        raw: 
-            external: http://datasource.coronacidades.org:7000/v1/raw/csv
-            local: http://localhost:7000/v1/raw/csv
+    api:
+        external: http://datasource.coronacidades.org:7000/
+        local: http://localhost:7000/
+        endpoints:
+            simulacovid: "br/cities/simulacovid/main"
+            analysis: "br/cities/cases/full"
     drive_paths:
         cities_population: https://docs.google.com/spreadsheets/d/1k8mXuUggBuBEghHhhLrLtA-5wa4JsAc-D35S5bNlf24
         health_infrastructure: https://docs.google.com/spreadsheets/d/1JD9GREVkU_doNqQQvvA_NC18HhoulrxcJLTqxd07508
@@ -83,3 +85,11 @@ br:
         i2_percentage: 0.12
         i3_percentage: 0.025
         infected_health_care_proportion: 0.05
+    rt_parameters:
+        r_t_range_max: 12
+        optimal_sigma: 0.01 # best sigma for Brazil (prior hyperparameters)
+        window_size: 7
+        gaussian_kernel_std: 2
+        gaussian_min_periods: 7
+        gamma_alpha: 4
+        min_days: 14

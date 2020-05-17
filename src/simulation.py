@@ -67,9 +67,7 @@ def main():
 
         # GET DATA
         config = yaml.load(open('configs/config.yaml', 'r'), Loader = yaml.FullLoader)
-        # if abs(datetime.now().minute - FIXED) > config['refresh_rate']:
-        #         caching.clear_cache()
-        cities = loader.read_data('br', config, refresh_rate=refresh_rate(config))
+        cities = loader.read_data('br', config, endpoint=config['br']['api']['endpoints']['simulacovid'])
 
 
         # REGION/CITY USER INPUT
@@ -102,6 +100,8 @@ def main():
         if len(cities_filtered) > 1: # pega taxa do estado quando +1 municipio selecionado
                 notification_rate = round(cities_filtered['state_notification_rate'].mean(), 4)
 
+        elif np.isnan(cities_filtered['notification_rate'].values):
+                notification_rate = 1
         else:
                 notification_rate = round(cities_filtered['notification_rate'].values[0], 4)
 
