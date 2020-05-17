@@ -39,12 +39,20 @@ class Alert(enum.Enum):
     HIGH='red-alert'
 
 # Models
-class Indicator(NamedTuple):
-    header: str
-    caption: str
-    unit: str
-    metric: str = ""
-    risk: Alert = Alert.NONE.value
+class Indicator():
+    def __init__(self, header, caption, unit, metric=-1, display="", risk=Alert.HIGH.value):
+        self.header = header
+        self.caption = caption
+        self.unit = unit
+        self.metric = metric
+        self.display = display
+        self.risk = risk
+    # header: str
+    # caption: str
+    # unit: str
+    # metric: int = -1,
+    # display: str = "",
+    # risk: Alert = Alert.HIGH.value
 
 class ResourceAvailability(NamedTuple):
     locality: str

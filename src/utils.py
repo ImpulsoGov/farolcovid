@@ -43,14 +43,22 @@ def genHeroSection(title: str, subtitle: str):
         ''', unsafe_allow_html=True)
 
 def genIndicatorCard(indicator: Indicator):
-        return f'''<div class="indicator-card flex flex-column">
-                        <span class="header">{indicator.header}</span>
-                        <span>{indicator.caption}</span>
-                        <span>{indicator.metric}<span> {indicator.unit}</span></span>
-                        <span>Médio</span>
-                        <div class="flex flex-row flex-justify-space-between"> 
-                                <div>Semana passada:<span>1.2-1.4</span></div>
-                                <span>Tendência: piorar</span>
+        return f'''<div class="indicator-card flex flex-column ml">
+                        <span class="header p3">{indicator.header}</span>
+                        <span class="p4">{indicator.caption}</span>
+                        <span class="bold p2">{indicator.display}<span class="bold p4"> {indicator.unit}</span></span>
+                        <div class="{indicator.risk}-bg risk-pill">
+                                <span class="white-span p4 bold">Alto</span>
+                        </div>
+                        <div class="flex flex-row flex-justify-space-between mt"> 
+                                <div class="br flex flex-column text-align-center pr">
+                                        <span class="lighter">Semana passada:</span>
+                                        <span class="bold">1.2-1.4</span>
+                                </div>
+                                <div class="flex flex-column text-align-center pl">
+                                        <span class="lighter">Tendência futura:</span>
+                                        <span class="bold">Piorar ⚠</span>
+                                </div>
                         </div>
                 </div>
         '''
@@ -61,10 +69,12 @@ def genKPISection(locality: str, overall_risk: str, indicators: Dict[str, Indica
         cards = ''.join(cards)
 
         st.write(f'''
-         <div class="alert-banner red-alert-bg flex flex-column">
-                <span class="white-span header">{locality}</span>
-                <span class="white-span">Risco {overall_risk} de reabertura</span>
-                <div class="flex flex-row">{cards}</div>
+         <div class="alert-banner red-alert-bg">
+                <div class="base-wrapper flex flex-column" style="margin-top: 100px;">
+                        <span class="white-span header p1">{locality}</span>
+                        <span class="white-span p3">Risco {overall_risk} de reabertura</span>
+                        <div class="flex flex-row">{cards}</div>
+                </div>
         </div>
         ''', unsafe_allow_html=True)
 

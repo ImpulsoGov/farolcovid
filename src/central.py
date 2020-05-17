@@ -35,7 +35,14 @@ def dday_city(params, selected_region, config, supply_type="n_beds"):
     
     return dday_beds["best"], dday_beds["worst"]
 
-# def getAlertLevel(indicators):
+# def get_alert_level(indicators):
+#     if indicators["rt"].metric 
+
+def update_indicator(indicator, metric, display):
+    indicator.metric = metric
+    indicator.display = display
+    return indicator
+    # return indicator._replace(metric=metric, display=display)
 
 def main():
     utils.localCSS("style.css")
@@ -73,7 +80,7 @@ def main():
 
     # GET NOTIFICATION RATE & Rt
     if len(cities_filtered) > 1: # pega taxa do estado quando +1 municipio selecionado
-            user_input["notification_rate"] = round(cities_filtered['state_notification_rate'].mean(), 4)
+            user_input["notification_rate"] = round(cities_filtered['state_notification_rate'].mean(), 2)
             rt = df_rt_states[df_rt_states["state"] == cities_filtered["state"].unique()[0]]
 
     elif np.isnan(cities_filtered['notification_rate'].values):
@@ -87,12 +94,12 @@ def main():
     if len(rt) < 1: #TODO in case no RT edge case
         st.write("Rt: Sua cidade não possui casos suficiente para o cálculo!")
     else:
-        indicators["rt"] = indicators["rt"]._replace(metric=f'{str(rt.iloc[-1]["Rt_low_95"])} a {str(rt.iloc[-1]["Rt_high_95"])}')
-        indicators['subnotification_rate'] = indicators["subnotification_rate"]._replace(metric=(1.0 - user_input["notification_rate"]))
+        indicators["rt"] = update_indicator(indicators["rt"], metric=(rt.iloc[-1]["Rt_most_likely"]), display=f'{str(round(rt.iloc[-1]["Rt_low_95"], 1))} - {str(round(rt.iloc[-1]["Rt_high_95"], 1))}')
+        indicators['subnotification_rate'] = update_indicator(indicators["subnotification_rate"], metric=(1.0 - user_input["notification_rate"]), display=int((1.0 - user_input["notification_rate"]) * 10))
 
     # Populating base indicator template
     dday_beds_best, dday_beds_worst = dday_city(user_input, selected_region, config, supply_type="n_beds")
-    indicators['hospital_capacity'] = indicators['hospital_capacity']._replace(metric=f'''{str(dday_beds_worst)} e {str(dday_beds_best)}''')
+    indicators['hospital_capacity'] = update_indicator(indicators['hospital_capacity'], metric=((dday_beds_worst + dday_beds_best) / 2), display=f'''{str(dday_beds_worst)} e {str(dday_beds_best)}''')
 
     utils.genKPISection(locality=locality, overall_risk="alto", indicators=indicators)
 
