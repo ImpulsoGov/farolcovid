@@ -133,10 +133,16 @@ def main():
    
     products = ProductCards;
     utils.genProductsSection(products)
+    product = st.selectbox( 'Como você gostaria de prosseguir?', ('Contenção', 'Reabertura'), 0)
+
+    if product == 'Contenção':
+        sm.main()
+    
+    # elif product == 'Reabertura':
+        # so.main()
+
     # INDICATORS
     # sources = cities_filtered[[c for c in cities_filtered.columns if (('author' in c) or ('last_updated_' in c))]]
-    # st.write("Você está aqui!")
-    # sm.main() 
 
 if __name__ == "__main__":
     main()
