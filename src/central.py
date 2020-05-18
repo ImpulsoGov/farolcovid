@@ -8,7 +8,7 @@ from simulator import run_evolution
 from simulation import calculate_recovered, filter_options
 import utils
 import simulation as sm
-from models import IndicatorType, IndicatorCards, Alert, RiskLabel
+from models import IndicatorType, IndicatorCards, Alert, RiskLabel, ProductCards
 
 # Dados da projeção de capacidade de leitos
 def dday_city(params, selected_region, config, supply_type="n_beds"):
@@ -130,7 +130,9 @@ def main():
     indicators['hospital_capacity'] = update_indicator(IndicatorType.HOSPITAL_CAPACITY.name, indicators['hospital_capacity'], metric=((dday_beds_worst + dday_beds_best) / 2), display=f'''{str(dday_beds_worst)} e {str(dday_beds_best)}''')
 
     utils.genKPISection(locality=locality, alert=get_overall_alert_level(indicators), indicators=indicators)
-
+   
+    products = ProductCards;
+    utils.genProductsSection(products)
     # INDICATORS
     # sources = cities_filtered[[c for c in cities_filtered.columns if (('author' in c) or ('last_updated_' in c))]]
     # st.write("Você está aqui!")

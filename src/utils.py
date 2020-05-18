@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import datetime
 from datetime import timedelta
-from models import SimulatorOutput, ContainmentStrategy, ResourceAvailability, BackgroundColor, Logo, Link, Indicator, Alert, RiskBackground, RiskLabel
+from models import SimulatorOutput, ContainmentStrategy, ResourceAvailability, BackgroundColor, Logo, Link, Indicator, Alert, RiskBackground, RiskLabel, Illustration, Product
 from typing import List, Dict
 import re
 
@@ -68,12 +68,37 @@ def genKPISection(locality: str, alert: Alert, indicators: Dict[str, Indicator])
         cards = ''.join(cards)
 
         st.write(f'''
-         <div class="alert-banner {RiskBackground(alert.name).name}-alert-bg">
+         <div class="alert-banner {RiskBackground(alert.name).name}-alert-bg mb">
                 <div class="base-wrapper flex flex-column" style="margin-top: 100px;">
                         <span class="white-span header p1">{locality}</span>
                         <span class="white-span p3">Risco {alert.value} de reabertura</span>
                         <div class="flex flex-row">{cards}</div>
                 </div>
+        </div>
+        ''', unsafe_allow_html=True)
+
+
+def genProductCard(product: Product):
+        return f'''<div class="flex flex-column elevated pr pl product-card mt flex-align-items-center">
+                <div class="flex flex-row flex-align-items-center">
+                        <span class="p3 header bold uppercase">{product.name}</span>
+                        <span class="pl">{product.recommendation}</span>
+                </div>
+                <span>{product.caption}</span>
+                <img src="{product.image}" style="width: 200px"/>
+        </div>
+        '''
+
+def genProductsSection(products: List[Product]):
+
+        cards = list(map(genProductCard, products))
+        
+        cards = ''.join(cards)
+        
+        st.write(f'''
+        <div class="base-wrapper" style="margin-top: 200px">
+                <span class="section-header primary-span">COMO SEGUIR COM SEGURANÇA?</span>
+                <div class="flex flex-row flex-space-around mt">{cards}</div>
         </div>
         ''', unsafe_allow_html=True)
 

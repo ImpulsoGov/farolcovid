@@ -38,6 +38,9 @@ class Alert(enum.Enum):
     MEDIUM='médio'
     HIGH='alto'
  
+class Illustration(enum.Enum):
+    CITY='https://i.imgur.com/W0JI4AE.png'
+    BUILDING='https://i.imgur.com/FjHaC7A.png' 
 
 class IndicatorType(enum.Enum):
     RT='rt'
@@ -92,9 +95,9 @@ class SimulatorOutput(NamedTuple):
     max_range_ventilators: int
 
 Strategies: List[ContainmentStrategy] = [
-        ContainmentStrategy(BackgroundColor.GREY, FontColor.GREY, 1, "Não Intervenção", "https://i.imgur.com/pxYFm76.png", "Nenhuma medida de restrição de contato é adotada pelas autoridades."),
+        ContainmentStrategy(BackgroundColor.GREY, FontColor.GREY, 1, "Não Intervenção", Illustration.CITY.value, "Nenhuma medida de restrição de contato é adotada pelas autoridades."),
         ContainmentStrategy(BackgroundColor.LIGHT_BLUE, FontColor.LIGHT_BLUE, 2, "Medidas Restritivas", "https://i.imgur.com/W0JI4AE.png", "Fechamento das fronteiras e do comércio não-essencial. Restrição do transporte público e toda circulação não estritamente necessária."),
-        ContainmentStrategy(BackgroundColor.DARK_BLUE, FontColor.DARK_BLUE, 3, "Quarentena", "https://i.imgur.com/FjHaC7A.png", "O governo amplia a capacidade de testes e proíbe estritamente o movimento das pessoas não-autorizadas (lockdown).")
+        ContainmentStrategy(BackgroundColor.DARK_BLUE, FontColor.DARK_BLUE, 3, "Quarentena", Illustration.BUILDING.value, "O governo amplia a capacidade de testes e proíbe estritamente o movimento das pessoas não-autorizadas (lockdown).")
 ]
 
 IndicatorCards: Dict[str, Indicator] = {
@@ -103,3 +106,16 @@ IndicatorCards: Dict[str, Indicator] = {
     IndicatorType.HOSPITAL_CAPACITY.value: Indicator( header="Capacidade Hospitalar", caption="A capacidade hospitalar será atingida em", unit="dias"),
     # 'social_distancing': Indicator(header="Isolamento Social", caption="Ficaram em casa cerca de", unit="das pessoas")
 }
+
+class Product:
+    def __init__(self, name, caption, image,  recommendation=""):
+        self.recommendation = recommendation
+        self.name=name
+        self.caption = caption
+        self.image = image
+        
+
+ProductCards: List[Product] = [
+    Product(recommendation="Sugerido", name="Contenção", caption="Quer conter o crescimento de casos na sua comunidade? Simule a eficácia de diferentes táticas de contenção.", image=Illustration.BUILDING.value),
+    Product(recommendation="Risco Alto", name="Reabertura", caption="Planeje a reabertura de acordo com o impacto na saúde e economia da sua comunidade.", image=Illustration.CITY.value)
+]
