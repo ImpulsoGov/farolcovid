@@ -12,7 +12,12 @@ Ambiente de testes e homologação:
 Ambiente de produção:
 - branch stable -> https://simulacovid.coronacidades.org/
 
-## Como executar a aplicação localmente?
+## 📊 Como colaborar com análises
+
+Todas as análises com dados da ferramenta estão em [`analysis`](/analysis). Veja como colaborar [aqui](/src/analysis/README.md)!
+
+
+## ⚙️ Como executar a aplicação localmente?
 
 Utilizando Python + Virtualenv
 
@@ -45,22 +50,4 @@ sudo apt-get install -y make
 # Execute o servidor
 # ficará disponível em http://localhost:8501/
 make docker-build-run
-```
-
-## Ambiente de Modelagem
-
-```bash
-# Instale o 'make'
-sudo apt-get install -y make
-
-# Crie o virtualenv
-make create-env-analysis
-
-# Ative o ambiente
-. venvanalysis/bin/activate
-
-# Abra o jupyter
-jupyter notebook
-
-# Mude o kernel do notebook para venvanalysis
 ```
