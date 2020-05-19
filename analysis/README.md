@@ -25,7 +25,7 @@ Caso já tenha passado um tempo que você criou o branch e queira subir outro no
 ```bash
 $ git checkout analysis_[usuario] # ex: git checkout -b analysis_fernandascovino
 
-$ git pull # ex: git checkout -b analysis_fernandascovino
+$ git pull
 
 $ git merge master
 
@@ -81,13 +81,13 @@ Tudo pronto para mostrar suas análises para outr@s colaborador@s? Então, no su
 $ git status
 
 # Adicione o notebook no track
-$ git add [nome do notebook]
+$ git add analysis/[nome do notebook] # ex: git add analysis/br_states_rt_forecasting.ipynb
 
 # Adicione uma msg sobre sua analise
-$ git commit -m "[breve msg esplicando o que foi feito]"
+$ git commit -m "[breve msg esplicando o que foi feito]" # ex: git commit -m "add analise de forecasting da taxa de contagio em ufs"
 
 # Envie seu notebook para o GitHub subindo o seu branch!
-$ git push --set-upstream origin analysis_[usuario]
+$ git push --set-upstream origin analysis_[usuario] # ex: git push --set-upstream origin analysis_fernandascovino
 
 ```
 
