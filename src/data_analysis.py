@@ -115,8 +115,6 @@ def prepare_heatmap(df, mavg_days=5):
 
     return plot_deaths_heatmap2(df_deaths, 'state', title='Distribuição de novas mortes nas UFs (mavg = 5 days)')
 
-def get_rolling_amount(grp,time,data_col, col_to_roll):
-    return grp.rolling(time, min_periods=1, on=data_col)[col_to_roll].mean()
 
 def prepare_country_heatmap(df, mavg_days=5):
 
@@ -294,25 +292,17 @@ def plot_deaths_heatmap2(t, place_type, title):
     st.plotly_chart(fig)
 
 
-def plot_cities_deaths_heatmap(t, state, place_type,min_deaths, title, colors='temps',save_img=False):
-    t = t[t['state']==state]
-    df_heatmap = t.reset_index()\
-                          .pivot(index=place_type, 
-                                  columns='last_updated', 
-                                  values='rolling_deaths_new')\
-                           .fillna(0)\
-                           .apply(lambda x: x/x.max(), axis=1)\
-                           .dropna(how='all')
 
-    # remove days with all states zero
-    df_heatmap = df_heatmap.loc[:, (df_heatmap != 0).any(axis=0)]
-    print(len(df_heatmap))
+
+def plot_cities_deaths_heatmap(t, state, place_type, col_time, min_deaths, title, colors='temps'):
+    t = t.query(f'state =="{state}"')
+    df_heatmap = var_through_time(t,place_type,col_time,'deaths',norm=True)
 
     city_total_deaths = [t[t['city'] ==x]['deaths'].max() for x in df_heatmap.index]
     idy = np.argsort(city_total_deaths)
     idx = np.array(city_total_deaths,dtype=np.int32)[idy] > min_deaths
 
-    #Remove the column '0' that only exist in some states
+    
     try:
         trace1 = go.Heatmap(_df_to_plotly(df_heatmap.iloc[idy,:].loc[idx,:].drop('0',axis=1)), 
                                         colorscale=colors,showscale=False)
@@ -340,9 +330,48 @@ def plot_cities_deaths_heatmap(t, state, place_type,min_deaths, title, colors='t
     )
 
     fig = go.Figure(data=d, layout=layout)
-    if save_img:
-        pio.write_image(fig,'data/output/Mortes_{}.jpeg'.format(state),format='jpeg',width=1920, height=1080)
-    fig.show()
+
+    legend = """
+
+
+    """
+
+
+    fig.add_annotation(dict(font=dict(color="black",size=14),
+                            x=-1.1,
+                            y=1,
+                            showarrow=False,
+                            text=legend,
+                            xref="paper",
+                            yref="paper",
+                            align='left'
+                           ))
+
+    
+
+    st.plotly_chart(fig)
+
+
+def prepare_cities_heatmap(df,state, mavg_days=5):
+
+    df_cities_deaths = df[~df['deaths'].isnull()][['state','city', 'last_updated', 'deaths']]\
+                                                    .groupby(['state','city', 'last_updated'])['deaths']\
+                                                    .sum()\
+                                                    .reset_index()
+
+    df_cities_deaths['rolling_deaths_new'] = df_cities_deaths.groupby('city', 
+                                                        as_index=False, 
+                                                        group_keys=False)\
+                                               .apply(lambda x : get_rolling_amount(x,5, 'last_updated', 'deaths'))
+
+
+    return  plot_cities_deaths_heatmap(df_cities_deaths,
+                               state,
+                               place_type='city',
+                               col_time='last_updated',
+                               min_deaths=70,
+                               title = 'Distribuição de novas mortes municipal (mavg = 5 days)',
+                               colors='temps')    
 
 def prepare_countries_heatmap(df, mavg_days=5):
 
@@ -442,11 +471,6 @@ def plot_countries_heatmap(t, place_type, min_deaths, title,save_img=False):
 
 
 
-
-
-
-
-
 def var_through_time(t,place_type,col_time,var,norm=False):
     if norm:
         df_tt = t.reset_index()\
@@ -513,33 +537,7 @@ def data_slider(geodf, geojson, Z, cmap,txt, cbar_title, title,locmode='geojson-
     return data_slider, layout
 
 
-'''
-df2 = pd.read_csv('http://localhost:80/br/cities/cases/full')
-df_bystate = df2[~df2['deaths'].isnull()][['state', 'last_updated','state_notification_rate','last_available_death_rate', 'deaths','new_deaths']]\
-                                                .groupby(['state', 'last_updated', 'state_notification_rate'])['deaths']\
-                                                .sum()\
-                                                .reset_index()
 
-
-vtt = var_through_time(df_bystate,
-                 place_type='state',
-                 col_time='last_updated',
-                 var='deaths')
-
-year = 2018
-types = {
-    'States': geobr.read_state(code_state='all', year=year)
-}
-df1 = types['States']
-df1 = df1.sort_values('abbrev_state').reset_index(drop=True)
-
-gdf = gpd.GeoDataFrame(df1[['abbrev_state','geometry']])
-jdf = json.loads(df1[['abbrev_state','geometry']].to_json())
-cmap = 'temps'
-dates = vtt.columns
-Title = "Total de mortos até {}".format(dates[-1])
-cbar_title = 'Numero de mortos'
-'''
 def main():
 
     utils.localCSS("style.css")
@@ -568,7 +566,7 @@ def main():
     ,  unsafe_allow_html=True)
     prepare_heatmap(df)
 
-
+    prepare_cities_heatmap(df,'SP')
 
 '''
     ds, layout = data_slider(geodf = gdf,
