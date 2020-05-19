@@ -3,9 +3,13 @@
 **⚠️ Todos os passos abaixos devem ser seguidos em ordem para garantir a estabilidade do app! ⚠️**
 
 1️⃣ [Criar um branch para suas análises](#1-criando-seu-branch)
+
 2️⃣ [Ativar o ambiente virtual de modelagem](#2-ativando-ambiente-de-modelagem)
+
 3️⃣ [Criar seu notebook em `analysis`](#3-criando-seu-notebook)
+
 4️⃣ [Puxar os dados da API](#4-puxando-dados-da-api)
+
 5️⃣ [Subir sua análise no repo via _pull request_](#5-subindo-análise-no-repositório)
 
 ### 1. Criando seu branch
