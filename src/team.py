@@ -33,6 +33,11 @@ def main():
                 "bio":  "<b>Gabriel Saruhashi</b><br><i>Voluntário Desenvolvimento FE</i><br>Graduando em Ciência da Computação e Psicologia na Yale University"
         },
 
+        "joao_abreu": {
+            "foto": "https://media-exp1.licdn.com/dms/image/C4E03AQF-9YgG5RDaMA/profile-displayphoto-shrink_400_400/0?e=1595462400&v=beta&t=DqvapZaWe1nRo9HgQS6bmZtX8U-j1DmvV2RbE37oY-4",
+            "bio": "<b>João Abreu</b><br><i>Coordenação</i><br>Co-fundador da Impulso e Mestre em Desenvolvimento Internacional pela Universidade de Harvard"
+        },
+
         "joao_carabetta": {
             "foto": "https://media-exp1.licdn.com/dms/image/C4D03AQF8rJe40DpQqA/profile-displayphoto-shrink_200_200/0?e=1591833600&v=beta&t=6smhmNk7Ppktq5cX4vxhD4x-A6mMTdZnIAEu5DlV18g",
             "bio": "<b>João Carabetta</b><br><i>Voluntário Desenvolvimento BE</i><br>Mestre em Matemática Aplicada pela FGV"
@@ -45,7 +50,7 @@ def main():
 
         "paula": {
             "foto": "https://media-exp1.licdn.com/dms/image/C4D03AQG8RMTG5WMF3A/profile-displayphoto-shrink_800_800/0?e=1595462400&v=beta&t=1g8QyLGjF0NiGlhJeud0PKtdSIMnu9_RlpFiZNOa7tI",
-            "bio": "<b>Paula Minardi Fonseca</b><br><i>Programa Embaixadores</i><br>Mestre em Administração Financeira no Insper"
+            "bio": "<b>Paula Minardi Fonseca</b><br><i>Programa Embaixadores</i><br>Mestre em Administração Financeira pelo Insper"
         },
 
         "sarah": {
@@ -69,7 +74,7 @@ def main():
     def quem_somos(time):
         text = ""
         for nome, info in time.items():
-            text += "<div class='profile'><img class='profile-photo' src='{}'/><span class='profile-name'>{}</span></div>".format(
+            text += "<div class='profile'><img class='profile-photo' src='{}'/><br><span class='profile-name'>{}</span></div>".format(
                 time[nome]["foto"], 
                 time[nome]["bio"]
             )
