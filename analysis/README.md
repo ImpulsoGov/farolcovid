@@ -12,7 +12,7 @@
 
 5️⃣ [Subir sua análise no repo via _pull request_](#5-subindo-análise-no-repositório)
 
-### 1. Criando seu branch
+## 1. Criando seu branch
 
 Depois de clonar o repositório no seu computador, crie uma branch para desenvolver suas análises.
 
@@ -22,7 +22,7 @@ $ git checkout -b analysis_[usuario] # ex: git checkout -b analysis_fernandascov
 
 💬 Concentre suas análises nesse branch para evitar problemas de versionamento
 
-### 2. Ativando ambiente de modelagem
+## 2. Ativando ambiente de modelagem
 
 ```bash
 # Instale o 'make'
@@ -40,7 +40,7 @@ $ jupyter notebook
 # Mude o kernel do notebook para venvanalysis
 ```
 
-### 3. Criando seu notebook
+## 3. Criando seu notebook
 
 *Todos os notebooks devem estar na pasta `analysis`*. Para subir o notebook no repositório, o mesmo deve ter:
 
@@ -49,7 +49,7 @@ $ jupyter notebook
 
 - Primeira célula deve conter a descrição do notebook!
 
-### 4. Puxando dados da API
+## 4. Puxando dados da API
 
 Todos os dados da API podem ser acessados aqui: http://datasource.coronacidades.org:7000/, veja a lista de tabelas [aqui](https://github.com/ImpulsoGov/simulacovid-datasource/blob/master/README.md).
 
@@ -59,7 +59,7 @@ Todos os dados da API podem ser acessados aqui: http://datasource.coronacidades.
 - Caso você gere arquivos na sua análise, coloque dentro da pasta `analysis/data/output`
 
 
-#### 5. Subindo análise no repositório
+## 5. Subindo análise no repositório
 
 Tudo pronto para mostrar suas análises para outr@s colaborador@s? Então, no sua cópia local, adicione os arquivos para criar o _pull request_:
 
