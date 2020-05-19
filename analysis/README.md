@@ -20,6 +20,19 @@ Depois de clonar o repositório no seu computador, crie uma branch para desenvol
 $ git checkout -b analysis_[usuario] # ex: git checkout -b analysis_fernandascovino
 ```
 
+Caso já tenha passado um tempo que você criou o branch e queira subir outro notebook, lembre-se puxar as atualizações do `master` para seu branch:
+
+```bash
+$ git checkout analysis_[usuario] # ex: git checkout -b analysis_fernandascovino
+
+$ git pull # ex: git checkout -b analysis_fernandascovino
+
+$ git merge master
+
+# Para checar as mudanças
+$ git status
+```
+
 💬 Concentre suas análises nesse branch para evitar problemas de versionamento
 
 ## 2. Ativando ambiente de modelagem
