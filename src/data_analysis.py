@@ -24,7 +24,7 @@ def _generate_hovertext(df_to_plotly):
         hovertext.append(list())
         for xi, xx in enumerate(df_to_plotly["x"]):
             hovertext[-1].append(
-                "<b>{}<b>Data: {}Percentual do máximo: {}".format(
+                "<b>{}</b><br>Data: {}<br>Percentual do máximo: {}".format(
                     yy, str(xx)[:10], round(df_to_plotly["z"][yi][xi], 2)
                 )
             )
@@ -77,6 +77,11 @@ def plot_heatmap(df, place_type, legend, title=None, group=None):
         xaxis="x2",
         yaxis="y2",
         orientation="h",
+        hoverinfo="text",
+        hovertext=[
+            "{}: {} mortes até hoje".format(i[0], i[1])
+            for i in zip(states_total_deaths.index, states_total_deaths)
+        ],
     )
 
     d = [trace1, trace2]
