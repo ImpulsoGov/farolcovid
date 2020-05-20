@@ -62,6 +62,18 @@ def plot_heatmap(df, place_type, legend, title=None, group=None):
         .sort_values()
     )
 
+    # Ordena por: 1. Dia do máximo, 2. Quantidade de Mortes
+    sorted_index = (
+        pivot.loc[states_total_deaths.index]
+        .idxmax(axis=1)
+        .to_frame()
+        .merge(states_total_deaths.to_frame(), left_index=True, right_index=True)
+        .sort_values(by=[0, col_deaths])
+        .index
+    )
+
+    states_total_deaths = states_total_deaths.reindex(sorted_index)
+
     data = _df_to_plotly(pivot.loc[states_total_deaths.index])
     trace1 = go.Heatmap(
         data,
@@ -151,9 +163,9 @@ def prepare_heatmap(df, place_type, group=None, mavg_days=5):
             maior número de mortes por dia observado no município
             até hoje</b>.
             <br><br>
-            Os municípios estão ordenadas pelo número de mortos total, 
-            ou seja, os município com mais mortes nominais. {}
-            é o município com o maior número de mortos, com: <i>{}</i>. 
+            Os municípios estão ordenadas pelo dia que atingiu o máximo de mortes, 
+            ou seja, municípios no pico de mortes aparecerão no topo. {}
+            é o município com o maior número de mortos, com: <i>{}</i>
             e o estado totaliza: <i>{}</i>.
             <br><br>
             <i>Última atualização: {}</i>
@@ -173,9 +185,9 @@ def prepare_heatmap(df, place_type, group=None, mavg_days=5):
             <b>quanto mais vermelho, mais próximo está o valor do
             maior número de mortes por dia observado na UF até hoje</b>.
             <br><br>
-            As UFs estão ordenadas pelo número de mortos total,
-            ou seja, os estados com mais mortes nominais. {}
-            é o estado com o maior número de mortos, com: <i>{}</i>. 
+            As UFs estão ordenadas pelo dia que atingiu o máximo de mortes, 
+            ou seja, UFs no pico de mortes aparecerão no topo. {}
+            é o estado com o maior número de mortos, com: <i>{}</i>
             e o Brasil totaliza: <i>{}</i>.
             <br><br>
             <i>Última atualização: {}</i>
@@ -196,9 +208,9 @@ def prepare_heatmap(df, place_type, group=None, mavg_days=5):
             mais próximo está o valor do maior número de mortes por
             dia observado na UF até hoje</b>.
             <br><br>
-            Os países estão ordenadas pelo número de mortos total,
-            ou seja, os países com mais mortes nominais. {}
-            é o país com o maior número de mortos, com: <i>{}</i>. 
+            Os países estão ordernados pelo dia que atingiu o máximo de mortes,
+            ou seja, os países no pico de mortes aparecerão no topo. {}
+            é o país com o maior número de mortos, com: <i>{}</i>
             e o mundo totaliza: <i>{}</i>.
             <br><br>
             <i>Última atualização: {}</i>
