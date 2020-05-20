@@ -4,6 +4,8 @@ from datetime import timedelta
 from models import SimulatorOutput, ContainmentStrategy, ResourceAvailability, BackgroundColor, Logo, Link, Indicator, Alert, RiskBackground, RiskLabel, Illustration, Product
 from typing import List, Dict
 import re
+import numpy as np
+from simulation import calculate_recovered
 
 '''Helper Functions'''
 def make_clickable(text, link):
@@ -41,6 +43,65 @@ def genHeroSection(title: str, subtitle: str):
                 </div>
         </div>
         ''', unsafe_allow_html=True)
+
+
+def genInputFields(locality, user_input, cities_filtered, selected_region, config):
+        if not np.all(cities_filtered['last_updated'].isna()):
+                last_update_cases = cities_filtered['last_updated'].max().strftime('%d/%m')
+
+        sources = cities_filtered[[c for c in cities_filtered.columns if (('author' in c) or ('last_updated_' in c))]]
+
+        # SOURCES USER INPUT
+        source_beds = sources[['author_number_beds', 'last_updated_number_beds']].drop_duplicates()
+        authors_beds = source_beds.author_number_beds.str.cat(sep=', ')
+
+        source_ventilators = sources[['author_number_ventilators', 'last_updated_number_ventilators']].drop_duplicates()
+        authors_ventilators = source_ventilators.author_number_ventilators.str.cat(sep=', ')
+
+        if locality == 'Brasil':
+                authors_beds = 'SUS e Embaixadores'
+                authors_ventilators = 'SUS e Embaixadores'
+
+        user_input['n_beds'] = st.number_input(
+                f"Número de leitos destinados aos pacientes com Covid-19 (fonte: {authors_beds}, atualizado: {source_beds.last_updated_number_beds.max().strftime('%d/%m')})"
+                , 0, None,  int(selected_region['number_beds']))
+
+        user_input['n_ventilators'] = st.number_input(
+                f"Número de ventiladores destinados aos pacientes com Covid-19 (fonte: {authors_ventilators}, atualizado: {source_ventilators.last_updated_number_ventilators.max().strftime('%d/%m')}):"
+                , 0, None, int(selected_region['number_ventilators']))
+
+
+        # POP USER INPUTS
+        user_input['population_params'] = {'N': int(selected_region['population'])}
+        user_input['population_params']['D'] = st.number_input('Mortes confirmadas:', 0, None, int(selected_region['deaths']))
+        
+        # get infected cases
+        infectious_period = config['br']['seir_parameters']['severe_duration'] + config['br']['seir_parameters']['critical_duration']
+        
+        if selected_region['confirmed_cases'] == 0:
+                st.write(f'''<div class="base-wrapper">
+                Seu município ou regional de saúde ainda não possui casos reportados oficialmente. Portanto, simulamos como se o primeiro caso ocorresse hoje.
+                <br><br>Caso queria, você pode mudar esse número abaixo:
+                        </div>''', unsafe_allow_html=True)
+
+                user_input['population_params']['I'] = st.number_input('Casos ativos estimados:', 0, None, 1)
+
+        else:
+                user_input['population_params']['I'] = int(selected_region['infectious_period_cases'] / user_input['notification_rate'])
+
+                st.write(f'''<div class="base-wrapper">
+                O número de casos confirmados oficialmente no seu município ou regional de saúde é de {int(selected_region['confirmed_cases'].sum())} em {last_update_cases}. 
+                Dada a progressão clínica da doença (em média, {infectious_period} dias) e a taxa de notificação ajustada para a região ({int(100*user_input['notification_rate'])}%), 
+                <b>estimamos que o número de casos ativos é de {user_input['population_params']['I']}</b>.
+                <br>Caso queria, você pode mudar esse número para a simulação abaixo:
+                        </div>''', unsafe_allow_html=True)
+
+                user_input['population_params']['I'] = st.number_input('Casos ativos estimados:', 0, None, user_input['population_params']['I'])
+        
+        # calculate recovered cases
+        user_input = calculate_recovered(user_input, selected_region, user_input['notification_rate'])
+        return user_input
+
 
 def genIndicatorCard(indicator: Indicator):
         return f'''<div class="indicator-card flex flex-column ml">

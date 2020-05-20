@@ -106,7 +106,8 @@ def main():
 
     selected_region = cities_filtered.sum(numeric_only=True)
 
-    # GET NOTIFICATION RATE & Rt
+    # GET NOTIFICATION RATE & Rt 
+
     if len(cities_filtered) > 1: # pega taxa do estado quando +1 municipio selecionado
             user_input["notification_rate"] = round(cities_filtered['state_notification_rate'].mean(), 2)
             rt = df_rt_states[df_rt_states["state"] == cities_filtered["state"].unique()[0]]
@@ -124,6 +125,19 @@ def main():
     else:
         indicators["rt"] = update_indicator(IndicatorType.RT.name, indicators["rt"], metric=(rt.iloc[-1]["Rt_most_likely"]), display=f'{str(round(rt.iloc[-1]["Rt_low_95"], 1))} - {str(round(rt.iloc[-1]["Rt_high_95"], 1))}')
         indicators['subnotification_rate'] = update_indicator(IndicatorType.SUBNOTIFICATION_RATE.name, indicators["subnotification_rate"], metric=(1.0 - user_input["notification_rate"]), display=int((1.0 - user_input["notification_rate"]) * 10))
+
+    # CUSTOMIZE INPUT SECTION
+
+    
+
+    utils.genInputCustomizationSectionHeader(locality)
+    
+    
+    user_input = utils.genInputFields(locality, user_input, cities_filtered, selected_region, config)
+    
+    
+    # AMBASSADOR SECTION
+    utils.genAmbassadorSection()
 
     # Populating base indicator template
     dday_beds_best, dday_beds_worst = dday_city(user_input, selected_region, config, supply_type="n_beds")
