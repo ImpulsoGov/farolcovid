@@ -108,7 +108,7 @@ IndicatorCards: Dict[str, Indicator] = {
 }
 
 class Product:
-    def __init__(self, name, caption, image: Illustration,  recommendation=""):
+    def __init__(self, name, caption: str, image: Illustration,  recommendation=""):
         self.recommendation = recommendation
         self.name=name
         self.caption = caption

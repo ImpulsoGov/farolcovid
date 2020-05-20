@@ -133,10 +133,10 @@ def main():
    
     products = ProductCards;
     utils.genProductsSection(products)
-    product = st.selectbox( 'Como você gostaria de prosseguir?', ('Contenção', 'Reabertura'), 0)
-
+    product = st.selectbox( 'Como você gostaria de prosseguir?', ('Contenção', 'Reabertura'))
+    
     if product == 'Contenção':
-        sm.main()
+        sm.main(user_input=user_input, locality=locality, cities_filtered=cities_filtered, config=config)
     
     # elif product == 'Reabertura':
         # so.main()

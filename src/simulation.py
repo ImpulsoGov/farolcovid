@@ -46,41 +46,43 @@ def calculate_recovered(user_input, selected_region, notification_rate):
         
         return user_input
 
-def main():
-        utils.localCSS("style.css")
-        utils.localCSS("icons.css")
-
-
-        # HEADER
-        utils.genHeroSection("Simula", "Um simulador da demanda por leitos hospitalares e ventiladores.")
-        utils.genVideoTutorial()
-
-
-        # GET DATA
-        config = yaml.load(open('configs/config.yaml', 'r'), Loader = yaml.FullLoader)
-        cities = loader.read_data('br', config, endpoint=config['br']['api']['endpoints']['simulacovid'])
-
-
-        # REGION/CITY USER INPUT
-        user_input = dict()
+def main(user_input, locality, cities_filtered, config):
         
-        utils.genStateInputSectionHeader()
+        # utils.localCSS("style.css")
+        # utils.localCSS("icons.css")
 
-        user_input['state'] = st.selectbox('Estado', add_all(cities['state_name'].unique()))
-        cities_filtered = filter_options(cities, user_input['state'], 'state_name')
         
-        utils.genMunicipalityInputSection()
+        # # HEADER
+        # utils.genHeroSection("Simula", "Um simulador da demanda por leitos hospitalares e ventiladores.")
+        # utils.genVideoTutorial()
 
-        user_input['region'] = st.selectbox('Região SUS', add_all(cities_filtered['health_system_region'].unique()))
-        cities_filtered = filter_options(cities_filtered, user_input['region'], 'health_system_region')
 
-        user_input['city'] = st.selectbox('Município', add_all(cities_filtered['city_name'].unique()))
-        cities_filtered = filter_options(cities_filtered, user_input['city'], 'city_name')
+        # # GET DATA
+        # config = yaml.load(open('configs/config.yaml', 'r'), Loader = yaml.FullLoader)
+        # cities = loader.read_data('br', config, endpoint=config['br']['api']['endpoints']['simulacovid'])
+
+
+        # # REGION/CITY USER INPUT
+        # user_input = dict()
+        
+        # utils.genStateInputSectionHeader()
+
+        # user_input['state'] = st.selectbox('Estado', add_all(cities['state_name'].unique()))
+        # cities_filtered = filter_options(cities, user_input['state'], 'state_name')
+        
+        # utils.genMunicipalityInputSection()
+
+        # user_input['region'] = st.selectbox('Região SUS', add_all(cities_filtered['health_system_region'].unique()))
+        # cities_filtered = filter_options(cities_filtered, user_input['region'], 'health_system_region')
+
+        # user_input['city'] = st.selectbox('Município', add_all(cities_filtered['city_name'].unique()))
+        # cities_filtered = filter_options(cities_filtered, user_input['city'], 'city_name')
+        
 
         sources = cities_filtered[[c for c in cities_filtered.columns if (('author' in c) or ('last_updated_' in c))]]
  
         selected_region = cities_filtered.sum(numeric_only=True)
-
+       
 
         # GET LAST UPDATE DATE
         if not np.all(cities_filtered['last_updated'].isna()):
@@ -97,8 +99,8 @@ def main():
                 notification_rate = round(cities_filtered['notification_rate'].values[0], 4)
 
         # pick locality according to hierarchy
-        locality = utils.choose_place(user_input['city'], user_input['region'], user_input['state'])
-
+        #locality = utils.choose_place(user_input['city'], user_input['region'], user_input['state'])
+        locality=locality
         st.write('<br/>', unsafe_allow_html=True)
 
         utils.genInputCustomizationSectionHeader(locality)
@@ -185,10 +187,10 @@ def main():
                                         beds=user_input['n_beds'], 
                                         ventilators=user_input['n_ventilators'])
         
-        utils.genSimulationSection(int(user_input['population_params']['I']), locality, resources, worst_case, best_case)
+        # utils.genSimulationSection(int(user_input['population_params']['I']), locality, resources, worst_case, best_case)
         
-        utils.genActNowSection(locality, worst_case)
-        utils.genStrategiesSection(Strategies)
+        # utils.genActNowSection(locality, worst_case)
+        # utils.genStrategiesSection(Strategies)
 
 
         st.write('''

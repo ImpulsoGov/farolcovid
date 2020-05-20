@@ -900,4 +900,5 @@ header>.toolbar { /* Hide toolbar menu */
     height: 400px;
     border-radius: 15px;
     margin-right: var(--main-item-margin);
+    padding: var(--main-padding)
 }
