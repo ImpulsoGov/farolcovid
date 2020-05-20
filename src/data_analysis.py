@@ -32,7 +32,7 @@ def _generate_hovertext(df_to_plotly):
     return hovertext
 
 
-def plot_heatmap(df, place_type, legend, min_deaths=0, title=None, group=None):
+def plot_heatmap(df, place_type, legend, title=None, group=None):
 
     if place_type == "state" or place_type == "city":
         col_date = "last_updated"
@@ -54,16 +54,15 @@ def plot_heatmap(df, place_type, legend, min_deaths=0, title=None, group=None):
     pivot = pivot.loc[:, (pivot != 0).any(axis=0)]
 
     # entender o que acontece aqui
-    states_total_deaths = [
-        df[df[place_type] == x][col_deaths].max() for x in pivot.index
-    ]
+    states_total_deaths = (
+        df.groupby(place_type)[col_deaths]
+        .max()
+        .loc[pivot.index]
+        .sort_values(ascending=False)[:30]
+        .sort_values()
+    )
 
-    idy = np.argsort(states_total_deaths)
-    idx = np.array(states_total_deaths, dtype=np.int32)[idy] > min_deaths
-
-    states_total_deaths = np.array(states_total_deaths)
-
-    data = _df_to_plotly(pivot.iloc[idy, :].loc[idx, :])
+    data = _df_to_plotly(pivot.loc[states_total_deaths.index])
     trace1 = go.Heatmap(
         data,
         hoverinfo="text",
@@ -73,8 +72,8 @@ def plot_heatmap(df, place_type, legend, min_deaths=0, title=None, group=None):
     )
 
     trace2 = go.Bar(
-        x=states_total_deaths[idy][idx],
-        y=pivot.iloc[idy, :].loc[idx, :].index,
+        x=states_total_deaths,
+        y=states_total_deaths.index,
         xaxis="x2",
         yaxis="y2",
         orientation="h",
@@ -115,7 +114,7 @@ def _generate_mvg_deaths(df, place_type, mavg_days):
     return df
 
 
-def prepare_heatmap(df, place_type, min_deaths=0, group=None, mavg_days=5):
+def prepare_heatmap(df, place_type, group=None, mavg_days=5):
 
     refresh = df["data_last_refreshed"][0]
 
@@ -140,8 +139,7 @@ def prepare_heatmap(df, place_type, min_deaths=0, group=None, mavg_days=5):
         legend = """
         <div class="base-wrapper">
             O gráfico abaixo mostra a média do número de mortes
-            diárias dos últimos cinco dias em cada município com mais
-            de 10 mortes, desde a data da primeira morte reportada.
+            diárias dos últimos cinco dias para os 30 municípios com mais mortes, desde a data da primeira morte reportada.
             Para comparação, os números foram normalizados pelo 
             maior valor encontrado em cada município:
             <b>quanto mais vermelho, mais próximo está o valor do
@@ -185,9 +183,9 @@ def prepare_heatmap(df, place_type, min_deaths=0, group=None, mavg_days=5):
         <div class="base-wrapper">
             <span class="section-header primary-span">MORTES DIÁRIAS POR PAÍS</span>
             <br><br>
-            O gráfico ao lado mostra a média do número de mortes
-            diárias dos últimos cinco dias para cada país com mais
-            de 1000 mortes, desde a data da primeira morte reportada.
+            O gráfico abaixo mostra a média do número de mortes
+            diárias dos últimos cinco dias para os 30 países com mais 
+            mortes, desde a data da primeira morte reportada.
             Para comparação, os números foram normalizados pelo maior
             valor encontrado em cada país:<b> quanto mais vermelho,
             mais próximo está o valor do maior número de mortes por
@@ -215,7 +213,7 @@ def prepare_heatmap(df, place_type, min_deaths=0, group=None, mavg_days=5):
     return plot_heatmap(
         df,
         place_type,
-        min_deaths=min_deaths,
+        # min_deaths=min_deaths,
         legend=legend,
         # title ="Distribuição de novas mortes nas UFs (mavg = 5 days)",
     )
@@ -243,7 +241,7 @@ def main():
     user_uf = st.selectbox("Selecione um estado para análise:", utils.get_ufs_list())
 
     prepare_heatmap(
-        br_cases, place_type="city", min_deaths=10, group=user_uf,
+        br_cases, place_type="city", group=user_uf,
     )
 
     prepare_heatmap(
@@ -255,7 +253,6 @@ def main():
             "br", config, endpoint=config["br"]["api"]["endpoints"]["analysis"]["owid"]
         ),
         place_type="country_pt",
-        min_deaths=1000,
     )
 
 
