@@ -17,6 +17,21 @@ def _df_to_plotly(df):
     return {"z": df.values.tolist(), "x": df.columns.tolist(), "y": df.index.tolist()}
 
 
+def _generate_hovertext(df_to_plotly):
+
+    hovertext = list()
+    for yi, yy in enumerate(df_to_plotly["y"]):
+        hovertext.append(list())
+        for xi, xx in enumerate(df_to_plotly["x"]):
+            hovertext[-1].append(
+                "<b>{}<b><br>Data: {}<br>Percentual do máximo: {}".format(
+                    yy, str(xx)[:10], round(df_to_plotly["z"][yi][xi], 2)
+                )
+            )
+
+    return hovertext
+
+
 def plot_heatmap(df, place_type, legend, min_deaths=0, title=None, group=None):
 
     if place_type == "state" or place_type == "city":
@@ -57,8 +72,11 @@ def plot_heatmap(df, place_type, legend, min_deaths=0, title=None, group=None):
 
     states_total_deaths = np.array(states_total_deaths)
 
+    data = _df_to_plotly(pivot.iloc[idy, :].loc[idx, :])
     trace1 = go.Heatmap(
-        _df_to_plotly(pivot.iloc[idy, :].loc[idx, :]),
+        data,
+        hoverinfo="text",
+        hovertext=_generate_hovertext(data),
         colorscale="temps",
         showscale=False,
     )
