@@ -24,7 +24,7 @@ def _generate_hovertext(df_to_plotly):
         hovertext.append(list())
         for xi, xx in enumerate(df_to_plotly["x"]):
             hovertext[-1].append(
-                "<b>{}<b><br>Data: {}<br>Percentual do máximo: {}".format(
+                "<b>{}<b>Data: {}Percentual do máximo: {}".format(
                     yy, str(xx)[:10], round(df_to_plotly["z"][yi][xi], 2)
                 )
             )
@@ -38,7 +38,7 @@ def plot_heatmap(df, place_type, legend, min_deaths=0, title=None, group=None):
         col_date = "last_updated"
         col_deaths = "deaths"
 
-    if place_type == "iso_code":
+    if place_type == "country_pt":
         col_date = "date"
         col_deaths = "total_deaths"
 
@@ -52,15 +52,6 @@ def plot_heatmap(df, place_type, legend, min_deaths=0, title=None, group=None):
 
     # remove days with all states zero
     pivot = pivot.loc[:, (pivot != 0).any(axis=0)]
-
-    # TODO: arrumar essa selecao e ordenacao dos locais
-    place_max_deaths = (
-        df.groupby(place_type)[[col_deaths]]
-        .max()
-        .reset_index()
-        .sort_values(col_deaths)
-        .iloc[-1][place_type]
-    )
 
     # entender o que acontece aqui
     states_total_deaths = [
@@ -93,60 +84,22 @@ def plot_heatmap(df, place_type, legend, min_deaths=0, title=None, group=None):
     layout = go.Layout(
         title=title,
         plot_bgcolor="rgba(0,0,0,0)",
-        # autosize= True,
-        width=1200,
+        # autosize=True,
+        # width=1000,
         height=700,
-        margin={"l": 600, "t": 50},
+        margin={"l": 100, "r": 100, "t": 30},
         xaxis=dict(domain=[0, 0.8]),
         xaxis2=dict(domain=[0.85, 1]),
         yaxis=dict(tickmode="linear"),
         # yaxis2=dict(tickmode="linear", anchor="x2"),
     )
 
-    legend = legend.format(
-        place_max_deaths,
-        states_total_deaths.max(),
-        states_total_deaths.sum(),
-        pivot.columns[-1],
-    )
-
     fig = go.Figure(data=d, layout=layout)
 
-    if place_type == "city":
-        fontsize = 11
-    else:
-        fontsize = 12
-
-    fig.add_annotation(
-        dict(
-            font=dict(color="black", size=fontsize),
-            x=-1.1,
-            y=1,
-            showarrow=False,
-            text=legend,
-            xref="paper",
-            yref="paper",
-            align="left",
-        )
-    )
-
-    # fig.add_annotation(
-    #     dict(
-    #         font=dict(color="black", size=14),
-    #         x=-1.1,
-    #         y=1,
-    #         showarrow=False,
-    #         text=legend,
-    #         xref="paper",
-    #         yref="paper",
-    #         align="left",
-    #     )
-    # )
-
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, use_container_width=True)
 
 
-def _generate_pivot_table(df, place_type, mavg_days):
+def _generate_mvg_deaths(df, place_type, mavg_days):
 
     df = (
         df[~df["deaths"].isnull()][[place_type, "last_updated", "deaths"]]
@@ -164,70 +117,100 @@ def _generate_pivot_table(df, place_type, mavg_days):
 
 def prepare_heatmap(df, place_type, min_deaths=0, group=None, mavg_days=5):
 
+    refresh = df["data_last_refreshed"][0]
+
     if place_type == "city":
-        df = _generate_pivot_table(df[df["state"] == group], place_type, mavg_days)
+        df = df[df["state"] == group]
+
+    if place_type == "city" or place_type == "state":
+        df = _generate_mvg_deaths(df, place_type, mavg_days)
+        col_date = "last_updated"
+        col_deaths = "deaths"
+
+    if place_type == "country_pt":
+        col_date = "date"
+        col_deaths = "total_deaths"
+
+    place_max_deaths = (
+        df.groupby(place_type)[[col_deaths]].max().reset_index().sort_values(col_deaths)
+    )
+
+    if place_type == "city":
 
         legend = """
-            O gráfico ao lado mostra a média do número de mortes<br>
-            diárias dos últimos cinco dias em cada município com mais<br>
-            de 10 mortes, desde a data da primeira morte reportada.<br>
-            Para comparação, os números foram normalizados pelo <br>
-            maior valor encontrado em cada município:<br>
-            <b>quanto mais vermelho, mais próximo está o valor do<br>
-            maior número de mortes por dia observado no município<br>
+        <div class="base-wrapper">
+            O gráfico abaixo mostra a média do número de mortes
+            diárias dos últimos cinco dias em cada município com mais
+            de 10 mortes, desde a data da primeira morte reportada.
+            Para comparação, os números foram normalizados pelo 
+            maior valor encontrado em cada município:
+            <b>quanto mais vermelho, mais próximo está o valor do
+            maior número de mortes por dia observado no município
             até hoje</b>.
             <br><br>
-            Os municípios estão ordenadas pelo número de mortos total, <br>
-            ou seja, os município com mais mortes nominais. {}<br>
-            é o município com o maior número de mortos, com: <i>{}</i>. <br>
+            Os municípios estão ordenadas pelo número de mortos total, 
+            ou seja, os município com mais mortes nominais. {}
+            é o município com o maior número de mortos, com: <i>{}</i>. 
             e o estado totaliza: <i>{}</i>.
             <br><br>
-
             <i>Última atualização: {}</i>
+        </div>
         """
 
     if place_type == "state":
-        df = _generate_pivot_table(df, place_type, mavg_days)
 
         legend = """
-            O gráfico ao lado mostra a média do número de mortes<br>
-            diárias dos últimos cinco dias em cada UF, desde a data da<br>
-            primeira morte reportada. Para comparação, os números foram<br>
-            normalizados pelo maior valor encontrado em cada UF:<br>
-            <b>quanto mais vermelho, mais próximo está o valor do<br>
+        <div class="base-wrapper">
+            <span class="section-header primary-span">MORTES DIÁRIAS POR ESTADO</span>
+            <br><br>
+            O gráfico abaixo mostra a média do número de mortes
+            diárias dos últimos cinco dias em cada UF, desde a data da
+            primeira morte reportada. Para comparação, os números foram
+            normalizados pelo maior valor encontrado em cada UF:
+            <b>quanto mais vermelho, mais próximo está o valor do
             maior número de mortes por dia observado na UF até hoje</b>.
             <br><br>
-            As UFs estão ordenadas pelo número de mortos total,<br>
-            ou seja, os estados com mais mortes nominais. {}<br>
-            é o estado com o maior número de mortos, com: <i>{}</i>. <br>
+            As UFs estão ordenadas pelo número de mortos total,
+            ou seja, os estados com mais mortes nominais. {}
+            é o estado com o maior número de mortos, com: <i>{}</i>. 
             e o Brasil totaliza: <i>{}</i>.
             <br><br>
-
             <i>Última atualização: {}</i>
+        </div>
         """
 
-    if place_type == "iso_code":
+    if place_type == "country_pt":
 
         legend = """
-            O gráfico ao lado mostra a média do número de mortes<br>
-            diárias dos últimos cinco dias para cada país com mais<br>
-            de 1000 mortes, desde a data da primeira morte reportada.<br>
-            Para comparação, os números foram normalizados pelo maior<br>
-            valor encontrado em cada país:<b> quanto mais vermelho,<br>
-            mais próximo está o valor do maior número de mortes por<br>
+        <div class="base-wrapper">
+            <span class="section-header primary-span">MORTES DIÁRIAS POR PAÍS</span>
+            <br><br>
+            O gráfico ao lado mostra a média do número de mortes
+            diárias dos últimos cinco dias para cada país com mais
+            de 1000 mortes, desde a data da primeira morte reportada.
+            Para comparação, os números foram normalizados pelo maior
+            valor encontrado em cada país:<b> quanto mais vermelho,
+            mais próximo está o valor do maior número de mortes por
             dia observado na UF até hoje</b>.
             <br><br>
-            Os países estão ordenadas pelo número de mortos total,<br>
-            ou seja, os países com mais mortes nominais. {}<br>
-            é o país com o maior número de mortos, com: <i>{}</i>. <br>
+            Os países estão ordenadas pelo número de mortos total,
+            ou seja, os países com mais mortes nominais. {}
+            é o país com o maior número de mortos, com: <i>{}</i>. 
             e o mundo totaliza: <i>{}</i>.
             <br><br>
-
             <i>Última atualização: {}</i>
+        </div>
         """
-        # .format(
-        #     min_deaths, states_total_deaths.max(), t.columns[-1]
-        # )
+
+    st.write(
+        legend.format(
+            place_max_deaths.iloc[-1][place_type],
+            place_max_deaths.max()[col_deaths],
+            place_max_deaths.sum()[col_deaths],
+            refresh[:10],
+        ),
+        unsafe_allow_html=True,
+    )
 
     return plot_heatmap(
         df,
@@ -236,37 +219,6 @@ def prepare_heatmap(df, place_type, min_deaths=0, group=None, mavg_days=5):
         legend=legend,
         # title ="Distribuição de novas mortes nas UFs (mavg = 5 days)",
     )
-
-
-ufs = [
-    "AC",
-    "AL",
-    "AM",
-    "AP",
-    "BA",
-    "CE",
-    "DF",
-    "ES",
-    "GO",
-    "MA",
-    "MG",
-    "MS",
-    "MT",
-    "PA",
-    "PB",
-    "PE",
-    "PI",
-    "PR",
-    "RJ",
-    "RN",
-    "RO",
-    "RR",
-    "RS",
-    "SC",
-    "SE",
-    "SP",
-    "TO",
-]
 
 
 def main():
@@ -288,39 +240,21 @@ def main():
         unsafe_allow_html=True,
     )
 
-    user_uf = st.selectbox("Selecione um estado para análise:", ufs)
+    user_uf = st.selectbox("Selecione um estado para análise:", utils.get_ufs_list())
 
     prepare_heatmap(
         br_cases, place_type="city", min_deaths=10, group=user_uf,
-    )
-
-    st.write(
-        """
-        <div class="base-wrapper">
-                <span class="section-header primary-span">MORTES DIÁRIAS POR ESTADO</span>
-        </div>
-        """,
-        unsafe_allow_html=True,
     )
 
     prepare_heatmap(
         br_cases, place_type="state",
     )
 
-    st.write(
-        """
-        <div class="base-wrapper">
-                <span class="section-header primary-span">MORTES DIÁRIAS POR PAÍS</span>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
     prepare_heatmap(
         loader.read_data(
             "br", config, endpoint=config["br"]["api"]["endpoints"]["analysis"]["owid"]
         ),
-        place_type="iso_code",
+        place_type="country_pt",
         min_deaths=1000,
     )
 
