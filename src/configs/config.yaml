@@ -27,6 +27,8 @@ br:
         local: http://localhost:7000/
         endpoints:
             simulacovid: "br/cities/simulacovid/main"
+            rt_cities: "br/cities/rt"
+            rt_states: "br/states/rt"
             analysis:
                 cases: "br/cities/cases/full"
                 owid: "world/owid/heatmap"
