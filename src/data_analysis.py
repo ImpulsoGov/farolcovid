@@ -536,6 +536,53 @@ def data_slider(geodf, geojson, Z, cmap,txt, cbar_title, title,locmode='geojson-
     
     return data_slider, layout
 
+def get_map(df, place_type, time_col,var, cmap, Title, cbar_title):
+    
+        
+    df_bystate = df[~df['deaths'].isnull()][['state', 'last_updated','state_notification_rate','last_available_death_rate', 'deaths','new_deaths']]\
+                                                    .groupby(['state', 'last_updated', 'state_notification_rate'])['deaths']\
+                                                    .sum()\
+                                                    .reset_index()
+
+    df_bystate['rolling_deaths_new'] = df_bystate.groupby(['state','last_updated'], 
+                                                        as_index=False, 
+                                                        group_keys=False)\
+                                            .apply(lambda x : get_rolling_amount(x,5, 'last_updated', 'deaths'))
+        
+    vtt = var_through_time(df_bystate,
+                 place_type=place_type,
+                 col_time=time_col,
+                 var=var)
+    
+    dates = vtt.columns
+    
+    if place_type == 'state':
+        year = 2018
+        types = {
+            'States': geobr.read_state(code_state='all', year=year)
+        }
+
+
+
+        df1 = types['States']
+        df1 = df1.sort_values('abbrev_state').reset_index(drop=True)
+
+        gdf = gpd.GeoDataFrame(df1[['abbrev_state','geometry']])
+        jdf = json.loads(df1[['abbrev_state','geometry']].to_json())
+
+        
+        ds, layout = data_slider(geodf = gdf,
+                     geojson = jdf,
+                     Z = vtt[dates[-10:]],
+                     cmap = cmap,
+                     txt = 'abbrev_state',
+                     cbar_title = cbar_title,
+                     title = Title,
+                     locmode='geojson-id')
+        
+        
+    fig = dict(data = ds,layout = layout)
+    st.plotly_chart(fig)
 
 
 def main():
@@ -546,7 +593,7 @@ def main():
     config = yaml.load(open('configs/config.yaml', 'r'), Loader = yaml.FullLoader)
 
     df = loader.read_data('br', config, endpoint=config['br']['api']['endpoints']['analysis'])
-    dfc = pd.read_csv('data/raw/owid-covid-data.csv')
+    dfc = pd.read_csv('../notebooks/data/raw/owid-covid-data.csv')
     st.write(
         """
         <div class="base-wrapper">
@@ -565,24 +612,18 @@ def main():
         """
     ,  unsafe_allow_html=True)
     prepare_heatmap(df)
+    get_map(df,
+    place_type='state',
+    time_col='last_updated',
+    var='deaths',
+    cmap='temps',
+    Title = 'Mortos por estado',
+    cbar_title='numero de mortes')
+
 
     prepare_cities_heatmap(df,'SP')
 
-'''
-    ds, layout = data_slider(geodf = gdf,
-                 geojson = jdf,
-                 Z = vtt[-10:],
-                 cmap = cmap,
-                 txt = 'abbrev_state',
-                 cbar_title = cbar_title,
-                 title = Title,
-                 locmode='geojson-id')
 
-    fig = dict(data = ds,layout = layout)
-
-    iplot(fig)
-
-'''
     # st.write('Dados atualizados para 10 de maio. Os dados dos dias mais recentes são provisórios e podem ser revisados para cima à medida que testes adicionais são processados.')
 
 if __name__ == "__main__":
