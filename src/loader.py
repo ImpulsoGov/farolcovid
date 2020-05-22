@@ -5,9 +5,9 @@ import os
 import yaml
 
 
-config = yaml.load(open("configs/config.yaml", "r"), Loader = yaml.FullLoader)
+config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
 
-@st.cache(allow_output_mutation=True)
+
 def read_data(country, config, endpoint):
 
     if os.getenv("IS_LOCAL") == "TRUE":
@@ -21,10 +21,12 @@ def read_data(country, config, endpoint):
     df = pd.read_csv(url)
 
     if "last_updated" in df.columns:
-            # fix types
-            df["last_updated"] = df["last_updated"].replace("0", np.nan)
-            # df["is_last"] = df["is_last"].astype(bool)
-            df[[c for c in df.columns if "last_updated" in c]] = df[[c for c in df.columns if "last_updated" in c]].apply(pd.to_datetime)
+        # fix types
+        df["last_updated"] = df["last_updated"].replace("0", np.nan)
+        # df["is_last"] = df["is_last"].astype(bool)
+        df[[c for c in df.columns if "last_updated" in c]] = df[
+            [c for c in df.columns if "last_updated" in c]
+        ].apply(pd.to_datetime)
 
     return df
 

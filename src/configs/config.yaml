@@ -27,7 +27,9 @@ br:
         local: http://localhost:80/
         endpoints:
             simulacovid: "br/cities/simulacovid/main"
-            analysis: "br/cities/cases/full"
+            analysis:
+                cases: "br/cities/cases/full"
+                owid: "world/owid/heatmap"
     drive_paths:
         cities_population: https://docs.google.com/spreadsheets/d/1k8mXuUggBuBEghHhhLrLtA-5wa4JsAc-D35S5bNlf24
         health_infrastructure: https://docs.google.com/spreadsheets/d/1JD9GREVkU_doNqQQvvA_NC18HhoulrxcJLTqxd07508
