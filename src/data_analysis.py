@@ -29,7 +29,6 @@ def _generate_hovertext(df_to_plotly):
                 )
             )
 
-<<<<<<< HEAD
     legend = """
         O gráfico ao lado mostra a média do número de mortes<br>
         diárias dos últimos cinco dias em cada UF, desde a data da<br>
@@ -75,9 +74,6 @@ def prepare_heatmap(df, mavg_days=5):
 
     return plot_deaths_heatmap2(df_deaths, 'state', title='Distribuição de novas mortes nas UFs (mavg = 5 days)')
 
-=======
-    return hovertext
->>>>>>> master
 
 
 def plot_heatmap(df, place_type, legend, title=None, group=None):
@@ -131,7 +127,6 @@ def plot_heatmap(df, place_type, legend, title=None, group=None):
         showscale=False,
     )
 
-<<<<<<< HEAD
     fig = go.Figure(data=d, layout=layout)
     fig.add_annotation(dict(font=dict(color="black",size=14),
                             x=-1.1,
@@ -255,36 +250,6 @@ def plot_countries_heatmap(t, place_type, min_deaths, title,save_img=False):
                            .fillna(0)\
                            .apply(lambda x: x/x.max(), axis=1)\
                            .dropna(how='all')
-=======
-    trace2 = go.Bar(
-        x=states_total_deaths,
-        y=states_total_deaths.index,
-        xaxis="x2",
-        yaxis="y2",
-        orientation="h",
-        hoverinfo="text",
-        hovertext=[
-            "{}: {} mortes até hoje".format(i[0], i[1])
-            for i in zip(states_total_deaths.index, states_total_deaths)
-        ],
-    )
-
-    d = [trace1, trace2]
-    layout = go.Layout(
-        title=title,
-        plot_bgcolor="rgba(0,0,0,0)",
-        # autosize=True,
-        # width=1000,
-        height=700,
-        margin={"l": 100, "r": 100, "t": 30},
-        xaxis=dict(domain=[0, 0.8]),
-        xaxis2=dict(domain=[0.85, 1]),
-        yaxis=dict(tickmode="linear"),
-        # yaxis2=dict(tickmode="linear", anchor="x2"),
-    )
-
-    fig = go.Figure(data=d, layout=layout)
->>>>>>> master
 
     st.plotly_chart(fig, use_container_width=True)
 
@@ -307,7 +272,6 @@ def _generate_mvg_deaths(df, place_type, mavg_days):
 
 def prepare_heatmap(df, place_type, group=None, mavg_days=5):
 
-<<<<<<< HEAD
 def var_through_time(t,place_type,col_time,var,norm=False):
     if norm:
         df_tt = t.reset_index()\
@@ -423,7 +387,6 @@ def get_map(df, place_type, time_col,var, cmap, Title, cbar_title):
 
 
 def main():
-=======
     refresh = df["data_last_refreshed"][0]
 
     if place_type == "city":
@@ -443,7 +406,6 @@ def main():
     )
 
     if place_type == "city":
->>>>>>> master
 
         legend = """
         <div class="base-wrapper">
@@ -466,30 +428,9 @@ def main():
 
     if place_type == "state":
 
-<<<<<<< HEAD
     df = loader.read_data('br', config, endpoint=config['br']['api']['endpoints']['analysis'])
     dfc = pd.read_csv('../notebooks/data/raw/owid-covid-data.csv')
     st.write(
-=======
-        legend = """
-        <div class="base-wrapper">
-            <span class="section-header primary-span">MORTES DIÁRIAS POR ESTADO</span>
-            <br><br>
-            O gráfico abaixo mostra a média do número de mortes
-            diárias dos últimos cinco dias em cada UF, desde a data da
-            primeira morte reportada. Para comparação, os números foram
-            normalizados pelo maior valor encontrado em cada UF:
-            <b>quanto mais vermelho, mais próximo está o valor do
-            maior número de mortes por dia observado na UF até hoje</b>.
-            <br><br>
-            As UFs estão ordenadas pelo dia que atingiu o máximo de mortes, 
-            ou seja, UFs no pico de mortes aparecerão no topo. {}
-            é o estado com o maior número de mortos, com: <i>{}</i>
-            e o Brasil totaliza: <i>{}</i>.
-            <br><br>
-            <i>Última atualização: {}</i>
-        </div>
->>>>>>> master
         """
 
     if place_type == "country_pt":
@@ -549,7 +490,6 @@ def main():
         <div class="base-wrapper">
                 <span class="section-header primary-span">MORTES DIÁRIAS POR MUNICÍPIO</span>
         </div>
-<<<<<<< HEAD
         """
     ,  unsafe_allow_html=True)
     prepare_heatmap(df)
@@ -560,38 +500,13 @@ def main():
     cmap='temps',
     Title = 'Mortos por estado',
     cbar_title='numero de mortes')
-=======
-        """,
-        unsafe_allow_html=True,
-    )
->>>>>>> master
 
     user_uf = st.selectbox("Selecione um estado para análise:", utils.get_ufs_list())
 
-<<<<<<< HEAD
     prepare_cities_heatmap(df,'SP')
 
 
     # st.write('Dados atualizados para 10 de maio. Os dados dos dias mais recentes são provisórios e podem ser revisados para cima à medida que testes adicionais são processados.')
-=======
-    prepare_heatmap(
-        br_cases, place_type="city", group=user_uf,
-    )
-
-    prepare_heatmap(
-        br_cases, place_type="state",
-    )
-
-    prepare_heatmap(
-        loader.read_data(
-            "br", config, endpoint=config["br"]["api"]["endpoints"]["analysis"]["owid"]
-        ),
-        place_type="country_pt",
-    )
-
-
-# st.write('Dados atualizados para 10 de maio. Os dados dos dias mais recentes são provisórios e podem ser revisados para cima à medida que testes adicionais são processados.')
->>>>>>> master
 
 if __name__ == "__main__":
     main()
