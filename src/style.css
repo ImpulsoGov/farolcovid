@@ -152,6 +152,9 @@
     margin-left: var(--main-item-margin);
 }
 
+.mr {
+    margin-right: var(--main-item-margin);
+}
 .mt {
     margin-top: var(--main-item-margin);
 }
@@ -213,6 +216,12 @@
 
 .flex-column {
     flex-direction: column;
+}
+
+@media only screen and (max-width: 425px) {
+    .flex-m-column {
+        flex-direction: column !important;
+    }
 }
 
 .flex-space-between {
@@ -431,6 +440,8 @@ header>.toolbar { /* Hide toolbar menu */
     }
 }
 
+
+
 /* Resources Output - Square Style */
 
 .locality-name {
@@ -581,6 +592,14 @@ header>.toolbar { /* Hide toolbar menu */
     color: var(--main-primary);
     background-color: white;
     text-decoration: none;
+}
+
+.secondary-badge {
+    color: var(--main-primary);
+    background-color: white;
+    border: 1px solid var(--main-primary);
+    padding: var(--minor-padding);
+    border-radius: var(--main-border-radius);
 }
 
 /* Simulation Output - Banner Style */
@@ -888,6 +907,21 @@ header>.toolbar { /* Hide toolbar menu */
     background-color: white;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
+
+
+.product-section {
+    margin-top: 400px;
+}
+@media only screen and (max-width: 425px) {
+    .indicator-card {
+        height: 350px;
+    }
+
+    .product-section {
+        margin-top: 1200px;
+    }
+}
+
 
 .risk-pill {
     width: 125px;

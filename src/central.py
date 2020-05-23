@@ -128,8 +128,6 @@ def main():
 
     # CUSTOMIZE INPUT SECTION
 
-    
-
     utils.genInputCustomizationSectionHeader(locality)
     
     
