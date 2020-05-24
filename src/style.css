@@ -934,7 +934,7 @@ header>.toolbar { /* Hide toolbar menu */
 
 .product-card {
     width: 400px;
-    height: 300px;
+    height: 350px;
     border-radius: 15px;
     margin-right: var(--main-item-margin);
     padding: var(--main-padding)

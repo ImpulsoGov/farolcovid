@@ -39,8 +39,8 @@ class Alert(enum.Enum):
     HIGH='alto'
  
 class Illustration(enum.Enum):
-    CITY='https://i.imgur.com/W0JI4AE.png'
-    BUILDING='https://i.imgur.com/FjHaC7A.png' 
+    CITY='https://i.imgur.com/UP2ZylF.png'
+    BUILDING='https://i.imgur.com/zaGvVzy.png' 
 
 class IndicatorType(enum.Enum):
     RT='rt'

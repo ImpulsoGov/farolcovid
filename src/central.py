@@ -160,8 +160,7 @@ def main():
     if len(rt) < 1: #TODO in case no RT edge case
         st.write("Rt: Sua cidade não possui casos suficiente para o cálculo!")
     else:
-        pd.set_option('display.max_columns', None)
-        print(alerts)
+        # pd.set_option('display.max_columns', None)
         indicators["rt"] = update_indicator(IndicatorType.RT.name, indicators["rt"],
                                             metric=(rt.iloc[-1]["Rt_most_likely"]), 
                                             display=f'{str(round(rt.iloc[-1]["Rt_low_95"], 1))} - {str(round(rt.iloc[-1]["Rt_high_95"], 1))}',
@@ -176,7 +175,7 @@ def main():
 
     # Populating base indicator template
     dday_beds_best, dday_beds_worst = dday_city(user_input, selected_region, config, supply_type="n_beds")
-    if dday_beds_best == dday_beds_worst:
+    if dday_beds_best != dday_beds_worst:
         display = f'{round(dday_beds_worst, 1)} e {round(dday_beds_best, 1)}'
     else:
         display = f'''{dday_beds_best}'''

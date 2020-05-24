@@ -56,7 +56,7 @@ def genHeroSection(title: str, subtitle: str):
                                         <span class="hero-container-subtitle primary-span">{subtitle}</span>
                                 </div>
                         </div>   
-                        <img class="hero-container-image" src="https://i.imgur.com/w5yVANW.png"/>
+                        <img class="hero-container-image" src="https://i.imgur.com/nVUF9nx.png"/>
                 </div>
         </div>
         ''',
