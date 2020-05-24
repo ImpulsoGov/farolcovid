@@ -20,6 +20,7 @@ from typing import List
 import re
 import numpy as np
 from simulation import calculate_recovered
+import math
 
 '''Helper Functions'''
 def make_clickable(text, link):
@@ -123,6 +124,15 @@ def genInputFields(locality, user_input, cities_filtered, selected_region, confi
 
 
 def genIndicatorCard(indicator: Indicator):
+        display_left = 'flex'
+        display_right = 'flex'
+
+        if indicator.left_display == 'nan':
+                display_left = 'hide-bg'
+
+        if indicator.right_display == 'nan':
+                display_right = 'hide-bg'
+
         return f'''<div class="indicator-card flex flex-column mr">
                         <span class="header p3">{indicator.header}</span>
                         <span class="p4">{indicator.caption}</span>
@@ -131,11 +141,11 @@ def genIndicatorCard(indicator: Indicator):
                                 <span class="white-span p4 bold">{RiskLabel(indicator.risk).name}</span>
                         </div>
                         <div class="flex flex-row flex-justify-space-between mt"> 
-                                <div class="br flex flex-column text-align-center pr">
+                                <div class="br {display_left} flex-column text-align-center pr">
                                         <span class="lighter">{indicator.left_label}</span>
                                         <span class="bold">{indicator.left_display}</span>
                                 </div>
-                                <div class="flex flex-column text-align-center pl">
+                                <div class="flex flex-column text-align-center pl {display_right}">
                                         <span class="lighter">{indicator.right_label}</span>
                                         <span class="bold">{indicator.right_display}</span>
                                 </div>
@@ -166,13 +176,16 @@ def genKPISection(locality: str, alert: Alert, indicators: Dict[str, Indicator])
 
 def genProductCard(product: Product):
         if product.recommendation == 'Sugerido':
-                badge_style = 'secondary-badge'
+                badge_style = 'primary-bg'
+                rec = product.recommendation
         else:
-                badge_style = f'red-alert-bg risk-pill'
-        return f'''<div class="flex flex-column elevated pr pl product-card mt flex-align-items-center">
+                badge_style = f'{RiskBackground(product.recommendation).name}-alert-bg'
+                rec = Alert._member_map_[product.recommendation]
+                rec = f'Risco {rec}'
+        return f'''<div class="flex flex-column elevated pr pl product-card mt  ">
                 <div class="flex flex-row">
                         <span class="p3 header bold uppercase">{product.name}</span>
-                        <span class="ml {badge_style} white-span">{product.recommendation}</span>
+                         <span class="{badge_style} ml secondary-badge">{rec}</span>
                 </div>
                 <span>{product.caption}</span>
                 <img src="{product.image}" style="width: 200px"/>

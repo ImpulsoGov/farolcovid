@@ -123,9 +123,35 @@ def main():
             rt = df_rt_cities[df_rt_cities["city_id"] == cities_filtered["city_id"].iloc[0]]
             alerts = df_alert[df_alert["city_id"] == cities_filtered["city_id"].iloc[0]]
 
-    utils.genInputCustomizationSectionHeader(locality)
+
+    if selected_region['confirmed_cases'] == 0:
+        st.write(f'''<div class="base-wrapper">
+        Seu município ou regional de saúde ainda não possui casos reportados oficialmente. Portanto, simulamos como se o primeiro caso ocorresse hoje.
+        <br><br>Caso queria, você pode mudar esse número abaixo:
+                </div>''', unsafe_allow_html=True)
+
+
+    else:
+        infectious_period = config['br']['seir_parameters']['severe_duration'] + config['br']['seir_parameters']['critical_duration']
+        estimation = int(selected_region['infectious_period_cases'] / user_input['notification_rate'])
+        if not np.all(cities_filtered['last_updated'].isna()):
+                last_update_cases = cities_filtered['last_updated'].max().strftime('%d/%m')
+        st.write(f'''<div class="base-wrapper">
+        O número de casos confirmados oficialmente no seu município ou regional de saúde é de {int(selected_region['confirmed_cases'].sum())} em {last_update_cases}. 
+        Dada a progressão clínica da doença (em média, {infectious_period} dias) e a taxa de notificação ajustada para a região ({int(100*user_input['notification_rate'])}%), 
+        <b>estimamos que o número de casos ativos é de {estimation}</b>.
+        <br>Caso queria, você pode mudar esse número para a simulação abaixo:
+                </div>''', unsafe_allow_html=True)
+
     
-    user_input = utils.genInputFields(locality, user_input, cities_filtered, selected_region, config)
+
+    if st.button('Alterar dados'):
+        utils.genInputCustomizationSectionHeader(locality)
+        
+        user_input = utils.genInputFields(locality, user_input, cities_filtered, selected_region, config)
+         # AMBASSADOR SECTION
+        utils.genAmbassadorSection()
+
     if len(rt) < 1: #TODO in case no RT edge case
         st.write("Rt: Sua cidade não possui casos suficiente para o cálculo!")
     else:
@@ -134,32 +160,31 @@ def main():
         indicators["rt"] = update_indicator(IndicatorType.RT.name, indicators["rt"],
                                             metric=(rt.iloc[-1]["Rt_most_likely"]), 
                                             display=f'{str(round(rt.iloc[-1]["Rt_low_95"], 1))} - {str(round(rt.iloc[-1]["Rt_high_95"], 1))}',
-                                            left_display=f'{alerts.iloc[-1]["rt_17days_ago_low"]} - {alerts.iloc[-1]["rt_17days_ago_high"]}',
+                                            left_display=f'{round(alerts.iloc[-1]["rt_17days_ago_low"], 1)} - {round(alerts.iloc[-1]["rt_17days_ago_high"], 1)}',
                                             right_display=f'{alerts.iloc[-1]["rt_comparision"]}')
         indicators['subnotification_rate'] = update_indicator(IndicatorType.SUBNOTIFICATION_RATE.name, indicators["subnotification_rate"], 
                                                         metric=(1.0 - user_input["notification_rate"]), 
                                                         display=int((1.0 - user_input["notification_rate"]) * 10),
-                                                        left_display=f'{int(alerts.iloc[-1]["deaths"])}',
+                                                        left_display=f'{alerts.iloc[-1]["deaths"]}',
                                                         right_display=f'{alerts.iloc[-1]["subnotification_rank"]}')
     
-    # AMBASSADOR SECTION
-    utils.genAmbassadorSection()
 
     # Populating base indicator template
     dday_beds_best, dday_beds_worst = dday_city(user_input, selected_region, config, supply_type="n_beds")
     if dday_beds_best == dday_beds_worst:
-        display = f'''{str(dday_beds_worst)} e {str(dday_beds_best)}'''
+        display = f'{round(dday_beds_worst, 1)} e {round(dday_beds_best, 1)}'
     else:
-        display = f'''{str(dday_beds_best)}'''
+        display = f'''{dday_beds_best}'''
     indicators['hospital_capacity'] = update_indicator(IndicatorType.HOSPITAL_CAPACITY.name, indicators['hospital_capacity'], 
                                                 metric=((dday_beds_worst + dday_beds_best) / 2), 
-                                                display=f'''{str(dday_beds_worst)} e {str(dday_beds_best)}''',
+                                                display=f'{display}',
                                                 left_display=f'{alerts.iloc[-1]["number_ventilators"]}',
                                                 right_display=f'{alerts.iloc[-1]["number_beds"]}')
 
     utils.genKPISection(locality=locality, alert=get_overall_alert_level(indicators), indicators=indicators)
    
-    products = ProductCards;
+    products = ProductCards
+    products[1].recommendation = Alert(alerts.iloc[-1]['overall_alert']).name
     utils.genProductsSection(products)
     product = st.selectbox( 'Como você gostaria de prosseguir?', ('Contenção', 'Reabertura'))
     

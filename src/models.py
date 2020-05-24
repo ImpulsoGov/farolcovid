@@ -120,6 +120,6 @@ class Product:
         
 
 ProductCards: List[Product] = [
-    Product(recommendation="Sugerido", name="Contenção", caption="Quer conter o crescimento de casos na sua comunidade? Simule a eficácia de diferentes táticas de contenção.", image=Illustration.BUILDING.value),
-    Product(recommendation="Risco Alto", name="Reabertura", caption="Planeje a reabertura de acordo com o impacto na saúde e economia da sua comunidade.", image=Illustration.CITY.value)
+    Product(recommendation="Sugerido", name="SimulaCovid", caption="simule o impacto de diferentes ritmos de contágio da Covid-19 no seu sistema de saúde.", image=Illustration.BUILDING.value),
+    Product(recommendation="", name="Saúde em Ordem", caption="explore que setores não-essenciais da sua economia são menos expostos ao risco de contaminação por Covid-19", image=Illustration.CITY.value)
 ]

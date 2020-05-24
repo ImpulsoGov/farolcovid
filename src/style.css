@@ -120,7 +120,7 @@
 }
 
 .hide-bg {
-    display: hidden;
+    visibility: hidden;
 }
 
 /* useful classes */
@@ -595,11 +595,13 @@ header>.toolbar { /* Hide toolbar menu */
 }
 
 .secondary-badge {
-    color: var(--main-primary);
-    background-color: white;
-    border: 1px solid var(--main-primary);
+    color: white;
+    text-align: center;
+    /* background-color: white; */
+    /* border: 1px solid var(--main-primary); */
     padding: var(--minor-padding);
     border-radius: var(--main-border-radius);
+    max-width: 200px;
 }
 
 /* Simulation Output - Banner Style */
