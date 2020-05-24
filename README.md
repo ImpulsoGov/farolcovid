@@ -1,6 +1,11 @@
 # SimulaCovid
 
-Simulação do COVID-19 nos municípios brasileiros | Brazilian municipalities COVID-19 simuation.
+<p align="left">
+<!-- <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a> -->
+<a href="https://github.com/ImpulsoGov/simulacovid-datasource/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/ImpulsoGov/simulacovid"></a> <a href=""><img alt="Master update" src="https://img.shields.io/github/last-commit/ImpulsoGov/simulacovid/master?label=last%20commit%20%28master%29"></a> <a href=""><img alt="Master update" src="https://img.shields.io/github/last-commit/ImpulsoGov/simulacovid/stable?label=last%20updated%20%28stable%29"></a> <a href=""><img alt="Deploy" src="https://img.shields.io/github/deployments/ImpulsoGov/simulacovid/simulacovid-production?label=deploy%20status%20%28stable%29"></a>
+</p>
+
+Simulação do COVID-19 nos municípios brasileiros | Brazilian municipalities COVID-19 simulation.
 
 Conteúdo e códigos baseados no repositório do <a href="https://github.com/alsnhll/SEIR_COVID19">Alison Hill</a>, e <a href="https://www.cappra.institute">Cappra Institute for Data Science</a>.
 
@@ -12,7 +17,12 @@ Ambiente de testes e homologação:
 Ambiente de produção:
 - branch stable -> https://simulacovid.coronacidades.org/
 
-## Como executar a aplicação localmente?
+## 📊 Como colaborar com análises
+
+Todas as análises com dados da ferramenta estão em [`analysis`](/analysis). Veja como colaborar [aqui](/src/analysis/README.md)!
+
+
+## ⚙️ Como executar a aplicação localmente?
 
 Utilizando Python + Virtualenv
 
@@ -45,22 +55,4 @@ sudo apt-get install -y make
 # Execute o servidor
 # ficará disponível em http://localhost:8501/
 make docker-build-run
-```
-
-## Ambiente de Modelagem
-
-```bash
-# Instale o 'make'
-sudo apt-get install -y make
-
-# Crie o virtualenv
-make create-env-analysis
-
-# Ative o ambiente
-. venvanalysis/bin/activate
-
-# Abra o jupyter
-jupyter notebook
-
-# Mude o kernel do notebook para venvanalysis
 ```
