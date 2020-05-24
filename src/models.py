@@ -108,7 +108,7 @@ IndicatorCards: Dict[str, Indicator] = {
     IndicatorType.RT.value: Indicator(header="Ritmo de Contágio", caption="Cada contaminado infecta em média", unit="pessoas", left_label="Semana passada:", right_label="Tendência 📈:"),
     IndicatorType.SUBNOTIFICATION_RATE.value: Indicator(header="Taxa de Subnotificação", caption="A cada 10 pessoas infectadas, somente", unit="são identificadas", left_label="Mortes semana passada", right_label="Ranking BR:"),
     IndicatorType.HOSPITAL_CAPACITY.value: Indicator( header="Capacidade Hospitalar", caption="A capacidade hospitalar será atingida em", unit="dias",  left_label="N.o de Leitos Covid:", right_label="# Ventiladores Covid:"),
-    # 'social_distancing': Indicator(header="Isolamento Social", caption="Ficaram em casa cerca de", unit="das pessoas", left_label="Média semana passada:", right_label="Tendência 📈")
+    IndicatorType.SOCIAL_ISOLATION.value: Indicator(header="Isolamento Social", caption="Ficaram em casa cerca de", unit="das pessoas", left_label="Média semana passada:", right_label="Tendência 📈")
 }
 
 class Product:

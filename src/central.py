@@ -61,6 +61,11 @@ def get_indicator_alert(name, indicator):
             return Alert.MEDIUM.name
         else:
             return Alert.LOW.name
+    elif name == IndicatorType.SUBNOTIFICATION_RATE.name:
+        if indicator >= 0.7:
+            return Alert.HIGH.name
+        else:
+            return Alert.NONE.name
     else:
         return Alert.NONE.name
         
@@ -181,10 +186,17 @@ def main():
                                                 left_display=f'{alerts.iloc[-1]["number_ventilators"]}',
                                                 right_display=f'{alerts.iloc[-1]["number_beds"]}')
 
+    indicators[IndicatorType.SOCIAL_ISOLATION.value] = update_indicator(IndicatorType.SOCIAL_ISOLATION.name, indicators[IndicatorType.SOCIAL_ISOLATION.value], 
+                                                metric=alerts.iloc[-1]["inloco_today_7days_avg"], 
+                                                display=f'{int(alerts.iloc[-1]["inloco_today_7days_avg"] * 100)}%',
+                                                left_display=f'{int(alerts.iloc[-1]["inloco_last_week_7days_avg"] * 100)}%',
+                                                right_display=f'{alerts.iloc[-1]["inloco_comparision"]}')
+
+
     utils.genKPISection(locality=locality, alert=get_overall_alert_level(indicators), indicators=indicators)
    
     products = ProductCards
-    products[1].recommendation = Alert(alerts.iloc[-1]['overall_alert']).name
+    products[1].recommendation = f'Risco {alerts.iloc[-1]["overall_alert"]}'
     utils.genProductsSection(products)
     product = st.selectbox( 'Como você gostaria de prosseguir?', ('Contenção', 'Reabertura'))
     

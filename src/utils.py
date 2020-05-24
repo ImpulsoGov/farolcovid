@@ -177,18 +177,18 @@ def genKPISection(locality: str, alert: Alert, indicators: Dict[str, Indicator])
 def genProductCard(product: Product):
         if product.recommendation == 'Sugerido':
                 badge_style = 'primary-bg'
-                rec = product.recommendation
+        elif product.recommendation == 'Risco alto':
+                badge_style = f'red-alert-bg'
         else:
-                badge_style = f'{RiskBackground(product.recommendation).name}-alert-bg'
-                rec = Alert._member_map_[product.recommendation]
-                rec = f'Risco {rec}'
+                badge_style = 'hide-bg'
+                
         return f'''<div class="flex flex-column elevated pr pl product-card mt  ">
                 <div class="flex flex-row">
                         <span class="p3 header bold uppercase">{product.name}</span>
-                         <span class="{badge_style} ml secondary-badge">{rec}</span>
+                         <span class="{badge_style} ml secondary-badge">{product.recommendation}</span>
                 </div>
                 <span>{product.caption}</span>
-                <img src="{product.image}" style="width: 200px"/>
+                <img src="{product.image}" style="width: 200px" class="mt"/>
         </div>
         '''
 
