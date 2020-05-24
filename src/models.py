@@ -63,7 +63,7 @@ class RiskBackground(enum.Enum):
 
 # Models
 class Indicator():
-    def __init__(self, header, caption, unit, metric=-1, display="", risk=Alert.HIGH.value, risk_label=""):
+    def __init__(self, header, caption, unit, left_label, right_label, metric=-1, display="", risk=Alert.HIGH.value, risk_label="", left_display="", right_display=""):
         self.header = header
         self.caption = caption
         self.unit = unit
@@ -71,6 +71,10 @@ class Indicator():
         self.display = display
         self.risk = risk
         self.risk_label = risk_label
+        self.left_label = left_label
+        self.right_label = right_label
+        self.left_display= left_display
+        self.right_display = right_display
 
 class ResourceAvailability(NamedTuple):
     locality: str
@@ -101,10 +105,10 @@ Strategies: List[ContainmentStrategy] = [
 ]
 
 IndicatorCards: Dict[str, Indicator] = {
-    IndicatorType.RT.value: Indicator(header="Ritmo de Contágio", caption="Cada contaminado infecta em média", unit="pessoas"),
-    IndicatorType.SUBNOTIFICATION_RATE.value: Indicator(header="Taxa de Subnotificação", caption="A cada 10 pessoas infectadas, somente", unit="são identificadas"),
-    IndicatorType.HOSPITAL_CAPACITY.value: Indicator( header="Capacidade Hospitalar", caption="A capacidade hospitalar será atingida em", unit="dias"),
-    # 'social_distancing': Indicator(header="Isolamento Social", caption="Ficaram em casa cerca de", unit="das pessoas")
+    IndicatorType.RT.value: Indicator(header="Ritmo de Contágio", caption="Cada contaminado infecta em média", unit="pessoas", left_label="Semana passada:", right_label="Tendência 📈:"),
+    IndicatorType.SUBNOTIFICATION_RATE.value: Indicator(header="Taxa de Subnotificação", caption="A cada 10 pessoas infectadas, somente", unit="são identificadas", left_label="Mortes semana passada", right_label="Ranking BR:"),
+    IndicatorType.HOSPITAL_CAPACITY.value: Indicator( header="Capacidade Hospitalar", caption="A capacidade hospitalar será atingida em", unit="dias",  left_label="N.o de Leitos Covid:", right_label="# Ventiladores Covid:"),
+    # 'social_distancing': Indicator(header="Isolamento Social", caption="Ficaram em casa cerca de", unit="das pessoas", left_label="Média semana passada:", right_label="Tendência 📈")
 }
 
 class Product:

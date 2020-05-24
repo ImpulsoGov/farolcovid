@@ -14,7 +14,7 @@ import data_analysis as anal
 import central
 
 def main():
-    page = st.sidebar.radio("Menu", ["Central COVID19", "COVID19 no seu Município", "Metodologia", "Quem somos?"]) # "Central COVID19", "Análises"
+    page = st.sidebar.radio("Menu", ["Central COVID19", "Análises", "Metodologia", "Quem somos?"]) # "Central COVID19", "Análises"
 
     if page == "Metodologia":
         if __name__ == "__main__":
