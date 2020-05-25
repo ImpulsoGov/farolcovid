@@ -1,5 +1,12 @@
 IMAGE_TAG=impulsogov/simulacovid
 
+UNAME := $(shell uname)
+ifeq ($(UNAME), Linux)
+SHELL := /bin/bash
+else
+SHELL := /bin/sh
+endif
+
 # Python
 create-env:
 	virtualenv venv
