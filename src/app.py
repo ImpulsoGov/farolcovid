@@ -12,9 +12,10 @@ import team as tm
 import simulation as sm
 import data_analysis as anal
 import central
+import farol
 
 def main():
-    page = st.sidebar.radio("Menu", ["COVID19 no seu Município", "Análises", "Metodologia", "Quem somos?"]) # "Central COVID19", 
+    page = st.sidebar.radio("Menu", ["COVID19 no seu Município", "Análises", "Metodologia","Farolcovid", "Quem somos?"]) # "Central COVID19", 
 
     if page == "Metodologia":
         if __name__ == "__main__":
@@ -27,6 +28,10 @@ def main():
     elif page == "Análises": 
           if __name__ == "__main__":
             anal.main()
+
+    elif page == "Farolcovid": 
+          if __name__ == "__main__":
+            farol.main()  
 
     elif page == "Quem somos?":        
           if __name__ == "__main__":
