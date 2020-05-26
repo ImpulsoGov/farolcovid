@@ -23,8 +23,8 @@ simulator:
 
 br:
     api:
-        external: http://datasource.coronacidades.org:7000/
-        local: http://localhost:7000/
+        external: http://datasource.coronacidades.org:80/
+        local: http://localhost:80/
         endpoints:
             simulacovid: "br/cities/simulacovid/main"
             analysis:
