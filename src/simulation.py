@@ -63,7 +63,7 @@ def main(user_input, locality, cities_filtered, config):
         <div class="base-wrapper">
                 <span class="section-header primary-span">Etapa 4: Simule o resultado de possíveis intervenções</span>
                 <br />
-                <span>Agora é a hora de planejar como você pode melhor se preparar para evitar a sobrecarga hospitalar. Veja como mudanças na estratégia adotada afetam a necessidade de internação em leitos.</span>
+                <span>Agora é a hora de planejar como você pode melhor se preparar para evitar a sobrecarga hospitalar. Veja como mudanças no seu ritmo de contágio afetam a necessidade de leitos e ventiladores na sua cidade:</span>
         </div>''', unsafe_allow_html=True)
 
         user_input['strategy']['isolation'] = st.slider('Em quantos dias você quer acionar a Estratégia 2, medidas restritivas? (deixe como 0 se a medida já estiver em vigor)', 0, 90, 0, key='strategy2')

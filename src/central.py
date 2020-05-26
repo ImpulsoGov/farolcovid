@@ -35,44 +35,45 @@ def dday_city(params, selected_region, config, supply_type="n_beds"):
     
     return dday_beds["best"], dday_beds["worst"]
 
-def get_overall_alert_level(indicators):
-    if indicators["rt"].metric < 1.0 and \
-        indicators["hospital_capacity"] > 30 and \
-        indicators["subnotification_rate"] < 0.5: 
-        return Alert.LOW
+# def get_overall_alert_level(indicators):
+#     if indicators["rt"].metric < 1.0 and \
+#         indicators["hospital_capacity"] > 30 and \
+#         indicators["subnotification_rate"] < 0.5: 
+#         return Alert.LOW
     
-    elif (indicators["rt"].metric >= 1.0 and indicators["rt"].metric <= 1.2) and indicators["hospital_capacity"] > 30 and indicators["subnotification_rate"] < 0.5: 
-        return Alert.MEDIUM
-    else:
-        return Alert.HIGH
+#     elif (indicators["rt"].metric >= 1.0 and indicators["rt"].metric <= 1.2) and indicators["hospital_capacity"] > 30 and indicators["subnotification_rate"] < 0.5: 
+#         return Alert.MEDIUM
+#     else:
+#         return Alert.HIGH
 
-def get_indicator_alert(name, indicator):
-    if name == IndicatorType.RT.name:
-        if indicator < 1.0:
-            return Alert.LOW.name
-        elif (indicator >= 1.0 and indicator <= 1.2):
-            return Alert.MEDIUM.name
-        else:
-            return Alert.HIGH.name
-    elif name == IndicatorType.HOSPITAL_CAPACITY.name:
-        if indicator < 30:
-            return Alert.HIGH.name
-        elif indicator >= 30 and indicator <= 60:
-            return Alert.MEDIUM.name
-        else:
-            return Alert.LOW.name
-    elif name == IndicatorType.SUBNOTIFICATION_RATE.name:
-        if indicator >= 0.7:
-            return Alert.HIGH.name
-        else:
-            return Alert.NONE.name
-    else:
-        return Alert.NONE.name
+# def get_indicator_alert(name, indicator):
+#     if name == IndicatorType.RT.name:
+#         if indicator < 1.0:
+#             return Alert.LOW.name
+#         elif (indicator >= 1.0 and indicator <= 1.2):
+#             return Alert.MEDIUM.name
+#         else:
+#             return Alert.HIGH.name
+#     elif name == IndicatorType.HOSPITAL_CAPACITY.name:
+#         if indicator < 30:
+#             return Alert.HIGH.name
+#         elif indicator >= 30 and indicator <= 60:
+#             return Alert.MEDIUM.name
+#         else:
+#             return Alert.LOW.name
+#     elif name == IndicatorType.SUBNOTIFICATION_RATE.name:
+#         if indicator >= 0.7:
+#             return Alert.HIGH.name
+#         else:
+#             return Alert.NONE.name
+#     else:
+#         return Alert.NONE.name
         
-def update_indicator(key, indicator, metric, display, left_display, right_display):
-    indicator.metric = metric
+def update_indicator(indicator, display, left_display, right_display, risk):
+    # indicator.metric = metric
     indicator.display = display
-    indicator.risk = get_indicator_alert(key, metric)
+    #indicator.risk = get_indicator_alert(key, metric)
+    indicator.risk = risk
     indicator.risk_label= RiskLabel(indicator.risk).value
     indicator.left_display=left_display
     indicator.right_display=right_display
@@ -81,18 +82,15 @@ def update_indicator(key, indicator, metric, display, left_display, right_displa
 
 def main():
     utils.localCSS("style.css")
-    utils.genHeroSection("Farol", "Como sua comunidade pode reagir à crise?")
+    utils.genHeroSection("Farol", "Entenda e controle a Covid-19 no seu município")
     # GET DATA
     config = yaml.load(open('configs/config.yaml', 'r'), Loader = yaml.FullLoader)
     cities = loader.read_data('br', config, endpoint=config['br']['api']['endpoints']['simulacovid'])
 
-    # Dados Rt
-    df_rt_cities = loader.read_data("br", config, endpoint="br/cities/rt")
-    df_rt_states = loader.read_data("br", config, endpoint="br/states/rt")
-
     # Dados Central
-    df_alert = loader.read_data("br", config,endpoint=config['br']['api']['endpoints']['farolcovid'])
-
+    df_cities = loader.read_data("br", config,endpoint=config['br']['api']['endpoints']['farolcovid']['cities'])
+    df_states = loader.read_data("br", config,endpoint=config['br']['api']['endpoints']['farolcovid']['states'])
+    
     # REGION/CITY USER INPUT
     user_input = dict()
     indicators = IndicatorCards
@@ -116,17 +114,17 @@ def main():
 
     if len(cities_filtered) > 1: # pega taxa do estado quando +1 municipio selecionado
             user_input["notification_rate"] = round(cities_filtered['state_notification_rate'].mean(), 2)
-            rt = df_rt_states[df_rt_states["state"] == cities_filtered["state"].unique()[0]]
-            alerts = df_alert[df_alert["state"] == cities_filtered["state"].unique()[0]]
+            rt = df_cities[df_cities["state"] == cities_filtered["state"].unique()[0]]
+            alerts = df_cities[df_cities["state"] == cities_filtered["state"].unique()[0]]
     elif np.isnan(cities_filtered['notification_rate'].values):
             user_input["notification_rate"] = 1
-            rt = df_rt_cities[df_rt_cities["city_id"] == cities_filtered["city_id"].iloc[0]]
-            alerts = df_alert[df_alert["city_id"] == cities_filtered["city_id"].iloc[0]]
+            rt = df_cities[df_cities["city_id"] == cities_filtered["city_id"].iloc[0]]
+            alerts = df_cities[df_cities["city_id"] == cities_filtered["city_id"].iloc[0]]
 
     else:
             user_input["notification_rate"] = round(cities_filtered['notification_rate'], 4)
-            rt = df_rt_cities[df_rt_cities["city_id"] == cities_filtered["city_id"].iloc[0]]
-            alerts = df_alert[df_alert["city_id"] == cities_filtered["city_id"].iloc[0]]
+            rt = df_cities[df_cities["city_id"] == cities_filtered["city_id"].iloc[0]]
+            alerts = df_cities[df_cities["city_id"] == cities_filtered["city_id"].iloc[0]]
 
 
     if selected_region['confirmed_cases'] == 0:
@@ -161,16 +159,22 @@ def main():
         st.write("Rt: Sua cidade não possui casos suficiente para o cálculo!")
     else:
         # pd.set_option('display.max_columns', None)
-        indicators["rt"] = update_indicator(IndicatorType.RT.name, indicators["rt"],
-                                            metric=(rt.iloc[-1]["Rt_most_likely"]), 
-                                            display=f'{str(round(rt.iloc[-1]["Rt_low_95"], 1))} - {str(round(rt.iloc[-1]["Rt_high_95"], 1))}',
+        # kill metricc, add risk direclty kill function
+        indicators["rt"] = update_indicator(#IndicatorType.RT.name,
+
+                                            indicators["rt"],
+                                            # metric=(rt.iloc[-1]["rt_10days_week_avg"]), 
+                                            display=f'{str(round(rt.iloc[-1]["rt_10days_ago_low"], 1))} - {str(round(rt.iloc[-1]["rt_10days_ago_high"], 1))}',
                                             left_display=f'{round(alerts.iloc[-1]["rt_17days_ago_low"], 1)} - {round(alerts.iloc[-1]["rt_17days_ago_high"], 1)}',
-                                            right_display=f'{alerts.iloc[-1]["rt_comparision"]}')
-        indicators['subnotification_rate'] = update_indicator(IndicatorType.SUBNOTIFICATION_RATE.name, indicators["subnotification_rate"], 
-                                                        metric=(1.0 - user_input["notification_rate"]), 
+                                            right_display=f'{alerts.iloc[-1]["rt_comparision"]}',
+                                            risk=alerts.iloc[-1]["rt_classification"])
+        indicators['subnotification_rate'] = update_indicator(#IndicatorType.SUBNOTIFICATION_RATE.name, 
+                                                        indicators["subnotification_rate"], 
+                                                        # metric=(1.0 - user_input["notification_rate"]), 
                                                         display=int((1.0 - user_input["notification_rate"]) * 10),
                                                         left_display=f'{alerts.iloc[-1]["deaths"]}',
-                                                        right_display=f'{alerts.iloc[-1]["subnotification_rank"]}')
+                                                        right_display=f'{alerts.iloc[-1]["subnotification_rank"]}',
+                                                        risk="")
     
 
     # Populating base indicator template
@@ -179,17 +183,17 @@ def main():
         display = f'{round(dday_beds_worst, 1)} e {round(dday_beds_best, 1)}'
     else:
         display = f'''{dday_beds_best}'''
-    indicators['hospital_capacity'] = update_indicator(IndicatorType.HOSPITAL_CAPACITY.name, indicators['hospital_capacity'], 
-                                                metric=((dday_beds_worst + dday_beds_best) / 2), 
+    indicators['hospital_capacity'] = update_indicator(indicators['hospital_capacity'], 
                                                 display=f'{display}',
                                                 left_display=f'{alerts.iloc[-1]["number_ventilators"]}',
-                                                right_display=f'{alerts.iloc[-1]["number_beds"]}')
+                                                right_display=f'{alerts.iloc[-1]["number_beds"]}',
+                                                risk=alerts.iloc[-1]["dday_classification"])
 
-    indicators[IndicatorType.SOCIAL_ISOLATION.value] = update_indicator(IndicatorType.SOCIAL_ISOLATION.name, indicators[IndicatorType.SOCIAL_ISOLATION.value], 
-                                                metric=alerts.iloc[-1]["inloco_today_7days_avg"], 
+    indicators[IndicatorType.SOCIAL_ISOLATION.value] = update_indicator(indicators[IndicatorType.SOCIAL_ISOLATION.value], 
                                                 display=f'{int(alerts.iloc[-1]["inloco_today_7days_avg"] * 100)}%',
                                                 left_display=f'{int(alerts.iloc[-1]["inloco_last_week_7days_avg"] * 100)}%',
-                                                right_display=f'{alerts.iloc[-1]["inloco_comparision"]}')
+                                                right_display=f'{alerts.iloc[-1]["inloco_comparision"]}', 
+                                                risk="inloco")
 
 
     utils.genKPISection(locality=locality, alert=get_overall_alert_level(indicators), indicators=indicators)

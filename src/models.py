@@ -50,10 +50,10 @@ class IndicatorType(enum.Enum):
 
 
 class RiskLabel(enum.Enum):
-    Nada=Alert.NONE.name
-    Bom=Alert.LOW.name
-    Insatisfatório=Alert.MEDIUM.name
-    Ruim=Alert.HIGH.name
+    nada=Alert.NONE.name
+    bom=Alert.LOW.name
+    insatisfatório=Alert.MEDIUM.name
+    ruiim=Alert.HIGH.name
 
 class RiskBackground(enum.Enum):
     hide=Alert.NONE.name
@@ -106,9 +106,9 @@ Strategies: List[ContainmentStrategy] = [
 
 IndicatorCards: Dict[str, Indicator] = {
     IndicatorType.RT.value: Indicator(header="Ritmo de Contágio", caption="Cada contaminado infecta em média", unit="pessoas", left_label="Semana passada:", right_label="Tendência 📈:"),
-    IndicatorType.SUBNOTIFICATION_RATE.value: Indicator(header="Taxa de Subnotificação", caption="A cada 10 pessoas infectadas, somente", unit="são identificadas", left_label="Mortes semana passada", right_label="Ranking BR:"),
+    IndicatorType.SUBNOTIFICATION_RATE.value: Indicator(header="Subnotificação", caption="A cada 10 pessoas infectadas, somente", unit="são identificadas", left_label="Mortes semana passada", right_label="Ranking BR:"),
     IndicatorType.HOSPITAL_CAPACITY.value: Indicator( header="Capacidade Hospitalar", caption="A capacidade hospitalar será atingida em", unit="dias",  left_label="N.o de Leitos Covid:", right_label="# Ventiladores Covid:"),
-    IndicatorType.SOCIAL_ISOLATION.value: Indicator(header="Isolamento Social", caption="Ficaram em casa cerca de", unit="das pessoas", left_label="Média semana passada:", right_label="Tendência 📈")
+    IndicatorType.SOCIAL_ISOLATION.value: Indicator(header="Isolamento Social", caption="Semana passada, ficaram em casa", unit="das pessoas", left_label="Média semana passada:", right_label="Tendência 📈")
 }
 
 class Product:

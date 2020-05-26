@@ -27,7 +27,9 @@ br:
         local: http://localhost:7000/
         endpoints:
             simulacovid: "br/cities/simulacovid/main"
-            farolcovid: "br/cities/farolcovid/main"
+            farolcovid: 
+                cities: "br/cities/farolcovid/main"
+                states: "br/states/farolcovid/main"
             analysis:
                 cases: "br/cities/cases/full"
                 owid: "world/owid/heatmap"
