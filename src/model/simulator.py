@@ -27,10 +27,11 @@ def iterate_simulation(current_state, seir_parameters, phase, initial):
 
 
 # Get reproduction rate
-def get_rt(config, place_id, place_type, simulation_params, bound):
+def get_rt(place_type, user_input, config, simulation_params, bound):
 
     if place_type == "city_id":
         endpoint = config["br"]["api"]["endpoints"]["rt_cities"]
+
     if place_type == "state":
         endpoint = config["br"]["api"]["endpoints"]["rt_states"]
 
@@ -38,9 +39,11 @@ def get_rt(config, place_id, place_type, simulation_params, bound):
     # pegando estimacao de 10 dias atras
     rt = rt[rt["last_updated"] == (rt["last_updated"].max() - dt.timedelta(10))]
 
-    # caso nao tenha rt, usa o r0 de wuhan
-    if place_id not in rt[place_type].values:
-        return get_r0(config["simulator"]["scenarios"], simulation_params, bound)
+    # caso nao tenha rt, usa o rt do estado
+    if (user_input[place_type] not in rt[place_type].values) & (
+        place_type == "city_id"
+    ):
+        return get_rt("state", user_input, config, simulation_params, bound)
 
     cols = {"best": "Rt_low_95", "worst": "Rt_high_95"}
 
@@ -48,29 +51,20 @@ def get_rt(config, place_id, place_type, simulation_params, bound):
 
         # TODO: mudar para novas flags com o front
         if simulation_params[phase]["scenario"] == "isolation":  # nothing
-            simulation_params[phase]["R0"] = rt[rt[place_type] == place_id][
-                cols[bound]
-            ].values[0]
+            simulation_params[phase]["R0"] = rt[
+                rt[place_type] == user_input[place_type]
+            ][cols[bound]].values[0]
 
         if simulation_params[phase]["scenario"] == "lockdown":  # smaller_rt
             simulation_params[phase]["R0"] = (
-                rt[rt[place_type] == place_id][cols[bound]].values[0] / 2
+                rt[rt[place_type] == user_input[place_type]][cols[bound]] / 2
             )
 
         if simulation_params[phase]["scenario"] == "nothing":  # greater_rt
             simulation_params[phase]["R0"] = (
-                rt[rt[place_type] == place_id][cols[bound]].values[0] * 2
+                rt[rt[place_type] == user_input[place_type]][cols[bound]] * 2
             )
 
-    return simulation_params
-
-
-def get_r0(scenario_parameters, simulation_params, bound):
-
-    for phase in simulation_params:
-        simulation_params[phase]["R0"] = scenario_parameters[bound][
-            simulation_params[phase]["scenario"]
-        ]["R0"]
     return simulation_params
 
 
@@ -84,20 +78,20 @@ def decide_scenario(user_strategy):
         return ["nothing", "lockdown", "isolation"]
 
 
-def run_simulation(population_params, strategy_params, config, place_id, place_type):
+def run_simulation(user_input, config):
     """
     Run simulation phases and return hospital demand.
     
     Parameters
     ----------
-    population_params: str
+    user_input["population_params"]: str
             Explicit population parameters:
                     - N: population
                     - I: infected
                     - R: recovered
                     - D: deaths
             
-    strategy_params: dict
+    user_input["strategy"]: dict
             Simulation parameters for each phase (from user input):
                 - scenario: date
                     
@@ -116,26 +110,25 @@ def run_simulation(population_params, strategy_params, config, place_id, place_t
 
         # Get ranges with test delay
         intervals = (
-            min(strategy_params.values())
+            min(user_input["strategy"].values())
             + config["simulator"]["scenarios"][bound]["test_delay"],
-            max(strategy_params.values()) - min(strategy_params.values()),
-            config["simulator"]["max_days"] - max(strategy_params.values()),
+            max(user_input["strategy"].values()) - min(user_input["strategy"].values()),
+            config["simulator"]["max_days"] - max(user_input["strategy"].values()),
         )
 
-        scenarios = decide_scenario(strategy_params)
+        scenarios = decide_scenario(user_input["strategy"])
         simulation_params = {
             f"phase{i+1}": {"scenario": scenarios[i], "n_days": intervals[i]}
             for i in range(3)
         }
 
         # Get Rts
-        if place_id == "Brasil":
-            simulation_params = get_r0(
-                config["simulator"]["scenarios"], simulation_params, bound
-            )
+        if (user_input["state"] == "Todos") & (user_input["city"] == "Todos"):
+            for phase in simulation_params:
+                simulation_params[phase]["R0"] = 3
         else:
             simulation_params = get_rt(
-                config, place_id, place_type, simulation_params, bound
+                user_input["place_type"], user_input, config, simulation_params, bound
             )
 
         # Iterate over phases
@@ -145,7 +138,7 @@ def run_simulation(population_params, strategy_params, config, place_id, place_t
 
             if phase == "phase1":
                 res, current_state = iterate_simulation(
-                    population_params,
+                    user_input["population_params"],
                     config["br"]["seir_parameters"],
                     simulation_params[phase],
                     initial=True,
@@ -269,13 +262,13 @@ def plot_fig(t, cols):
 
 def run_evolution(user_input, config):
 
-    dfs = run_simulation(
-        user_input["population_params"],
-        user_input["strategy"],
-        config,
-        user_input["place_id"],
-        user_input["place_type"],
-    )
+    # if user_input["place_type"] == "city":
+    #     user_input[place_type] = user_input["city"]
+
+    # if user_input["place_type"] == "state":
+    #     user_input[place_type] = user_input["state"]
+
+    dfs = run_simulation(user_input, config)
 
     cols = {
         "I2": {
