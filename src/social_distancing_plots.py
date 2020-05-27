@@ -170,7 +170,8 @@ def gen_social_dist_plots(in_args):
 gen_social_dist_plots.cities_df = None
 gen_social_dist_plots.states_df = None
 
-
+# In: numerical id ( id < 100 for states, id > 100 for cities)
+# Out: a plotly figure
 def gen_social_dist_plots_placeid(place_id):
     names = utils.get_place_names_by_id(place_id)
     if type(names) == type("sampletext"):  # IS STATE
