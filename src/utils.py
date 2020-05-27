@@ -11,6 +11,38 @@ from models import (
 )
 from typing import List
 import re
+import pandas as pd
+import os
+
+configs_path = os.path.join(os.path.dirname(__file__), "configs")
+cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
+states = pd.read_csv(os.path.join(configs_path, "states_table.csv"))
+
+# In: name of the state (returns a numerical id of only the state) or the name of the state and the name of the city
+# Out: the numerical id of the state of the city
+def get_place_id_by_names(state_name, city_name_input="Todos"):
+    state_num_id = states.query("state_name == '%s'" % state_name).values[0][-1]
+    if city_name_input == "Todos":
+        return state_num_id
+    city_id = (
+        cities.query("state_num_id == '%s'" % state_num_id)
+        .query("city_name == '%s'" % city_name_input)
+        .values[0][1]
+    )
+    return city_id
+
+
+# In: id of a place (id < 100 for states, id > 100 for cities)
+# Out: either a string representing the name of the state or a list contaning [state name,city name]
+def get_place_names_by_id(place_id):
+    if place_id <= 100:
+        return states.query("state_num_id == '%s'" % place_id).values[0][2]
+    else:
+        data = cities.query("city_id == '%s'" % place_id).values[0]
+        city_name = data[2]
+        state_id = data[3]
+        state_name = states.query("state_num_id == '%s'" % state_id).values[0][2]
+        return [state_name, city_name]
 
 
 def make_clickable(text, link):
@@ -525,4 +557,3 @@ def get_ufs_list():
         "SP",
         "TO",
     ]
-
