@@ -12,15 +12,17 @@ import team as tm
 import simulation as sm
 import data_analysis as anal
 import central
+import risk_description as rd
+import rt_description as rt
 
 def main():
-    page = st.sidebar.radio("Menu", ["Central COVID19", "Análises", "Metodologia", "Quem somos?"]) # "Central COVID19", "Análises"
+    page = st.sidebar.radio("Menu", ["FarolCovid", "Análises", "Níveis de Risco","Estimando Ritmo de Contágio",  "Metodologia SimulaCovid", "Quem somos?"]) # "Central COVID19", 
 
-    if page == "Metodologia":
+    if page == "Metodologia SimulaCovid":
         if __name__ == "__main__":
             md.main()
 
-    elif page == "COVID19 no seu Município":        
+    elif page == "FarolCovid":        
           if __name__ == "__main__":
             sm.main()    
 
@@ -32,9 +34,13 @@ def main():
           if __name__ == "__main__":
             tm.main()    
 
-    elif page == "Central COVID19": 
+    elif page == "Níveis de Risco": 
           if __name__ == "__main__":
-            central.main()    
+            rd.main()
+
+    elif page == "Estimando Ritmo de Contágio": 
+          if __name__ == "__main__":
+            rt.main()  
             
  
 if __name__ == "__main__":
