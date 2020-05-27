@@ -1,4 +1,4 @@
-s st
+import streamlit as st
 
 def main():
 
