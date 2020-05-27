@@ -131,7 +131,7 @@ def genIndicatorCard(indicator: Indicator):
 
         if indicator.right_display == 'nan':
                 display_right = 'hide-bg'
-
+ 
         return f'''<div class="indicator-card flex flex-column mr">
                         <span class="header p3">{indicator.header}</span>
                         <span class="p4">{indicator.caption}</span>
@@ -144,7 +144,7 @@ def genIndicatorCard(indicator: Indicator):
                                         <span class="lighter">{indicator.left_label}</span>
                                         <span class="bold">{indicator.left_display}</span>
                                 </div>
-                                <div class="flex flex-column text-align-center pl {display_right}">
+                                <div class=" bl flex flex-column text-align-center pl {display_right}">
                                         <span class="lighter">{indicator.right_label}</span>
                                         <span class="bold">{indicator.right_display}</span>
                                 </div>
@@ -153,11 +153,10 @@ def genIndicatorCard(indicator: Indicator):
         '''
 
 def genKPISection(locality: str, alert: str, indicators: Dict[str, Indicator]):
-
+        alert=float('nan')
         if not isinstance(alert, str):
                 bg = "gray"
-                locality = "Sugerimos que confira o nivel de risco de seu Estado."
-                caption = "Seu municipio nao possui dados suficientes para calcularmos o nivel de risco."
+                caption = "Sugerimos que confira o nível de risco de seu Estado.<br/>Seu municipio nao possui dados suficientes para calcularmos o nivel de risco."
                 
         else:
                 bg = AlertBackground(alert).name

@@ -54,7 +54,7 @@ class IndicatorBackground(enum.Enum):
     green='bom'
     yellow='insatisfatório'
     red='ruim'
-    blue='inloco'
+    inloco='inloco'
 
 # Models
 class Indicator():

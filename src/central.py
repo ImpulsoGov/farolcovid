@@ -74,18 +74,25 @@ def main():
         user_input['place_type'] = 'city'
         cities_filtered = filter_options(cities, user_input['city'], 'city_name')
         locality = user_input['city']
-        alert = df_cities[df_cities["city_id"] == cities_filtered["city_id"].iloc[0]]
+        alert = df_cities[df_cities["city_id"] == cities_filtered["city_id"].iloc[0]].iloc[0]
+        state = df_states[df_states["state_name"] == cities_filtered["state_name"].iloc[0]].iloc[0]
         
+        print(alert["notification_rate"].dtype)
         if np.isnan(alert["notification_rate"]):
-            alert["notification_rate"] = df_states[df_states["state_name"] == cities_filtered["state_name"].iloc[0]].iloc[0]["notification_rate"]
+            alert["notification_rate"] = state["notification_rate"]
+            alert["subnotification_classification"] = state["subnotification_classification"]
             st.write("Seu município não possui dados suficientes para calcular a taxa de subnotificação. Vamos utilizar a do Estado.")
-        if np.inan(alert["rt_10days_ago_most_likely"]):
-            state = df_states[df_states["state_name"] == cities_filtered["state_name"].iloc[0]].iloc[0]
+        if np.isnan(alert["rt_10days_ago_most_likely"]):
             alert["rt_10days_ago_most_likely"] = state["rt_10days_ago_most_likely"]
             alert["rt_10days_ago_low"] = state["rt_10days_ago_low"]
             alert["rt_10days_ago_high"] = state["rt_10days_ago_high"]
+            alert["rt_classification"] = state["rt_classification"]
             st.write("Seu município não possui dados suficientes para calcular o índice de contágio. Vamos utilizar o do Estado.")
-    
+       
+        if np.isnan(alert['dday_beds_best']) or np.isnan(alert['dday_beds_worst']): 
+            alert['dday_classification'] = state['dday_classification']
+            alert['dday_beds_best'] = state['dday_beds_best']
+            alert['dday_beds_worst'] = state['dday_beds_worst']
         user_input["notification_rate"] = alert["notification_rate"]
 
         
@@ -150,18 +157,22 @@ def main():
                                         risk=alert["rt_classification"])
     indicators['subnotification_rate'] = update_indicator( 
                                                     indicators["subnotification_rate"], 
-                                                    display=int((1.0 - user_input["notification_rate"]) * 10),
-                                                    left_display=f'{round(alert["deaths"])}',
-                                                    right_display=f'{round(alert["subnotification_rank"])}',
+                                                    display=int((user_input["notification_rate"]) * 10),
+                                                    left_display=f'{np.round(alert["deaths"])}',
+                                                    right_display=f'{np.round(alert["subnotification_rank"])}',
                                                     risk="")
     
 
     # Populating base indicator template
     dday_beds_best, dday_beds_worst = dday_city(user_input, alert, config, supply_type="n_beds")
-    if dday_beds_best != dday_beds_worst:
+    
+    if dday_beds_best == -1 or dday_beds_worst == -1:
+        display = f'>90'
+    elif dday_beds_best != dday_beds_worst:
         display = f'{round(dday_beds_worst, 1)} e {round(dday_beds_best, 1)}'
     else:
         display = f'''{dday_beds_best}'''
+        
     indicators['hospital_capacity'] = update_indicator(indicators['hospital_capacity'], 
                                                 display=f'{display}',
                                                 left_display=f'{round(alert["number_ventilators"])}',

@@ -123,6 +123,10 @@
     background-color: #c4c4c4;
 }
 
+.inloco-alert-bg {
+    background-color: var(--main-primary);
+}
+
 .hide-bg {
     visibility: hidden;
 }
@@ -168,7 +172,11 @@
 }
 
 .br {
-    border-right: 1px solid #c4c4c4;
+    border-right: 0.5px solid #c4c4c4;
+}
+
+.bl {
+    border-left: 0.5px solid #c4c4c4;
 }
 
 .uppercase {
