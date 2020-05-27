@@ -31,12 +31,6 @@ class Logo(enum.Enum):
 class Link(enum.Enum):
     AMBASSADOR_FORM='https://forms.gle/iPFE7T6Wrq4JzoEw9'
     YOUTUBE_TUTORIAL='https://www.youtube.com/watch?v=-4Y0wHMmWAs'
-
-class Alert(enum.Enum):
-    NONE=""
-    LOW='baixo'
-    MEDIUM='médio'
-    HIGH='alto'
  
 class Illustration(enum.Enum):
     CITY='https://i.imgur.com/UP2ZylF.png'
@@ -49,28 +43,27 @@ class IndicatorType(enum.Enum):
     SOCIAL_ISOLATION='social_isolation'
 
 
-class RiskLabel(enum.Enum):
-    nada=Alert.NONE.name
-    bom=Alert.LOW.name
-    insatisfatório=Alert.MEDIUM.name
-    ruiim=Alert.HIGH.name
+class AlertBackground(enum.Enum):
+    hide=''
+    green='baixo'
+    yellow='médio'
+    red='alto'
 
-class RiskBackground(enum.Enum):
-    hide=Alert.NONE.name
-    green=Alert.LOW.name
-    yellow=Alert.MEDIUM.name
-    red=Alert.HIGH.name
+class IndicatorBackground(enum.Enum):
+    hide=''
+    green='bom'
+    yellow='insatisfatório'
+    red='ruim'
+    blue='inloco'
 
 # Models
 class Indicator():
-    def __init__(self, header, caption, unit, left_label, right_label, metric=-1, display="", risk=Alert.HIGH.value, risk_label="", left_display="", right_display=""):
+    def __init__(self, header, caption, unit, left_label, right_label, risk="", display="", left_display="", right_display=""):
         self.header = header
         self.caption = caption
         self.unit = unit
-        self.metric = metric
         self.display = display
         self.risk = risk
-        self.risk_label = risk_label
         self.left_label = left_label
         self.right_label = right_label
         self.left_display= left_display
@@ -105,10 +98,10 @@ Strategies: List[ContainmentStrategy] = [
 ]
 
 IndicatorCards: Dict[str, Indicator] = {
-    IndicatorType.RT.value: Indicator(header="Ritmo de Contágio", caption="Cada contaminado infecta em média", unit="pessoas", left_label="Semana passada:", right_label="Tendência 📈:"),
-    IndicatorType.SUBNOTIFICATION_RATE.value: Indicator(header="Subnotificação", caption="A cada 10 pessoas infectadas, somente", unit="são identificadas", left_label="Mortes semana passada", right_label="Ranking BR:"),
-    IndicatorType.HOSPITAL_CAPACITY.value: Indicator( header="Capacidade Hospitalar", caption="A capacidade hospitalar será atingida em", unit="dias",  left_label="N.o de Leitos Covid:", right_label="# Ventiladores Covid:"),
-    IndicatorType.SOCIAL_ISOLATION.value: Indicator(header="Isolamento Social", caption="Semana passada, ficaram em casa", unit="das pessoas", left_label="Média semana passada:", right_label="Tendência 📈")
+    IndicatorType.RT.value: Indicator(header="Ritmo de Contágio", caption="Cada contaminado infecta em média outras", unit="pessoas", left_label="Semana passada:", right_label="Tendência 📈:"),
+    IndicatorType.SUBNOTIFICATION_RATE.value: Indicator(header="Subnotificação", caption="A cada 10 pessoas doentes, apenas", unit="são diagnosticadas", left_label="Mortes semana passada", right_label="Ranking BR:"),
+    IndicatorType.HOSPITAL_CAPACITY.value: Indicator( header="Capacidade Hospitalar", caption="Os seus leitos estarão todos ocupados em", unit="dias",  left_label="N.o de Leitos Covid:", right_label="# Ventiladores Covid:"),
+    IndicatorType.SOCIAL_ISOLATION.value: Indicator(header="Isolamento Social", caption="Na última semana, ficaram em casa cerca de", unit="das pessoas", left_label="Média semana passada:", right_label="Tendência 📈")
 }
 
 class Product:

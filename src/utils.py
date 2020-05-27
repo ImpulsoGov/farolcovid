@@ -10,9 +10,8 @@ from models import (
     Logo,
     Link,
     Indicator, 
-    Alert, 
-    RiskBackground, 
-    RiskLabel, 
+    AlertBackground, 
+    IndicatorBackground,
     Illustration, 
     Product
 )
@@ -56,7 +55,7 @@ def genHeroSection(title: str, subtitle: str):
                                         <span class="hero-container-subtitle primary-span">{subtitle}</span>
                                 </div>
                         </div>   
-                        <img class="hero-container-image" src="https://i.imgur.com/nVUF9nx.png"/>
+                        <img class="hero-container-image" src="https://i.imgur.com/l3vuQdP.png"/>
                 </div>
         </div>
         ''',
@@ -137,8 +136,8 @@ def genIndicatorCard(indicator: Indicator):
                         <span class="header p3">{indicator.header}</span>
                         <span class="p4">{indicator.caption}</span>
                         <span class="bold p2">{indicator.display}<span class="bold p4"> {indicator.unit}</span></span>
-                        <div class="{RiskBackground(indicator.risk).name}-alert-bg risk-pill">
-                                <span class="white-span p4 bold">{RiskLabel(indicator.risk).name}</span>
+                        <div class="{IndicatorBackground(indicator.risk).name}-alert-bg risk-pill">
+                                <span class="white-span p4 bold">{indicator.risk}</span>
                         </div>
                         <div class="flex flex-row flex-justify-space-between mt"> 
                                 <div class="br {display_left} flex-column text-align-center pr">
@@ -153,25 +152,37 @@ def genIndicatorCard(indicator: Indicator):
                 </div>
         '''
 
-def genKPISection(locality: str, alert: Alert, indicators: Dict[str, Indicator]):
+def genKPISection(locality: str, alert: str, indicators: Dict[str, Indicator]):
+
+        if not isinstance(alert, str):
+                bg = "gray"
+                locality = "Sugerimos que confira o nivel de risco de seu Estado."
+                caption = "Seu municipio nao possui dados suficientes para calcularmos o nivel de risco."
+                
+        else:
+                bg = AlertBackground(alert).name
+                caption = f"Nível de risco {alert} do colapso no sistema de saúde"
+       
         cards = list(map(genIndicatorCard, indicators.values()))
         cards = ''.join(cards)
-        msg = f'''🚨 *BOLETIM CoronaCidades:*  {locality} - {datetime.now().strftime('%d/%m')}  🚨%0a%0a
-                😷 Cada contaminado infecta em média outras {indicators['rt'].display} pessoas0a%0a
-                🏥 A capacidade hospitalar será atingida entre {indicators['hospital_capacity'].display} %0a%0a
-                🏥 A cada 10 pessoas infecadas, somente {indicators['subnotification_rate'].display} são identificadas%0a%0a
-                👉 _Acompanhe e simule a situação do seu município acessando o *FarolCovid* aqui_: https://coronacidades.org/ ''' 
+        msg = f"""
+        🚨 *BOLETIM CoronaCidades:*  {locality} - {datetime.now().strftime('%d/%m')}  🚨%0a%0a
+        😷 Cada contaminado infecta em média outras {indicators['rt'].display} pessoas0a%0a
+        🏥 A capacidade hospitalar será atingida entre {indicators['hospital_capacity'].display} %0a%0a
+        🏥 A cada 10 pessoas infecadas, somente {indicators['subnotification_rate'].display} são identificadas%0a%0a
+        👉 _Acompanhe e simule a situação do seu município acessando o *FarolCovid* aqui_: https://coronacidades.org/ """ 
+        
 
-        st.write(f'''
-         <div class="alert-banner {RiskBackground(alert.name).name}-alert-bg mb">
+        st.write('''
+        <div class="alert-banner %s-alert-bg mb">
                 <div class="base-wrapper flex flex-column" style="margin-top: 100px;">
-                        <span class="white-span header p1">{locality}</span>
-                        <span class="white-span p3">Risco {alert.value} do colapso no sistema de saúde</span>
-                        <div class="flex flex-row flex-m-column">{cards}</div>
-                        <a class="btn-wpp" href="whatsapp://send?text={msg}" target="blank">Compartilhar no Whatsapp</a>
+                        <span class="white-span header p1">%s</span>
+                        <span class="white-span p3">%s</span>
+                        <div class="flex flex-row flex-m-column">%s</div>
+                        <a class="btn-wpp" href="whatsapp://send?text=%s" target="blank">Compartilhar no Whatsapp</a>
                 </div>
         </div>
-        ''', unsafe_allow_html=True)
+        ''' % (bg, locality, caption , cards, msg), unsafe_allow_html=True)
 
 
 def genProductCard(product: Product):
@@ -193,9 +204,7 @@ def genProductCard(product: Product):
         '''
 
 def genProductsSection(products: List[Product]):
-
         cards = list(map(genProductCard, products))
-        
         cards = ''.join(cards)
         
         st.write(f'''

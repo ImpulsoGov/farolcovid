@@ -8,73 +8,36 @@ from simulator import run_evolution
 from simulation import calculate_recovered, filter_options
 import utils
 import simulation as sm
-from models import IndicatorType, IndicatorCards, Alert, RiskLabel, ProductCards
+from models import IndicatorType, IndicatorCards, ProductCards
 
 # Dados da projeção de capacidade de leitos
-def dday_city(params, selected_region, config, supply_type="n_beds"):
+def dday_city(params, alert, config, supply_type="n_beds"):
 
     params["population_params"] = {
-        "N": selected_region["population"],
-        "I": selected_region["active_cases"],
-        "D": selected_region["deaths"]
+        "N": alert["population"],
+        "I": alert["active_cases"],
+        "D": alert["deaths"]
     }
 
     params["strategy"] = {'isolation': 90, 'lockdown': 90}
 
-    params["n_beds"] = selected_region["number_beds"]
-    params["n_ventilators"] = selected_region["number_ventilators"]
+    params["n_beds"] = alert["number_beds"]
+    params["n_ventilators"] = alert["number_ventilators"]
 
-    if np.isnan(selected_region["active_cases"]):
+    if np.isnan(alert["active_cases"]):
         params["population_params"]["I"] = 1
     
-    if np.isnan(selected_region["deaths"]):
+    if np.isnan(alert["deaths"]):
         params["population_params"]["D"] = 0
     
-    params = calculate_recovered(params, selected_region, params['notification_rate'])
+    params = calculate_recovered(params, alert, params['notification_rate'])
     _, dday_beds, dday_ventilators = run_evolution(params, config)
     
     return dday_beds["best"], dday_beds["worst"]
-
-# def get_overall_alert_level(indicators):
-#     if indicators["rt"].metric < 1.0 and \
-#         indicators["hospital_capacity"] > 30 and \
-#         indicators["subnotification_rate"] < 0.5: 
-#         return Alert.LOW
-    
-#     elif (indicators["rt"].metric >= 1.0 and indicators["rt"].metric <= 1.2) and indicators["hospital_capacity"] > 30 and indicators["subnotification_rate"] < 0.5: 
-#         return Alert.MEDIUM
-#     else:
-#         return Alert.HIGH
-
-# def get_indicator_alert(name, indicator):
-#     if name == IndicatorType.RT.name:
-#         if indicator < 1.0:
-#             return Alert.LOW.name
-#         elif (indicator >= 1.0 and indicator <= 1.2):
-#             return Alert.MEDIUM.name
-#         else:
-#             return Alert.HIGH.name
-#     elif name == IndicatorType.HOSPITAL_CAPACITY.name:
-#         if indicator < 30:
-#             return Alert.HIGH.name
-#         elif indicator >= 30 and indicator <= 60:
-#             return Alert.MEDIUM.name
-#         else:
-#             return Alert.LOW.name
-#     elif name == IndicatorType.SUBNOTIFICATION_RATE.name:
-#         if indicator >= 0.7:
-#             return Alert.HIGH.name
-#         else:
-#             return Alert.NONE.name
-#     else:
-#         return Alert.NONE.name
         
 def update_indicator(indicator, display, left_display, right_display, risk):
-    # indicator.metric = metric
-    indicator.display = display
-    #indicator.risk = get_indicator_alert(key, metric)
     indicator.risk = risk
-    indicator.risk_label= RiskLabel(indicator.risk).value
+    indicator.display = display
     indicator.left_display=left_display
     indicator.right_display=right_display
 
@@ -82,7 +45,7 @@ def update_indicator(indicator, display, left_display, right_display, risk):
 
 def main():
     utils.localCSS("style.css")
-    utils.genHeroSection("Farol", "Entenda e controle a Covid-19 no seu município")
+    utils.genHeroSection("Farol", "Entenda e controle a Covid-19 em sua cidade e estado.")
     # GET DATA
     config = yaml.load(open('configs/config.yaml', 'r'), Loader = yaml.FullLoader)
     cities = loader.read_data('br', config, endpoint=config['br']['api']['endpoints']['simulacovid'])
@@ -96,38 +59,57 @@ def main():
     indicators = IndicatorCards
 
     level = st.selectbox('Nível', ["Estadual", "Municipal"])
+    pd.set_option('display.max_columns', None)
 
     if level == "Estadual":
         user_input['state'] = st.selectbox('Estado', cities['state_name'].unique())
+        user_input['place_type'] = 'state'
         cities_filtered = filter_options(cities, user_input['state'], 'state_name')
         locality = user_input['state']
+        alert = df_states[df_states["state_name"] == cities_filtered["state_name"].iloc[0]].iloc[0]
+        user_input["notification_rate"] = alert["notification_rate"]
 
     if level == "Municipal":
         user_input['city'] = st.selectbox('Município', cities['city_name'].unique())
+        user_input['place_type'] = 'city'
         cities_filtered = filter_options(cities, user_input['city'], 'city_name')
         locality = user_input['city']
+        alert = df_cities[df_cities["city_id"] == cities_filtered["city_id"].iloc[0]]
+        
+        if np.isnan(alert["notification_rate"]):
+            alert["notification_rate"] = df_states[df_states["state_name"] == cities_filtered["state_name"].iloc[0]].iloc[0]["notification_rate"]
+            st.write("Seu município não possui dados suficientes para calcular a taxa de subnotificação. Vamos utilizar a do Estado.")
+        if np.inan(alert["rt_10days_ago_most_likely"]):
+            state = df_states[df_states["state_name"] == cities_filtered["state_name"].iloc[0]].iloc[0]
+            alert["rt_10days_ago_most_likely"] = state["rt_10days_ago_most_likely"]
+            alert["rt_10days_ago_low"] = state["rt_10days_ago_low"]
+            alert["rt_10days_ago_high"] = state["rt_10days_ago_high"]
+            st.write("Seu município não possui dados suficientes para calcular o índice de contágio. Vamos utilizar o do Estado.")
+    
+        user_input["notification_rate"] = alert["notification_rate"]
+
+        
 
     selected_region = cities_filtered.sum(numeric_only=True)
     # CUSTOMIZE INPUT SECTION
 
     # GET NOTIFICATION RATE & Rt 
 
-    if len(cities_filtered) > 1: # pega taxa do estado quando +1 municipio selecionado
-            user_input["notification_rate"] = round(cities_filtered['state_notification_rate'].mean(), 2)
-            rt = df_cities[df_cities["state"] == cities_filtered["state"].unique()[0]]
-            alerts = df_cities[df_cities["state"] == cities_filtered["state"].unique()[0]]
-    elif np.isnan(cities_filtered['notification_rate'].values):
-            user_input["notification_rate"] = 1
-            rt = df_cities[df_cities["city_id"] == cities_filtered["city_id"].iloc[0]]
-            alerts = df_cities[df_cities["city_id"] == cities_filtered["city_id"].iloc[0]]
+    # if len(cities_filtered) > 1: # pega taxa do estado quando +1 municipio selecionado
+    #         user_input["notification_rate"] = round(cities_filtered['state_notification_rate'].mean(), 2)
+    #         rt = df_cities[df_cities["state"] == cities_filtered["state"].unique()[0]]
+    #         alert = df_cities[df_cities["state"] == cities_filtered["state"].unique()[0]]
+    # elif np.isnan(cities_filtered['notification_rate'].values):
+    #         user_input["notification_rate"] = 1
+    #         rt = df_cities[df_cities["city_id"] == cities_filtered["city_id"].iloc[0]]
+    #         alert = df_cities[df_cities["city_id"] == cities_filtered["city_id"].iloc[0]]
 
-    else:
-            user_input["notification_rate"] = round(cities_filtered['notification_rate'], 4)
-            rt = df_cities[df_cities["city_id"] == cities_filtered["city_id"].iloc[0]]
-            alerts = df_cities[df_cities["city_id"] == cities_filtered["city_id"].iloc[0]]
+    # else:
+    #         user_input["notification_rate"] = round(cities_filtered['notification_rate'], 4)
+    #         rt = df_cities[df_cities["city_id"] == cities_filtered["city_id"].iloc[0]]
+    #         alert = df_cities[df_cities["city_id"] == cities_filtered["city_id"].iloc[0]]
 
-
-    if selected_region['confirmed_cases'] == 0:
+    if alert['confirmed_cases'] == 0:
         st.write(f'''<div class="base-wrapper">
         Seu município ou regional de saúde ainda não possui casos reportados oficialmente. Portanto, simulamos como se o primeiro caso ocorresse hoje.
         <br><br>Caso queria, você pode mudar esse número abaixo:
@@ -140,7 +122,7 @@ def main():
         if not np.all(cities_filtered['last_updated'].isna()):
                 last_update_cases = cities_filtered['last_updated'].max().strftime('%d/%m')
         st.write(f'''<div class="base-wrapper">
-        O número de casos confirmados oficialmente no seu município ou regional de saúde é de {int(selected_region['confirmed_cases'].sum())} em {last_update_cases}. 
+        O número de casos confirmados oficialmente no seu município ou regional de saúde é de {int(alert['confirmed_cases'].sum())} em {last_update_cases}. 
         Dada a progressão clínica da doença (em média, {infectious_period} dias) e a taxa de notificação ajustada para a região ({int(100*user_input['notification_rate'])}%), 
         <b>estimamos que o número de casos ativos é de {estimation}</b>.
         <br>Caso queria, você pode mudar esse número para a simulação abaixo:
@@ -151,55 +133,51 @@ def main():
     if st.button('Alterar dados'):
         utils.genInputCustomizationSectionHeader(locality)
         
-        user_input = utils.genInputFields(locality, user_input, cities_filtered, selected_region, config)
+        user_input = utils.genInputFields(locality, user_input, cities_filtered, alert, config)
          # AMBASSADOR SECTION
         utils.genAmbassadorSection()
 
-    if len(rt) < 1: #TODO in case no RT edge case
-        st.write("Rt: Sua cidade não possui casos suficiente para o cálculo!")
-    else:
+    # if np.isnan(alert['rt_10days_ago_most_likely']): #TODO in case no RT edge case
+    #     st.write("Rt: Sua cidade não possui casos suficiente para o cálculo!")
+    # else:
         # pd.set_option('display.max_columns', None)
         # kill metricc, add risk direclty kill function
-        indicators["rt"] = update_indicator(#IndicatorType.RT.name,
 
-                                            indicators["rt"],
-                                            # metric=(rt.iloc[-1]["rt_10days_week_avg"]), 
-                                            display=f'{str(round(rt.iloc[-1]["rt_10days_ago_low"], 1))} - {str(round(rt.iloc[-1]["rt_10days_ago_high"], 1))}',
-                                            left_display=f'{round(alerts.iloc[-1]["rt_17days_ago_low"], 1)} - {round(alerts.iloc[-1]["rt_17days_ago_high"], 1)}',
-                                            right_display=f'{alerts.iloc[-1]["rt_comparision"]}',
-                                            risk=alerts.iloc[-1]["rt_classification"])
-        indicators['subnotification_rate'] = update_indicator(#IndicatorType.SUBNOTIFICATION_RATE.name, 
-                                                        indicators["subnotification_rate"], 
-                                                        # metric=(1.0 - user_input["notification_rate"]), 
-                                                        display=int((1.0 - user_input["notification_rate"]) * 10),
-                                                        left_display=f'{alerts.iloc[-1]["deaths"]}',
-                                                        right_display=f'{alerts.iloc[-1]["subnotification_rank"]}',
-                                                        risk="")
+    indicators["rt"] = update_indicator(indicators["rt"],
+                                        display=f'{str(round(alert["rt_10days_ago_low"], 1))} - {str(round(alert["rt_10days_ago_high"], 1))}',
+                                        left_display=f'{round(alert["rt_17days_ago_low"], 1)} - {round(alert["rt_17days_ago_high"], 1)}',
+                                        right_display=f'{alert["rt_growth"]}',
+                                        risk=alert["rt_classification"])
+    indicators['subnotification_rate'] = update_indicator( 
+                                                    indicators["subnotification_rate"], 
+                                                    display=int((1.0 - user_input["notification_rate"]) * 10),
+                                                    left_display=f'{round(alert["deaths"])}',
+                                                    right_display=f'{round(alert["subnotification_rank"])}',
+                                                    risk="")
     
 
     # Populating base indicator template
-    dday_beds_best, dday_beds_worst = dday_city(user_input, selected_region, config, supply_type="n_beds")
+    dday_beds_best, dday_beds_worst = dday_city(user_input, alert, config, supply_type="n_beds")
     if dday_beds_best != dday_beds_worst:
         display = f'{round(dday_beds_worst, 1)} e {round(dday_beds_best, 1)}'
     else:
         display = f'''{dday_beds_best}'''
     indicators['hospital_capacity'] = update_indicator(indicators['hospital_capacity'], 
                                                 display=f'{display}',
-                                                left_display=f'{alerts.iloc[-1]["number_ventilators"]}',
-                                                right_display=f'{alerts.iloc[-1]["number_beds"]}',
-                                                risk=alerts.iloc[-1]["dday_classification"])
+                                                left_display=f'{round(alert["number_ventilators"])}',
+                                                right_display=f'{round(alert["number_beds"])}',
+                                                risk=alert["dday_classification"])
 
     indicators[IndicatorType.SOCIAL_ISOLATION.value] = update_indicator(indicators[IndicatorType.SOCIAL_ISOLATION.value], 
-                                                display=f'{int(alerts.iloc[-1]["inloco_today_7days_avg"] * 100)}%',
-                                                left_display=f'{int(alerts.iloc[-1]["inloco_last_week_7days_avg"] * 100)}%',
-                                                right_display=f'{alerts.iloc[-1]["inloco_comparision"]}', 
+                                                display=f'{int(alert["inloco_today_7days_avg"] * 100)}%',
+                                                left_display=f'{int(alert["inloco_last_week_7days_avg"] * 100)}%',
+                                                right_display=f'{alert["inloco_growth"]}', 
                                                 risk="inloco")
 
-
-    utils.genKPISection(locality=locality, alert=get_overall_alert_level(indicators), indicators=indicators)
+    utils.genKPISection(locality=locality, alert=alert['overall_alert'], indicators=indicators)
    
     products = ProductCards
-    products[1].recommendation = f'Risco {alerts.iloc[-1]["overall_alert"]}'
+    products[1].recommendation = f'Risco {alert["overall_alert"]}'
     utils.genProductsSection(products)
     product = st.selectbox( 'Como você gostaria de prosseguir?', ('Contenção', 'Reabertura'))
     

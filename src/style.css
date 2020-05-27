@@ -119,6 +119,10 @@
     background-color: var(--main-green-alert);
 }
 
+.gray-alert-bg {
+    background-color: #c4c4c4;
+}
+
 .hide-bg {
     visibility: hidden;
 }
