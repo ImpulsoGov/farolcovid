@@ -1,9 +1,10 @@
 import streamlit as st
 
+
 def main():
 
     st.header("""$$R_t$$ de Estados e Municípios""")
-    
+
     st.subheader("""Calculo do $$R_t$$""")
 
     st.write(
@@ -25,28 +26,30 @@ def main():
         1 se traduz na expectativa de que o número de novas infecções vai diminuir ao longo do tempo, indicando que a situação está sob controle se todas 
         as medidas e comportamentos forem mantidos.
 
-        Uma boa notícia: por causa da mudança de comportamento, o  tende a ser menor que o , como explicam os desenvolvedores do 
-        [Covid ActNow](https://blog.covidactnow.org/inference-projections-for-states/). Calculá-lo também nos permite, portanto, 
+        Uma boa notícia: por causa da mudança de comportamento, o $$R_t$$ tende a ser menor que o $$R_0$$, como explicam os desenvolvedores do 
+        Covid ActNow [1]. Calculá-lo também nos permite, portanto, 
         comparar qual seria a evolução do contágio da Covid-19 caso medidas restritivas de contato e contágio não tivessem sido adotadas.
 
         Medir diretamente o número efetivo de reprodução da Covid-19 não é possível. Porém, podemos estimar o número de reprodução 
         instantâneo ($$R_t$$) mais provável pelo número de novos casos por dia:
 
         - Modelo bayesiano no qual o número de novos casos segue uma distribuição de Poisson, e a relação entre os novos casos e $$R_t$$ é dada pela 
-        equação encontrada em Bettencourt & Ribeiro:
+        equação encontrada em Bettencourt & Ribeiro [2]:
 
         """
-        )
+    )
 
     st.latex("""k \sim Pois(\lambda), \lambda = k_{t-1} e^{\gamma(R_t-1)}""")
-    
+
     st.write(
         """
         - A cada nova observação, atualizamos nossa crença em relação ao valor de $$R_t$$ pela regra de Bayes:
         """
-        )
-    
-    st.latex(r"""P(k_t) = \sum_{R_t} P(k_t \mid R_t) P(R_t) \rightarrow P(R_t \mid k_t) = \frac{P(R_t \mid k_t) P(R_t)}{P(k_t)}""") 
+    )
+
+    st.latex(
+        r"""P(k_t) = \sum_{R_t} P(k_t \mid R_t) P(R_t) \rightarrow P(R_t \mid k_t) = \frac{P(R_t \mid k_t) P(R_t)}{P(k_t)}"""
+    )
 
     st.subheader("""Considerações""")
     st.write(
@@ -55,31 +58,40 @@ def main():
 
         - A relação dada por $$\lambda = k_{t-1} e^{\gamma(R_t-1)}$$  é obtida a partir de $$R_0 = \frac{\beta}{\gamma}$$
         tamando $$\beta$$ e $$\gamma$$ fixos, o que não contempla a variabilidade de transmissão devido à intervenções sociais. 
-        O [*CovidAct Now*](https://blog.covidactnow.org/inference-projections-for-states/) sinaliza, por exemplo, o 
+        O *CovidAct Now* [1] sinaliza, por exemplo, o 
         $$R_0$$ como o número pré-intervenção e o $$R_{eff}$$ (efetivo) como pós;
 
         - O $$R_t$$ deve ser lido como número de novas infecções que são esperadas no tempo serial determinado - estimado em 8 dias para a 
         Covid-19. Ou seja, esperamos que cada pessoa infectada hoje infecte aquele número de novas pessoas nesse intervalo de tempo;
         
-        - Seguindo [Covid ActNow](https://blog.covidactnow.org/modeling-metrics-critical-to-reopen-safely/), reportamos o $$R_t$$ de 10 dias 
+        - Seguindo Covid ActNow [3], reportamos o $$R_t$$ de 10 dias 
         atrás - garantindo que não incorreremos em problemas de demora no resultado de testes, por exemplo;
 
         """
-        )
+    )
 
     st.subheader("""Referências""")
     st.write(
         """
-        Loft-BR. 2020. [Visualizando a evolução do número de reprodução no Brasil](https://github.com/loft-br/realtime_r0_brazil/blob/master/realtime_r0_bettencourt_ribeiro.ipynb) 
-
-        COVID ActNow. 2020. [Infer R_t](https://github.com/covid-projections/covid-data-model/blob/089e4e81db32befd6e86e4e105454629fd834ad2/pyseir/inference/infer_rt.py)
-
-        Kevin Systrom. 2020. [The Metric We Need to Manage COVID-19](http://systrom.com/blog/the-metric-we-need-to-manage-covid-19/)
-
-        Bettencourt & Ribeiro. 2008. [Real Time Bayesian Estimation of the Epidemic Potential of Emerging Infectious Diseases](https://doi.org/10.1371/journal.pone.0002185). PLoS ONE 3(5): e2185.
-
+        [1] COVID ActNow Blog, 2020. [Inference projections for states.](https://blog.covidactnow.org/inference-projections-for-states/)
+        
+        
+        [2] Bettencourt & Ribeiro. 2008. [Real Time Bayesian Estimation of the Epidemic Potential of Emerging Infectious Diseases](https://doi.org/10.1371/journal.pone.0002185). PLoS ONE 3(5): e2185.
+        
+        
+        [3] COVID ActNow Blog, 2020. [Modeling metrics critical to reopen safely](https://blog.covidactnow.org/modeling-metrics-critical-to-reopen-safely/)
+        
+        
+        [4] Kevin Systrom. 2020. [The Metric We Need to Manage COVID-19 (código base)](http://systrom.com/blog/the-metric-we-need-to-manage-covid-19/)
+        
+        
+        [5] Loft-BR. 2020. [Visualizando a evolução do número de reprodução no Brasil (código adaptado).](https://github.com/loft-br/realtime_r0_brazil/blob/master/realtime_r0_bettencourt_ribeiro.ipynb) 
+        
+        
+        [6] COVID ActNow, 2020. [Infer R_t (código adaptado)](https://github.com/covid-projections/covid-data-model/blob/089e4e81db32befd6e86e4e105454629fd834ad2/pyseir/inference/infer_rt.py)
         """
-        )
+    )
+
 
 if __name__ == "__main__":
     main()
