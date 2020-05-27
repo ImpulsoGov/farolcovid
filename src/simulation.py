@@ -59,17 +59,19 @@ def main(user_input, locality, cities_filtered, config):
 
         # DEFAULT WORST SCENARIO  
 
-        st.write('''
+        st.write(f'''
         <div class="base-wrapper">
-                <span class="section-header primary-span">Etapa 4: Simule o resultado de possíveis intervenções</span>
+                <span class="section-header primary-span"> Simule o impacto causado por de diferentes ritmos de contágio no seu sistema hospitalar</span>
                 <br />
-                <span>Agora é a hora de planejar como você pode melhor se preparar para evitar a sobrecarga hospitalar. Veja como mudanças no seu ritmo de contágio afetam a necessidade de leitos e ventiladores na sua cidade:</span>
+                <span>Agora é a hora de se preparar para evitar a sobrecarga hospitalar. No momento, em {locality}, estimamos que cada pessoa doente infectará outras {user_input['rt']} pessoas. Simule como mudanças no seu ritmo de contágio afetam a demanda por leitos e ventiladores na sua cidade:</span>
         </div>''', unsafe_allow_html=True)
 
-        user_input['strategy']['isolation'] = st.slider('Em quantos dias você quer acionar a Estratégia 2, medidas restritivas? (deixe como 0 se a medida já estiver em vigor)', 0, 90, 0, key='strategy2')
+        # user_input['strategy']['isolation'] = st.slider('Em quantos dias você quer acionar a Estratégia 2, medidas restritivas? (deixe como 0 se a medida já estiver em vigor)', 0, 90, 0, key='strategy2')
 
-        user_input['strategy']['lockdown'] = st.slider('Em quantos dias você quer acionar a Estratégia 3, quarentena?', 0, 90, 90, key='strategy3')
-        
+        # user_input['strategy']['lockdown'] = st.slider('Em quantos dias você quer acionar a Estratégia 3, quarentena?', 0, 90, 90, key='strategy3')
+        #TODO add rt
+        sim_type = st.selectbox("Select Hospital", (' O que acontece se seu ritmo de contágio diminuir pela metade?', ' O que acontece se seu ritmo de contágio continuar constante?', 'O que acontece se dobrar o seu ritmo de contágio?'))
+
         st.write('<br/><br/>', unsafe_allow_html=True)
         
         # SIMULATOR SCENARIOS: BEDS & RESPIRATORS

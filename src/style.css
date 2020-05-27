@@ -924,16 +924,24 @@ header>.toolbar { /* Hide toolbar menu */
 }
 
 
+.see-more-btn {
+    margin-top: 250px;
+}
+
 .product-section {
-    margin-top: 400px;
+    margin-top: 50px;
 }
 @media only screen and (max-width: 425px) {
     .indicator-card {
         height: 350px;
     }
 
-    .product-section {
+    /* .product-section {
         margin-top: 1200px;
+    } */
+
+    .see-more-btn {
+        margin-top: 1400px;
     }
 }
 

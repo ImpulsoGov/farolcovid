@@ -59,7 +59,6 @@ def main():
     indicators = IndicatorCards
 
     level = st.selectbox('Nível', ["Estadual", "Municipal"])
-    pd.set_option('display.max_columns', None)
 
     if level == "Estadual":
         user_input['state'] = st.selectbox('Estado', cities['state_name'].unique())
@@ -67,7 +66,6 @@ def main():
         cities_filtered = filter_options(cities, user_input['state'], 'state_name')
         locality = user_input['state']
         alert = df_states[df_states["state_name"] == cities_filtered["state_name"].iloc[0]].iloc[0]
-        user_input["notification_rate"] = alert["notification_rate"]
 
     if level == "Municipal":
         user_input['city'] = st.selectbox('Município', cities['city_name'].unique())
@@ -77,23 +75,30 @@ def main():
         alert = df_cities[df_cities["city_id"] == cities_filtered["city_id"].iloc[0]].iloc[0]
         state = df_states[df_states["state_name"] == cities_filtered["state_name"].iloc[0]].iloc[0]
         
-        print(alert["notification_rate"].dtype)
         if np.isnan(alert["notification_rate"]):
             alert["notification_rate"] = state["notification_rate"]
             alert["subnotification_classification"] = state["subnotification_classification"]
-            st.write("Seu município não possui dados suficientes para calcular a taxa de subnotificação. Vamos utilizar a do Estado.")
+            st.write(f'''<div class="base-wrapper">
+            Seu município não possui dados suficientes para calcular a taxa de subnotificação. Vamos utilizar a do Estado.
+            </div>''', unsafe_allow_html=True)
+        
+        alert["rt_10days_ago_most_likely"] = float("nan")
         if np.isnan(alert["rt_10days_ago_most_likely"]):
+            
             alert["rt_10days_ago_most_likely"] = state["rt_10days_ago_most_likely"]
             alert["rt_10days_ago_low"] = state["rt_10days_ago_low"]
             alert["rt_10days_ago_high"] = state["rt_10days_ago_high"]
             alert["rt_classification"] = state["rt_classification"]
-            st.write("Seu município não possui dados suficientes para calcular o índice de contágio. Vamos utilizar o do Estado.")
+            st.write(f'''<div class="base-wrapper">
+            Seu município não possui dados suficientes para calcular o índice de contágio. Vamos utilizar o do Estado.
+            </div>''', unsafe_allow_html=True)
        
         if np.isnan(alert['dday_beds_best']) or np.isnan(alert['dday_beds_worst']): 
             alert['dday_classification'] = state['dday_classification']
             alert['dday_beds_best'] = state['dday_beds_best']
             alert['dday_beds_worst'] = state['dday_beds_worst']
-        user_input["notification_rate"] = alert["notification_rate"]
+    user_input["notification_rate"] = alert["notification_rate"]
+    user_input["rt"] =  alert["rt_10days_ago_most_likely"]
 
         
 
@@ -162,7 +167,7 @@ def main():
                                                     right_display=f'{np.round(alert["subnotification_rank"])}',
                                                     risk="")
     
-
+    
     # Populating base indicator template
     dday_beds_best, dday_beds_worst = dday_city(user_input, alert, config, supply_type="n_beds")
     
@@ -172,7 +177,7 @@ def main():
         display = f'{round(dday_beds_worst, 1)} e {round(dday_beds_best, 1)}'
     else:
         display = f'''{dday_beds_best}'''
-        
+
     indicators['hospital_capacity'] = update_indicator(indicators['hospital_capacity'], 
                                                 display=f'{display}',
                                                 left_display=f'{round(alert["number_ventilators"])}',
@@ -187,6 +192,11 @@ def main():
 
     utils.genKPISection(locality=locality, alert=alert['overall_alert'], indicators=indicators)
    
+    #TODO add plots
+    st.write("<div class='see-more-btn'></div>", unsafe_allow_html=True)
+    if st.button('Ver mais detalhes'):
+        st.write("Display charts here")
+
     products = ProductCards
     products[1].recommendation = f'Risco {alert["overall_alert"]}'
     utils.genProductsSection(products)
@@ -198,6 +208,7 @@ def main():
     # elif product == 'Reabertura':
         # so.main()
 
+    st.write("##Estamos à disposição para apoiar o gestor público a aprofundar a análise para seu estado ou município, de forma inteiramente gratuita. Entre em contato pelo Coronacidades.org!")
     # INDICATORS
     # sources = cities_filtered[[c for c in cities_filtered.columns if (('author' in c) or ('last_updated_' in c))]]
 

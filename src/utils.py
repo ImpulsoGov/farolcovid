@@ -153,7 +153,6 @@ def genIndicatorCard(indicator: Indicator):
         '''
 
 def genKPISection(locality: str, alert: str, indicators: Dict[str, Indicator]):
-        alert=float('nan')
         if not isinstance(alert, str):
                 bg = "gray"
                 caption = "Sugerimos que confira o nível de risco de seu Estado.<br/>Seu municipio nao possui dados suficientes para calcularmos o nivel de risco."
@@ -166,22 +165,23 @@ def genKPISection(locality: str, alert: str, indicators: Dict[str, Indicator]):
         cards = ''.join(cards)
         msg = f"""
         🚨 *BOLETIM CoronaCidades:*  {locality} - {datetime.now().strftime('%d/%m')}  🚨%0a%0a
-        😷 Cada contaminado infecta em média outras {indicators['rt'].display} pessoas0a%0a
-        🏥 A capacidade hospitalar será atingida entre {indicators['hospital_capacity'].display} %0a%0a
+        😷 Cada contaminado infecta em média outras {indicators['rt'].display} pessoas %0a%0a
+        🏥 A capacidade hospitalar será atingida entre {indicators['hospital_capacity'].display} dias %0a%0a
         🏥 A cada 10 pessoas infecadas, somente {indicators['subnotification_rate'].display} são identificadas%0a%0a
         👉 _Acompanhe e simule a situação do seu município acessando o *FarolCovid* aqui_: https://coronacidades.org/ """ 
         
 
-        st.write('''
-        <div class="alert-banner %s-alert-bg mb">
+        st.write('''<div class="alert-banner %s-alert-bg mb">
                 <div class="base-wrapper flex flex-column" style="margin-top: 100px;">
-                        <span class="white-span header p1">%s</span>
+                        <div class="flex flex-row flex-space-between flex-align-items-center">
+                                <span class="white-span header p1">%s</span>
+                                <a class="btn-wpp" href="whatsapp://send?text=%s" target="blank">Compartilhar no Whatsapp</a>
+                        </div>
                         <span class="white-span p3">%s</span>
                         <div class="flex flex-row flex-m-column">%s</div>
-                        <a class="btn-wpp" href="whatsapp://send?text=%s" target="blank">Compartilhar no Whatsapp</a>
                 </div>
         </div>
-        ''' % (bg, locality, caption , cards, msg), unsafe_allow_html=True)
+        ''' % (bg, locality,msg, caption , cards), unsafe_allow_html=True)
 
 
 def genProductCard(product: Product):
