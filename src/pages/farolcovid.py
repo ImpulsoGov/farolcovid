@@ -49,17 +49,28 @@ def update_indicators(indicators, data, config):
                 indicators[group].left_display = "- "
 
         else:
+
+            if group == "subnotification_rate":
+                indicators[group].display = str(
+                    int(
+                        10
+                        * data[config["br"]["indicators"][group]["display"]]
+                        .fillna("- ")
+                        .values[0]
+                    )
+                )
+
+            else:
+                indicators[group].display = fix_type(
+                    data[config["br"]["indicators"][group]["display"]]
+                    .fillna("- ")
+                    .values[0]
+                )
             indicators[group].risk = [
                 str(data[config["br"]["indicators"][group]["risk"]].values[0])
                 if group != "social_isolation"
                 else "Fonte: inloco"
             ][0]
-
-            indicators[group].display = fix_type(
-                data[config["br"]["indicators"][group]["display"]]
-                .fillna("- ")
-                .values[0]
-            )
 
             indicators[group].left_display = fix_type(
                 data[config["br"]["indicators"][group]["left_display"]]
@@ -200,7 +211,16 @@ def main():
             unsafe_allow_html=True,
         )
 
+    # INDICATORS CARDS
+    indicators = IndicatorCards
+
+    # TODO: casos de municipios sem dados
+    indicators = update_indicators(indicators, data, config)
+
     if st.button("Alterar dados"):
+
+        if st.button("Esconder"):
+            pass
 
         utils.genInputCustomizationSectionHeader(user_input["locality"])
 
@@ -209,24 +229,15 @@ def main():
         )
 
         # TODO: Confirmar as mudanças dos valores dos cards aqui!
-        config["br"]["indicators"]["hospital_capacity"]["right_display"] = user_input[
-            "n_beds"
-        ]
-        config["br"]["indicators"]["hospital_capacity"]["left_display"] = user_input[
-            "n_ventilators"
-        ]
-        config["br"]["indicators"]["subnotification_rate"]["left_display"] = user_input[
+        indicators["hospital_capacity"].right_display = user_input["n_beds"]
+        indicators["hospital_capacity"].left_display = user_input["n_ventilators"]
+        indicators["subnotification_rate"].left_display = user_input[
             "population_params"
         ]["D"]
 
         # AMBASSADOR SECTION
         utils.genAmbassadorSection()
 
-    # INDICATORS CARDS
-    indicators = IndicatorCards
-
-    # TODO: casos de municipios sem dados
-    indicators = update_indicators(indicators, data, config)
 
     utils.genKPISection(
         locality=user_input["locality"],
@@ -243,9 +254,12 @@ def main():
             pass
 
         st.write(
-            """
+            f"""
             <div class="base-wrapper">
-                    <span class="section-header primary-span">ISOLAMENTO SOCIAL (IN LOCO)</span>
+                    <span class="section-header primary-span">TAXA DE ISOLAMENTO SOCIAL EM {user_input["locality"]}</span>
+                    <br><br>
+                    Percentual de smartphones que deixou o local de residência, em cada dia, calculado  pela inloco. 
+                    Para mais informações, <a target="_blank" style="color:#3E758A;="https://mapabrasileirodacovid.inloco.com.br/pt/">veja aqui</a>.
             </div>
             """,
             unsafe_allow_html=True,
