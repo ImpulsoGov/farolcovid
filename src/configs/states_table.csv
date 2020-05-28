@@ -1,0 +1,28 @@
+,state_id,state_name,state_num_id
+0,AC,Acre,12
+1,AL,Alagoas,27
+2,AM,Amazonas,13
+3,AP,Amapá,16
+4,BA,Bahia,29
+5,CE,Ceará,23
+6,DF,Distrito Federal,53
+7,ES,Espírito Santo,32
+8,GO,Goiás,52
+9,MA,Maranhão,21
+10,MG,Minas Gerais,31
+11,MS,Mato Grosso do Sul,50
+12,MT,Mato Grosso,51
+13,PA,Pará,15
+14,PB,Paraíba,25
+15,PE,Pernambuco,26
+16,PI,Piauí,22
+17,PR,Paraná,41
+18,RJ,Rio de Janeiro,33
+19,RN,Rio Grande do Norte,24
+20,RO,Rondônia,11
+21,RR,Roraima,14
+22,RS,Rio Grande do Sul,43
+23,SC,Santa Catarina,42
+24,SE,Sergipe,28
+25,SP,São Paulo,35
+26,TO,Tocantins,17
