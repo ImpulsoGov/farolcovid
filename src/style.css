@@ -411,6 +411,7 @@ header>.toolbar { /* Hide toolbar menu */
 
 .hero-container-image {
     margin-left: auto;
+    margin-right: auto;
     width: 500px;
     height: 100%;
 }

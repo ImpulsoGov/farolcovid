@@ -27,6 +27,8 @@ br:
         local: http://localhost:7000/
         endpoints:
             simulacovid: "br/cities/simulacovid/main"
+            rt_cities: "br/cities/rt"
+            rt_states: "br/states/rt"
             farolcovid: 
                 cities: "br/cities/farolcovid/main"
                 states: "br/states/farolcovid/main"
