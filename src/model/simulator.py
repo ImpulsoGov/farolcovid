@@ -30,9 +30,11 @@ def iterate_simulation(current_state, seir_parameters, phase, initial):
 def get_rt(place_type, user_input, config, simulation_params, bound):
 
     if place_type == "city_id":
+        col = place_type
         endpoint = config["br"]["api"]["endpoints"]["rt_cities"]
 
-    if place_type == "state":
+    if place_type == "state_id":
+        col = "state"
         endpoint = config["br"]["api"]["endpoints"]["rt_states"]
 
     rt = loader.read_data("br", config, endpoint=endpoint)
@@ -40,10 +42,8 @@ def get_rt(place_type, user_input, config, simulation_params, bound):
     rt = rt[rt["last_updated"] == (rt["last_updated"].max() - dt.timedelta(10))]
 
     # caso nao tenha rt, usa o rt do estado
-    if (user_input[place_type] not in rt[place_type].values) & (
-        place_type == "city_id"
-    ):
-        return get_rt("state", user_input, config, simulation_params, bound)
+    if (place_type == "city_id") & (user_input[place_type] not in rt[col].values):
+        return get_rt("state_id", user_input, config, simulation_params, bound)
 
     cols = {"best": "Rt_low_95", "worst": "Rt_high_95"}
 
@@ -51,18 +51,18 @@ def get_rt(place_type, user_input, config, simulation_params, bound):
 
         # TODO: mudar para novas flags com o front
         if simulation_params[phase]["scenario"] == "isolation":  # nothing
-            simulation_params[phase]["R0"] = rt[
-                rt[place_type] == user_input[place_type]
-            ][cols[bound]].values[0]
+            simulation_params[phase]["R0"] = rt[rt[col] == user_input[place_type]][
+                cols[bound]
+            ].values[0]
 
         if simulation_params[phase]["scenario"] == "lockdown":  # smaller_rt
             simulation_params[phase]["R0"] = (
-                rt[rt[place_type] == user_input[place_type]][cols[bound]] / 2
+                rt[rt[col] == user_input[place_type]][cols[bound]] / 2
             )
 
         if simulation_params[phase]["scenario"] == "nothing":  # greater_rt
             simulation_params[phase]["R0"] = (
-                rt[rt[place_type] == user_input[place_type]][cols[bound]] * 2
+                rt[rt[col] == user_input[place_type]][cols[bound]] * 2
             )
 
     return simulation_params
@@ -123,7 +123,7 @@ def run_simulation(user_input, config):
         }
 
         # Get Rts
-        if not user_input["state"] and not user_input["city_id"]:
+        if not user_input["state_id"] and not user_input["city_id"]:
             for phase in simulation_params:
                 simulation_params[phase]["R0"] = 3
         else:

@@ -23,25 +23,6 @@ import pandas as pd
 import os
 
 
-# def get_indicators(x):
-#         dic_indicators = {
-#                 "rt": {
-#                         "display": ["rt_10days_ago_low", "rt_10days_ago_high"],
-#                         "left_display": ["rt_17days_ago_low", "rt_17days_ago_high"],
-#                         "right_display": "rt_growth",
-#                         "risk": "rt_classification"
-
-#                 }
-#                 "subnotification_rate": {
-#                         "display": "subnotification_rate",
-#                         "left_display": ["rt_17days_ago_low", "rt_17days_ago_high"],
-#                         "right_display": "rt_growth",
-#                         "risk": "rt_classification"
-#                 }
-#         }
-#         return dic_indicators[x]
-
-
 def fix_dates(df):
 
     for col in df.columns:
@@ -54,21 +35,16 @@ def add_all(x, all_string="Todos"):
     return [all_string] + list(x)
 
 
-def filter_options(_df, var, col, all_string="Todos"):
-    if var == "Todos":
-        return _df
-    else:
-        return _df.query(f'{col} == "{var}"')
-
-
 # TODO: melhorar essa funcao
 def get_sources(data, resources, cities_sources):
 
     sources = dict()
 
     for x in resources:
+
         for item in ["author_number", "last_updated_number", "number"]:
             col = "_".join([item, x])
+
             if not col in data.columns:
                 sources[col] = (
                     cities_sources[
@@ -79,7 +55,7 @@ def get_sources(data, resources, cities_sources):
                     .values
                 )
             else:
-                sources[col] = data[col].drop_duplicates().values  # .fillna(0)
+                sources[col] = data[col].drop_duplicates().fillna(0).values
 
     return sources
 
@@ -235,7 +211,7 @@ def genKPISection(locality: str, alert: str, indicators: Dict[str, Indicator]):
     # alert = float("nan")
     if not isinstance(alert, str):
         bg = "gray"
-        caption = "Sugerimos que confira o nível de risco de seu Estado.<br/>Seu municipio nao possui dados suficientes para calcularmos o nivel de risco."
+        caption = "Sugerimos que confira o nível de risco de seu estado.<br/>Seu município nao possui dados suficientes para calcularmos o nível de risco."
 
     else:
         bg = AlertBackground(alert).name
@@ -251,7 +227,7 @@ def genKPISection(locality: str, alert: str, indicators: Dict[str, Indicator]):
         👉 _Acompanhe e simule a situação do seu município acessando o *FarolCovid* aqui_: https://coronacidades.org/ """
 
     st.write(
-        """<div class="alert-banner %s-alert-bg mb">
+        """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;">
                 <div class="base-wrapper flex flex-column" style="margin-top: 100px;">
                         <div class="flex flex-row flex-space-between flex-align-items-center">
                          <span class="white-span header p1">%s</span>
@@ -292,7 +268,7 @@ def genProductsSection(products: List[Product]):
 
     st.write(
         f"""
-        <div class="base-wrapper product-section">
+        <div class="base-wrapper">
                 <span class="section-header primary-span">COMO SEGUIR COM SEGURANÇA?</span>
                 <div class="flex flex-row flex-space-around mt flex-m-column">{cards}</div>
         </div>
@@ -343,7 +319,7 @@ def genInputCustomizationSectionHeader(locality: str) -> None:
     st.write(
         """
         <div class="base-wrapper">
-                <span class="section-header primary-span">Etapa 3: Verifique os dados disponíveis <span class="yellow-span">(%s)</span></span>
+                <span class="section-header primary-span">Verifique os dados disponíveis <span class="yellow-span">(%s)</span></span>
                 <br />
                 <span>Usamos os dados do Brasil.io e DataSUS, mas é possível que eles dados estejam um pouco desatualizados. Se estiverem, é só ajustar os valores abaixo para continuar a simulação.</span>
                 <br />
