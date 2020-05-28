@@ -5,8 +5,6 @@ import numpy as np
 import pandas as pd
 
 # import sys
-# sys.path.append("../")
-
 from models import IndicatorType, IndicatorCards, ProductCards
 from model.simulator import run_evolution
 
@@ -15,6 +13,7 @@ import pages.simulacovid as sm
 # from pages.simulacovid import calculate_recovered, filter_options
 
 import utils
+import social_distancing_plots as sdp
 
 
 def update_indicator(indicator, display, left_display, right_display, risk):
@@ -73,7 +72,19 @@ def main():
         user_input["city_id"] = data["city_id"].values[0]
         user_input["place_type"] = "city_id"
 
-    # print(len(data))
+    if st.button("Veja mais"):
+        if user_input["city_id"]:
+            locality_id = user_input["city_id"]
+        else:
+            df_state_mapping = pd.read_csv('./configs/states_table.csv')
+            state = df_state_mapping.loc[df_state_mapping['state_name'] == data["state_name"].values[0]]
+            locality_id = state.iloc[0]["state_num_id"]
+
+        try: 
+            fig = sdp.gen_social_dist_plots_placeid(locality_id)
+            st.plotly_chart(fig)
+        except:
+            st.write('Não há 30 dias de dado.')
 
     locality = utils.choose_place(
         city=user_input["city"], state=user_input["state"], region="Todos"
