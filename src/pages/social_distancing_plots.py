@@ -160,7 +160,7 @@ def generateFigsCities(city_states_pairs, df, decoration=False):
     return fig
 
 
-def gen_social_dist_plots(in_args):
+def gen_social_dist_plots(in_args, in_height=700):
     if type(in_args[0]) == type([]):
         is_city = True
     else:
@@ -184,6 +184,7 @@ def gen_social_dist_plots(in_args):
         social_dist_plot = generateFigsStates(in_args, my_clean_df)
     social_dist_plot.update_layout(xaxis=dict(tickformat="%d/%m"))
     social_dist_plot.update_layout(yaxis=dict(tickformat=",.0%"))
+    social_dist_plot.update_layout(height=in_height)
     return social_dist_plot
 
 
@@ -204,9 +205,10 @@ gen_social_dist_plots.states_df = None
 
 # In: numerical id ( id < 100 for states, id > 100 for cities)
 # Out: a plotly figure
-def gen_social_dist_plots_placeid(place_id):
+def gen_social_dist_plots_placeid(place_id, height=700):
     names = utils.get_place_names_by_id(place_id)
     if type(names) == type("sampletext"):  # IS STATE
-        return gen_social_dist_plots([names])
+        return gen_social_dist_plots([names], height)
     else:  # IS CITY
-        return gen_social_dist_plots([names[::-1]])
+        return gen_social_dist_plots([names[::-1]], height)
+
