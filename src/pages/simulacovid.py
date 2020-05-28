@@ -25,24 +25,12 @@ from pandas import Timestamp
 
 FIXED = datetime.now().minute
 
-
-def add_all(x, all_string="Todos"):
-    return [all_string] + list(x)
-
-
-def filter_options(_df, var, col, all_string="Todos"):
-    if var == "Todos":
-        return _df
-    else:
-        return _df.query(f'{col} == "{var}"')
-
-
-def refresh_rate(config):
-    dt = (
-        math.floor(datetime.now().minute / config["refresh_rate"])
-        * config["refresh_rate"]
-    )
-    return datetime.now().replace(minute=dt, second=0, microsecond=0)
+# def refresh_rate(config):
+#     dt = (
+#         math.floor(datetime.now().minute / config["refresh_rate"])
+#         * config["refresh_rate"]
+#     )
+#     return datetime.now().replace(minute=dt, second=0, microsecond=0)
 
 
 def calculate_recovered(user_input, data):
@@ -69,7 +57,7 @@ def calculate_recovered(user_input, data):
     return user_input
 
 
-def main(user_input, locality, indicators, data, config):
+def main(user_input, indicators, data, config):
 
     st.write(
         f"""
@@ -77,7 +65,7 @@ def main(user_input, locality, indicators, data, config):
                 <span class="section-header primary-span">Simule o impacto de diferentes ritmos de contágio no seu sistema hospitalar</span>
                 <br><br>
                 <span>Agora é a hora de se preparar para evitar a sobrecarga hospitalar. 
-                No momento, em {locality}, estimamos que <b>o ritmo de contágio esteja entre {indicators["rt"].display}</b>, 
+                No momento, em {user_input["locality"]}, estimamos que <b>o ritmo de contágio esteja entre {indicators["rt"].display}</b>, 
                 ou seja, cada pessoa doente infectará em média entre outras {indicators["rt"].display} pessoas</b>.
                 </span>
         </div>""",
@@ -130,4 +118,4 @@ def main(user_input, locality, indicators, data, config):
 
 
 if __name__ == "__main__":
-    main()
+    pass

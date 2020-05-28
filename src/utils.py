@@ -23,25 +23,6 @@ import pandas as pd
 import os
 
 
-# def get_indicators(x):
-#         dic_indicators = {
-#                 "rt": {
-#                         "display": ["rt_10days_ago_low", "rt_10days_ago_high"],
-#                         "left_display": ["rt_17days_ago_low", "rt_17days_ago_high"],
-#                         "right_display": "rt_growth",
-#                         "risk": "rt_classification"
-
-#                 }
-#                 "subnotification_rate": {
-#                         "display": "subnotification_rate",
-#                         "left_display": ["rt_17days_ago_low", "rt_17days_ago_high"],
-#                         "right_display": "rt_growth",
-#                         "risk": "rt_classification"
-#                 }
-#         }
-#         return dic_indicators[x]
-
-
 def fix_dates(df):
 
     for col in df.columns:
@@ -52,13 +33,6 @@ def fix_dates(df):
 
 def add_all(x, all_string="Todos"):
     return [all_string] + list(x)
-
-
-def filter_options(_df, var, col, all_string="Todos"):
-    if var == "Todos":
-        return _df
-    else:
-        return _df.query(f'{col} == "{var}"')
 
 
 # TODO: melhorar essa funcao
