@@ -235,13 +235,16 @@ def main():
     )
 
     # PLOTS
-    # st.write("<div class='see-more-btn'></div>", unsafe_allow_html=True)
+    st.write("<div class='base-wrapper product-section'></div>", unsafe_allow_html=True)
 
     if st.button("Veja mais"):
 
+        if st.button("Esconder"):
+            pass
+
         st.write(
             """
-            <div class="base-wrapper product-section">
+            <div class="base-wrapper">
                     <span class="section-header primary-span">ISOLAMENTO SOCIAL (IN LOCO)</span>
             </div>
             """,

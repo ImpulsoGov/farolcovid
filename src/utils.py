@@ -227,7 +227,7 @@ def genKPISection(locality: str, alert: str, indicators: Dict[str, Indicator]):
         👉 _Acompanhe e simule a situação do seu município acessando o *FarolCovid* aqui_: https://coronacidades.org/ """
 
     st.write(
-        """<div class="alert-banner %s-alert-bg mb">
+        """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;">
                 <div class="base-wrapper flex flex-column" style="margin-top: 100px;">
                         <div class="flex flex-row flex-space-between flex-align-items-center">
                          <span class="white-span header p1">%s</span>
@@ -268,7 +268,7 @@ def genProductsSection(products: List[Product]):
 
     st.write(
         f"""
-        <div class="base-wrapper product-section">
+        <div class="base-wrapper">
                 <span class="section-header primary-span">COMO SEGUIR COM SEGURANÇA?</span>
                 <div class="flex flex-row flex-space-around mt flex-m-column">{cards}</div>
         </div>
