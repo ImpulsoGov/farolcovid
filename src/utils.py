@@ -41,8 +41,10 @@ def get_sources(data, resources, cities_sources):
     sources = dict()
 
     for x in resources:
+
         for item in ["author_number", "last_updated_number", "number"]:
             col = "_".join([item, x])
+
             if not col in data.columns:
                 sources[col] = (
                     cities_sources[
@@ -53,7 +55,7 @@ def get_sources(data, resources, cities_sources):
                     .values
                 )
             else:
-                sources[col] = data[col].drop_duplicates().values  # .fillna(0)
+                sources[col] = data[col].drop_duplicates().fillna(0).values
 
     return sources
 
@@ -209,7 +211,7 @@ def genKPISection(locality: str, alert: str, indicators: Dict[str, Indicator]):
     # alert = float("nan")
     if not isinstance(alert, str):
         bg = "gray"
-        caption = "Sugerimos que confira o nível de risco de seu Estado.<br/>Seu municipio nao possui dados suficientes para calcularmos o nivel de risco."
+        caption = "Sugerimos que confira o nível de risco de seu estado.<br/>Seu município nao possui dados suficientes para calcularmos o nível de risco."
 
     else:
         bg = AlertBackground(alert).name
