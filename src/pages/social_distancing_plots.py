@@ -66,10 +66,17 @@ def generateFigsStates(states, clean_df, decoration=False):
             my_line_scheme = dict()
             my_line_scheme["color"] = genColor(yValues[-1])
             fig.add_trace(
-                go.Scatter(x=xValues, y=yValues, name=state_name, line=my_line_scheme,)
+                go.Scatter(
+                    x=translate_dates(xValues),
+                    y=yValues,
+                    name=state_name,
+                    line=my_line_scheme,
+                )
             )
         else:
-            fig.add_trace(go.Scatter(x=xValues, y=yValues, name=state_name,))
+            fig.add_trace(
+                go.Scatter(x=translate_dates(xValues), y=yValues, name=state_name,)
+            )
         buttons_list.append(
             dict(
                 label=state_name,
@@ -114,7 +121,7 @@ def generateFigsCities(city_states_pairs, df, decoration=False):
             my_line_scheme["color"] = genColor(clean_df["isolated"][-1])
             fig.add_trace(
                 go.Scatter(
-                    x=clean_df["dt"],
+                    x=translate_dates(clean_df["dt"]),
                     y=clean_df["isolated"],
                     name=city_name,
                     line=my_line_scheme,
@@ -122,7 +129,11 @@ def generateFigsCities(city_states_pairs, df, decoration=False):
             )
         else:
             fig.add_trace(
-                go.Scatter(x=clean_df["dt"], y=clean_df["isolated"], name=city_name,)
+                go.Scatter(
+                    x=translate_dates(clean_df["dt"]),
+                    y=clean_df["isolated"],
+                    name=city_name,
+                )
             )
         buttons_list.append(
             dict(
@@ -164,7 +175,21 @@ def gen_social_dist_plots(in_args):
             .dropna(how="all")
         )
         social_dist_plot = generateFigsStates(in_args, my_clean_df)
+    social_dist_plot.update_layout(xaxis=dict(tickformat="%d/%m"))
+    social_dist_plot.update_layout(yaxis=dict(tickformat=",.0%"))
     return social_dist_plot
+
+
+def translate_dates(df, simple=True, lang_frame="pt_BR.utf8"):
+    if simple:
+        return df
+    else:
+        import locale
+
+        locale.setlocale(locale.LC_ALL, lang_frame)
+        newdate = pd.to_datetime(df)
+        newdate = [d.strftime("%d %b %y") for d in newdate]
+        return newdate
 
 
 gen_social_dist_plots.cities_df = None
