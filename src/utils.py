@@ -317,7 +317,7 @@ def genInputCustomizationSectionHeader(locality: str) -> None:
     st.write(
         """
         <div class="base-wrapper">
-                <span class="section-header primary-span">Etapa 3: Verifique os dados disponíveis <span class="yellow-span">(%s)</span></span>
+                <span class="section-header primary-span">Verifique os dados disponíveis <span class="yellow-span">(%s)</span></span>
                 <br />
                 <span>Usamos os dados do Brasil.io e DataSUS, mas é possível que eles dados estejam um pouco desatualizados. Se estiverem, é só ajustar os valores abaixo para continuar a simulação.</span>
                 <br />
