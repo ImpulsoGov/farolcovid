@@ -27,6 +27,33 @@ def update_indicator(indicator, display, left_display, right_display, risk):
     return indicator
 
 
+def filter_options(user_input, df_cities, df_states):
+
+    if user_input["city"] == "Todos":
+
+        data = df_states[df_states["state_name"] == user_input["state_name"].iloc[0]]
+
+        user_input["state"] = data["state_id"].values[0]
+        user_input["city_id"] = False
+        user_input["place_type"] = "state"
+
+    else:
+        data = df_cities[
+            (df_cities["state_name"] == user_input["state_name"])
+            & (df_cities["city_name"] == user_input["city_name"])
+        ]
+
+        user_input["state"] = False
+        user_input["city_id"] = data["city_id"].values[0]
+        user_input["place_type"] = "city_id"
+
+    user_input["locality"] = utils.choose_place(
+        city=user_input["city"], state=user_input["state"], region="Todos"
+    )
+
+    return user_input, data
+
+
 def main():
 
     utils.localCSS("style.css")
@@ -52,33 +79,19 @@ def main():
     user_input["state"] = st.selectbox(
         "Estado", df_cities["state_name"].sort_values().unique()
     )
-    data = utils.filter_options(
-        df_cities, user_input["state"], "state_name"
-    )  # .fillna("")
 
     user_input["city"] = st.selectbox(
-        "Município", utils.add_all(data["city_name"].unique())
+        "Município",
+        utils.add_all(
+            df_cities[df_cities["state_name"] == user_input["state"]][
+                "city_name"
+            ].unique()
+        ),
     )
-    data = utils.filter_options(data, user_input["city"], "city_name")
 
-    if user_input["city"] == "Todos":
-
-        data = df_states[df_states["state_id"] == data["state_id"].iloc[0]]
-
-        user_input["state"] = data["state_id"].values[0]
-        user_input["city_id"] = False
-        user_input["place_type"] = "state"
-
-    else:
-        user_input["state"] = False
-        user_input["city_id"] = data["city_id"].values[0]
-        user_input["place_type"] = "city_id"
-
+    user_input, data = filter_options(user_input, df_cities, df_states)
+    # data = utils.filter_options(data, user_input["city"], "city_name")
     # print(len(data))
-
-    locality = utils.choose_place(
-        city=user_input["city"], state=user_input["state"], region="Todos"
-    )
 
     # SOURCES PARAMS
     sources = utils.get_sources(data, ["beds", "ventilators"], df_cities)
@@ -122,9 +135,19 @@ def main():
 
     if st.button("Alterar dados"):
 
-        utils.genInputCustomizationSectionHeader(locality)
-        # OK
-        user_input = utils.genInputFields(locality, user_input, sources, config)
+        utils.genInputCustomizationSectionHeader(user_input["locality"])
+
+        user_input = utils.genInputFields(
+            user_input["locality"], user_input, sources, config
+        )
+
+        # TODO: Confirmar as mudanças dos valores dos cards aqui!
+        config["hospital_capacity"]["right_display"] = user_input["n_beds"]
+        config["hospital_capacity"]["left_display"] = user_input["n_ventilators"]
+        config["subnotification_rate"]["left_display"] = user_input[
+            "population_params"
+        ]["D"]
+
         # AMBASSADOR SECTION
         utils.genAmbassadorSection()
 
@@ -132,6 +155,7 @@ def main():
     indicators = IndicatorCards
 
     # TODO: casos de municipios sem dados
+
     # state_notification_rate == state, => subnotification_rank == np.nan => dday_beds_best == np.nan
     # rt_classification == np.nan,
     # inloco_growth == np.nan, ...
@@ -142,51 +166,54 @@ def main():
     # pd.set_option('display.max_columns', None)
     # kill metricc, add risk direclty kill function
 
-    indicators["rt"] = update_indicator(
-        indicators["rt"],
-        display=f'{str(round(data["rt_10days_ago_low"].values[0], 1))} a {str(round(data["rt_10days_ago_high"].values[0], 1))}',
-        left_display=f'{round(data["rt_17days_ago_low"].values[0], 1)} a {round(data["rt_17days_ago_high"].values[0], 1)}',
-        right_display=f'{data["rt_growth"].values[0]}',
-        risk=str(data["rt_classification"].values[0]),
-    )
+    # indicators["rt"] = update_indicator(
+    #     indicators["rt"],
+    #     display=f'{str(round(data["rt_10days_ago_low"].values[0], 1))} a {str(round(data["rt_10days_ago_high"].values[0], 1))}',
+    #     left_display=f'{round(data["rt_17days_ago_low"].values[0], 1)} a {round(data["rt_17days_ago_high"].values[0], 1)}',
+    #     right_display=f'{data["rt_growth"].values[0]}',
+    #     risk=str(data["rt_classification"].values[0]),
+    # )
 
-    indicators["subnotification_rate"] = update_indicator(
-        indicators["subnotification_rate"],
-        display=int((data["notification_rate"].values[0]) * 10),
-        left_display=f'{int(data["deaths"].values[0])}',
-        right_display=[
-            f'{int(data["subnotification_rank"].values[0])}º'
-            if not np.isnan(data["subnotification_rank"].values[0])
-            else "-"
-        ][0],
-        risk=str(data["subnotification_classification"].values[0]),
-    )
+    # indicators["subnotification_rate"] = update_indicator(
+    #     indicators["subnotification_rate"],
+    #     display=int((data["notification_rate"].values[0]) * 10),
+    #     left_display=f'{int(data["deaths"].values[0])}',
+    #     right_display=[
+    #         f'{int(data["subnotification_rank"].values[0])}º'
+    #         if not np.isnan(data["subnotification_rank"].values[0])
+    #         else "-"
+    #     ][0],
+    #     risk=str(data["subnotification_classification"].values[0]),
+    # )
 
-    indicators["hospital_capacity"] = update_indicator(
-        indicators["hospital_capacity"],
-        display=f"{int(data['dday_beds_best'].values[0])}",
-        left_display=f'{int(data["number_ventilators"].values[0])}',
-        right_display=f'{int(data["number_beds"].values[0])}',
-        risk=str(data["dday_classification"].values[0]),
-    )
+    # indicators["hospital_capacity"] = update_indicator(
+    #     indicators["hospital_capacity"],
+    #     display=f"{int(data['dday_beds_best'].values[0])}",
+    #     left_display=f'{int(data["number_ventilators"].values[0])}',
+    #     right_display=f'{int(data["number_beds"].values[0])}',
+    #     risk=str(data["dday_classification"].values[0]),
+    # )
 
-    indicators[IndicatorType.SOCIAL_ISOLATION.value] = update_indicator(
-        indicators[IndicatorType.SOCIAL_ISOLATION.value],
-        display=f'{int(data["inloco_today_7days_avg"].values[0] * 100)}%',
-        left_display=f'{int(data["inloco_last_week_7days_avg"].values[0] * 100)}%',
-        right_display=f'{data["inloco_growth"].values[0]}',
-        risk="Fonte: inloco",
-    )
+    # indicators[IndicatorType.SOCIAL_ISOLATION.value] = update_indicator(
+    #     indicators[IndicatorType.SOCIAL_ISOLATION.value],
+    #     display=f'{int(data["inloco_today_7days_avg"].values[0] * 100)}%',
+    #     left_display=f'{int(data["inloco_last_week_7days_avg"].values[0] * 100)}%',
+    #     right_display=f'{data["inloco_growth"].values[0]}',
+    #     risk="Fonte: inloco",
+    # )
 
     utils.genKPISection(
-        locality=locality, alert=data["overall_alert"].values[0], indicators=indicators
+        locality=user_input["locality"],
+        alert=data["overall_alert"].values[0],
+        indicators=indicators,
     )
 
-    # TODO: add plots
+    # PLOTS
     st.write("<div class='see-more-btn'></div>", unsafe_allow_html=True)
     if st.button("Ver mais detalhes"):
         fcp.main()
 
+    # TOOLS
     products = ProductCards
     products[1].recommendation = f'Risco {data["overall_alert"].values[0]}'
     utils.genProductsSection(products)
@@ -197,7 +224,7 @@ def main():
     )
 
     if product == "SimulaCovid":
-        sm.main(user_input, locality, indicators, data, config)
+        sm.main(user_input, indicators, data, config)
 
     elif product == "Saúde em Ordem (em breve)":
         pass
