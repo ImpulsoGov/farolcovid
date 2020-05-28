@@ -169,9 +169,9 @@ def main():
 
     # POPULATION PARAMS
     user_input["population_params"] = {
-        "N": int(data["population"].values[0]),
-        "D": int(data["deaths"].values[0]),
-        "I": int(data["active_cases"].values[0]),
+        "N": int(data["population"].fillna(0).values[0]),
+        "D": int(data["deaths"].fillna(0).values[0]),
+        "I": int(data["active_cases"].fillna(0).values[0]),
     }
 
     if data["confirmed_cases"].sum() == 0:
