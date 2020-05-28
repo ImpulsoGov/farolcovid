@@ -1,6 +1,7 @@
 import streamlit as st
 from datetime import datetime
 from datetime import timedelta
+from typing import List, Dict
 from models import (
     SimulatorOutput,
     ContainmentStrategy,
@@ -8,9 +9,86 @@ from models import (
     BackgroundColor,
     Logo,
     Link,
+    Indicator,
+    AlertBackground,
+    IndicatorBackground,
+    Illustration,
+    Product,
 )
 from typing import List
 import re
+import numpy as np
+import math
+import pandas as pd
+import os
+
+
+def fix_dates(df):
+
+    for col in df.columns:
+        if "last_updated" in col:
+            df[col] = pd.to_datetime(df[col]).apply(lambda x: x.strftime("%d/%m/%Y"))
+    return df
+
+
+def add_all(x, all_string="Todos"):
+    return [all_string] + list(x)
+
+
+# TODO: melhorar essa funcao
+def get_sources(data, resources, cities_sources):
+
+    sources = dict()
+
+    for x in resources:
+
+        for item in ["author_number", "last_updated_number", "number"]:
+            col = "_".join([item, x])
+
+            if not col in data.columns:
+                sources[col] = (
+                    cities_sources[
+                        cities_sources["state_id"] == data["state_id"].iloc[0]
+                    ][col]
+                    .drop_duplicates()
+                    .fillna(0)
+                    .values
+                )
+            else:
+                sources[col] = data[col].drop_duplicates().fillna(0).values
+
+    return sources
+
+
+configs_path = os.path.join(os.path.dirname(__file__), "configs")
+cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
+states = pd.read_csv(os.path.join(configs_path, "states_table.csv"))
+
+# In: name of the state (returns a numerical id of only the state) or the name of the state and the name of the city
+# Out: the numerical id of the state of the city
+def get_place_id_by_names(state_name, city_name_input="Todos"):
+    state_num_id = states.query("state_name == '%s'" % state_name).values[0][-1]
+    if city_name_input == "Todos":
+        return state_num_id
+    city_id = (
+        cities.query("state_num_id == '%s'" % state_num_id)
+        .query("city_name == '%s'" % city_name_input)
+        .values[0][1]
+    )
+    return city_id
+
+
+# In: id of a place (id < 100 for states, id > 100 for cities)
+# Out: either a string representing the name of the state or a list contaning [state name,city name]
+def get_place_names_by_id(place_id):
+    if place_id <= 100:
+        return states.query("state_num_id == '%s'" % place_id).values[0][2]
+    else:
+        data = cities.query("city_id == '%s'" % place_id).values[0]
+        city_name = data[2]
+        state_id = data[3]
+        state_name = states.query("state_num_id == '%s'" % state_id).values[0][2]
+        return [state_name, city_name]
 
 
 def make_clickable(text, link):
@@ -24,23 +102,182 @@ def localCSS(file_name):
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 
-def genHeroSection():
+def choose_place(city, region, state):
+    if city == "Todos" and region == "Todos" and state == "Todos":
+        return "Brasil"
+    if city == "Todos" and region == "Todos":
+        return state + " (Estado)" if state != "Todos" else "Brasil"
+    if city == "Todos":
+        return region + " (Região SUS)" if region != "Todos" else "Todas as regiões SUS"
+    return city
+
+
+"""View Components CentralCOVID"""
+
+
+def genHeroSection(title: str, subtitle: str):
     st.write(
-        """<div class="base-wrapper hero-bg">
+        f"""
+        <div class="base-wrapper hero-bg">
                 <a href="https://coronacidades.org/" target="blank" class="logo-link"><span class="logo-bold">corona</span><span class="logo-lighter">cidades</span></a>
                 <div class="hero-wrapper">
                         <div class="hero-container">
                                 <div class="hero-container-content">
-                                        <span class="hero-container-product primary-span">Simula<br/>Covid</span>
-                                        <span class="hero-container-subtitle primary-span">Um simulador da demanda por leitos hospitalares e ventiladores.</span>
+                                        <span class="hero-container-product primary-span">{title}<br/>Covid</span>
+                                        <span class="hero-container-subtitle primary-span">{subtitle}</span>
                                 </div>
                         </div>   
-                        <img class="hero-container-image" src="https://i.imgur.com/w5yVANW.png"/>
+                        <img class="hero-container-image" src="https://i.imgur.com/l3vuQdP.png"/>
                 </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
+
+
+def genInputFields(locality, user_input, sources, config):
+
+    #     if not np.all(cities_filtered["last_updated"].isna()):
+    #         last_update_cases = cities_filtered["last_updated"].max().strftime("%d/%m")
+
+    authors_beds = ", ".join(sources["author_number_beds"])
+    beds_update = sources["last_updated_number_beds"].max()
+
+    authors_ventilators = ", ".join(sources["author_number_ventilators"])
+    ventilators_update = sources["last_updated_number_ventilators"].max()
+
+    if locality == "Brasil":
+        authors_beds = "SUS e Embaixadores"
+        authors_ventilators = "SUS e Embaixadores"
+
+    user_input["n_beds"] = st.number_input(
+        f"Número de leitos destinados aos pacientes com Covid-19 (fonte: {authors_beds}; atualizado: {beds_update})",
+        0,
+        None,
+        int(user_input["n_beds"]),
+    )
+
+    user_input["n_ventilators"] = st.number_input(
+        f"Número de ventiladores destinados aos pacientes com Covid-19 (fonte: {authors_ventilators}; atualizado: {ventilators_update}):",
+        0,
+        None,
+        int(user_input["n_ventilators"]),
+    )
+
+    user_input["population_params"]["D"] = st.number_input(
+        "Mortes confirmadas:", 0, None, int(user_input["population_params"]["D"])
+    )
+    user_input["population_params"]["I"] = st.number_input(
+        "Casos ativos estimados:", 0, None, user_input["population_params"]["I"]
+    )
+
+    return user_input
+
+
+def genIndicatorCard(indicator: Indicator):
+    display_left = "flex"
+    display_right = "flex"
+
+    # print(indicator.left_display, indicator.right_display)
+
+    if str(indicator.left_display) == "nan":
+        display_left = "hide-bg"
+
+    if str(indicator.right_display) == "nan":
+        display_right = "hide-bg"
+
+    return f"""<div class="indicator-card flex flex-column mr">
+                        <span class="header p3">{indicator.header}</span>
+                        <span class="p4">{indicator.caption}</span>
+                        <span class="bold p2">{indicator.display}<span class="bold p4"> {indicator.unit}</span></span>
+                        <div class="{IndicatorBackground(indicator.risk).name}-alert-bg risk-pill">
+                                <span class="white-span p4 bold">{indicator.risk}</span>
+                        </div>
+                        <div class="flex flex-row flex-justify-space-between mt"> 
+                                <div class="br {display_left} flex-column text-align-center pr">
+                                        <span class="lighter">{indicator.left_label}</span>
+                                        <span class="bold">{indicator.left_display}</span>
+                                </div>
+                                <div class=" bl flex flex-column text-align-center pl {display_right}">
+                                        <span class="lighter">{indicator.right_label}</span>
+                                        <span class="bold">{indicator.right_display}</span>
+                                </div>
+                        </div>
+                </div>
+        """
+
+
+def genKPISection(locality: str, alert: str, indicators: Dict[str, Indicator]):
+    # alert = float("nan")
+    if not isinstance(alert, str):
+        bg = "gray"
+        caption = "Sugerimos que confira o nível de risco de seu estado.<br/>Seu município nao possui dados suficientes para calcularmos o nível de risco."
+
+    else:
+        bg = AlertBackground(alert).name
+        caption = f"Nível de risco {alert} do colapso no sistema de saúde"
+
+    cards = list(map(genIndicatorCard, indicators.values()))
+    cards = "".join(cards)
+    msg = f"""
+        🚨 *BOLETIM CoronaCidades:*  {locality} - {datetime.now().strftime('%d/%m')}  🚨%0a%0a
+        😷 Cada contaminado infecta em média outras {indicators['rt'].display} pessoas 0a%0a
+        🏥 A capacidade hospitalar será atingida entre {indicators['hospital_capacity'].display} dias %0a%0a
+        🏥 A cada 10 pessoas infecadas, somente {indicators['subnotification_rate'].display} são identificadas%0a%0a
+        👉 _Acompanhe e simule a situação do seu município acessando o *FarolCovid* aqui_: https://coronacidades.org/ """
+
+    st.write(
+        """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;">
+                <div class="base-wrapper flex flex-column" style="margin-top: 100px;">
+                        <div class="flex flex-row flex-space-between flex-align-items-center">
+                         <span class="white-span header p1">%s</span>
+                         <a class="btn-wpp" href="whatsapp://send?text=%s" target="blank">Compartilhar no Whatsapp</a>
+                         </div>
+                        <span class="white-span p3">%s</span>
+                        <div class="flex flex-row flex-m-column">%s</div>
+                </div>
+        </div>
+        """
+        % (bg, locality, msg, caption, cards),
+        unsafe_allow_html=True,
+    )
+
+
+def genProductCard(product: Product):
+    if product.recommendation == "Sugerido":
+        badge_style = "primary-bg"
+    elif product.recommendation == "Risco alto":
+        badge_style = f"red-alert-bg"
+    else:
+        badge_style = "hide-bg"
+
+    return f"""<div class="flex flex-column elevated pr pl product-card mt  ">
+                <div class="flex flex-row">
+                        <span class="p3 header bold uppercase">{product.name}</span>
+                         <span class="{badge_style} ml secondary-badge">{product.recommendation}</span>
+                </div>
+                <span>{product.caption}</span>
+                <img src="{product.image}" style="width: 200px" class="mt"/>
+        </div>
+        """
+
+
+def genProductsSection(products: List[Product]):
+    cards = list(map(genProductCard, products))
+    cards = "".join(cards)
+
+    st.write(
+        f"""
+        <div class="base-wrapper">
+                <span class="section-header primary-span">COMO SEGUIR COM SEGURANÇA?</span>
+                <div class="flex flex-row flex-space-around mt flex-m-column">{cards}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+"""View Components SimulaCovid"""
 
 
 def genVideoTutorial():
@@ -82,7 +319,7 @@ def genInputCustomizationSectionHeader(locality: str) -> None:
     st.write(
         """
         <div class="base-wrapper">
-                <span class="section-header primary-span">Etapa 3: Verifique os dados disponíveis <span class="yellow-span">(%s)</span></span>
+                <span class="section-header primary-span">Verifique os dados disponíveis <span class="yellow-span">(%s)</span></span>
                 <br />
                 <span>Usamos os dados do Brasil.io e DataSUS, mas é possível que eles dados estejam um pouco desatualizados. Se estiverem, é só ajustar os valores abaixo para continuar a simulação.</span>
                 <br />
@@ -401,37 +638,34 @@ def genStrategiesSection(strategies: List[ContainmentStrategy]) -> None:
     )
 
 
-def genChartSimulationSection(
-    time2sd: int, time2lockdown: int, simulation: SimulatorOutput, fig
-) -> None:
+def genChartSimulationSection(simulation: SimulatorOutput, fig) -> None:
 
     simulation = genSimulatorOutput(simulation)
-    sd_date = (datetime.now() + timedelta(days=int(time2sd))).strftime("%d/%m")
-    lockdown_date = (datetime.now() + timedelta(days=int(time2lockdown))).strftime(
-        "%d/%m"
-    )
+    #     sd_date = (datetime.now() + timedelta(days=int(time2sd))).strftime("%d/%m")
+    #     lockdown_date = (datetime.now() + timedelta(days=int(time2lockdown))).strftime(
+    #         "%d/%m"
+    #     )
 
-    simulation_description = ""
-    if time2lockdown <= time2sd:
+    #     simulation_description = ""
+    #     if time2lockdown <= time2sd:
 
-        if time2lockdown == 0:
-            simulation_description = (
-                f"Começando a quarentena <b>hoje</b> ({lockdown_date}):"
-            )
-        else:
-            simulation_description = f"Começando a quarentena em <b>{time2lockdown}</b> dias ({lockdown_date}):"
-    else:  # lockdown after social distancing
-        if time2sd == 0:
-            simulation_description = f"Começando o isolamento social <b>hoje</b>  ({sd_date}) e a quarentena em <b>{time2lockdown}</b> dias ({lockdown_date}):"
-        else:
-            simulation_description = f"Começando o isolamento social em <b>{time2sd}</b> dias ({sd_date}) e a quarentena em <b>{time2lockdown}</b> dias ({lockdown_date}):"
+    #         if time2lockdown == 0:
+    #             simulation_description = (
+    #                 f"Começando a quarentena <b>hoje</b> ({lockdown_date}):"
+    #             )
+    #         else:
+    #             simulation_description = f"Começando a quarentena em <b>{time2lockdown}</b> dias ({lockdown_date}):"
+    #     else:  # lockdown after social distancing
+    #         if time2sd == 0:
+    #             simulation_description = f"Começando o isolamento social <b>hoje</b>  ({sd_date}) e a quarentena em <b>{time2lockdown}</b> dias ({lockdown_date}):"
+    #         else:
+    #             simulation_description = f"Começando o isolamento social em <b>{time2sd}</b> dias ({sd_date}) e a quarentena em <b>{time2lockdown}</b> dias ({lockdown_date}):"
 
     st.write(
         """<div class="lightgrey-bg">
                 <div class="base-wrapper">
                         <div class="simulator-header">
                                 <span class="section-header primary-span">Aqui está o resultado da sua simulação</span>
-                                <span class="chart-simulator-instructions subsection-header">%s</span>
                         </div>
                         <div class="simulator-wrapper">
                                 %s
@@ -447,7 +681,7 @@ def genChartSimulationSection(
                 </div>
         </div>
         """
-        % (simulation_description, simulation),
+        % (simulation),
         unsafe_allow_html=True,
     )
 
@@ -525,4 +759,3 @@ def get_ufs_list():
         "SP",
         "TO",
     ]
-
