@@ -7,7 +7,6 @@ import yaml
 import os
 
 config = yaml.load(open("../src/configs/config.yaml", "r"), Loader=yaml.FullLoader)
-secrets = yaml.load(open("../src/configs/secrets.yaml", "r"), Loader=yaml.FullLoader)
 # TODO: Change this pallete thing to be more standard
 # pallete = config[farolcovid][pallete]
 pallete = ["#0097A7", "#17A700", "#F2C94C", "#FF5F6B"]
@@ -15,9 +14,17 @@ if os.getenv("IS_LOCAL") == "TRUE":
     api_url = config["br"]["api"]["local"]
 else:
     api_url = config["br"]["api"]["external"]
-
-cities_url = api_url + secrets["inloco"]["cities"]["route"]
-states_url = api_url + secrets["inloco"]["states"]["route"]
+if os.getenv("INLOCO_CITIES_ROUTE") and os.getenv("INLOCO_STATES_ROUTE"):
+    api_cities_complement = os.getenv("INLOCO_CITIES_ROUTE")
+    api_states_complement = os.getenv("INLOCO_STATES_ROUTE")
+else:
+    secrets = yaml.load(
+        open("../src/configs/secrets.yaml", "r"), Loader=yaml.FullLoader
+    )
+    api_cities_complement = secrets["inloco"]["cities"]["route"]
+    api_states_complement = secrets["inloco"]["states"]["route"]
+cities_url = api_url + api_cities_complement
+states_url = api_url + api_states_complement
 
 import pandas as pd
 
@@ -66,10 +73,17 @@ def generateFigsStates(states, clean_df, decoration=False):
             my_line_scheme = dict()
             my_line_scheme["color"] = genColor(yValues[-1])
             fig.add_trace(
-                go.Scatter(x=xValues, y=yValues, name=state_name, line=my_line_scheme,)
+                go.Scatter(
+                    x=translate_dates(xValues),
+                    y=yValues,
+                    name=state_name,
+                    line=my_line_scheme,
+                )
             )
         else:
-            fig.add_trace(go.Scatter(x=xValues, y=yValues, name=state_name,))
+            fig.add_trace(
+                go.Scatter(x=translate_dates(xValues), y=yValues, name=state_name,)
+            )
         buttons_list.append(
             dict(
                 label=state_name,
@@ -114,7 +128,7 @@ def generateFigsCities(city_states_pairs, df, decoration=False):
             my_line_scheme["color"] = genColor(clean_df["isolated"][-1])
             fig.add_trace(
                 go.Scatter(
-                    x=clean_df["dt"],
+                    x=translate_dates(clean_df["dt"]),
                     y=clean_df["isolated"],
                     name=city_name,
                     line=my_line_scheme,
@@ -122,7 +136,11 @@ def generateFigsCities(city_states_pairs, df, decoration=False):
             )
         else:
             fig.add_trace(
-                go.Scatter(x=clean_df["dt"], y=clean_df["isolated"], name=city_name,)
+                go.Scatter(
+                    x=translate_dates(clean_df["dt"]),
+                    y=clean_df["isolated"],
+                    name=city_name,
+                )
             )
         buttons_list.append(
             dict(
@@ -164,7 +182,21 @@ def gen_social_dist_plots(in_args):
             .dropna(how="all")
         )
         social_dist_plot = generateFigsStates(in_args, my_clean_df)
+    social_dist_plot.update_layout(xaxis=dict(tickformat="%d/%m"))
+    social_dist_plot.update_layout(yaxis=dict(tickformat=",.0%"))
     return social_dist_plot
+
+
+def translate_dates(df, simple=True, lang_frame="pt_BR.utf8"):
+    if simple:
+        return df
+    else:
+        import locale
+
+        locale.setlocale(locale.LC_ALL, lang_frame)
+        newdate = pd.to_datetime(df)
+        newdate = [d.strftime("%d %b %y") for d in newdate]
+        return newdate
 
 
 gen_social_dist_plots.cities_df = None
