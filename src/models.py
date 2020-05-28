@@ -150,10 +150,10 @@ IndicatorCards: Dict[str, Indicator] = {
     ),
     IndicatorType.SUBNOTIFICATION_RATE.value: Indicator(
         header="Subnotificação",
-        caption="A cada 10 pessoas doentes, apenas",
-        unit="são diagnosticadas",
-        left_label="Mortes semana passada",
-        right_label="Ranking BR:",
+        caption="A cada 10 pessoas doentes, são apenas",
+        unit="diagnosticadas",
+        left_label="Mortes semana passada:",
+        right_label="Ranking BR/UF:",
     ),
     IndicatorType.HOSPITAL_CAPACITY.value: Indicator(
         header="Capacidade Hospitalar",
