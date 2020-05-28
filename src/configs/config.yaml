@@ -100,25 +100,24 @@ br:
         gaussian_min_periods: 7
         gamma_alpha: 4
         min_days: 14
-    farolcovid:
-        indicators:
-            rt:
-                risk: "rt_classification"
-                right_display: "rt_growth"
-                left_display: ["rt_17days_ago_low", "rt_17days_ago_high"]
-                display: ["rt_10days_ago_low", "rt_1days_ago_high"]
-            subnotification_rate:
-                risk: "subnotification_classification"
-                right_display: "subnotification_rank"
-                left_display: "deaths"
-                display: "notification_rate"
-            hospital_capacity:
-                risk: "dday_classification"
-                right_display: "number_beds"
-                left_display: "number_ventilators"
-                display: "dday_beds_best"
-            social_isolation:
-                risk: "Fonte: inloco"
-                right_display: "inloco_growth"
-                left_display: "inloco_last_week_7days_avg"
-                display: inloco_today_7days_avg
+    indicators:
+        rt:
+            risk: "rt_classification"
+            right_display: "rt_growth"
+            left_display: ["rt_17days_ago_low", "rt_17days_ago_high"]
+            display: ["rt_10days_ago_low", "rt_10days_ago_high"]
+        subnotification_rate:
+            risk: "subnotification_classification"
+            right_display: "subnotification_rank"
+            left_display: "deaths"
+            display: "notification_rate"
+        hospital_capacity:
+            risk: "dday_classification"
+            right_display: "number_beds"
+            left_display: "number_ventilators"
+            display: "dday_beds_best"
+        social_isolation:
+            risk: "Fonte: inloco"
+            right_display: "inloco_growth"
+            left_display: "inloco_last_week_7days_avg"
+            display: "inloco_today_7days_avg"

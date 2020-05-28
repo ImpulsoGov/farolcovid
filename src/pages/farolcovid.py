@@ -9,32 +9,82 @@ from models import IndicatorType, IndicatorCards, ProductCards
 from model.simulator import run_evolution
 
 import pages.simulacovid as sm
-import pages.farolcovid_plots as fcp
-
-# from pages.simulacovid import calculate_recovered, filter_options
-
+import pages.social_distancing_plots as sdp
 import utils
-import social_distancing_plots as sdp
 
 
-def update_indicator(indicator, display, left_display, right_display, risk):
-    indicator.risk = risk
-    indicator.display = display
-    indicator.left_display = left_display
-    indicator.right_display = right_display
+def fix_type(x):
 
-    return indicator
+    if (type(x) == str) or (type(x) == np.int64):
+        return x
+
+    if type(x) == np.ndarray:
+        return "-".join([str(round(i, 1)) for i in x])
+
+    if type(x) == np.float64:
+        if x <= 1:
+            return str(int(x * 100)) + "%"
+        else:
+            return int(x)
 
 
-def filter_options(user_input, df_cities, df_states):
+def update_indicators(indicators, data, config):
 
-    if user_input["city"] == "Todos":
+    # TODO: indicadores quando cidade não posssui dados
+    for group in config["br"]["indicators"].keys():
 
-        data = df_states[df_states["state_name"] == user_input["state_name"].iloc[0]]
+        ref = [
+            config["br"]["indicators"][group]["risk"]
+            if group != "social_isolation"
+            else config["br"]["indicators"][group]["display"]
+        ][0]
 
-        user_input["state"] = data["state_id"].values[0]
+        if data[ref].fillna("").values[0] == "":
+
+            indicators[group].display = "- "
+            indicators[group].risk = "nan"
+
+            if group != "hospital_capacity":
+                indicators[group].right_display = "- "
+                indicators[group].left_display = "- "
+
+        else:
+            indicators[group].risk = [
+                str(data[config["br"]["indicators"][group]["risk"]].values[0])
+                if group != "social_isolation"
+                else "Fonte: inloco"
+            ][0]
+
+            indicators[group].display = fix_type(
+                data[config["br"]["indicators"][group]["display"]]
+                .fillna("- ")
+                .values[0]
+            )
+
+            indicators[group].left_display = fix_type(
+                data[config["br"]["indicators"][group]["left_display"]]
+                .fillna("- ")
+                .values[0]
+            )
+
+            indicators[group].right_display = fix_type(
+                data[config["br"]["indicators"][group]["right_display"]]
+                .fillna("- ")
+                .values[0]
+            )
+
+    return indicators
+
+
+def filter_options(user_input, df_cities, df_states, config):
+
+    if user_input["city_name"] == "Todos":
+
+        data = df_states[df_states["state_name"] == user_input["state_name"]]
+
+        user_input["state_id"] = data["state_id"].values[0]
         user_input["city_id"] = False
-        user_input["place_type"] = "state"
+        user_input["place_type"] = "state_id"
 
     else:
         data = df_cities[
@@ -42,15 +92,41 @@ def filter_options(user_input, df_cities, df_states):
             & (df_cities["city_name"] == user_input["city_name"])
         ]
 
-        user_input["state"] = False
+        user_input["state_id"] = False
         user_input["city_id"] = data["city_id"].values[0]
         user_input["place_type"] = "city_id"
 
+        # para simulacovid
+        user_input["state_rt"] = (
+            df_states[df_states["state_name"] == user_input["state_name"]][
+                ["rt_10days_ago_low", "rt_10days_ago_high"]
+            ]
+            .astype(str)
+            .agg("-".join, axis=1)
+            .values[0]
+        )
+
     user_input["locality"] = utils.choose_place(
-        city=user_input["city"], state=user_input["state"], region="Todos"
+        city=user_input["city_name"], state=user_input["state_name"], region="Todos"
     )
 
     return user_input, data
+
+
+@st.cache(suppress_st_warning=True)
+def get_data(config):
+    return (
+        loader.read_data(
+            "br",
+            config,
+            endpoint=config["br"]["api"]["endpoints"]["farolcovid"]["cities"],
+        ),
+        loader.read_data(
+            "br",
+            config,
+            endpoint=config["br"]["api"]["endpoints"]["farolcovid"]["states"],
+        ),
+    )
 
 
 def main():
@@ -63,48 +139,26 @@ def main():
 
     # GET DATA
     config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
-
-    df_cities = loader.read_data(
-        "br", config, endpoint=config["br"]["api"]["endpoints"]["farolcovid"]["cities"]
-    )
-
-    df_states = loader.read_data(
-        "br", config, endpoint=config["br"]["api"]["endpoints"]["farolcovid"]["states"]
-    )
+    df_cities, df_states = get_data(config)
 
     # REGION/CITY USER INPUT
     user_input = dict()
 
-    user_input["state"] = st.selectbox(
+    user_input["state_name"] = st.selectbox(
         "Estado", df_cities["state_name"].sort_values().unique()
     )
 
-    user_input["city"] = st.selectbox(
+    user_input["city_name"] = st.selectbox(
         "Município",
         utils.add_all(
-            df_cities[df_cities["state_name"] == user_input["state"]][
+            df_cities[df_cities["state_name"] == user_input["state_name"]][
                 "city_name"
             ].unique()
         ),
     )
 
-    user_input, data = filter_options(user_input, df_cities, df_states)
-    # data = utils.filter_options(data, user_input["city"], "city_name")
+    user_input, data = filter_options(user_input, df_cities, df_states, config)
     # print(len(data))
-    
-    if st.button("Veja mais"):
-        if user_input["city_id"]:
-            locality_id = user_input["city_id"]
-        else:
-            df_state_mapping = pd.read_csv('./configs/states_table.csv')
-            state = df_state_mapping.loc[df_state_mapping['state_name'] == data["state_name"].values[0]]
-            locality_id = state.iloc[0]["state_num_id"]
-
-        try: 
-            fig = sdp.gen_social_dist_plots_placeid(locality_id)
-            st.plotly_chart(fig)
-        except:
-            st.write('Não há 30 dias de dado.')
 
     # SOURCES PARAMS
     sources = utils.get_sources(data, ["beds", "ventilators"], df_cities)
@@ -123,8 +177,8 @@ def main():
     if data["confirmed_cases"].sum() == 0:
         st.write(
             f"""<div class="base-wrapper">
-        Seu município ou regional de saúde ainda não possui casos reportados oficialmente. Portanto, simulamos como se o primeiro caso ocorresse hoje.
-        <br><br>Caso queria, você pode mudar esse número abaixo:
+                    Seu município ou regional de saúde ainda não possui casos reportados oficialmente. Portanto, simulamos como se o primeiro caso ocorresse hoje.
+                    <br><br>Caso queria, você pode mudar esse número abaixo:
                 </div>""",
             unsafe_allow_html=True,
         )
@@ -155,9 +209,13 @@ def main():
         )
 
         # TODO: Confirmar as mudanças dos valores dos cards aqui!
-        config["hospital_capacity"]["right_display"] = user_input["n_beds"]
-        config["hospital_capacity"]["left_display"] = user_input["n_ventilators"]
-        config["subnotification_rate"]["left_display"] = user_input[
+        config["br"]["indicators"]["hospital_capacity"]["right_display"] = user_input[
+            "n_beds"
+        ]
+        config["br"]["indicators"]["hospital_capacity"]["left_display"] = user_input[
+            "n_ventilators"
+        ]
+        config["br"]["indicators"]["subnotification_rate"]["left_display"] = user_input[
             "population_params"
         ]["D"]
 
@@ -168,52 +226,7 @@ def main():
     indicators = IndicatorCards
 
     # TODO: casos de municipios sem dados
-
-    # state_notification_rate == state, => subnotification_rank == np.nan => dday_beds_best == np.nan
-    # rt_classification == np.nan,
-    # inloco_growth == np.nan, ...
-
-    # if np.isnan(alert['rt_10days_ago_most_likely']): #TODO in case no RT edge case
-    #     st.write("Rt: Sua cidade não possui casos suficiente para o cálculo!")
-    # else:
-    # pd.set_option('display.max_columns', None)
-    # kill metricc, add risk direclty kill function
-
-    # indicators["rt"] = update_indicator(
-    #     indicators["rt"],
-    #     display=f'{str(round(data["rt_10days_ago_low"].values[0], 1))} a {str(round(data["rt_10days_ago_high"].values[0], 1))}',
-    #     left_display=f'{round(data["rt_17days_ago_low"].values[0], 1)} a {round(data["rt_17days_ago_high"].values[0], 1)}',
-    #     right_display=f'{data["rt_growth"].values[0]}',
-    #     risk=str(data["rt_classification"].values[0]),
-    # )
-
-    # indicators["subnotification_rate"] = update_indicator(
-    #     indicators["subnotification_rate"],
-    #     display=int((data["notification_rate"].values[0]) * 10),
-    #     left_display=f'{int(data["deaths"].values[0])}',
-    #     right_display=[
-    #         f'{int(data["subnotification_rank"].values[0])}º'
-    #         if not np.isnan(data["subnotification_rank"].values[0])
-    #         else "-"
-    #     ][0],
-    #     risk=str(data["subnotification_classification"].values[0]),
-    # )
-
-    # indicators["hospital_capacity"] = update_indicator(
-    #     indicators["hospital_capacity"],
-    #     display=f"{int(data['dday_beds_best'].values[0])}",
-    #     left_display=f'{int(data["number_ventilators"].values[0])}',
-    #     right_display=f'{int(data["number_beds"].values[0])}',
-    #     risk=str(data["dday_classification"].values[0]),
-    # )
-
-    # indicators[IndicatorType.SOCIAL_ISOLATION.value] = update_indicator(
-    #     indicators[IndicatorType.SOCIAL_ISOLATION.value],
-    #     display=f'{int(data["inloco_today_7days_avg"].values[0] * 100)}%',
-    #     left_display=f'{int(data["inloco_last_week_7days_avg"].values[0] * 100)}%',
-    #     right_display=f'{data["inloco_growth"].values[0]}',
-    #     risk="Fonte: inloco",
-    # )
+    indicators = update_indicators(indicators, data, config)
 
     utils.genKPISection(
         locality=user_input["locality"],
@@ -222,18 +235,46 @@ def main():
     )
 
     # PLOTS
-    st.write("<div class='see-more-btn'></div>", unsafe_allow_html=True)
-    if st.button("Ver mais detalhes"):
-        fcp.main()
+    # st.write("<div class='see-more-btn'></div>", unsafe_allow_html=True)
+
+    if st.button("Veja mais"):
+
+        st.write(
+            """
+            <div class="base-wrapper product-section">
+                    <span class="section-header primary-span">ISOLAMENTO SOCIAL (IN LOCO)</span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        if user_input["city_id"]:
+            locality_id = user_input["city_id"]
+        else:
+            df_state_mapping = pd.read_csv("./configs/states_table.csv")
+            state = df_state_mapping.loc[
+                df_state_mapping["state_name"] == data["state_name"].values[0]
+            ]
+            locality_id = state.iloc[0]["state_num_id"]
+
+        try:
+            fig = sdp.gen_social_dist_plots_placeid(locality_id)
+            st.plotly_chart(fig, use_container_width=True)
+        except:
+            st.write("Seu município ou estado não possui mais de 30 dias de dado.")
 
     # TOOLS
     products = ProductCards
     products[1].recommendation = f'Risco {data["overall_alert"].values[0]}'
     utils.genProductsSection(products)
 
-    product = st.radio(
-        "Como você gostaria de prosseguir?",
-        ("SimulaCovid", "Saúde em Ordem (em breve)"),
+    product = st.selectbox(
+        "",
+        [
+            "Como você gostaria de prosseguir?",
+            "SimulaCovid",
+            "Saúde em Ordem (em breve)",
+        ],
     )
 
     if product == "SimulaCovid":
