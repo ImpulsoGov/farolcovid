@@ -59,18 +59,34 @@ def calculate_recovered(user_input, data):
 
 def main(user_input, indicators, data, config):
 
-    st.write(
-        f"""
-        <div class="base-wrapper">
-                <span class="section-header primary-span">Simule o impacto de diferentes ritmos de contágio no seu sistema hospitalar</span>
-                <br><br>
-                <span>Agora é a hora de se preparar para evitar a sobrecarga hospitalar. 
-                No momento, em {user_input["locality"]}, estimamos que <b>o ritmo de contágio esteja entre {indicators["rt"].display}</b>, 
-                ou seja, cada pessoa doente infectará em média entre outras {indicators["rt"].display} pessoas</b>.
-                </span>
-        </div>""",
-        unsafe_allow_html=True,
-    )
+    if indicators["rt"].display != "- ":
+        st.write(
+            f"""
+            <div class="base-wrapper">
+                    <span class="section-header primary-span">Simule o impacto de diferentes ritmos de contágio no seu sistema hospitalar</span>
+                    <br><br>
+                    <span>Agora é a hora de se preparar para evitar a sobrecarga hospitalar. 
+                    No momento, em {user_input["locality"]}, estimamos que <b>o ritmo de contágio esteja entre {indicators["rt"].display}</b>, 
+                    ou seja, cada pessoa doente infectará em média entre outras {indicators["rt"].display} pessoas.
+                    </span>
+            </div>""",
+            unsafe_allow_html=True,
+        )
+    else:
+
+        st.write(
+            f"""
+            <div class="base-wrapper">
+                    <span class="section-header primary-span">Simule o impacto de diferentes ritmos de contágio no seu sistema hospitalar</span>
+                    <br><br>
+                    <span>Agora é a hora de se preparar para evitar a sobrecarga hospitalar. 
+                    No momento, em {user_input["locality"]}, não temos dados suficientes para estimativa do ritmo de contágio. 
+                    Por isso, <b>iremos simular com o ritmo de contágio do seu estado, que está entre {user_input["state_rt"]}</b>, 
+                    ou seja, cada pessoa doente infectará em média entre outras {user_input["state_rt"]} pessoas.
+                    </span>
+            </div>""",
+            unsafe_allow_html=True,
+        )
 
     dic_scenarios = {
         "Cenário Estável: O que acontece se seu ritmo de contágio continuar constante?": {
@@ -87,34 +103,35 @@ def main(user_input, indicators, data, config):
         },
     }
 
-    user_input["strategy"] = dic_scenarios[
-        st.selectbox(
-            "Simule como mudanças no seu ritmo de contágio afetam a demanda por leitos e ventiladores no local:",
-            list(dic_scenarios.keys()),
-        )
-    ]
-
-    st.write("<br/><br/>", unsafe_allow_html=True)
-
-    # calculate recovered cases
-    user_input = calculate_recovered(user_input, data)
-
-    # SIMULATOR SCENARIOS: BEDS & RESPIRATORS
-    fig, dday_beds, dday_ventilators = simulator.run_evolution(user_input, config)
-
-    utils.genChartSimulationSection(
-        SimulatorOutput(
-            color=BackgroundColor.SIMULATOR_CARD_BG,
-            min_range_beds=dday_beds["worst"],
-            max_range_beds=dday_beds["best"],
-            min_range_ventilators=dday_ventilators["worst"],
-            max_range_ventilators=dday_ventilators["best"],
-        ),
-        fig,
+    option = st.selectbox(
+        "",
+        ["Selecione uma mudança no seu ritmo de contágio"] + list(dic_scenarios.keys()),
     )
 
-    utils.genWhatsappButton()
-    utils.genFooter()
+    if option == "Selecione uma mudança no seu ritmo de contágio":
+        pass
+
+    else:
+        user_input["strategy"] = dic_scenarios[option]
+        # calculate recovered cases
+        user_input = calculate_recovered(user_input, data)
+
+        # SIMULATOR SCENARIOS: BEDS & RESPIRATORS
+        fig, dday_beds, dday_ventilators = simulator.run_evolution(user_input, config)
+
+        utils.genChartSimulationSection(
+            SimulatorOutput(
+                color=BackgroundColor.SIMULATOR_CARD_BG,
+                min_range_beds=dday_beds["worst"],
+                max_range_beds=dday_beds["best"],
+                min_range_ventilators=dday_ventilators["worst"],
+                max_range_ventilators=dday_ventilators["best"],
+            ),
+            fig,
+        )
+
+        utils.genWhatsappButton()
+        utils.genFooter()
 
 
 if __name__ == "__main__":
