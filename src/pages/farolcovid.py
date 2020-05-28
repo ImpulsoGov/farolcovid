@@ -11,6 +11,7 @@ from models import IndicatorType, IndicatorCards, ProductCards
 from model.simulator import run_evolution
 
 import pages.simulacovid as sm
+import pages.farolcovid_plots as fcp
 
 # from pages.simulacovid import calculate_recovered, filter_options
 
@@ -143,8 +144,8 @@ def main():
 
     indicators["rt"] = update_indicator(
         indicators["rt"],
-        display=f'{str(round(data["rt_10days_ago_low"].values[0], 1))} - {str(round(data["rt_10days_ago_high"].values[0], 1))}',
-        left_display=f'{round(data["rt_17days_ago_low"].values[0], 1)} - {round(data["rt_17days_ago_high"].values[0], 1)}',
+        display=f'{str(round(data["rt_10days_ago_low"].values[0], 1))} a {str(round(data["rt_10days_ago_high"].values[0], 1))}',
+        left_display=f'{round(data["rt_17days_ago_low"].values[0], 1)} a {round(data["rt_17days_ago_high"].values[0], 1)}',
         right_display=f'{data["rt_growth"].values[0]}',
         risk=str(data["rt_classification"].values[0]),
     )
@@ -180,6 +181,11 @@ def main():
     utils.genKPISection(
         locality=locality, alert=data["overall_alert"].values[0], indicators=indicators
     )
+
+    # TODO: add plots
+    st.write("<div class='see-more-btn'></div>", unsafe_allow_html=True)
+    if st.button("Ver mais detalhes"):
+        fcp.main()
 
     products = ProductCards
     products[1].recommendation = f'Risco {data["overall_alert"].values[0]}'
