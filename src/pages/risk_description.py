@@ -171,7 +171,7 @@ def main():
                     ou Insatisfatório (entre 30 e 60 dias), indicando que o sistema de saúde tem capacidade de ser reorganizado 
                     antes de atingir capacidade, caso haja um crescimento inesperado no número de casos.</li>
             </ul>
-        Dizemos que município está no <strong style="color:red">Nível de Risco ALTO</strong>  se satisfizer todos os seguintes requisitos:<br><br>
+        Dizemos que município está no <strong style="color:red">Nível de Risco ALTO</strong> se satisfizer <b>algum</b> dos seguintes requisitos:<br><br>
             <ul>
                 <li><strong>Ritmo de contágio </strong> <strong style="color:red">Ruim</strong> (Rt > 1.2), 
                     indicando que ainda há um crescimento exponencial da doença na cidade ou estado;</li>

@@ -211,11 +211,11 @@ def genKPISection(locality: str, alert: str, indicators: Dict[str, Indicator]):
     # alert = float("nan")
     if not isinstance(alert, str):
         bg = "gray"
-        caption = "Sugerimos que confira o nível de risco de seu estado.<br/>Seu município nao possui dados suficientes para calcularmos o nível de risco."
+        caption = "Sugerimos que confira o nível de risco de seu estado. (Veja o menu ao lado para metodologia)<br/>Seu município nao possui dados suficientes para calcularmos o nível de risco."
 
     else:
         bg = AlertBackground(alert).name
-        caption = f"Nível de risco {alert} do colapso no sistema de saúde"
+        caption = f"Nível de risco {alert} do colapso no sistema de saúde (Veja o menu ao lado para metodologia)"
 
     cards = list(map(genIndicatorCard, indicators.values()))
     cards = "".join(cards)

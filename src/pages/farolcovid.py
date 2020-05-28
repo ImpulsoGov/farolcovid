@@ -238,7 +238,6 @@ def main():
         # AMBASSADOR SECTION
         utils.genAmbassadorSection()
 
-
     utils.genKPISection(
         locality=user_input["locality"],
         alert=data["overall_alert"].values[0],
@@ -258,7 +257,7 @@ def main():
             <div class="base-wrapper">
                     <span class="section-header primary-span">TAXA DE ISOLAMENTO SOCIAL EM {user_input["locality"]}</span>
                     <br><br>
-                    Percentual de smartphones que deixou o local de residência, em cada dia, calculado  pela inloco. 
+                    Percentual de smartphones que não deixou o local de residência, em cada dia, calculado pela inloco. 
                     Para mais informações, <a target="_blank" style="color:#3E758A;="https://mapabrasileirodacovid.inloco.com.br/pt/">veja aqui</a>.
             </div>
             """,
@@ -269,16 +268,20 @@ def main():
             locality_id = user_input["city_id"]
         else:
             df_state_mapping = pd.read_csv("./configs/states_table.csv")
-            state = df_state_mapping.loc[
+            locality_id = df_state_mapping.loc[
                 df_state_mapping["state_name"] == data["state_name"].values[0]
-            ]
-            locality_id = state.iloc[0]["state_num_id"]
+            ].iloc[0]["state_num_id"]
 
         try:
             fig = sdp.gen_social_dist_plots_placeid(locality_id)
             st.plotly_chart(fig, use_container_width=True)
         except:
             st.write("Seu município ou estado não possui mais de 30 dias de dado.")
+
+        st.write(
+            "<div class='base-wrapper'><i>Em breve:</i> gráficos de ritmo de contágio e subnotificação.</div>",
+            unsafe_allow_html=True,
+        )
 
     # TOOLS
     products = ProductCards
