@@ -109,7 +109,7 @@ br:
         subnotification_rate:
             risk: "subnotification_classification"
             right_display: "subnotification_rank"
-            left_display: "last_mortality_ratio"
+            left_display: "confirmed_cases"
             display: "notification_rate"
         hospital_capacity:
             risk: "dday_classification"
