@@ -64,7 +64,7 @@ $ jupyter notebook
 
 ## 4. Puxando dados da API
 
-Todos os dados da API podem ser acessados aqui: http://datasource.coronacidades.org:7000/, veja a lista de tabelas [aqui](https://github.com/ImpulsoGov/simulacovid-datasource/blob/master/README.md).
+Todos os dados da API podem ser acessados aqui: http://datasource.coronacidades.org:7000/v1/, veja a lista de tabelas [aqui](https://github.com/ImpulsoGov/simulacovid-datasource/blob/master/README.md).
 
 ⚠️ **Nunca suba tabelas para o repositório!** ⚠️
 

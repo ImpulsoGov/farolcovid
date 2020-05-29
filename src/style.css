@@ -19,6 +19,9 @@
     --minor-padding: 0.5em;
     --main-border-radius: 20px;
     --main-border-radius-pill: 50px;
+    --main-red-alert: #FF5F6B;
+    --main-green-alert: #17A700;
+    --main-yellow-alert:  #F2C94C;
 }
 
 /* keyframes */
@@ -92,18 +95,161 @@
     color: var(--main-black);
 }
 
+.yellow-alert {
+    color: var(--main-yellow-alert);
+}
+
+.yellow-alert-bg {
+    background-color: var(--main-yellow-alert);
+}
+
+.red-alert {
+    color: var(--main-red-alert);
+}
+
+.red-alert-bg {
+    background-color: var(--main-red-alert);
+}
+
+.green-alert {
+    color: var(--main-green-alert);
+}
+
+.green-alert-bg {
+    background-color: var(--main-green-alert);
+}
+
+.gray-alert-bg {
+    background-color: #c4c4c4;
+}
+
+.inloco-alert-bg {
+    background-color: var(--main-primary);
+}
+
+.hide-bg {
+    visibility: hidden;
+}
+
 /* useful classes */
+.p1 {
+    font-size: 48px;
+}
+
+.p2 {
+    font-size: 36px;
+}
+
+.p3 {
+    font-size: 24px;
+}
+
+.p4 {
+    font-size: 18px;
+}
+
+.p5 {
+    font-size: 16px;
+}
+
+.p6 {
+    font-size: 14px;
+}
+
+.ml {
+    margin-left: var(--main-item-margin);
+}
+
+.mr {
+    margin-right: var(--main-item-margin);
+}
+.mt {
+    margin-top: var(--main-item-margin);
+}
+
 .bold {
     font-weight: bold;
 }
 
+.br {
+    border-right: 0.5px solid #c4c4c4;
+}
+
+.bl {
+    border-left: 0.5px solid #c4c4c4;
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
 .italic {
     font-weight: italic;
 }
 
+.flex-shrink-0 {
+    flex-shrink: 0;
+}
+
+.flex-basis-50 {
+    flex-basis: 50%;
+}
+
+.text-align-center {
+    text-align: center;
+}
+
+.flex-align-items-center {
+    align-items: center;
+}
+
+.lighter {
+    font-weight: lighter;
+}
+
+.pr {
+    padding-right: var(--main-padding);
+}
+
+.pl {
+    padding-left: var(--main-padding);
+}
 
 .hide {
     visibility: hide;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-row {
+    flex-direction: row;
+}
+
+.flex-column {
+    flex-direction: column;
+}
+
+@media only screen and (max-width: 425px) {
+    .flex-m-column {
+        flex-direction: column !important;
+    }
+}
+
+.flex-space-between {
+    justify-content: space-between;
+}
+
+.flex-space-around {
+    justify-content: space-around;
+}
+
+.header {
+    font-family: var(--main-header-font-family);
+}
+
+.elevated {
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 /* Override default template */
 .row-widget {
@@ -169,6 +315,10 @@ header>.toolbar { /* Hide toolbar menu */
 .Widget>label {
     font-size: 1rem;
 }
+
+.st-d4 {
+    border-color: var(--main-primary);
+} 
 /* Base components */
 .base-wrapper {
     padding: 3rem;
@@ -261,6 +411,7 @@ header>.toolbar { /* Hide toolbar menu */
 
 .hero-container-image {
     margin-left: auto;
+    margin-right: auto;
     width: 500px;
     height: 100%;
 }
@@ -301,6 +452,8 @@ header>.toolbar { /* Hide toolbar menu */
         height: 100%;
     }
 }
+
+
 
 /* Resources Output - Square Style */
 
@@ -452,6 +605,17 @@ header>.toolbar { /* Hide toolbar menu */
     color: var(--main-primary);
     background-color: white;
     text-decoration: none;
+}
+
+.secondary-badge {
+    color: white;
+    text-align: center;
+    /* background-color: white; */
+    /* border: 1px solid var(--main-primary); */
+    padding: var(--minor-padding);
+    border-radius: var(--main-border-radius);
+    max-width: 200px;
+    max-height: 50px;
 }
 
 /* Simulation Output - Banner Style */
@@ -741,4 +905,50 @@ header>.toolbar { /* Hide toolbar menu */
 .github-link {
     color: var(--main-primary) !important;
     text-decoration: underline;
+}
+
+/* CENTRAL COVID */
+.alert-banner {
+    width: 100vw;
+    height: 400px;
+}
+
+.indicator-card {
+    margin-top: 50px;
+    padding: var(--main-padding);
+    width: 280px;
+    height: 400px;
+    border-radius: var(--main-border-radius);
+    opacity: 0.95;
+    background-color: white;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+
+.product-section {
+    margin-top: 150px;
+}
+@media only screen and (max-width: 425px) {
+    .indicator-card {
+        height: 350px;
+    }
+
+    .product-section {
+        margin-top: 1500px;
+    }
+}
+
+
+.risk-pill {
+    width: 125px;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.product-card {
+    width: 400px;
+    height: 350px;
+    border-radius: 15px;
+    margin-right: var(--main-item-margin);
+    padding: var(--main-padding)
 }

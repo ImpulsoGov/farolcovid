@@ -44,7 +44,7 @@ def main():
         },
 
         "luiz": {
-            "foto": "https://media-exp1.licdn.com/dms/image/C4E03AQHSVHQ8br4SoQ/profile-displayphoto-shrink_200_200/0?e=1591833600&v=beta&t=rzj5_o4-AXYpcLG2EN6xOaB_c8-Ki-HQSIBUArD_ZxM",
+            "foto": "https://www.gravatar.com/avatar/1617e0d1d8ac9ec461c5f215772f7552?s=200&d=mm&r=g",
             "bio": "<b>Luiz Felipe Costa</b><br><i>Voluntário Desenvolvimento BE</i><br>Graduado em Sistemas de Informação pela UNIFEI"
         },
 
