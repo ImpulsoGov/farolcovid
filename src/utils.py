@@ -22,6 +22,71 @@ import math
 import pandas as pd
 import os
 
+import collections
+import functools
+import inspect
+import textwrap
+
+
+# code from: https://gist.github.com/treuille/bc4eacbb00bfc846b73eec2984869645
+def cache_on_button_press(label, **cache_kwargs):
+    """Function decorator to memoize function executions.
+
+    Parameters
+    ----------
+    label : str
+        The label for the button to display prior to running the cached funnction.
+    cache_kwargs : Dict[Any, Any]
+        Additional parameters (such as show_spinner) to pass into the underlying @st.cache decorator.
+
+    Example
+    -------
+    This show how you could write a username/password tester:
+
+    >>> @cache_on_button_press('Authenticate')
+    ... def authenticate(username, password):
+    ...     return username == "buddha" and password == "s4msara"
+    ...
+    ... username = st.text_input('username')
+    ... password = st.text_input('password')
+    ...
+    ... if authenticate(username, password):
+    ...     st.success('Logged in.')
+    ... else:
+    ...     st.error('Incorrect username or password')
+    """
+    internal_cache_kwargs = dict(cache_kwargs)
+    internal_cache_kwargs["allow_output_mutation"] = True
+    internal_cache_kwargs["show_spinner"] = False
+
+    def function_decorator(func):
+        @functools.wraps(func)
+        def wrapped_func(*args, **kwargs):
+            @st.cache(**internal_cache_kwargs)
+            def get_cache_entry(func, args, kwargs):
+                class ButtonCacheEntry:
+                    def __init__(self):
+                        self.evaluated = False
+                        self.return_value = None
+
+                    def evaluate(self):
+                        self.evaluated = True
+                        self.return_value = func(*args, **kwargs)
+
+                return ButtonCacheEntry()
+
+            cache_entry = get_cache_entry(func, args, kwargs)
+            if not cache_entry.evaluated:
+                if st.button(label):
+                    cache_entry.evaluate()
+                else:
+                    raise st.ScriptRunner.StopException
+            return cache_entry.return_value
+
+        return wrapped_func
+
+    return function_decorator
+
 
 def fix_dates(df):
 
@@ -137,8 +202,11 @@ def genHeroSection(title: str, subtitle: str):
 
 def genInputFields(locality, user_input, sources, config):
 
-    #     if not np.all(cities_filtered["last_updated"].isna()):
-    #         last_update_cases = cities_filtered["last_updated"].max().strftime("%d/%m")
+    # print("abrindo seletores")
+
+    # @cache_on_button_press("Finalizar alterações")
+    # def authenticate():
+    #     return True
 
     authors_beds = ", ".join(sources["author_number_beds"])
     beds_update = sources["last_updated_number_beds"].max()
@@ -167,9 +235,18 @@ def genInputFields(locality, user_input, sources, config):
     user_input["population_params"]["D"] = st.number_input(
         "Mortes confirmadas:", 0, None, int(user_input["population_params"]["D"])
     )
+
     user_input["population_params"]["I"] = st.number_input(
         "Casos ativos estimados:", 0, None, user_input["population_params"]["I"]
     )
+
+    # if authenticate():
+    #     # print("autenticado")
+    #     return user_input
+
+    # else:
+    #     print("nao autenticado")
+    #     return "ERROR"
 
     return user_input
 
@@ -211,11 +288,11 @@ def genKPISection(locality: str, alert: str, indicators: Dict[str, Indicator]):
     # alert = float("nan")
     if not isinstance(alert, str):
         bg = "gray"
-        caption = "Sugerimos que confira o nível de risco de seu estado. (Veja o menu ao lado para metodologia)<br/>Seu município nao possui dados suficientes para calcularmos o nível de risco."
+        caption = "Sugerimos que confira o nível de risco de seu estado. (Veja Níveis de Risco no menu ao lado)<br/>Seu município nao possui dados suficientes para calcularmos o nível de risco."
 
     else:
         bg = AlertBackground(alert).name
-        caption = f"Risco {alert} de colapso no sistema de saúde (Veja o menu ao lado para metodologia)"
+        caption = f"Risco {alert} de colapso no sistema de saúde (Veja Níveis de Risco no menu ao lado)"
 
     cards = list(map(genIndicatorCard, indicators.values()))
     cards = "".join(cards)
@@ -334,7 +411,7 @@ def genAmbassadorSection() -> None:
         """
         <div class="base-wrapper">
                 <div class="ambassador-container">
-                        <span class="ambassador-question bold">Você teve que atualizar algum dos dados acima? Você tem informações mais recentes e pode colaborar conosco?</span>
+                        <span class="ambassador-question bold">Você gostaria de atualizar algum dos dados acima? Você tem informações mais recentes e pode colaborar conosco?</span>
                         <span>Estamos montando uma rede para manter o SimulaCovid sempre atualizado e nossas projeções serem úteis para tomada de decisão na sua cidade. Venha ser parte do nosso time de embaixadores!</span>
                         <a class="btn-ambassador" href="%s" target="blank">Quero ser embaixador</a>
                 </div>
