@@ -215,7 +215,7 @@ def genKPISection(locality: str, alert: str, indicators: Dict[str, Indicator]):
 
     else:
         bg = AlertBackground(alert).name
-        caption = f"Nível de risco {alert} do colapso no sistema de saúde (Veja o menu ao lado para metodologia)"
+        caption = f"Risco {alert} de colapso no sistema de saúde (Veja o menu ao lado para metodologia)"
 
     cards = list(map(genIndicatorCard, indicators.values()))
     cards = "".join(cards)

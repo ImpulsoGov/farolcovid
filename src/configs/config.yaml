@@ -109,12 +109,12 @@ br:
         subnotification_rate:
             risk: "subnotification_classification"
             right_display: "subnotification_rank"
-            left_display: "deaths"
+            left_display: "last_mortality_ratio"
             display: "notification_rate"
         hospital_capacity:
             risk: "dday_classification"
-            right_display: "number_beds"
-            left_display: "number_ventilators"
+            right_display: "number_ventilators"
+            left_display: "number_beds"
             display: "dday_beds_best"
         social_isolation:
             risk: "Fonte: inloco"
