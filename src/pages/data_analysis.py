@@ -81,6 +81,8 @@ def plot_heatmap(df, place_type, legend, title=None, group=None):
         hovertext=_generate_hovertext(data),
         colorscale="temps",
         showscale=False,
+        zmin=0,
+        zmax=1
     )
 
     trace2 = go.Bar(
