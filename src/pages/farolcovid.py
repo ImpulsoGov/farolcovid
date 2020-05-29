@@ -13,7 +13,7 @@ import pages.social_distancing_plots as sdp
 import utils
 
 
-def fix_type(x):
+def fix_type(x, group):
 
     if (type(x) == str) or (type(x) == np.int64):
         return x
@@ -23,7 +23,10 @@ def fix_type(x):
 
     if type(x) == np.float64:
         if x <= 1:
-            return str(int(x * 100)) + "%"
+            if group == "hospital_capacity":
+                return int(x)
+            if group == "subnotification_rate" or group == "social_isolation":
+                return str(int(x * 100)) + "%"
         else:
             return int(x)
 
@@ -64,7 +67,8 @@ def update_indicators(indicators, data, config):
                 indicators[group].display = fix_type(
                     data[config["br"]["indicators"][group]["display"]]
                     .fillna("- ")
-                    .values[0]
+                    .values[0],
+                    group,
                 )
             indicators[group].risk = [
                 str(data[config["br"]["indicators"][group]["risk"]].values[0])
@@ -75,13 +79,15 @@ def update_indicators(indicators, data, config):
             indicators[group].left_display = fix_type(
                 data[config["br"]["indicators"][group]["left_display"]]
                 .fillna("- ")
-                .values[0]
+                .values[0],
+                group,
             )
 
             indicators[group].right_display = fix_type(
                 data[config["br"]["indicators"][group]["right_display"]]
                 .fillna("- ")
-                .values[0]
+                .values[0],
+                group,
             )
 
     return indicators
@@ -217,34 +223,13 @@ def main():
     # TODO: casos de municipios sem dados
     indicators = update_indicators(indicators, data, config)
 
-    if st.button("Alterar dados"):
-
-        if st.button("Esconder"):
-            pass
-
-        utils.genInputCustomizationSectionHeader(user_input["locality"])
-
-        user_input = utils.genInputFields(
-            user_input["locality"], user_input, sources, config
-        )
-
-        # TODO: Confirmar as mudanças dos valores dos cards aqui!
-        indicators["hospital_capacity"].right_display = user_input["n_beds"]
-        indicators["hospital_capacity"].left_display = user_input["n_ventilators"]
-        indicators["subnotification_rate"].left_display = user_input[
-            "population_params"
-        ]["D"]
-
-        # AMBASSADOR SECTION
-        utils.genAmbassadorSection()
-
     utils.genKPISection(
         locality=user_input["locality"],
         alert=data["overall_alert"].values[0],
         indicators=indicators,
     )
 
-    # PLOTS
+    # SPACE AFTER CARDS
     st.write("<div class='base-wrapper product-section'></div>", unsafe_allow_html=True)
 
     if st.button("Veja mais"):
@@ -283,6 +268,15 @@ def main():
             unsafe_allow_html=True,
         )
 
+    # AMBASSADOR SECTION
+    utils.genAmbassadorSection()
+
+    indicators["hospital_capacity"].left_display = user_input["n_beds"]
+    indicators["hospital_capacity"].right_display = user_input["n_ventilators"]
+    indicators["subnotification_rate"].left_display = user_input["population_params"][
+        "D"
+    ]
+
     # TOOLS
     products = ProductCards
     products[1].recommendation = f'Risco {data["overall_alert"].values[0]}'
@@ -298,7 +292,7 @@ def main():
     )
 
     if product == "SimulaCovid":
-        sm.main(user_input, indicators, data, config)
+        sm.main(user_input, indicators, data, config, sources)
 
     elif product == "Saúde em Ordem (em breve)":
         pass

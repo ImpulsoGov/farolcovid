@@ -57,7 +57,7 @@ def calculate_recovered(user_input, data):
     return user_input
 
 
-def main(user_input, indicators, data, config):
+def main(user_input, indicators, data, config, sources):
 
     if indicators["rt"].display != "- ":
         st.write(
@@ -112,6 +112,13 @@ def main(user_input, indicators, data, config):
         pass
 
     else:
+
+        utils.genInputCustomizationSectionHeader(user_input["locality"])
+
+        user_input = utils.genInputFields(
+            user_input["locality"], user_input, sources, config
+        )
+
         user_input["strategy"] = dic_scenarios[option]
         # calculate recovered cases
         user_input = calculate_recovered(user_input, data)
