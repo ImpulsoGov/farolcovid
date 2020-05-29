@@ -152,15 +152,15 @@ IndicatorCards: Dict[str, Indicator] = {
         header="Subnotificação",
         caption="A cada 10 pessoas doentes, são",
         unit="diagnosticadas",
-        left_label="Mortalidade semana passada:",
+        left_label="Casos confirmados:",
         right_label="Ranking BR/UF:",
     ),
     IndicatorType.HOSPITAL_CAPACITY.value: Indicator(
         header="Capacidade Hospitalar",
         caption="Os seus leitos estarão todos ocupados em até",
         unit="dias",
-        left_label="Leitos Covid-19:",
-        right_label="Ventiladores Covid-19:",
+        left_label="Leitos Covid:",
+        right_label="Ventiladores Covid:",
     ),
     IndicatorType.SOCIAL_ISOLATION.value: Indicator(
         header="Isolamento Social",
