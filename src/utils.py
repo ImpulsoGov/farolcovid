@@ -288,7 +288,7 @@ def genKPISection(place_type: str, locality: str, alert: str, indicators: Dict[s
     if not isinstance(alert, str):
         bg = "gray"
         caption = "Sugerimos que confira o nível de risco de seu estado. (Veja Níveis de Risco no menu ao lado)<br/>Seu município nao possui dados suficientes para calcularmos o nível de risco."
-        stoplight = ""
+        stoplight = "%0a%0a"
     else:
         bg = AlertBackground(alert).name
         caption = f"Risco {alert} de colapso no sistema de saúde (Veja Níveis de Risco no menu ao lado)"
