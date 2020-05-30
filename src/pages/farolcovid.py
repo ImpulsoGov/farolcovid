@@ -224,6 +224,7 @@ def main():
     indicators = update_indicators(indicators, data, config)
 
     utils.genKPISection(
+        place_type=user_input["place_type"],
         locality=user_input["locality"],
         alert=data["overall_alert"].values[0],
         indicators=indicators,

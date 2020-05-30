@@ -51,7 +51,7 @@ class IndicatorType(enum.Enum):
 class AlertBackground(enum.Enum):
     hide = ""
     green = "baixo"
-    yellow = "medio"
+    yellow = "médio"
     red = "alto"
 
 
@@ -159,8 +159,8 @@ IndicatorCards: Dict[str, Indicator] = {
         header="Capacidade Hospitalar",
         caption="Os seus leitos estarão todos ocupados em até",
         unit="dias",
-        left_label="Leitos Covid:",
-        right_label="Ventiladores Covid:",
+        left_label="Leitos:",
+        right_label="Ventiladores:",
     ),
     IndicatorType.SOCIAL_ISOLATION.value: Indicator(
         header="Isolamento Social",
