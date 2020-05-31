@@ -137,12 +137,12 @@ def get_data(config):
             "br",
             config,
             endpoint=config["br"]["api"]["endpoints"]["farolcovid"]["cities"],
-        ),
+        ).replace({"medio": "médio", "insatisfatorio": "insatisfatório"}),
         loader.read_data(
             "br",
             config,
             endpoint=config["br"]["api"]["endpoints"]["farolcovid"]["states"],
-        ),
+        ).replace({"medio": "médio", "insatisfatorio": "insatisfatório"}),
     )
 
 
