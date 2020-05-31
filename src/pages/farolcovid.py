@@ -209,7 +209,7 @@ def main():
         )
         st.write(
             f"""<div class="base-wrapper">
-        O número de casos confirmados oficialmente no seu município ou estado é de {int(data['confirmed_cases'].sum())} em {data["last_updated_subnotification"].values[0]}. 
+        O número de casos confirmados oficialmente no seu município ou estado é de {int(data['confirmed_cases'].sum())} em {pd.to_datetime(data["data_last_refreshed"].values[0]).strftime("%d/%m/%Y")}. 
         Dada a progressão clínica da doença (em média, {infectious_period} dias) e a taxa de notificação ajustada para o município ou estado de ({int(100*data['notification_rate'].values[0])}%), 
         <b>estimamos que o número de casos ativos é de {int(data['active_cases'].sum())}</b>.<br>
         <br>Caso queria, você pode mudar esse número para a simulação abaixo:
