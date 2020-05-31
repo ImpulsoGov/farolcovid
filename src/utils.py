@@ -284,24 +284,35 @@ def genIndicatorCard(indicator: Indicator):
         """
 
 
-def genKPISection(locality: str, alert: str, indicators: Dict[str, Indicator]):
-    # alert = float("nan")
+def genKPISection(place_type: str, locality: str, alert: str, indicators: Dict[str, Indicator]):
     if not isinstance(alert, str):
         bg = "gray"
         caption = "Sugerimos que confira o nível de risco de seu estado. (Veja Níveis de Risco no menu ao lado)<br/>Seu município nao possui dados suficientes para calcularmos o nível de risco."
-
+        stoplight = "%0a%0a"
     else:
         bg = AlertBackground(alert).name
         caption = f"Risco {alert} de colapso no sistema de saúde (Veja Níveis de Risco no menu ao lado)"
+        if 'state' in place_type:
+            place_type = 'estado'
+        else: 
+            place_type = 'município'
 
+        if alert == 'baixo':
+            stoplight = f'Meu {place_type} está no farol verde! E o seu? %0a%0a'
+        elif alert == 'médio':
+            stoplight = f'Meu {place_type} está no farol amarelo! E o seu? %0a%0a'
+        else:
+            stoplight = f'Meu {place_type} está no farol vermelho! E o seu? %0a%0a'
+  
     cards = list(map(genIndicatorCard, indicators.values()))
     cards = "".join(cards)
     msg = f"""
         🚨 *BOLETIM CoronaCidades:*  {locality} - {datetime.now().strftime('%d/%m')}  🚨%0a%0a
-        😷 Cada contaminado infecta em média outras {indicators['rt'].display} pessoas 0a%0a
-        🏥 A capacidade hospitalar será atingida entre {indicators['hospital_capacity'].display} dias %0a%0a
-        🏥 A cada 10 pessoas infecadas, somente {indicators['subnotification_rate'].display} são identificadas%0a%0a
-        👉 _Acompanhe e simule a situação do seu município acessando o *FarolCovid* aqui_: https://coronacidades.org/ """
+        {stoplight} 😷 Cada contaminado infecta em média outras {indicators['rt'].display} pessoas %0a%0a
+        🏥 A capacidade hospitalar será atingida em {indicators['hospital_capacity'].display} dias %0a%0a
+        🔍 A cada 10 pessoas infectadas, {indicators['subnotification_rate'].display} são diagnosticadas %0a%0a
+        🏠 Na semana passada, {indicators['social_isolation'].display} das pessoas ficou em casa %0a%0a
+        👉 _Saiba se seu município está no farol verde, amarelo ou vermelho acessando o *FarolCovid* aqui_: https://coronacidades.org/farol-covid/ """
 
     st.write(
         """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;">
