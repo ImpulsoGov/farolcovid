@@ -8,3 +8,4 @@ pyyaml
 pytest
 ipykernel
 requests
+cufflinks

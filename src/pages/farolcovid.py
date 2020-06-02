@@ -9,7 +9,7 @@ from models import IndicatorType, IndicatorCards, ProductCards
 from model.simulator import run_evolution
 
 import pages.simulacovid as sm
-import pages.social_distancing_plots as sdp
+import pages.plots as plts
 import utils
 
 
@@ -259,13 +259,28 @@ def main():
             ].iloc[0]["state_num_id"]
 
         try:
-            fig = sdp.gen_social_dist_plots_placeid(locality_id)
+            fig = plts.gen_social_dist_plots_placeid(locality_id)
             st.plotly_chart(fig, use_container_width=True)
         except:
             st.write("Seu município ou estado não possui mais de 30 dias de dado.")
-
         st.write(
-            "<div class='base-wrapper'><i>Em breve:</i> gráficos de ritmo de contágio e subnotificação.</div>",
+            f"""
+            <div class="base-wrapper">
+                    <span class="section-header primary-span">CÁLUCLO DO RITMO DE CONTÁGIO EM {user_input["locality"]}</span>
+                    <br><br>
+                    Baseado em dados da inloco. 
+                    Para mais informações, visite a página de Metodologia.
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        try:
+            fig2 = plts.plot_rt_wrapper(locality_id)
+            st.plotly_chart(fig2, use_container_width=True)
+        except:
+            st.write("Seu município ou estado não possui mais de 30 dias de dado.")
+        st.write(
+            "<div class='base-wrapper'><i>Em breve:</i> gráficos de subnotificação.</div>",
             unsafe_allow_html=True,
         )
 
