@@ -9,7 +9,7 @@ import pandas as pd
 import utils
 
 
-def _get_rolling_amount(grp, time, data_col="last_updated", col_to_roll="deaths"):
+def _get_rolling_amount(grp, time, data_col="last_updated", col_to_roll="new_deaths"):
     return grp.rolling(time, min_periods=1, on=data_col)[col_to_roll].mean()
 
 
@@ -52,6 +52,9 @@ def plot_heatmap(df, place_type, legend, title=None, group=None):
 
     # remove days with all states zero
     pivot = pivot.loc[:, (pivot != 0).any(axis=0)]
+
+    # TODO: analisar remoção de mortes nos locais
+    pivot = pivot.applymap(lambda x: 0 if x < 0 else x)
 
     # entender o que acontece aqui
     states_total_deaths = (
@@ -118,8 +121,8 @@ def plot_heatmap(df, place_type, legend, title=None, group=None):
 def _generate_mvg_deaths(df, place_type, mavg_days):
 
     df = (
-        df[~df["deaths"].isnull()][[place_type, "last_updated", "deaths"]]
-        .groupby([place_type, "last_updated"])["deaths"]
+        df[~df["deaths"].isnull()][[place_type, "last_updated", "deaths", "new_deaths"]]
+        .groupby([place_type, "last_updated"])["deaths", "new_deaths"]
         .sum()
         .reset_index()
     )
@@ -206,7 +209,7 @@ def prepare_heatmap(df, place_type, group=None, mavg_days=5):
             Para comparação, os números foram normalizados pelo maior
             valor encontrado em cada país:<b> quanto mais vermelho,
             mais próximo está o valor do maior número de mortes por
-            dia observado na UF até hoje</b>.
+            dia observado no país até hoje</b>.
             <br><br>
             Os países estão ordernados pelo dia que atingiu o máximo de mortes,
             ou seja, os países no pico de mortes aparecerão no topo. {}
