@@ -222,22 +222,33 @@ def plot_fig(t, cols):
                 x=t.index,
                 y=[cols[i_type]["capacity"] for i in t.index],
                 name=cols[i_type]["resource_name"],
-                showlegend=False,
+                showlegend=True,
                 hovertemplate=None,
                 mode="lines",
-                line=dict(color=cols[i_type]["color"], width=6, dash="dash"),
+                line=dict(color=cols[i_type]["color"], width=6, dash="dot"),
             )
         )
 
     fig.update_layout(  # title="<b>EVOLUÇÃO DIÁRIA DA DEMANDA HOSPITALAR</b>", titlefont=dict(size=24, family='Oswald, sans-serif'),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        # paper_bgcolor="rgba(0,0,0,0)",
+        # plot_bgcolor="rgba(0,0,0,0)",
         legend_orientation="h",
+        template="plotly_white",
         legend=dict(x=0, y=-0.2, font=dict(size=18, family="Oswald, sans-serif")),
         hovermode="x",
         autosize=False,
         width=1000,
         height=800,
+        annotations=[
+            dict(
+                xref="paper",
+                yref="paper",
+                x=0.00,
+                y=1,
+                showarrow=False,
+                text="As áreas coloridas mostram a margem de erro da estimativa a cada dia",
+            )
+        ],
     )
 
     fig.update_xaxes(
@@ -249,15 +260,22 @@ def plot_fig(t, cols):
         linewidth=2,
         linecolor="black",
         showgrid=False,
+        tickformat="%d/%m",
     )
 
     fig.update_yaxes(
         gridwidth=1,
         gridcolor="#d7d8d9",
         tickfont=dict(size=16, family="Oswald, sans-serif"),
+        title="Demanda",
     )
 
     return fig
+
+
+def convert_times_to_real(row):
+    today = dt.datetime.now()
+    return today + dt.timedelta(row["ddias"])
 
 
 def run_evolution(user_input, config):
@@ -294,9 +312,13 @@ def run_evolution(user_input, config):
 
     dday_beds = get_dday(dfs, "I2", user_input["n_beds"])
     dday_ventilators = get_dday(dfs, "I3", user_input["n_ventilators"])
-
+    # Changing from number of days in the future to actual date in the future
+    t["ddias"] = t.index
+    t["ndias"] = t.apply(convert_times_to_real, axis=1)
+    t = t.set_index("ndias")
+    t.index.rename("dias", inplace=True)
+    t = t.drop("ddias", axis=1)
     fig = plot_fig(t, cols)
-
     return fig, dday_beds, dday_ventilators
 
 
