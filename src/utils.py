@@ -96,6 +96,11 @@ def fix_dates(df):
     return df
 
 
+def convert_times_to_real(row):
+    today = datetime.now()
+    return today + timedelta(row["ddias"])
+
+
 def add_all(x, all_string="Todos"):
     return [all_string] + list(x)
 
@@ -129,9 +134,12 @@ configs_path = os.path.join(os.path.dirname(__file__), "configs")
 cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
 states = pd.read_csv(os.path.join(configs_path, "states_table.csv"))
 
-# In: name of the state (returns a numerical id of only the state) or the name of the state and the name of the city
-# Out: the numerical id of the state of the city
+
 def get_place_id_by_names(state_name, city_name_input="Todos"):
+    """
+    In: name of the state (returns a numerical id of only the state) or the name of the state and the name of the city
+    Out: the numerical id of the state of the city
+    """
     state_num_id = states.query("state_name == '%s'" % state_name).values[0][-1]
     if city_name_input == "Todos":
         return state_num_id
@@ -143,17 +151,32 @@ def get_place_id_by_names(state_name, city_name_input="Todos"):
     return city_id
 
 
-# In: id of a place (id < 100 for states, id > 100 for cities)
-# Out: either a string representing the name of the state or a list contaning [state name,city name]
 def get_place_names_by_id(place_id):
+    """
+    In: id of a place (id < 100 for states, id > 100 for cities)
+    Out: either a string representing the name of the state or a list contaning [state name,city name]
+    """
+    state_name_index = [i for i in states.columns].index("state_name")
     if place_id <= 100:
-        return states.query("state_num_id == '%s'" % place_id).values[0][2]
+        state_name_index = [i for i in states.columns].index("state_name")
+        return states.query("state_num_id == '%s'" % place_id).values[0][
+            state_name_index
+        ]
     else:
         data = cities.query("city_id == '%s'" % place_id).values[0]
-        city_name = data[2]
-        state_id = data[3]
-        state_name = states.query("state_num_id == '%s'" % state_id).values[0][2]
+        city_name_index = [i for i in cities.columns].index("city_name")
+        state_num_id_index = [i for i in cities.columns].index("state_num_id")
+        city_name = data[city_name_index]
+        state_id = data[state_num_id_index]
+        state_name = states.query("state_num_id == '%s'" % state_id).values[0][
+            state_name_index
+        ]
         return [state_name, city_name]
+
+
+def get_state_str_id_by_id(place_id):
+    index = [i for i in states.columns].index("state_id")
+    return states.query("state_num_id == '%s'" % place_id).values[0][index]
 
 
 def make_clickable(text, link):
@@ -284,7 +307,9 @@ def genIndicatorCard(indicator: Indicator):
         """
 
 
-def genKPISection(place_type: str, locality: str, alert: str, indicators: Dict[str, Indicator]):
+def genKPISection(
+    place_type: str, locality: str, alert: str, indicators: Dict[str, Indicator]
+):
     if not isinstance(alert, str):
         bg = "gray"
         caption = "Sugerimos que confira o nível de risco de seu estado. (Veja Níveis de Risco no menu ao lado)<br/>Seu município nao possui dados suficientes para calcularmos o nível de risco."
@@ -292,18 +317,18 @@ def genKPISection(place_type: str, locality: str, alert: str, indicators: Dict[s
     else:
         bg = AlertBackground(alert).name
         caption = f"Risco {alert} de colapso no sistema de saúde (Veja Níveis de Risco no menu ao lado)"
-        if 'state' in place_type:
-            place_type = 'estado'
-        else: 
-            place_type = 'município'
-
-        if alert == 'baixo':
-            stoplight = f'Meu {place_type} está no farol verde! E o seu? %0a%0a'
-        elif alert == 'médio':
-            stoplight = f'Meu {place_type} está no farol amarelo! E o seu? %0a%0a'
+        if "state" in place_type:
+            place_type = "estado"
         else:
-            stoplight = f'Meu {place_type} está no farol vermelho! E o seu? %0a%0a'
-  
+            place_type = "município"
+
+        if alert == "baixo":
+            stoplight = f"Meu {place_type} está no farol verde! E o seu? %0a%0a"
+        elif alert == "médio":
+            stoplight = f"Meu {place_type} está no farol amarelo! E o seu? %0a%0a"
+        else:
+            stoplight = f"Meu {place_type} está no farol vermelho! E o seu? %0a%0a"
+
     cards = list(map(genIndicatorCard, indicators.values()))
     cards = "".join(cards)
     msg = f"""
@@ -773,7 +798,7 @@ def genChartSimulationSection(simulation: SimulatorOutput, fig) -> None:
         unsafe_allow_html=True,
     )
 
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, use_container_width=True)
 
 
 def genFooter() -> None:
