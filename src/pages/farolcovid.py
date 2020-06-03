@@ -275,7 +275,8 @@ def main():
             <div class="base-wrapper">
                     <span class="section-header primary-span">CÁLCULO DO RITMO DE CONTÁGIO EM {user_input["locality"]}</span>
                     <br><br>
-                    Baseado em dados da inloco. 
+                    O ritmo de contágio, conhecido como número de reprodução efetivo (Rt), traduz a dinâmica de disseminação do Covid a cada dia. 
+                    <br>O valor pode ser lido como o número médio de novas infecções diárias causadas por uma única pessoa infectada. 
                     Para mais informações, visite a página de Metodologia.
             </div>
             """,
