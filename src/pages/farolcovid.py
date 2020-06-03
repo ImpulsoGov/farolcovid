@@ -240,7 +240,7 @@ def main():
         unsafe_allow_html=True,
     )
 
-    if st.button("Veja mais"):
+    if st.button("Confira a evolução de indicadores-chave"):
 
         if st.button("Esconder"):
             pass
