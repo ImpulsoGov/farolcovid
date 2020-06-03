@@ -231,6 +231,14 @@ def main():
 
     # SPACE AFTER CARDS
     st.write("<div class='base-wrapper product-section'></div>", unsafe_allow_html=True)
+    st.write(
+        """
+        <div class='base-wrapper'>
+            <i>* Utilizamos 50% da capacidade hospitalar para o cálculo da projeção de dias para atingir a capacidade máxima.</i>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     if st.button("Veja mais"):
 
