@@ -265,7 +265,7 @@ def main():
         st.write(
             f"""
             <div class="base-wrapper">
-                    <span class="section-header primary-span">CÁLUCLO DO RITMO DE CONTÁGIO EM {user_input["locality"]}</span>
+                    <span class="section-header primary-span">CÁLCULO DO RITMO DE CONTÁGIO EM {user_input["locality"]}</span>
                     <br><br>
                     Baseado em dados da inloco. 
                     Para mais informações, visite a página de Metodologia.
