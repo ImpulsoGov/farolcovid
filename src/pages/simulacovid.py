@@ -21,6 +21,7 @@ import yaml
 import numpy as np
 import loader
 from model import simulator
+import pages.plots as plots
 from pandas import Timestamp
 
 FIXED = datetime.now().minute
@@ -124,7 +125,8 @@ def main(user_input, indicators, data, config, sources):
         user_input = calculate_recovered(user_input, data)
 
         # SIMULATOR SCENARIOS: BEDS & RESPIRATORS
-        fig, dday_beds, dday_ventilators = simulator.run_evolution(user_input, config)
+        # simulator
+        fig, dday_beds, dday_ventilators = plots.run_evolution(user_input, config)
 
         utils.genChartSimulationSection(
             SimulatorOutput(

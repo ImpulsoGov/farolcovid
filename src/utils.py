@@ -96,6 +96,11 @@ def fix_dates(df):
     return df
 
 
+def convert_times_to_real(row):
+    today = datetime.now()
+    return today + timedelta(row["ddias"])
+
+
 def add_all(x, all_string="Todos"):
     return [all_string] + list(x)
 
