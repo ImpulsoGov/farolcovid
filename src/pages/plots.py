@@ -5,6 +5,7 @@ sys.path.append("..")
 sys.path.append("../src")
 import src.utils as utils
 import src.loader as loader
+import src.model.simulator as simulator
 
 # Plotting
 import plotly
@@ -386,3 +387,140 @@ def gen_social_dist_plots_placeid(place_id, height=700):
         return gen_social_dist_plots([names], height)
     else:  # IS CITY
         return gen_social_dist_plots([names[::-1]], height)
+
+
+#####SIMULACOVID
+
+
+def plot_fig(t, cols):
+
+    fig = go.Figure()
+    for col in t.columns:
+        i_type = col.split("_")[0]
+
+        if "best" in col:
+            fig.add_trace(
+                go.Scatter(
+                    x=t.index,
+                    y=t[col].astype(int),
+                    name=cols[i_type]["name"],
+                    showlegend=False,
+                    fill=None,
+                    hovertemplate=None,  #'%{y:.0f} no dia %{x}',
+                    mode="lines",
+                    line=dict(color=cols[i_type]["color"], width=3),
+                )
+            )
+
+        else:
+            fig.add_trace(
+                go.Scatter(
+                    x=t.index,
+                    y=t[col].astype(int),
+                    name=cols[i_type]["name"],
+                    fill="tonexty",
+                    hovertemplate=None,  #'%{y:.0f} no dia %{x}',
+                    mode="lines",
+                    line=dict(color=cols[i_type]["color"], width=3),
+                )
+            )
+
+    for i_type in cols.keys():
+        fig.add_trace(
+            go.Scatter(
+                x=t.index,
+                y=[cols[i_type]["capacity"] for i in t.index],
+                name=cols[i_type]["resource_name"],
+                showlegend=True,
+                hovertemplate=None,
+                mode="lines",
+                line=dict(color=cols[i_type]["color"], width=6, dash="dot"),
+            )
+        )
+
+    fig.update_layout(  # title="<b>EVOLUÇÃO DIÁRIA DA DEMANDA HOSPITALAR</b>", titlefont=dict(size=24, family='Oswald, sans-serif'),
+        # paper_bgcolor="rgba(0,0,0,0)",
+        # plot_bgcolor="rgba(0,0,0,0)",
+        legend_orientation="h",
+        template="plotly_white",
+        legend=dict(x=0, y=-0.2, font=dict(size=18, family="Oswald, sans-serif")),
+        hovermode="x",
+        autosize=False,
+        width=1000,
+        height=800,
+        annotations=[
+            dict(
+                xref="paper",
+                yref="paper",
+                x=0.00,
+                y=1,
+                showarrow=False,
+                text="As áreas coloridas mostram a margem de erro da estimativa a cada dia",
+            )
+        ],
+    )
+
+    fig.update_xaxes(
+        title="dias",
+        tickfont=dict(size=16, family="Oswald, sans-serif"),
+        # titletext=dict(xref='paper', x=0),
+        titlefont=dict(size=18, family="Oswald, sans-serif"),
+        showline=True,
+        linewidth=2,
+        linecolor="black",
+        showgrid=False,
+        tickformat="%d/%m",
+    )
+
+    fig.update_yaxes(
+        gridwidth=1,
+        gridcolor="#d7d8d9",
+        tickfont=dict(size=16, family="Oswald, sans-serif"),
+        title="Demanda",
+    )
+
+    return fig
+
+
+def run_evolution(user_input, config):
+
+    # if user_input["place_type"] == "city":
+    #     user_input[place_type] = user_input["city"]
+
+    # if user_input["place_type"] == "state":
+    #     user_input[place_type] = user_input["state"]
+
+    dfs = simulator.run_simulation(user_input, config)
+
+    cols = {
+        "I2": {
+            "name": "Demanda por leitos",
+            "color": "#F2C94C",
+            "resource_name": "Capacidade de leitos",
+            "capacity": user_input["n_beds"],
+        },
+        "I3": {
+            "name": "Demanda por ventiladores",
+            "color": "#0097A7",
+            "resource_name": "Capacidade de ventiladores",
+            "capacity": user_input["n_ventilators"],
+        },
+    }
+
+    # Create graph
+    t = (
+        dfs["best"][cols.keys()]
+        .join(dfs["worst"][cols.keys()], lsuffix="_best", rsuffix="_worst")
+        .sort_index(axis=1)
+    )
+
+    dday_beds = simulator.get_dday(dfs, "I2", user_input["n_beds"])
+    dday_ventilators = simulator.get_dday(dfs, "I3", user_input["n_ventilators"])
+    # Changing from number of days in the future to actual date in the future
+    t["ddias"] = t.index
+    t["ndias"] = t.apply(utils.convert_times_to_real, axis=1)
+    t = t.set_index("ndias")
+    t.index.rename("dias", inplace=True)
+    t = t.drop("ddias", axis=1)
+    fig = plot_fig(t, cols)
+    return fig, dday_beds, dday_ventilators

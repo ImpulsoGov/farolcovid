@@ -6,7 +6,6 @@ import pandas as pd
 
 # import sys
 from models import IndicatorType, IndicatorCards, ProductCards
-from model.simulator import run_evolution
 
 import pages.simulacovid as sm
 import pages.plots as plts
