@@ -798,7 +798,7 @@ def genChartSimulationSection(simulation: SimulatorOutput, fig) -> None:
         unsafe_allow_html=True,
     )
 
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, use_container_width=True)
 
 
 def genFooter() -> None:
