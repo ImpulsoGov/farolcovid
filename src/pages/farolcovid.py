@@ -251,7 +251,7 @@ def main():
                     <span class="section-header primary-span">TAXA DE ISOLAMENTO SOCIAL EM {user_input["locality"]}</span>
                     <br><br>
                     Percentual de smartphones que não deixou o local de residência, em cada dia, calculado pela inloco. 
-                    Para mais informações, <a target="_blank" style="color:#3E758A;="https://mapabrasileirodacovid.inloco.com.br/pt/">veja aqui</a>.
+                    Para mais informações, <a target="_blank" style="color:#3E758A;" href="https://mapabrasileirodacovid.inloco.com.br/pt/">veja aqui</a>.
             </div>
             """,
             unsafe_allow_html=True,
