@@ -78,13 +78,13 @@ def plot_heatmap(df, x, y, z, title, colorscale="oranges"):
 def plot_rt(t, title=""):
     # TODO: put dicts in config
     rt_classification = {
-        "Risco médio: Acima desta linha, cada pessoa infectam em média entre outras 1.0-1.2": {
+        "Risco médio: Uma pessoa infecta em média outras 1-1.2": {
             "threshold": 1,
             "color": "rgba(132,217,217,1)",
             "fill": None,
             "width": 3,
         },
-        "Risco alto: Acima desta linha, cada pessoa infectam em média mais de 1.2 outras": {
+        "Risco alto: Uma pessoa infecta em média mais 1.2 outras": {
             "threshold": 1.2,
             "color": "rgba(242,185,80,1)",
             "fill": None,
@@ -204,7 +204,7 @@ def plot_rt_wrapper(place_id):
         final_data = pre_data.loc[pre_data["city_id"] == place_id]
     fig = plot_rt(final_data)
     fig.update_layout(xaxis=dict(tickformat="%d/%m"))
-    fig.update_layout(margin=dict(l=20, r=20, b=10, t=20, pad=4))
+    fig.update_layout(margin=dict(l=50, r=50, b=100, t=20, pad=4))
     fig.update_yaxes(automargin=True)
     return fig
 
@@ -359,7 +359,7 @@ def gen_social_dist_plots(in_args, in_height=700, set_height=False):
     social_dist_plot.update_layout(xaxis=dict(tickformat="%d/%m"))
     social_dist_plot.update_layout(yaxis=dict(tickformat=",.0%"))
     social_dist_plot.update_layout(template="plotly_white")
-    social_dist_plot.update_layout(margin=dict(l=30, r=10, b=10, t=20, pad=4))
+    social_dist_plot.update_layout(margin=dict(l=50, r=50, b=100, t=20, pad=4))
     if set_height:
         social_dist_plot.update_layout(height=in_height)
     return social_dist_plot
@@ -439,23 +439,24 @@ def plot_fig(t, cols):
         )
 
     fig.update_layout(  # title="<b>EVOLUÇÃO DIÁRIA DA DEMANDA HOSPITALAR</b>", titlefont=dict(size=24, family='Oswald, sans-serif'),
-        # paper_bgcolor="rgba(0,0,0,0)",
-        # plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
         legend_orientation="h",
         template="plotly_white",
         legend=dict(x=0, y=-0.2, font=dict(size=18, family="Oswald, sans-serif")),
         hovermode="x",
-        autosize=False,
-        width=1000,
+        autosize=True,
+        # width=1000,
         height=800,
+        margin={"l": 70, "r": 50},
         annotations=[
             dict(
                 xref="paper",
                 yref="paper",
                 x=0.00,
-                y=1,
+                y=1.1,
                 showarrow=False,
-                text="As áreas coloridas mostram a margem de erro da estimativa a cada dia",
+                text="<i>Como ler: As áreas coloridas mostram a<br>margem de erro da estimativa a cada dia<i>",
             )
         ],
     )
