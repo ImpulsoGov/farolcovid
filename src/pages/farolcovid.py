@@ -118,7 +118,7 @@ def update_indicators(indicators, data, config, user_input, session_state):
     user_input["strategy"] = "isolation"
 
     user_input = sm.calculate_recovered(user_input, data)
-    _, dday_beds, _ = run_evolution(user_input, config)
+    dday_beds, _ = run_simulation(user_input, config)
 
     print(dday_beds)
 
