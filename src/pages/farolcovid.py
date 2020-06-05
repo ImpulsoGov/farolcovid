@@ -7,7 +7,7 @@ import pandas as pd
 # import sys
 from models import IndicatorType, IndicatorCards, ProductCards
 
-from model.simulator import run_evolution
+from model.simulator import run_simulation, get_dday
 import pages.simulacovid as sm
 import pages.plots as plts
 import utils
@@ -84,6 +84,7 @@ def update_indicators(indicators, data, config, user_input, session_state):
                     .values[0],
                     group,
                 )
+
             indicators[group].risk = [
                 str(data[config["br"]["indicators"][group]["risk"]].values[0])
                 if group != "social_isolation"
@@ -108,22 +109,22 @@ def update_indicators(indicators, data, config, user_input, session_state):
 
         indicators["subnotification_rate"].left_display = session_state.cases
 
-        indicators["hospital_capacity"].left_display = session_state.n_beds
-        indicators["hospital_capacity"].right_display = session_state.n_ventilators
+        indicators["hospital_capacity"].left_display = session_state.number_beds
+        indicators["hospital_capacity"].right_display = session_state.number_ventilators
 
-        user_input["n_beds"] = session_state.n_beds
-        user_input["n_ventilators"] = session_state.n_ventilators
+        user_input["number_beds"] = session_state.number_beds
+        user_input["number_ventilators"] = session_state.number_ventilators
 
     # recalcula capacidade hospitalar
     user_input["strategy"] = "isolation"
 
     user_input = sm.calculate_recovered(user_input, data)
-    dday_beds, _ = run_simulation(user_input, config)
-
-    print(dday_beds)
 
     indicators["hospital_capacity"].display = fix_type(
-        dday_beds["best"], "hospital_capacity"
+        get_dday(run_simulation(user_input, config), "I2", user_input["number_beds"])[
+            "best"
+        ],
+        "hospital_capacity",
     )
 
     return indicators
@@ -186,8 +187,8 @@ def main():
 
     session_state = session.SessionState.get(
         update=False,
-        n_beds=None,
-        n_ventilators=None,
+        number_beds=None,
+        number_ventilators=None,
         deaths=None,
         cases=None,
         refresh=False,
@@ -220,21 +221,19 @@ def main():
     )
 
     user_input, data = filter_options(user_input, df_cities, df_states, config)
-    # print(len(data))
-
+    
     # SOURCES PARAMS
-    sources = utils.get_sources(data, ["beds", "ventilators"], df_cities)
-    # print(sources)
-
-    user_input["n_beds"] = sources["number_beds"][0]
-    user_input["n_ventilators"] = sources["number_ventilators"][0]
+    user_input = utils.get_sources(user_input, data, df_cities, ["beds", "ventilators"])
 
     # POPULATION PARAMS
     user_input["population_params"] = {
         "N": int(data["population"].fillna(0).values[0]),
         "D": int(data["deaths"].fillna(0).values[0]),
         "I": int(data["active_cases"].fillna(0).values[0]),
+        "I_confirmed": int(data["confirmed_cases"].fillna(0).values[0]),
     }
+
+    user_input["last_updated_cases"] = data["last_updated_subnotification"].max()
 
     if data["confirmed_cases"].sum() == 0:
         st.write(
@@ -279,9 +278,17 @@ def main():
     st.write(
         """
         <div class='base-wrapper'>
-            <i>* Utilizamos 50% da capacidade hospitalar para o cálculo da projeção de dias para atingir a capacidade máxima.</i>
+            <i>* Utilizamos 50&percnt; da capacidade hospitalar reportada por %s em %s (leitos) e %s em %s (ventiladores) 
+            para o cálculo da projeção de dias para atingir a capacidade máxima. 
+            Caso tenha dados mais atuais, sugerimos que mude os valores e refaça essa estimação abaixo.</i>
         </div>
-        """,
+        """
+        % (
+            user_input["author_number_beds"],
+            user_input["last_updated_number_beds"],
+            user_input["author_number_ventilators"],
+            user_input["last_updated_number_ventilators"],
+        ),
         unsafe_allow_html=True,
     )
 
@@ -339,9 +346,7 @@ def main():
 
     # CHANGE DATA SECTION
     utils.genInputCustomizationSectionHeader(user_input["locality"])
-    user_input, session_state = utils.genInputFields(
-        user_input, sources, config, session_state
-    )
+    user_input, session_state = utils.genInputFields(user_input, config, session_state)
 
     if session_state.update:
 
@@ -353,8 +358,8 @@ def main():
     # AMBASSADOR SECTION
     utils.genAmbassadorSection()
 
-    indicators["hospital_capacity"].left_display = user_input["n_beds"]
-    indicators["hospital_capacity"].right_display = user_input["n_ventilators"]
+    indicators["hospital_capacity"].left_display = user_input["number_beds"]
+    indicators["hospital_capacity"].right_display = user_input["number_ventilators"]
     indicators["subnotification_rate"].left_display = user_input["population_params"][
         "D"
     ]
@@ -374,7 +379,7 @@ def main():
     )
 
     if product == "SimulaCovid":
-        sm.main(user_input, indicators, data, config, sources, session_state)
+        sm.main(user_input, indicators, data, config, session_state)
 
     elif product == "Saúde em Ordem (em breve)":
         pass
