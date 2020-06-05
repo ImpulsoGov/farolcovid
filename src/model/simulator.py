@@ -95,8 +95,6 @@ def run_simulation(user_input, config):
         else:
             phase["R0"] = get_rt(user_input["place_type"], user_input, config, bound)
 
-        print(phase["R0"])
-
         res = entrypoint(
             user_input["population_params"],
             config["br"]["seir_parameters"],
@@ -121,9 +119,8 @@ def get_dday(dfs, col, resource_number):
 
         if max(df[col]) > resource_number:
             dday[case] = df[df[col] > resource_number].index[0]
-            print("aqui atinge a capacidade:", dday[case], case)
+
         else:
-            print("+ 90", resource_number)
             dday[case] = -1  # change here!
 
     return dday

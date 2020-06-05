@@ -21,8 +21,9 @@ import yaml
 import numpy as np
 import loader
 from model import simulator
-import pages.plots as plots
 from pandas import Timestamp
+
+from pages.plots import plot_simulation
 
 FIXED = datetime.now().minute
 
@@ -58,7 +59,7 @@ def calculate_recovered(user_input, data):
     return user_input
 
 
-def main(user_input, indicators, data, config, sources, session_state):
+def main(user_input, indicators, data, config, session_state):
 
     if indicators["rt"].display != "- ":
         st.write(
@@ -116,8 +117,23 @@ def main(user_input, indicators, data, config, sources, session_state):
         # SIMULATOR SCENARIOS: BEDS & RESPIRATORS
         user_input["strategy"] = dic_scenarios[option]
 
-        print(user_input["strategy"])
-        fig, dday_beds, dday_ventilators = simulator.run_evolution(user_input, config)
+        # TODO: melhorar aqui! como fazer a estimatima de casos ativos quando é modificado?
+        if (
+            user_input["population_params"]["I"]
+            == user_input["population_params"]["I_confirmed"]
+        ):
+            user_input["population_params"]["I"] = user_input["population_params"][
+                "I_confirmed"
+            ]
+
+        dfs = simulator.run_simulation(user_input, config)
+
+        dday_beds = simulator.get_dday(dfs, "I2", user_input["number_beds"])
+
+        dday_ventilators = simulator.get_dday(
+            dfs, "I3", user_input["number_ventilators"]
+        )
+        # fig, dday_beds, dday_ventilators = simulator.run_simulation(user_input, config)
 
         utils.genChartSimulationSection(
             SimulatorOutput(
@@ -127,7 +143,7 @@ def main(user_input, indicators, data, config, sources, session_state):
                 min_range_ventilators=dday_ventilators["worst"],
                 max_range_ventilators=dday_ventilators["best"],
             ),
-            fig,
+            plot_simulation(dfs, user_input),
         )
 
         utils.genWhatsappButton()
