@@ -28,66 +28,6 @@ import inspect
 import textwrap
 
 
-# code from: https://gist.github.com/treuille/bc4eacbb00bfc846b73eec2984869645
-def cache_on_button_press(label, **cache_kwargs):
-    """Function decorator to memoize function executions.
-
-    Parameters
-    ----------
-    label : str
-        The label for the button to display prior to running the cached funnction.
-    cache_kwargs : Dict[Any, Any]
-        Additional parameters (such as show_spinner) to pass into the underlying @st.cache decorator.
-
-    Example
-    -------
-    This show how you could write a username/password tester:
-
-    >>> @cache_on_button_press('Authenticate')
-    ... def authenticate(username, password):
-    ...     return username == "buddha" and password == "s4msara"
-    ...
-    ... username = st.text_input('username')
-    ... password = st.text_input('password')
-    ...
-    ... if authenticate(username, password):
-    ...     st.success('Logged in.')
-    ... else:
-    ...     st.error('Incorrect username or password')
-    """
-    internal_cache_kwargs = dict(cache_kwargs)
-    internal_cache_kwargs["allow_output_mutation"] = True
-    internal_cache_kwargs["show_spinner"] = False
-
-    def function_decorator(func):
-        @functools.wraps(func)
-        def wrapped_func(*args, **kwargs):
-            @st.cache(**internal_cache_kwargs)
-            def get_cache_entry(func, args, kwargs):
-                class ButtonCacheEntry:
-                    def __init__(self):
-                        self.evaluated = False
-                        self.return_value = None
-
-                    def evaluate(self):
-                        self.evaluated = True
-                        self.return_value = func(*args, **kwargs)
-
-                return ButtonCacheEntry()
-
-            cache_entry = get_cache_entry(func, args, kwargs)
-            if not cache_entry.evaluated:
-                if st.button(label):
-                    cache_entry.evaluate()
-                else:
-                    raise st.ScriptRunner.StopException
-            return cache_entry.return_value
-
-        return wrapped_func
-
-    return function_decorator
-
-
 def fix_dates(df):
 
     for col in df.columns:
@@ -106,28 +46,49 @@ def add_all(x, all_string="Todos"):
 
 
 # TODO: melhorar essa funcao
-def get_sources(data, resources, cities_sources):
+def get_sources(user_input, data, cities_sources, resources):
 
-    sources = dict()
+    cols_agg = {
+        "number": lambda x: x.fillna(0).sum(),
+        "last_updated_number": lambda x: pd.to_datetime(x).max(),
+        "author_number": lambda x: x.drop_duplicates().str.cat(),
+    }
 
-    for x in resources:
+    for x in resources:  # beds, ventilators
 
-        for item in ["author_number", "last_updated_number", "number"]:
+        for item in cols_agg.keys():
+
             col = "_".join([item, x])
 
-            if not col in data.columns:
-                sources[col] = (
-                    cities_sources[
-                        cities_sources["state_id"] == data["state_id"].iloc[0]
-                    ][col]
-                    .drop_duplicates()
-                    .fillna(0)
-                    .values
-                )
-            else:
-                sources[col] = data[col].drop_duplicates().fillna(0).values
+            if user_input["place_type"] == "state_id":
 
-    return sources
+                user_input[col] = cities_sources[
+                    cities_sources["state_id"] == data["state_id"].iloc[0]
+                ][col].agg(cols_agg[item])
+
+            if user_input["place_type"] == "city_id":
+                user_input[col] = data[col].values[0]
+
+                # if "last_updated" in col:
+                #     user_input[col] = pd.to_datetime(user_input[col]).strftime("%d/%m")
+
+    user_input["last_updated_number_beds"] = pd.to_datetime(
+        user_input["last_updated_number_beds"]
+    ).strftime("%d/%m")
+    user_input["last_updated_number_ventilators"] = pd.to_datetime(
+        user_input["last_updated_number_ventilators"]
+    ).strftime("%d/%m")
+
+    # user_input["n_beds"] = sources["number_beds"][0]
+    # user_input["n_ventilators"] = sources["number_ventilators"][0]
+
+    # user_input["authors_beds"] = ", ".join(sources["author_number_beds"])
+    # user_input["authors_ventilators"] = ", ".join(sources["author_number_ventilators"])
+
+    # user_input["last_updated_beds"] = sources["last_updated_number_beds"].max()
+    # user_input["last_updated_ventilators"] = sources["last_updated_number_ventilators"].max()
+
+    return user_input
 
 
 configs_path = os.path.join(os.path.dirname(__file__), "configs")
@@ -223,62 +184,64 @@ def genHeroSection(title: str, subtitle: str):
     )
 
 
-def genInputFields(locality, user_input, sources, config):
+def genInputFields(user_input, config, session):
 
-    # print("abrindo seletores")
+    authors_beds = user_input["author_number_beds"]
+    beds_update = user_input["last_updated_number_beds"]
 
-    # @cache_on_button_press("Finalizar alterações")
-    # def authenticate():
-    #     return True
+    authors_ventilators = user_input["author_number_ventilators"]
+    ventilators_update = user_input["last_updated_number_ventilators"]
 
-    authors_beds = ", ".join(sources["author_number_beds"])
-    beds_update = sources["last_updated_number_beds"].max()
+    cases_update = pd.to_datetime(user_input["last_updated_cases"]).strftime("%d/%m")
 
-    authors_ventilators = ", ".join(sources["author_number_ventilators"])
-    ventilators_update = sources["last_updated_number_ventilators"].max()
+    locality = user_input["locality"]
 
     if locality == "Brasil":
         authors_beds = "SUS e Embaixadores"
         authors_ventilators = "SUS e Embaixadores"
 
-    user_input["n_beds"] = st.number_input(
+    user_input["number_beds"] = st.number_input(
         f"Número de leitos destinados aos pacientes com Covid-19 (fonte: {authors_beds}; atualizado: {beds_update})",
         0,
         None,
-        int(user_input["n_beds"]),
+        int(user_input["number_beds"]),
     )
 
-    user_input["n_ventilators"] = st.number_input(
+    user_input["number_ventilators"] = st.number_input(
         f"Número de ventiladores destinados aos pacientes com Covid-19 (fonte: {authors_ventilators}; atualizado: {ventilators_update}):",
         0,
         None,
-        int(user_input["n_ventilators"]),
+        int(user_input["number_ventilators"]),
+    )
+
+    user_input["population_params"]["I_confirmed"] = st.number_input(
+        f"Casos confirmados (fonte: Brasil.IO; atualizado: {cases_update}):",
+        0,
+        None,
+        user_input["population_params"]["I_confirmed"],
     )
 
     user_input["population_params"]["D"] = st.number_input(
-        "Mortes confirmadas:", 0, None, int(user_input["population_params"]["D"])
+        f"Mortes confirmadas (fonte: Brasil.IO; atualizado: {cases_update}):",
+        0,
+        None,
+        int(user_input["population_params"]["D"]),
     )
 
-    user_input["population_params"]["I"] = st.number_input(
-        "Casos ativos estimados:", 0, None, user_input["population_params"]["I"]
-    )
+    if st.button("Finalizar alteração"):
 
-    # if authenticate():
-    #     # print("autenticado")
-    #     return user_input
+        session.number_beds = user_input["number_beds"]
+        session.number_ventilators = user_input["number_ventilators"]
+        session.cases = user_input["population_params"]["I_confirmed"]
 
-    # else:
-    #     print("nao autenticado")
-    #     return "ERROR"
+        session.update = True
 
-    return user_input
+    return user_input, session
 
 
 def genIndicatorCard(indicator: Indicator):
     display_left = "flex"
     display_right = "flex"
-
-    # print(indicator.left_display, indicator.right_display)
 
     if str(indicator.left_display) == "nan":
         display_left = "hide-bg"

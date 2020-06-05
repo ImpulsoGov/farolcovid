@@ -389,10 +389,38 @@ def gen_social_dist_plots_placeid(place_id, height=700):
         return gen_social_dist_plots([names[::-1]], height)
 
 
-#####SIMULACOVID
+##### SIMULACOVID
 
+def plot_simulation(dfs, user_input):
 
-def plot_fig(t, cols):
+    cols = {
+        "I2": {
+            "name": "Demanda por leitos",
+            "color": "#F2C94C",
+            "resource_name": "Capacidade de leitos",
+            "capacity": user_input["number_beds"],
+        },
+        "I3": {
+            "name": "Demanda por ventiladores",
+            "color": "#0097A7",
+            "resource_name": "Capacidade de ventiladores",
+            "capacity": user_input["number_ventilators"],
+        },
+    }
+
+    # Create graph
+    t = (
+        dfs["best"][cols.keys()]
+        .join(dfs["worst"][cols.keys()], lsuffix="_best", rsuffix="_worst")
+        .sort_index(axis=1)
+    )
+
+    # Changing from number of days in the future to actual date in the future
+    t["ddias"] = t.index
+    t["ndias"] = t.apply(utils.convert_times_to_real, axis=1)
+    t = t.set_index("ndias")
+    t.index.rename("dias", inplace=True)
+    t = t.drop("ddias", axis=1)
 
     fig = go.Figure()
     for col in t.columns:
@@ -482,46 +510,17 @@ def plot_fig(t, cols):
 
     return fig
 
+# def run_evolution(user_input, config):
 
-def run_evolution(user_input, config):
+#     # if user_input["place_type"] == "city":
+#     #     user_input[place_type] = user_input["city"]
 
-    # if user_input["place_type"] == "city":
-    #     user_input[place_type] = user_input["city"]
+#     # if user_input["place_type"] == "state":
+#     #     user_input[place_type] = user_input["state"]
 
-    # if user_input["place_type"] == "state":
-    #     user_input[place_type] = user_input["state"]
+#     dfs = simulator.run_simulation(user_input, config)
 
-    dfs = simulator.run_simulation(user_input, config)
+#     dday_beds = simulator.get_dday(dfs, "I2", user_input["number_beds"])
+#     dday_ventilators = simulator.get_dday(dfs, "I3", user_input["number_ventilators"])
 
-    cols = {
-        "I2": {
-            "name": "Demanda por leitos",
-            "color": "#F2C94C",
-            "resource_name": "Capacidade de leitos",
-            "capacity": user_input["n_beds"],
-        },
-        "I3": {
-            "name": "Demanda por ventiladores",
-            "color": "#0097A7",
-            "resource_name": "Capacidade de ventiladores",
-            "capacity": user_input["n_ventilators"],
-        },
-    }
-
-    # Create graph
-    t = (
-        dfs["best"][cols.keys()]
-        .join(dfs["worst"][cols.keys()], lsuffix="_best", rsuffix="_worst")
-        .sort_index(axis=1)
-    )
-
-    dday_beds = simulator.get_dday(dfs, "I2", user_input["n_beds"])
-    dday_ventilators = simulator.get_dday(dfs, "I3", user_input["n_ventilators"])
-    # Changing from number of days in the future to actual date in the future
-    t["ddias"] = t.index
-    t["ndias"] = t.apply(utils.convert_times_to_real, axis=1)
-    t = t.set_index("ndias")
-    t.index.rename("dias", inplace=True)
-    t = t.drop("ddias", axis=1)
-    fig = plot_fig(t, cols)
-    return fig, dday_beds, dday_ventilators
+#     return fig, dday_beds, dday_ventilators

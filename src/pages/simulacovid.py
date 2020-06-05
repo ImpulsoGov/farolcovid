@@ -21,8 +21,9 @@ import yaml
 import numpy as np
 import loader
 from model import simulator
-import pages.plots as plots
 from pandas import Timestamp
+
+from pages.plots import plot_simulation
 
 FIXED = datetime.now().minute
 
@@ -58,7 +59,7 @@ def calculate_recovered(user_input, data):
     return user_input
 
 
-def main(user_input, indicators, data, config, sources):
+def main(user_input, indicators, data, config, session_state):
 
     if indicators["rt"].display != "- ":
         st.write(
@@ -90,18 +91,9 @@ def main(user_input, indicators, data, config, sources):
         )
 
     dic_scenarios = {
-        "Cenário Estável: O que acontece se seu ritmo de contágio continuar constante?": {
-            "isolation": 0,
-            "lockdown": 90,
-        },
-        "Cenário Negativo: O que acontece se dobrar o seu ritmo de contágio?": {
-            "isolation": 90,
-            "lockdown": 90,
-        },
-        "Cenário Positivo: O que acontece se seu ritmo de contágio diminuir pela metade?": {
-            "isolation": 90,
-            "lockdown": 0,
-        },
+        "Cenário Estável: O que acontece se seu ritmo de contágio continuar constante?": "isolation",
+        "Cenário Negativo: O que acontece se dobrar o seu ritmo de contágio?": "nothing",
+        "Cenário Positivo: O que acontece se seu ritmo de contágio diminuir pela metade?": "lockdown",
     }
 
     option = st.selectbox(
@@ -114,19 +106,34 @@ def main(user_input, indicators, data, config, sources):
 
     else:
 
-        utils.genInputCustomizationSectionHeader(user_input["locality"])
+        # utils.genInputCustomizationSectionHeader(user_input["locality"])
+        # user_input, session_state = utils.genInputFields(
+        #     user_input, sources, config, session_state
+        # )
 
-        user_input = utils.genInputFields(
-            user_input["locality"], user_input, sources, config
-        )
-
-        user_input["strategy"] = dic_scenarios[option]
         # calculate recovered cases
         user_input = calculate_recovered(user_input, data)
 
         # SIMULATOR SCENARIOS: BEDS & RESPIRATORS
-        # simulator
-        fig, dday_beds, dday_ventilators = plots.run_evolution(user_input, config)
+        user_input["strategy"] = dic_scenarios[option]
+
+        # TODO: melhorar aqui! como fazer a estimatima de casos ativos quando é modificado?
+        if (
+            user_input["population_params"]["I"]
+            == user_input["population_params"]["I_confirmed"]
+        ):
+            user_input["population_params"]["I"] = user_input["population_params"][
+                "I_confirmed"
+            ]
+
+        dfs = simulator.run_simulation(user_input, config)
+
+        dday_beds = simulator.get_dday(dfs, "I2", user_input["number_beds"])
+
+        dday_ventilators = simulator.get_dday(
+            dfs, "I3", user_input["number_ventilators"]
+        )
+        # fig, dday_beds, dday_ventilators = simulator.run_simulation(user_input, config)
 
         utils.genChartSimulationSection(
             SimulatorOutput(
@@ -136,7 +143,7 @@ def main(user_input, indicators, data, config, sources):
                 min_range_ventilators=dday_ventilators["worst"],
                 max_range_ventilators=dday_ventilators["best"],
             ),
-            fig,
+            plot_simulation(dfs, user_input),
         )
 
         utils.genWhatsappButton()
