@@ -128,10 +128,22 @@ def main(user_input, indicators, data, config, session_state):
 
         dfs = simulator.run_simulation(user_input, config)
 
-        dday_beds = simulator.get_dday(dfs, "I2", user_input["number_beds"])
+        dday_beds = simulator.get_dday(
+            dfs,
+            "I2",
+            int(
+                user_input["number_beds"]
+                * config["simulator"]["resources_available_proportion"]
+            ),
+        )
 
         dday_ventilators = simulator.get_dday(
-            dfs, "I3", user_input["number_ventilators"]
+            dfs,
+            "I3",
+            int(
+                user_input["number_ventilators"]
+                * config["simulator"]["resources_available_proportion"]
+            ),
         )
         # fig, dday_beds, dday_ventilators = simulator.run_simulation(user_input, config)
 
@@ -143,7 +155,7 @@ def main(user_input, indicators, data, config, session_state):
                 min_range_ventilators=dday_ventilators["worst"],
                 max_range_ventilators=dday_ventilators["best"],
             ),
-            plot_simulation(dfs, user_input),
+            plot_simulation(dfs, user_input, config),
         )
 
         utils.genWhatsappButton()

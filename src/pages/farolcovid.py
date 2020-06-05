@@ -105,7 +105,14 @@ def update_indicators(indicators, data, config, user_input, session_state):
                 group,
             )
 
-    if session_state.refresh:
+    if (session_state.state != user_input["state_name"]) or (
+        session_state.city != user_input["city_name"]
+    ):
+
+        session_state.state = user_input["state_name"]
+        session_state.city = user_input["city_name"]
+
+    elif session_state.refresh:
 
         indicators["subnotification_rate"].left_display = session_state.cases
 
@@ -121,7 +128,7 @@ def update_indicators(indicators, data, config, user_input, session_state):
     user_input = sm.calculate_recovered(user_input, data)
 
     indicators["hospital_capacity"].display = fix_type(
-        get_dday(run_simulation(user_input, config), "I2", user_input["number_beds"])[
+        get_dday(run_simulation(user_input, config), "I2", user_input["number_beds"] * config["simulator"]["resources_available_proportion"])[
             "best"
         ],
         "hospital_capacity",
@@ -191,6 +198,8 @@ def main():
         number_ventilators=None,
         deaths=None,
         cases=None,
+        state="Acre",
+        city="Todos",
         refresh=False,
     )
 
@@ -221,9 +230,10 @@ def main():
     )
 
     user_input, data = filter_options(user_input, df_cities, df_states, config)
-    
+
     # SOURCES PARAMS
     user_input = utils.get_sources(user_input, data, df_cities, ["beds", "ventilators"])
+    print(user_input["number_ventilators"], user_input["number_beds"])
 
     # POPULATION PARAMS
     user_input["population_params"] = {

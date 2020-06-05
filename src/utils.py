@@ -49,7 +49,7 @@ def add_all(x, all_string="Todos"):
 def get_sources(user_input, data, cities_sources, resources):
 
     cols_agg = {
-        "number": lambda x: x.fillna(0).sum(),
+        "number": lambda x: x.sum() if np.isnan(x.sum()) == False else 0,
         "last_updated_number": lambda x: pd.to_datetime(x).max(),
         "author_number": lambda x: x.drop_duplicates().str.cat(),
     }
@@ -67,7 +67,7 @@ def get_sources(user_input, data, cities_sources, resources):
                 ][col].agg(cols_agg[item])
 
             if user_input["place_type"] == "city_id":
-                user_input[col] = data[col].values[0]
+                user_input[col] = data[col].fillna(0).values[0]
 
                 # if "last_updated" in col:
                 #     user_input[col] = pd.to_datetime(user_input[col]).strftime("%d/%m")
@@ -75,6 +75,7 @@ def get_sources(user_input, data, cities_sources, resources):
     user_input["last_updated_number_beds"] = pd.to_datetime(
         user_input["last_updated_number_beds"]
     ).strftime("%d/%m")
+
     user_input["last_updated_number_ventilators"] = pd.to_datetime(
         user_input["last_updated_number_ventilators"]
     ).strftime("%d/%m")

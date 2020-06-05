@@ -391,20 +391,27 @@ def gen_social_dist_plots_placeid(place_id, height=700):
 
 ##### SIMULACOVID
 
-def plot_simulation(dfs, user_input):
+
+def plot_simulation(dfs, user_input, config):
 
     cols = {
         "I2": {
             "name": "Demanda por leitos",
             "color": "#F2C94C",
             "resource_name": "Capacidade de leitos",
-            "capacity": user_input["number_beds"],
+            "capacity": int(
+                user_input["number_beds"]
+                * config["simulator"]["resources_available_proportion"]
+            ),
         },
         "I3": {
             "name": "Demanda por ventiladores",
             "color": "#0097A7",
             "resource_name": "Capacidade de ventiladores",
-            "capacity": user_input["number_ventilators"],
+            "capacity": int(
+                user_input["number_ventilators"]
+                * config["simulator"]["resources_available_proportion"]
+            ),
         },
     }
 
