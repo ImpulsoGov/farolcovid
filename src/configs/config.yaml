@@ -39,7 +39,7 @@ br:
                 owid: "world/owid/heatmap"
     drive_paths:
         cities_population: https://docs.google.com/spreadsheets/d/1k8mXuUggBuBEghHhhLrLtA-5wa4JsAc-D35S5bNlf24
-        health_infrastructure: https://docs.google.com/spreadsheets/d/1vprpjmCpzBg3vcbXTHFh1HTnd73ZgSVIHeKpSjd1E5M/edit#gid=1532641161
+        health_infrastructure: https://docs.google.com/spreadsheets/d/1vprpjmCpzBg3vcbXTHFh1HTnd73ZgSVIHeKpSjd1E5M
         embaixadores: https://docs.google.com/spreadsheets/d/1CASa-MdJS_o2tffWlIS--FSskSxhJUw3pA1L5AGIe04
     health:
         source: 'DataSUS'
