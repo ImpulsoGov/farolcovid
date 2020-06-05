@@ -8,7 +8,7 @@ import pandas as pd
 from models import IndicatorType, IndicatorCards, ProductCards
 
 import pages.simulacovid as sm
-import pages.plots as plts
+import plots
 import utils
 
 
@@ -266,7 +266,7 @@ def main():
             ].iloc[0]["state_num_id"]
 
         try:
-            fig = plts.gen_social_dist_plots_placeid(locality_id)
+            fig = plots.gen_social_dist_plots_placeid(locality_id)
             st.plotly_chart(fig, use_container_width=True)
         except:
             st.write("Seu município ou estado não possui mais de 30 dias de dado.")
@@ -283,7 +283,7 @@ def main():
             unsafe_allow_html=True,
         )
         try:
-            fig2 = plts.plot_rt_wrapper(locality_id)
+            fig2 = plots.plot_rt_wrapper(locality_id)
             st.plotly_chart(fig2, use_container_width=True)
         except:
             st.write("Seu município ou estado não possui mais de 30 dias de dado.")
