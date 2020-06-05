@@ -204,7 +204,7 @@ def main():
     st.latex("\\frac{dE}{dt} = (β_1 I_1 + β_2 I_2 + β_3 I_3) S - \sigma E")
     st.latex("\\frac{dI_1}{dt} = \sigma E - (γ_1 + p_1) I_1")
     st.latex("\\frac{dI_2}{dt} = p_1 I_1 - (γ_2 + p_2) I_2")
-    st.latex("\\frac{dI_3}{dt} = p_2 I_2 - (γ_3 + p_3) I_3")
+    st.latex("\\frac{dI_3}{dt} = p_2 I_2 - (γ_3 + μ) I_3")
     st.latex("\\frac{dR}{dt} = γ_1 I_1 + γ_2 I_2 + γ_3 I_3")
     st.latex("\\frac{dD}{dt} = μ I_3")
 
