@@ -21,7 +21,7 @@ def fix_type(x, group):
         return " a ".join([str(round(i, 1)) for i in x])
 
     if x == -1:
-        return "> 3"
+        return "+ de 3"
 
     if (type(x) == str) or (type(x) == np.int64) or (type(x) == int):
         return x
@@ -34,7 +34,7 @@ def fix_type(x, group):
             return str(int(round(100 * x, 0))) + "%"
 
         if (x == 91) & (group == "hospital_capacity"):
-            return "> 3"
+            return "+ de 3"
 
         else:
             return int(x)
@@ -127,15 +127,18 @@ def update_indicators(indicators, data, config, user_input, session_state):
 
     user_input = sm.calculate_recovered(user_input, data)
 
-    indicators["hospital_capacity"].display = fix_type(
-        get_dmonth(
-            run_simulation(user_input, config),
-            "I2",
-            user_input["number_beds"]
-            * config["simulator"]["resources_available_proportion"],
-        )["best"],
-        "hospital_capacity",
-    )
+    dmonth = get_dmonth(
+        run_simulation(user_input, config),
+        "I2",
+        user_input["number_beds"]
+        * config["simulator"]["resources_available_proportion"],
+    )["best"]
+
+    indicators["hospital_capacity"].display = fix_type(dmonth, "hospital_capacity")
+
+    # TODO: add no config farol? ou apssar tudo apra aqui?
+    dic_dmonth = {1: "ruim", 2: "insatisfatório", 3: "bom", -1: "bom"}
+    indicators["hospital_capacity"].risk = dic_dmonth[dmonth]
 
     return indicators
 

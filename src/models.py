@@ -158,7 +158,7 @@ IndicatorCards: Dict[str, Indicator] = {
     IndicatorType.HOSPITAL_CAPACITY.value: Indicator(
         header="Capacidade Hospitalar*",
         caption="Os seus leitos estarão todos ocupados em",
-        unit="meses",
+        unit="mês(es)",
         left_label="Leitos:",
         right_label="Ventiladores:",
     ),
