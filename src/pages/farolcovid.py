@@ -7,7 +7,7 @@ import pandas as pd
 # import sys
 from models import IndicatorType, IndicatorCards, ProductCards
 
-from model.simulator import run_simulation, get_dday
+from model.simulator import run_simulation, get_dmonth
 import pages.simulacovid as sm
 import pages.plots as plts
 import utils
@@ -17,14 +17,14 @@ import session
 
 def fix_type(x, group):
 
-    if (type(x) == str) or (type(x) == np.int64):
-        return x
-
     if type(x) == np.ndarray:
-        return "-".join([str(round(i, 1)) for i in x])
+        return " a ".join([str(round(i, 1)) for i in x])
 
     if x == -1:
-        return ">90 dias"
+        return "> 3"
+
+    if (type(x) == str) or (type(x) == np.int64) or (type(x) == int):
+        return x
 
     if type(x) == np.float64:
         if (x <= 1) & (group == "subnotification_rate"):
@@ -34,7 +34,7 @@ def fix_type(x, group):
             return str(int(round(100 * x, 0))) + "%"
 
         if (x == 91) & (group == "hospital_capacity"):
-            return ">90 dias"
+            return "> 3"
 
         else:
             return int(x)
@@ -128,9 +128,12 @@ def update_indicators(indicators, data, config, user_input, session_state):
     user_input = sm.calculate_recovered(user_input, data)
 
     indicators["hospital_capacity"].display = fix_type(
-        get_dday(run_simulation(user_input, config), "I2", user_input["number_beds"] * config["simulator"]["resources_available_proportion"])[
-            "best"
-        ],
+        get_dmonth(
+            run_simulation(user_input, config),
+            "I2",
+            user_input["number_beds"]
+            * config["simulator"]["resources_available_proportion"],
+        )["best"],
         "hospital_capacity",
     )
 
@@ -233,7 +236,6 @@ def main():
 
     # SOURCES PARAMS
     user_input = utils.get_sources(user_input, data, df_cities, ["beds", "ventilators"])
-    print(user_input["number_ventilators"], user_input["number_beds"])
 
     # POPULATION PARAMS
     user_input["population_params"] = {
@@ -288,16 +290,16 @@ def main():
     st.write(
         """
         <div class='base-wrapper'>
-            <i>* Utilizamos 50&percnt; da capacidade hospitalar reportada por %s em %s (leitos) e %s em %s (ventiladores) 
-            para o cálculo da projeção de dias para atingir a capacidade máxima. 
+            <i>* Utilizamos %s&percnt; da capacidade hospitalar reportada por %s em %s 
+            para o cálculo da projeção de dias para atingir a capacidade máxima.<br> 
+            Consideramos leitos disponíveis para Covid os tipos de leitos cirúrgicos, clínicos e hospital-dia.
             Caso tenha dados mais atuais, sugerimos que mude os valores e refaça essa estimação abaixo.</i>
         </div>
         """
         % (
+            str(int(config["simulator"]["resources_available_proportion"] * 100)),
             user_input["author_number_beds"],
             user_input["last_updated_number_beds"],
-            user_input["author_number_ventilators"],
-            user_input["last_updated_number_ventilators"],
         ),
         unsafe_allow_html=True,
     )

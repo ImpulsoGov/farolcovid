@@ -116,7 +116,7 @@ br:
             risk: "dday_classification"
             right_display: "number_ventilators"
             left_display: "number_beds"
-            display: "dday_beds_best"
+            display: "dday_beds_best_months"
         social_isolation:
             risk: "Fonte: inloco"
             right_display: "inloco_growth"

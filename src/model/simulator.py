@@ -11,6 +11,7 @@ import sys
 from model.seir import entrypoint
 import loader
 import datetime as dt
+import math
 
 
 def iterate_simulation(current_state, seir_parameters, phase, initial):
@@ -121,7 +122,20 @@ def get_dday(dfs, col, resource_number):
             dday[case] = df[df[col] > resource_number].index[0]
 
         else:
-            dday[case] = -1  # change here!
+            dday[case] = -1
+
+    return dday
+
+
+def get_dmonth(dfs, col, resource_number):
+
+    dday = get_dday(dfs, col, resource_number)
+
+    for bound, v in dday.items():
+        if v == -1:
+            dday[bound] = v
+        else:
+            dday[bound] = math.ceil(v / 30)
 
     return dday
 
