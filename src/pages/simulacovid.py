@@ -128,7 +128,7 @@ def main(user_input, indicators, data, config, session_state):
 
         dfs = simulator.run_simulation(user_input, config)
 
-        dday_beds = simulator.get_dday(
+        dday_beds = simulator.get_dmonth(
             dfs,
             "I2",
             int(
@@ -137,7 +137,7 @@ def main(user_input, indicators, data, config, session_state):
             ),
         )
 
-        dday_ventilators = simulator.get_dday(
+        dday_ventilators = simulator.get_dmonth(
             dfs,
             "I3",
             int(

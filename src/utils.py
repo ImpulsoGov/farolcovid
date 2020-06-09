@@ -253,7 +253,7 @@ def genIndicatorCard(indicator: Indicator):
     return f"""<div class="indicator-card flex flex-column mr">
                         <span class="header p3">{indicator.header}</span>
                         <span class="p4">{indicator.caption}</span>
-                        <span class="bold p2">{indicator.display}<span class="bold p4"> {indicator.unit}</span></span>
+                        <span class="bold p2">{indicator.display}<span class="bold p5"> {indicator.unit}</span></span>
                         <div class="{IndicatorBackground(indicator.risk).name}-alert-bg risk-pill">
                                 <span class="white-span p4 bold">{indicator.risk}</span>
                         </div>
@@ -497,12 +497,12 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
     ventilator_icon = "https://i.imgur.com/V419ZRI.png"
 
     has_bed_projection = output.min_range_beds != -1 and output.max_range_beds != -1
-    bed_prep = "entre" if has_bed_projection else "em"
+    bed_prep = "em até"  # "entre" if has_ventilator_projection else "em"
 
     has_ventilator_projection = (
         output.min_range_ventilators != -1 and output.max_range_ventilators != -1
     )
-    ventilator_prep = "entre" if has_ventilator_projection else "em"
+    ventilator_prep = "em até"  # "entre" if has_ventilator_projection else "em"
 
     if has_bed_projection:
         bed_min_range_date = (
@@ -511,13 +511,15 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
         bed_max_range_date = (
             datetime.now() + timedelta(days=int(output.max_range_beds))
         ).strftime("%d/%m")
-        bed_projection = f"""{output.min_range_beds}
-                        <span class="simulator-output-row-prediction-separator">e</span> 
-                        {output.max_range_beds} """
-        bed_rng = f" ({bed_min_range_date} - {bed_max_range_date}) "
+
+        bed_projection = f"{output.max_range_beds} meses"
+        # bed_projection = f"""{output.min_range_beds}
+        #                 <span class="simulator-output-row-prediction-separator">e</span>
+        #                 {output.max_range_beds} """
+        # bed_rng = f" ({bed_min_range_date} - {bed_max_range_date}) "
     else:
-        bed_projection = "mais de 90"
-        bed_rng = f""
+        bed_projection = "mais de 3 meses"
+        # bed_rng = f""
 
     if has_ventilator_projection:
         ventilator_min_range_date = (
@@ -526,15 +528,17 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
         ventilator_max_range_date = (
             datetime.now() + timedelta(days=int(output.max_range_ventilators))
         ).strftime("%d/%m")
-        ventilator_projection = (
-            '%i <span class="simulator-output-row-prediction-separator">e</span> %i'
-            % (output.min_range_ventilators, output.max_range_ventilators)
-        )
-        ventilator_rng = (
-            f" ({ventilator_min_range_date} - {ventilator_max_range_date}) "
-        )
+
+        ventilator_projection = f"{output.max_range_ventilators} meses"
+        # ventilator_projection = (
+        #     '%i <span class="simulator-output-row-prediction-separator">e</span> %i'
+        #     % (output.min_range_ventilators, output.max_range_ventilators)
+        # )
+        # ventilator_rng = (
+        #     f" ({ventilator_min_range_date} - {ventilator_max_range_date}) "
+        # )
     else:
-        ventilator_projection = "mais de 90"
+        ventilator_projection = "mais de 3 meses"
         ventilator_rng = ""
 
     output = """
@@ -548,7 +552,7 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
                                         </span>  
                                 </div> 
                                 <span class="simulator-output-row-prediction-label">
-                                        dias%s será atingida a capacidade máxima de <b>leitos</b>
+                                        será atingida a capacidade máxima de <b>leitos</b>
                                 </span>
                         </div>
                         <img src="%s" class="simulator-output-image"/>
@@ -563,7 +567,7 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
                                         </span>  
                                 </div> 
                                 <span class="simulator-output-row-prediction-label">
-                                        dias%s será atingida a capacidade máxima de <b>ventiladores</b>
+                                        meses será atingida a capacidade máxima de <b>ventiladores</b>
                                 </span>
                         </div>
                         <img src="%s" class="simulator-output-image"/>
@@ -572,12 +576,12 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
         output.color.value,
         bed_prep,
         bed_projection,
-        bed_rng,
+        # bed_rng,
         bed_img,
         output.color.value,
         ventilator_prep,
         ventilator_projection,
-        ventilator_rng,
+        # ventilator_rng,
         ventilator_icon,
     )
 
