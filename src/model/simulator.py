@@ -11,6 +11,7 @@ import sys
 from model.seir import entrypoint
 import loader
 import datetime as dt
+import math
 
 
 def iterate_simulation(current_state, seir_parameters, phase, initial):
@@ -27,7 +28,7 @@ def iterate_simulation(current_state, seir_parameters, phase, initial):
 
 
 # Get reproduction rate
-def get_rt(place_type, user_input, config, simulation_params, bound):
+def get_rt(place_type, user_input, config, bound):
 
     if place_type == "city_id":
         col = place_type
@@ -43,39 +44,18 @@ def get_rt(place_type, user_input, config, simulation_params, bound):
 
     # caso nao tenha rt, usa o rt do estado
     if (place_type == "city_id") & (user_input[place_type] not in rt[col].values):
-        return get_rt("state_id", user_input, config, simulation_params, bound)
+        return get_rt("state_id", user_input, config, bound)
 
     cols = {"best": "Rt_low_95", "worst": "Rt_high_95"}
 
-    for phase in simulation_params:
+    if user_input["strategy"] == "isolation":  # current
+        return rt[rt[col] == user_input[place_type]][cols[bound]].values[0]
 
-        # TODO: mudar para novas flags com o front
-        if simulation_params[phase]["scenario"] == "isolation":  # nothing
-            simulation_params[phase]["R0"] = rt[rt[col] == user_input[place_type]][
-                cols[bound]
-            ].values[0]
+    if user_input["strategy"] == "lockdown":  # smaller_rt
+        return rt[rt[col] == user_input[place_type]][cols[bound]] / 2
 
-        if simulation_params[phase]["scenario"] == "lockdown":  # smaller_rt
-            simulation_params[phase]["R0"] = (
-                rt[rt[col] == user_input[place_type]][cols[bound]] / 2
-            )
-
-        if simulation_params[phase]["scenario"] == "nothing":  # greater_rt
-            simulation_params[phase]["R0"] = (
-                rt[rt[col] == user_input[place_type]][cols[bound]] * 2
-            )
-
-    return simulation_params
-
-
-def decide_scenario(user_strategy):
-
-    if user_strategy["isolation"] < user_strategy["lockdown"]:
-        return ["nothing", "isolation", "lockdown"]
-    elif user_strategy["isolation"] == user_strategy["lockdown"]:  # lockdown only
-        return ["nothing", "lockdown", "lockdown"]
-    else:
-        return ["nothing", "lockdown", "isolation"]
+    if user_input["strategy"] == "nothing":  # greater_rt
+        return rt[rt[col] == user_input[place_type]][cols[bound]] * 2
 
 
 def run_simulation(user_input, config):
@@ -108,60 +88,26 @@ def run_simulation(user_input, config):
     # Run worst scenario
     for bound in dfs.keys():
 
-        # Get ranges with test delay
-        intervals = (
-            min(user_input["strategy"].values())
-            + config["simulator"]["scenarios"][bound]["test_delay"],
-            max(user_input["strategy"].values()) - min(user_input["strategy"].values()),
-            config["simulator"]["max_days"] - max(user_input["strategy"].values()),
-        )
-
-        scenarios = decide_scenario(user_input["strategy"])
-        simulation_params = {
-            f"phase{i+1}": {"scenario": scenarios[i], "n_days": intervals[i]}
-            for i in range(3)
-        }
+        phase = {"scenario": "projection_current_rt", "n_days": 90}
 
         # Get Rts
         if not user_input["state_id"] and not user_input["city_id"]:
-            for phase in simulation_params:
-                simulation_params[phase]["R0"] = 3
+            phase["R0"] = 3
         else:
-            simulation_params = get_rt(
-                user_input["place_type"], user_input, config, simulation_params, bound
-            )
+            phase["R0"] = get_rt(user_input["place_type"], user_input, config, bound)
 
-        # Iterate over phases
-        df_evolution = pd.DataFrame()
+        res = entrypoint(
+            user_input["population_params"],
+            config["br"]["seir_parameters"],
+            phase=phase,
+            initial=True,
+        )
 
-        for phase in simulation_params:
+        res = res.reset_index(drop=True)
+        res.index += 1
+        res.index.name = "dias"
 
-            if phase == "phase1":
-                res, current_state = iterate_simulation(
-                    user_input["population_params"],
-                    config["br"]["seir_parameters"],
-                    simulation_params[phase],
-                    initial=True,
-                )
-                df_evolution = df_evolution.append(res)  # consider 1st day
-
-            else:
-                res, current_state = iterate_simulation(
-                    current_state,
-                    config["br"]["seir_parameters"],
-                    simulation_params[phase],
-                    initial=False,
-                )
-                df_evolution = df_evolution.append(res[1:])
-
-        df_evolution = df_evolution[
-            config["simulator"]["scenarios"][bound]["test_delay"] :
-        ]
-        df_evolution = df_evolution.reset_index(drop=True)
-        df_evolution.index += 1
-        df_evolution.index.name = "dias"
-
-        dfs[bound] = df_evolution
+        dfs[bound] = res
 
     return dfs
 
@@ -174,8 +120,22 @@ def get_dday(dfs, col, resource_number):
 
         if max(df[col]) > resource_number:
             dday[case] = df[df[col] > resource_number].index[0]
+
         else:
-            dday[case] = -1  # change here!
+            dday[case] = -1
+
+    return dday
+
+
+def get_dmonth(dfs, col, resource_number):
+
+    dday = get_dday(dfs, col, resource_number)
+
+    for bound, v in dday.items():
+        if v == -1:
+            dday[bound] = v
+        else:
+            dday[bound] = math.ceil(v / 30)
 
     return dday
 
