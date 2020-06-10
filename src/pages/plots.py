@@ -399,19 +399,13 @@ def plot_simulation(dfs, user_input, config):
             "name": "Demanda por leitos",
             "color": "#F2C94C",
             "resource_name": "Capacidade de leitos",
-            "capacity": int(
-                user_input["number_beds"]
-                * config["simulator"]["resources_available_proportion"]
-            ),
+            "capacity": int(user_input["number_beds"]),
         },
         "I3": {
             "name": "Demanda por ventiladores",
             "color": "#0097A7",
             "resource_name": "Capacidade de ventiladores",
-            "capacity": int(
-                user_input["number_ventilators"]
-                * config["simulator"]["resources_available_proportion"]
-            ),
+            "capacity": int(user_input["number_ventilators"]),
         },
     }
 

@@ -128,22 +128,10 @@ def main(user_input, indicators, data, config, session_state):
 
         dfs = simulator.run_simulation(user_input, config)
 
-        dday_beds = simulator.get_dmonth(
-            dfs,
-            "I2",
-            int(
-                user_input["number_beds"]
-                * config["simulator"]["resources_available_proportion"]
-            ),
-        )
+        dday_beds = simulator.get_dmonth(dfs, "I2", int(user_input["number_beds"]))
 
         dday_ventilators = simulator.get_dmonth(
-            dfs,
-            "I3",
-            int(
-                user_input["number_ventilators"]
-                * config["simulator"]["resources_available_proportion"]
-            ),
+            dfs, "I3", int(user_input["number_ventilators"])
         )
         # fig, dday_beds, dday_ventilators = simulator.run_simulation(user_input, config)
 
