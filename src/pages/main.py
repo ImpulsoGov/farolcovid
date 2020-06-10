@@ -397,16 +397,8 @@ def main():
     elif product == "Saúde em Ordem (em breve)":
         pass
 
-    st.write(
-        """
-    <div class="base-wrapper">
-        Estamos à disposição para apoiar o gestor público a aprofundar a 
-        análise para seu estado ou município, de forma inteiramente gratuita. 
-        <a target="_blank" style="color:#3E758A;" href="https://coronacidades.org/fale-conosco/"><b>Entre em contato conosco</a>
-    </div>
-    """,
-        unsafe_allow_html=True,
-    )
+    utils.genWhatsappButton()
+    utils.genFooter()
 
 
 if __name__ == "__main__":
