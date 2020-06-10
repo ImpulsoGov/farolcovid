@@ -7,11 +7,11 @@ import plotly.express as px
 from streamlit import caching
 
 # Pages
+# import pages.simulacovid as sm
 import pages.model_description as md
 import pages.team as tm
-import pages.simulacovid as sm
 import pages.data_analysis as anal
-import pages.farolcovid as fc
+import pages.main as fc
 import pages.risk_description as rd
 import pages.rt_description as rt
 
