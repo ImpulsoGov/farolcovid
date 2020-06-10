@@ -21,9 +21,8 @@ import yaml
 import numpy as np
 import loader
 from model import simulator
+from plots import plot_simulation
 from pandas import Timestamp
-
-from pages.plots import plot_simulation
 
 FIXED = datetime.now().minute
 
@@ -128,22 +127,10 @@ def main(user_input, indicators, data, config, session_state):
 
         dfs = simulator.run_simulation(user_input, config)
 
-        dday_beds = simulator.get_dmonth(
-            dfs,
-            "I2",
-            int(
-                user_input["number_beds"]
-                * config["simulator"]["resources_available_proportion"]
-            ),
-        )
+        dday_beds = simulator.get_dmonth(dfs, "I2", int(user_input["number_beds"]))
 
         dday_ventilators = simulator.get_dmonth(
-            dfs,
-            "I3",
-            int(
-                user_input["number_ventilators"]
-                * config["simulator"]["resources_available_proportion"]
-            ),
+            dfs, "I3", int(user_input["number_ventilators"])
         )
         # fig, dday_beds, dday_ventilators = simulator.run_simulation(user_input, config)
 
@@ -155,7 +142,8 @@ def main(user_input, indicators, data, config, session_state):
                 min_range_ventilators=dday_ventilators["worst"],
                 max_range_ventilators=dday_ventilators["best"],
             ),
-            plot_simulation(dfs, user_input, config),
+            plot_simulation(dfs, user_input),
+            # plots.plot_simulation_wrapper(user_input, config)
         )
 
         utils.genWhatsappButton()

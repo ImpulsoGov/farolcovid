@@ -122,7 +122,7 @@ def get_dday(dfs, col, resource_number):
             dday[case] = df[df[col] > resource_number].index[0]
 
         else:
-            dday[case] = -1
+            dday[case] = 91
 
     return dday
 
@@ -132,8 +132,8 @@ def get_dmonth(dfs, col, resource_number):
     dday = get_dday(dfs, col, resource_number)
 
     for bound, v in dday.items():
-        if v == -1:
-            dday[bound] = v
+        if v == 91:
+            dday[bound] = 3
         else:
             dday[bound] = math.ceil(v / 30)
 
