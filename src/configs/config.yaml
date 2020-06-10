@@ -1,6 +1,8 @@
 refresh_rate: 999999 # minutes
 
-# simulator:
+# TODO: REMOVE HERE AFTER DATASOURCE CHANGE
+simulator:
+    resources_available_proportion: 0.5
 #     max_days: 90
 #     scenarios:
 #         worst:
