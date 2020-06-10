@@ -231,6 +231,14 @@ def plot_inloco(pairs, df, place_type, decoration=False):
     return fig
 
 
+def moving_average(a, n=7):
+    ret = np.cumsum(a, dtype=float)
+    ret = [ret[i] for i in range(len(ret)) if i < n] + [
+        ret[i] - ret[i - n] for i in range(len(ret)) if i >= n
+    ]
+    return [ret_day / min(n, i + 1) for i, ret_day in enumerate(ret)]
+
+
 def gen_social_dist_plots(in_args, in_height=700, set_height=False):
 
     api_inloco = utils.get_inloco_url(config)
@@ -267,6 +275,17 @@ def gen_social_dist_plots(in_args, in_height=700, set_height=False):
         )
 
         social_dist_plot = plot_inloco(in_args, my_clean_df, "state")
+    x_data = social_dist_plot.data[0]["x"]
+    y_data = social_dist_plot.data[0]["y"]
+    social_dist_plot.add_trace(
+        go.Scatter(
+            x=x_data,
+            y=moving_average(y_data, n=7),
+            line={"color": "grey", "dash": "dash",},  # 0
+            name="Média móvel últimos 7 dias",
+            showlegend=True,
+        )
+    )
 
     social_dist_plot.update_layout(
         {
