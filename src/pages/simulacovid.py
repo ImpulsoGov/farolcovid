@@ -21,9 +21,8 @@ import yaml
 import numpy as np
 import loader
 from model import simulator
+from plots import plot_simulation
 from pandas import Timestamp
-
-from pages.plots import plot_simulation
 
 FIXED = datetime.now().minute
 
@@ -143,7 +142,8 @@ def main(user_input, indicators, data, config, session_state):
                 min_range_ventilators=dday_ventilators["worst"],
                 max_range_ventilators=dday_ventilators["best"],
             ),
-            plot_simulation(dfs, user_input, config),
+            plot_simulation(dfs, user_input),
+            # plots.plot_simulation_wrapper(user_input, config)
         )
 
         utils.genWhatsappButton()

@@ -26,6 +26,30 @@ import collections
 import functools
 import inspect
 import textwrap
+import yaml
+
+
+def get_inloco_url(config):
+
+    api_inloco = dict()
+
+    if os.getenv("IS_LOCAL") == "TRUE":
+        api_url = config["br"]["api"]["local"]
+    else:
+        api_url = config["br"]["api"]["external"]
+
+    if os.getenv("INLOCO_CITIES_ROUTE") and os.getenv("INLOCO_STATES_ROUTE"):
+        api_inloco["cities"] = api_url + os.getenv("INLOCO_CITIES_ROUTE")
+        api_inloco["states"] = api_url + os.getenv("INLOCO_STATES_ROUTE")
+
+    else:
+        secrets = yaml.load(
+            open("../src/configs/secrets.yaml", "r"), Loader=yaml.FullLoader
+        )
+        api_inloco["cities"] = api_url + secrets["inloco"]["cities"]["route"]
+        api_inloco["states"] = api_url + secrets["inloco"]["states"]["route"]
+
+    return api_inloco
 
 
 def fix_dates(df):
