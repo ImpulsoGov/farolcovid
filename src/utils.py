@@ -746,23 +746,30 @@ def genChartSimulationSection(simulation: SimulatorOutput, fig) -> None:
 
 
 def genFooter() -> None:
+
     st.write(
         """
         <div class="magenta-bg">
                 <div class="base-wrapper">
                         <div class="logo-wrapper">
-                                <span>A presente ferramenta, voluntária, parte de estudos referenciados já publicados e considera os dados de saúde pública dos municípios brasileiros disponibilizados no DataSus. O repositório do projeto pode ser acessado no nosso <a class="github-link" href="https://github.com/ImpulsoGov/simulacovid">Github</a></span>
-                                <br/>
-                                <span>Os cenários projetados são meramente indicativos e dependem de variáveis que aqui não podem ser consideradas. Trata-se de mera contribuição à elaboração de cenários por parte dos municípios e não configura qualquer obrigação ou responsabilidade perante as decisões efetivadas. Saiba mais em nossa metodologia.</span>
-                                <br/>
-                                <span>Estamos em constante desenvolvimento e queremos ouvir sua opinião sobre a ferramenta - caso tenha sugestões ou comentários, entre em contato via o chat ao lado. Caso seja gestor público e necessite de apoio para preparo de seu município, acesse a Checklist e confira o site do CoronaCidades.</span>
-                                <br/>
+                                <span><b>Estamos à disposição para apoiar o gestor público a aprofundar a análise para seu estado ou município, de forma inteiramente gratuita. 
+                                <a target="_blank" style="color:#3E758A;" href="https://coronacidades.org/fale-conosco/">Entre em contato conosco</a></span><br/>
+                                <span>A presente ferramenta, voluntária, parte de estudos referenciados já publicados e considera os dados de saúde pública dos municípios 
+                                brasileiros disponibilizados no DataSus. O repositório do projeto pode ser acessado no 
+                                nosso <a class="github-link" href="https://github.com/ImpulsoGov/simulacovid">Github</a>.</span><br/>
+                                Os cenários projetados são meramente indicativos e dependem de variáveis que aqui não podem ser consideradas. 
+                                Trata-se de mera contribuição à elaboração de cenários por parte dos municípios e não configura qualquer obrigação ou 
+                                responsabilidade perante as decisões efetivadas. Saiba mais em nossa Metodologia. 
+                                Estamos em constante desenvolvimento e queremos ouvir sua opinião sobre a ferramenta - caso tenha sugestões ou comentários, 
+                                entre em contato via o chat ao lado. Caso seja gestor público e necessite de apoio para preparo de seu município, 
+                                acesse a Checklist e confira o site do CoronaCidades.
+                                <br/></br></br></span>
                                 <img class="logo-img" src="%s"/>
                                 <div class="logo-section">
                                         <img class="logo-img" src="%s"/>
                                         <img class="logo-img" src="%s"/>
                                 </div>
-                        </div>'
+                        </div>
                 </div>
         </div>"""
         % (Logo.IMPULSO.value, Logo.CORONACIDADES.value, Logo.ARAPYAU.value),
@@ -777,7 +784,7 @@ def genWhatsappButton() -> None:
     st.write(
         """ 
          <a href="%s" class="float" target="_blank" id="messenger">
-                <i class="material-icons">question_answer</i>
+                <i class="material-icons">?</i>
                 <p class="float-header">Dúvidas?</p></a>
         """
         % url,

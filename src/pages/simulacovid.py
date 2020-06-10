@@ -146,9 +146,6 @@ def main(user_input, indicators, data, config, session_state):
             # plots.plot_simulation_wrapper(user_input, config)
         )
 
-        utils.genWhatsappButton()
-        utils.genFooter()
-
 
 if __name__ == "__main__":
     pass
