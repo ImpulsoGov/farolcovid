@@ -2,11 +2,43 @@ import streamlit as st
 import pandas as pd
 from utils import make_clickable
 
+
 def main():
 
     st.header("Metodologia")
 
-    st.write('v1.2')
+    st.write("v1.3 - Atualizações")
+
+    st.subheader("Ritmo de contágio (**Rt**)")
+
+    st.write(
+        """
+      Nessa atualização do SimulaCovid alteramos a seleção de diferentes estratégias de intervenção para a 
+      seleção de *diferentes cenários de evolução da doença, a partir de hoje, dada a situação de seu município ou estado*. 
+      Essa evolução é dada pelo *ritmo de contágio* estimado, que traduz quantas pessoas em média um contaminado infecta. 
+      O ritmo de contágio é atualizado diariamente de acordo com o número de novos casos do município ou estado 
+      (veja o cálculo desse indicador em *Estimando Ritmo de Contágio*). Os diferentes cenários para simulação são:
+
+        - Cenário Estável: cenário no qual o ritmo de contágio da simulação é o mesmo do atual;
+        - Cenário Negativo: cenário no qual o ritmo de contágio da simulação é o *dobro* do atual;
+        - Cenário Positivo: cenário no qual o ritmo de contágio da simulação é a *metade* do atual;
+      """
+    )
+
+    st.subheader("Capacidade Hospitalar (Oferta)")
+
+    st.write(
+        """
+      Dada a evolução do Covid nos município e estados brasileiros desde a versão anterior da metodologia, 
+      e a resposta dos governos com a construção e obtenção de novos recursos hospitalares, 
+      modificamos também o percentual de leitos e ventiladores SUS e não-SUS disponíveis para a Covid de 20\% para 50\%.
+      
+      Os leitos disponíveis para Covid considerados são os tipos de leitos cirúrgicos, clínicos e hospital-dia. 
+      Atualizamos os dados de leitos e ventiladores com base na última versão do DataSUS de abril/2020. 
+      """
+    )
+
+    st.write("v1.2")
 
     st.write(
         """
@@ -54,7 +86,7 @@ def main():
         """
     )
 
-    st.latex('t^* = min \{t [dias] : \mathcal{D}^e(t) = \mathcal{O}^e(t)\}')
+    st.latex("t^* = min \{t [dias] : \mathcal{D}^e(t) = \mathcal{O}^e(t)\}")
 
     st.write(
         """
@@ -137,7 +169,7 @@ def main():
         """
     )
 
-    st.header("Quantidade de internações (Demanda)")    
+    st.header("Quantidade de internações (Demanda)")
 
     st.write(
         """
@@ -195,11 +227,13 @@ def main():
         """
     )
 
-    pic = open('imgs/model_graph', 'r').read()
+    pic = open("imgs/model_graph", "r").read()
     st.image(pic, use_column_width=True, caption=None)
-    st.write('*Fonte: [Alison Hill](https://alhill.shinyapps.io/COVID19seir/)*')
+    st.write("*Fonte: [Alison Hill](https://alhill.shinyapps.io/COVID19seir/)*")
 
-    st.write('Conforme a descrição acima, o conjunto de equações que determina a dinâmica do modelo é dado por:')
+    st.write(
+        "Conforme a descrição acima, o conjunto de equações que determina a dinâmica do modelo é dado por:"
+    )
     st.latex("\\frac{dS}{dt} = - (β_1 I_1 + β_2 I_2 + β_3 I_3) S")
     st.latex("\\frac{dE}{dt} = (β_1 I_1 + β_2 I_2 + β_3 I_3) S - \sigma E")
     st.latex("\\frac{dI_1}{dt} = \sigma E - (γ_1 + p_1) I_1")
@@ -208,9 +242,9 @@ def main():
     st.latex("\\frac{dR}{dt} = γ_1 I_1 + γ_2 I_2 + γ_3 I_3")
     st.latex("\\frac{dD}{dt} = μ I_3")
 
-    st.subheader('Parâmetros da doença')
+    st.subheader("Parâmetros da doença")
 
-    st.write('- **Número básico de reprodução ($$R_0$$)**')
+    st.write("- **Número básico de reprodução ($$R_0$$)**")
     st.write(
         """
         O número básico de reprodução da doença nos remete ao número médio de
@@ -223,7 +257,7 @@ def main():
         """
     )
 
-    st.write('- **Taxas de progressão ($p_i, \\sigma$) e mortalidade ($\\mu$)**')
+    st.write("- **Taxas de progressão ($p_i, \\sigma$) e mortalidade ($\\mu$)**")
     st.write(
         """
         As taxas de progressão da doença representam o grau no qual um indivíduo
@@ -238,12 +272,12 @@ def main():
         """
     )
 
-    df = pd.read_csv('https://docs.google.com/spreadsheets/d/1wvg1KFWZp4WhYVI4Gw_82bL_je_2WZHNLCcSnx95MTI/gviz/tq?tqx=out:csv&sheet=Taxas_de_progressao')
-    df.index = ['' for i in range(len(df))]
+    df = pd.read_csv(
+        "https://docs.google.com/spreadsheets/d/1wvg1KFWZp4WhYVI4Gw_82bL_je_2WZHNLCcSnx95MTI/gviz/tq?tqx=out:csv&sheet=Taxas_de_progressao"
+    )
+    df.index = ["" for i in range(len(df))]
     st.table(df)
-
-
-    st.write('- **Taxas de recuperação ($\\gamma_i$)**')
+    st.write("- **Taxas de recuperação ($\\gamma_i$)**")
     st.write(
         """
         As taxas de recuperação da doença representam o grau no qual um
@@ -253,11 +287,13 @@ def main():
         """
     )
 
-    df = pd.read_csv('https://docs.google.com/spreadsheets/d/1wvg1KFWZp4WhYVI4Gw_82bL_je_2WZHNLCcSnx95MTI/gviz/tq?tqx=out:csv&sheet=Taxas_de_recuperacao')
-    df.index = ['' for i in range(len(df))]
+    df = pd.read_csv(
+        "https://docs.google.com/spreadsheets/d/1wvg1KFWZp4WhYVI4Gw_82bL_je_2WZHNLCcSnx95MTI/gviz/tq?tqx=out:csv&sheet=Taxas_de_recuperacao"
+    )
+    df.index = ["" for i in range(len(df))]
     st.table(df)
 
-    st.write('- **Taxas de transmissão ($\\beta_i$)**')
+    st.write("- **Taxas de transmissão ($\\beta_i$)**")
     st.write(
         """
         As taxas de transmissão dizem respeito ao potencial de infecção de
@@ -278,8 +314,9 @@ def main():
         """
     )
 
-    st.latex("R_0  = N\\frac{\\beta_1}{p_1+\gamma_1} + N\\frac{p_1}{p_1 + \gamma_1} \left( \\frac{\\beta_2}{p_2+\gamma_2} + \\frac{p_2}{p_2 + \gamma_2} \\frac{\\beta_3}{\mu+\gamma_3}\\right)")
-
+    st.latex(
+        "R_0  = N\\frac{\\beta_1}{p_1+\gamma_1} + N\\frac{p_1}{p_1 + \gamma_1} \left( \\frac{\\beta_2}{p_2+\gamma_2} + \\frac{p_2}{p_2 + \gamma_2} \\frac{\\beta_3}{\mu+\gamma_3}\\right)"
+    )
 
     st.write("- **Cálculo das taxas**")
 
@@ -291,13 +328,15 @@ def main():
         """
     )
 
-    df = pd.read_csv('https://docs.google.com/spreadsheets/d/1wvg1KFWZp4WhYVI4Gw_82bL_je_2WZHNLCcSnx95MTI/export?format=csv&id').fillna('-')# .set_index('Descrição', drop=True)
-    df.index = ['' for i in range(len(df))]
+    df = pd.read_csv(
+        "https://docs.google.com/spreadsheets/d/1wvg1KFWZp4WhYVI4Gw_82bL_je_2WZHNLCcSnx95MTI/export?format=csv&id"
+    ).fillna(
+        "-"
+    )  # .set_index('Descrição', drop=True)
+    df.index = ["" for i in range(len(df))]
     st.table(df)
+    st.subheader("Parâmetros da Reação da Sociedade e Governo")
 
-
-    st.subheader('Parâmetros da Reação da Sociedade e Governo')
-    
     st.write(
         """
         - **Taxa de notificação ($$\\alpha$$)**
@@ -336,7 +375,9 @@ def main():
         """
     )
 
-    st.latex("\\alpha = \sum_{t=t_i - 7}^{t_i} \\frac{I(t)}{\hat{I}(t)}, \\text{   $t_i$ = última data de atualização dos casos}")
+    st.latex(
+        "\\alpha = \sum_{t=t_i - 7}^{t_i} \\frac{I(t)}{\hat{I}(t)}, \\text{   $t_i$ = última data de atualização dos casos}"
+    )
     st.write("<br>", unsafe_allow_html=True)
 
     st.write(
@@ -357,9 +398,11 @@ def main():
         relação à situação real da doença no município.
         """
     )
-    
+
     st.subheader("Inicialização dos estados")
-    st.write("Para simular a evolução da doença, determinamos os valores iniciais de cada estado populacional do modelo.")
+    st.write(
+        "Para simular a evolução da doença, determinamos os valores iniciais de cada estado populacional do modelo."
+    )
 
     st.write(
         """
@@ -424,7 +467,9 @@ def main():
     st.latex("I_1(0) = \\frac{\gamma_1}{\gamma_1 + p_1} I(0)")
     st.latex("I_2(0) = \\frac{\gamma_2}{\gamma_2 + p_2} I(0)")
     st.latex("I_3(0) = \\frac{\gamma_3}{\gamma_3 + \mu} I(0)")
-    st.latex("\\text{sendo }\\frac{\gamma_1}{\gamma_1 + p_1} + \\frac{\gamma_2}{\gamma_2 + p_2} + \\frac{\gamma_3}{\gamma_3 + \mu} = 1")
+    st.latex(
+        "\\text{sendo }\\frac{\gamma_1}{\gamma_1 + p_1} + \\frac{\gamma_2}{\gamma_2 + p_2} + \\frac{\gamma_3}{\gamma_3 + \mu} = 1"
+    )
 
     st.write(
         """
@@ -446,8 +491,9 @@ def main():
         """
     )
     # st.latex("I_1(1) - I_1(0) = \sigma E(0) - \gamma I_1(0) \\rightarrow E(0) =\\frac{ I_1(1) + (\gamma - 1)I_1(0)}{\sigma}")
-    st.latex("E(0) \\approx \\frac{ I(1) - I(0)}{\sigma} \\approx \\frac{0.15}{\sigma} \\times I(0)")
-
+    st.latex(
+        "E(0) \\approx \\frac{ I(1) - I(0)}{\sigma} \\approx \\frac{0.15}{\sigma} \\times I(0)"
+    )
 
     st.write(
         """
@@ -490,8 +536,10 @@ def main():
         """
     )
 
-    df = pd.read_csv('https://docs.google.com/spreadsheets/d/1wvg1KFWZp4WhYVI4Gw_82bL_je_2WZHNLCcSnx95MTI/gviz/tq?tqx=out:csv&sheet=Taxas_de_reproducao')# .set_index('Descrição', drop=True)
-    df.index = ['' for i in range(len(df))]
+    df = pd.read_csv(
+        "https://docs.google.com/spreadsheets/d/1wvg1KFWZp4WhYVI4Gw_82bL_je_2WZHNLCcSnx95MTI/gviz/tq?tqx=out:csv&sheet=Taxas_de_reproducao"
+    )  # .set_index('Descrição', drop=True)
+    df.index = ["" for i in range(len(df))]
     st.table(df)
 
     st.write(
@@ -509,7 +557,7 @@ def main():
         """
     )
 
-    st.header('Limitações')
+    st.header("Limitações")
 
     st.write(
         """
@@ -547,20 +595,26 @@ def main():
         vacinas e medicamentos anti-virais.
         """
     )
-    
-    st.header('Fonte de Dados')
-    st.write("""
-    Os dados iniciais utilizados na ferramenta foram coletados de:
-    """)
 
-    df = pd.read_csv('https://docs.google.com/spreadsheets/d/1wvg1KFWZp4WhYVI4Gw_82bL_je_2WZHNLCcSnx95MTI/gviz/tq?tqx=out:csv&sheet=Fontes')
+    st.header("Fonte de Dados")
+    st.write(
+        """
+    Os dados iniciais utilizados na ferramenta foram coletados de:
+    """
+    )
+
+    df = pd.read_csv(
+        "https://docs.google.com/spreadsheets/d/1wvg1KFWZp4WhYVI4Gw_82bL_je_2WZHNLCcSnx95MTI/gviz/tq?tqx=out:csv&sheet=Fontes"
+    )
 
     # link is the column with hyperlinks
-    df['Fonte'] = df[['URL', 'Fonte']].apply(lambda row: make_clickable(row['Fonte'], row['URL']), 1)
-    st.write(df.drop('URL', axis=1).to_html(escape=False), unsafe_allow_html=True)
+    df["Fonte"] = df[["URL", "Fonte"]].apply(
+        lambda row: make_clickable(row["Fonte"], row["URL"]), 1
+    )
+    st.write(df.drop("URL", axis=1).to_html(escape=False), unsafe_allow_html=True)
     st.write("<br>", unsafe_allow_html=True)
 
-    st.subheader('Programa de Embaixadores')
+    st.subheader("Programa de Embaixadores")
     st.write(
         """
         Para esta versão, também são integrados dados atualizados enviados pelos 
@@ -571,11 +625,11 @@ def main():
         """
     )
     st.write("<br>", unsafe_allow_html=True)
-    
-    st.header('Referências')
+
+    st.header("Referências")
 
     st.write(
-        '''
+        """
         Agência Nacional de Saúde Suplementar, 2012. Taxa de Ocupação Operacional Geral. Disponível em: http://www.ans.gov.br/images/stories/prestadores/E-EFI-03.pdf
 
         Ministério da Saúde do Brasil, 2020. Boletim Diário. 28 mar. 2020. Disponível em: https://www.saude.gov.br/images/pdf/2020/marco/28/28.03%20-%20COVID.pdf
@@ -593,9 +647,9 @@ def main():
         [1] Wang, C, et al. (2020) Evolving Epidemiology and Impact of Non-pharmaceutical Interventions on the Outbreak of Coronavirus Disease 2019 in Wuhan, China. DOI: https://doi.org/10.1101/2020.03.03.20030593 e pdf de apresentação https://docs.google.com/presentation/d/1-rvZs0zsXF_0Tw8TNsBxKH4V1LQQXq7Az9kDfCgZDfE/edit#slide=id.p1
         
         [2] Wang, J., Zhou, M., & Liu, F., 2020. Reasons for healthcare workers becoming infected with novel coronavirus disease 2019 (COVID-19) in China. Journal of Hospital Infection. DOI: https://doi.org/10.1016/j.jhin.2020.03.002
-        '''
+        """
     )
-        
+
+
 if __name__ == "__main__":
     main()
-    
