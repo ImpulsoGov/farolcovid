@@ -20,8 +20,6 @@ def fix_type(x, group):
     if type(x) == np.ndarray:
         return " a ".join([str(round(i, 1)) for i in x])
 
-    if x == -1:
-        return "+ de 3"
 
     if (type(x) == str) or (type(x) == np.int64) or (type(x) == int):
         return x
@@ -33,8 +31,6 @@ def fix_type(x, group):
         if (x <= 1) & (group == "social_isolation"):
             return str(int(round(100 * x, 0))) + "%"
 
-        if (x == 91) & (group == "hospital_capacity"):
-            return "+ de 3"
 
         else:
             return int(x)
@@ -131,13 +127,13 @@ def update_indicators(indicators, data, config, user_input, session_state):
         run_simulation(user_input, config),
         "I2",
         user_input["number_beds"]
-        * config["simulator"]["resources_available_proportion"],
+        * config["br"]["simulacovid"]["resources_available_proportion"],
     )["best"]
 
     indicators["hospital_capacity"].display = fix_type(dmonth, "hospital_capacity")
 
     # TODO: add no config farol? ou apssar tudo apra aqui?
-    dic_dmonth = {1: "ruim", 2: "insatisfatório", 3: "bom", -1: "bom"}
+    dic_dmonth = {1: "ruim", 2: "insatisfatório", 3: "bom"}#, -1: "bom"}
     indicators["hospital_capacity"].risk = dic_dmonth[dmonth]
 
     return indicators
@@ -300,7 +296,7 @@ def main():
         </div>
         """
         % (
-            str(int(config["simulator"]["resources_available_proportion"] * 100)),
+            str(int(config["br"]["simulacovid"]["resources_available_proportion"] * 100)),
             user_input["author_number_beds"],
             user_input["last_updated_number_beds"],
         ),
