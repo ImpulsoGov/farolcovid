@@ -26,6 +26,30 @@ import collections
 import functools
 import inspect
 import textwrap
+import yaml
+
+
+def get_inloco_url(config):
+
+    api_inloco = dict()
+
+    if os.getenv("IS_LOCAL") == "TRUE":
+        api_url = config["br"]["api"]["local"]
+    else:
+        api_url = config["br"]["api"]["external"]
+
+    if os.getenv("INLOCO_CITIES_ROUTE") and os.getenv("INLOCO_STATES_ROUTE"):
+        api_inloco["cities"] = api_url + os.getenv("INLOCO_CITIES_ROUTE")
+        api_inloco["states"] = api_url + os.getenv("INLOCO_STATES_ROUTE")
+
+    else:
+        secrets = yaml.load(
+            open("../src/configs/secrets.yaml", "r"), Loader=yaml.FullLoader
+        )
+        api_inloco["cities"] = api_url + secrets["inloco"]["cities"]["route"]
+        api_inloco["states"] = api_url + secrets["inloco"]["states"]["route"]
+
+    return api_inloco
 
 
 def fix_dates(df):
@@ -202,17 +226,23 @@ def genInputFields(user_input, config, session):
         authors_ventilators = "SUS e Embaixadores"
 
     user_input["number_beds"] = st.number_input(
-        f"Número de leitos destinados aos pacientes com Covid-19 (fonte: {authors_beds}; atualizado: {beds_update})",
+        f"Número de leitos destinados aos pacientes com Covid-19 (50% do reportado em {authors_beds}; atualizado: {beds_update})",
         0,
         None,
-        int(user_input["number_beds"]),
+        int(
+            user_input["number_beds"]
+            * config["br"]["simulacovid"]["resources_available_proportion"]
+        ),
     )
 
     user_input["number_ventilators"] = st.number_input(
-        f"Número de ventiladores destinados aos pacientes com Covid-19 (fonte: {authors_ventilators}; atualizado: {ventilators_update}):",
+        f"Número de ventiladores destinados aos pacientes com Covid-19 (50% do reportado em {authors_ventilators}; atualizado: {ventilators_update}):",
         0,
         None,
-        int(user_input["number_ventilators"]),
+        int(
+            user_input["number_ventilators"]
+            * config["br"]["simulacovid"]["resources_available_proportion"]
+        ),
     )
 
     user_input["population_params"]["I_confirmed"] = st.number_input(
@@ -250,12 +280,17 @@ def genIndicatorCard(indicator: Indicator):
     if str(indicator.right_display) == "nan":
         display_right = "hide-bg"
 
+    if indicator.risk == "Fonte: inloco":
+        risk_html_class = "black-span p4"
+    else:
+        risk_html_class = "bold white-span p4"
+
     return f"""<div class="indicator-card flex flex-column mr">
                         <span class="header p3">{indicator.header}</span>
                         <span class="p4">{indicator.caption}</span>
                         <span class="bold p2">{indicator.display}<span class="bold p5"> {indicator.unit}</span></span>
                         <div class="{IndicatorBackground(indicator.risk).name}-alert-bg risk-pill">
-                                <span class="white-span p4 bold">{indicator.risk}</span>
+                                <span class="{risk_html_class}">{indicator.risk}</span>
                         </div>
                         <div class="flex flex-row flex-justify-space-between mt"> 
                                 <div class="br {display_left} flex-column text-align-center pr">
@@ -493,59 +528,24 @@ def genResourceAvailabilitySection(resources: ResourceAvailability) -> None:
 
 
 def genSimulatorOutput(output: SimulatorOutput) -> str:
+
     bed_img = "https://i.imgur.com/27hutU0.png"
     ventilator_icon = "https://i.imgur.com/V419ZRI.png"
 
-    has_bed_projection = output.min_range_beds != -1 and output.max_range_beds != -1
-    bed_prep = "em até"  # "entre" if has_ventilator_projection else "em"
-
-    has_ventilator_projection = (
-        output.min_range_ventilators != -1 and output.max_range_ventilators != -1
-    )
-    ventilator_prep = "em até"  # "entre" if has_ventilator_projection else "em"
-
-    if has_bed_projection:
-        bed_min_range_date = (
-            datetime.now() + timedelta(days=int(output.min_range_beds))
-        ).strftime("%d/%m")
-        bed_max_range_date = (
-            datetime.now() + timedelta(days=int(output.max_range_beds))
-        ).strftime("%d/%m")
-
-        bed_projection = f"{output.max_range_beds} meses"
-        # bed_projection = f"""{output.min_range_beds}
-        #                 <span class="simulator-output-row-prediction-separator">e</span>
-        #                 {output.max_range_beds} """
-        # bed_rng = f" ({bed_min_range_date} - {bed_max_range_date}) "
+    if output.min_range_beds < 3 and output.max_range_beds < 3:
+        bed_projection = f"em até {output.max_range_beds} mês(es)"
     else:
-        bed_projection = "mais de 3 meses"
-        # bed_rng = f""
+        bed_projection = "mais de 2 meses"
 
-    if has_ventilator_projection:
-        ventilator_min_range_date = (
-            datetime.now() + timedelta(days=int(output.min_range_ventilators))
-        ).strftime("%d/%m")
-        ventilator_max_range_date = (
-            datetime.now() + timedelta(days=int(output.max_range_ventilators))
-        ).strftime("%d/%m")
-
-        ventilator_projection = f"{output.max_range_ventilators} meses"
-        # ventilator_projection = (
-        #     '%i <span class="simulator-output-row-prediction-separator">e</span> %i'
-        #     % (output.min_range_ventilators, output.max_range_ventilators)
-        # )
-        # ventilator_rng = (
-        #     f" ({ventilator_min_range_date} - {ventilator_max_range_date}) "
-        # )
+    if output.min_range_ventilators < 3 and output.max_range_ventilators < 3:
+        ventilator_projection = f"em até {output.max_range_ventilators} mês(es)"
     else:
-        ventilator_projection = "mais de 3 meses"
-        ventilator_rng = ""
+        ventilator_projection = "mais de 2 meses"
 
     output = """
         <div>
                 <div class="simulator-container %s">
                         <div class="simulator-output-wrapper">
-                                <span class="simulator-output-timeframe">%s</span>
                                 <div class="simulator-output-row">
                                         <span class="simulator-output-row-prediction-value">
                                                 %s
@@ -560,7 +560,6 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
                 <br />
                 <div class="simulator-container %s">
                         <div class="simulator-output-wrapper">
-                                <span class="simulator-output-timeframe">%s</span>
                                 <div class="simulator-output-row">
                                         <span class="simulator-output-row-prediction-value">
                                                 %s
@@ -574,14 +573,10 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
                 </div>
         </div>""" % (
         output.color.value,
-        bed_prep,
         bed_projection,
-        # bed_rng,
         bed_img,
         output.color.value,
-        ventilator_prep,
         ventilator_projection,
-        # ventilator_rng,
         ventilator_icon,
     )
 
@@ -722,25 +717,6 @@ def genStrategiesSection(strategies: List[ContainmentStrategy]) -> None:
 def genChartSimulationSection(simulation: SimulatorOutput, fig) -> None:
 
     simulation = genSimulatorOutput(simulation)
-    #     sd_date = (datetime.now() + timedelta(days=int(time2sd))).strftime("%d/%m")
-    #     lockdown_date = (datetime.now() + timedelta(days=int(time2lockdown))).strftime(
-    #         "%d/%m"
-    #     )
-
-    #     simulation_description = ""
-    #     if time2lockdown <= time2sd:
-
-    #         if time2lockdown == 0:
-    #             simulation_description = (
-    #                 f"Começando a quarentena <b>hoje</b> ({lockdown_date}):"
-    #             )
-    #         else:
-    #             simulation_description = f"Começando a quarentena em <b>{time2lockdown}</b> dias ({lockdown_date}):"
-    #     else:  # lockdown after social distancing
-    #         if time2sd == 0:
-    #             simulation_description = f"Começando o isolamento social <b>hoje</b>  ({sd_date}) e a quarentena em <b>{time2lockdown}</b> dias ({lockdown_date}):"
-    #         else:
-    #             simulation_description = f"Começando o isolamento social em <b>{time2sd}</b> dias ({sd_date}) e a quarentena em <b>{time2lockdown}</b> dias ({lockdown_date}):"
 
     st.write(
         """<div class="lightgrey-bg">
@@ -770,23 +746,30 @@ def genChartSimulationSection(simulation: SimulatorOutput, fig) -> None:
 
 
 def genFooter() -> None:
+
     st.write(
         """
         <div class="magenta-bg">
                 <div class="base-wrapper">
                         <div class="logo-wrapper">
-                                <span>A presente ferramenta, voluntária, parte de estudos referenciados já publicados e considera os dados de saúde pública dos municípios brasileiros disponibilizados no DataSus. O repositório do projeto pode ser acessado no nosso <a class="github-link" href="https://github.com/ImpulsoGov/simulacovid">Github</a></span>
-                                <br/>
-                                <span>Os cenários projetados são meramente indicativos e dependem de variáveis que aqui não podem ser consideradas. Trata-se de mera contribuição à elaboração de cenários por parte dos municípios e não configura qualquer obrigação ou responsabilidade perante as decisões efetivadas. Saiba mais em nossa metodologia.</span>
-                                <br/>
-                                <span>Estamos em constante desenvolvimento e queremos ouvir sua opinião sobre a ferramenta - caso tenha sugestões ou comentários, entre em contato via o chat ao lado. Caso seja gestor público e necessite de apoio para preparo de seu município, acesse a Checklist e confira o site do CoronaCidades.</span>
-                                <br/>
+                                <span><b>Estamos à disposição para apoiar o gestor público a aprofundar a análise para seu estado ou município, de forma inteiramente gratuita. 
+                                <a target="_blank" style="color:#3E758A;" href="https://coronacidades.org/fale-conosco/">Entre em contato conosco</a></span><br/>
+                                <span>A presente ferramenta, voluntária, parte de estudos referenciados já publicados e considera os dados de saúde pública dos municípios 
+                                brasileiros disponibilizados no DataSus. O repositório do projeto pode ser acessado no 
+                                nosso <a class="github-link" href="https://github.com/ImpulsoGov/simulacovid">Github</a>.</span><br/>
+                                Os cenários projetados são meramente indicativos e dependem de variáveis que aqui não podem ser consideradas. 
+                                Trata-se de mera contribuição à elaboração de cenários por parte dos municípios e não configura qualquer obrigação ou 
+                                responsabilidade perante as decisões efetivadas. Saiba mais em nossa Metodologia. 
+                                Estamos em constante desenvolvimento e queremos ouvir sua opinião sobre a ferramenta - caso tenha sugestões ou comentários, 
+                                entre em contato via o chat ao lado. Caso seja gestor público e necessite de apoio para preparo de seu município, 
+                                acesse a Checklist e confira o site do CoronaCidades.
+                                <br/></br></br></span>
                                 <img class="logo-img" src="%s"/>
                                 <div class="logo-section">
                                         <img class="logo-img" src="%s"/>
                                         <img class="logo-img" src="%s"/>
                                 </div>
-                        </div>'
+                        </div>
                 </div>
         </div>"""
         % (Logo.IMPULSO.value, Logo.CORONACIDADES.value, Logo.ARAPYAU.value),
@@ -801,7 +784,7 @@ def genWhatsappButton() -> None:
     st.write(
         """ 
          <a href="%s" class="float" target="_blank" id="messenger">
-                <i class="material-icons">question_answer</i>
+                <i class="material-icons">?</i>
                 <p class="float-header">Dúvidas?</p></a>
         """
         % url,

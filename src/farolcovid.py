@@ -7,18 +7,18 @@ import plotly.express as px
 from streamlit import caching
 
 # Pages
+# import pages.simulacovid as sm
 import pages.model_description as md
 import pages.team as tm
-import pages.simulacovid as sm
 import pages.data_analysis as anal
-import pages.farolcovid as fc
+import pages.main as fc
 import pages.risk_description as rd
 import pages.rt_description as rt
 
 def main():
-    page = st.sidebar.radio("Menu", ["FarolCovid", "Análises", "Níveis de Risco","Estimando Ritmo de Contágio",  "Metodologia SimulaCovid", "Quem somos?"]) # "Central COVID19", 
+    page = st.sidebar.radio("Menu", ["FarolCovid", "Análises", "Níveis de Risco","Estimando Ritmo de Contágio",  "Modelo Epidemiológico", "Quem somos?"]) # "Central COVID19", 
 
-    if page == "Metodologia SimulaCovid":
+    if page == "Modelo Epidemiológico":
         if __name__ == "__main__":
             md.main()
 

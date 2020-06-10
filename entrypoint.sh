@@ -10,4 +10,4 @@ source venv/bin/activate
 
 # Start server
 cd src/
-streamlit run app.py
+streamlit run farolcovid.py

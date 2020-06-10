@@ -25,10 +25,10 @@ update-env:
 			pip3 install --upgrade -r requirements.txt;
 
 serve:
-	source venv/bin/activate; cd src; export IS_LOCAL=FALSE; streamlit run app.py
+	source venv/bin/activate; cd src; export IS_LOCAL=FALSE; streamlit run farolcovid.py
 
 serve-local:
-	source venv/bin/activate; cd src; export IS_LOCAL=TRUE; streamlit run app.py
+	source venv/bin/activate; cd src; export IS_LOCAL=TRUE; streamlit run farolcovid.py
 
 # Docker
 docker-build:
