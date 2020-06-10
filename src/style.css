@@ -124,7 +124,7 @@
 }
 
 .inloco-alert-bg {
-    background-color: var(--main-primary);
+    background-color: var(--main-white);
 }
 
 .hide-bg {
@@ -919,7 +919,7 @@ header>.toolbar { /* Hide toolbar menu */
     width: 280px;
     height: 400px;
     border-radius: var(--main-border-radius);
-    opacity: 0.95;
+    opacity: 0.98;
     background-color: white;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
