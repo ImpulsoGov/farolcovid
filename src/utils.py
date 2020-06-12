@@ -211,11 +211,26 @@ def genHeroSection(title: str, subtitle: str):
 
 def genInputFields(user_input, config, session):
 
+    # Inicia sem update
+    session.update = False
+
     authors_beds = user_input["author_number_beds"]
     beds_update = user_input["last_updated_number_beds"]
 
     authors_ventilators = user_input["author_number_ventilators"]
     ventilators_update = user_input["last_updated_number_ventilators"]
+
+    number_beds = int(user_input["number_beds"])
+    number_ventilators = int(user_input["number_ventilators"])
+
+    if not session.refresh:
+        number_beds = int(
+            number_beds * config["br"]["simulacovid"]["resources_available_proportion"]
+        )
+        number_ventilators = int(
+            number_ventilators
+            * config["br"]["simulacovid"]["resources_available_proportion"]
+        )
 
     cases_update = pd.to_datetime(user_input["last_updated_cases"]).strftime("%d/%m")
 
@@ -229,20 +244,14 @@ def genInputFields(user_input, config, session):
         f"Número de leitos destinados aos pacientes com Covid-19 (50% do reportado em {authors_beds}; atualizado: {beds_update})",
         0,
         None,
-        int(
-            user_input["number_beds"]
-            * config["br"]["simulacovid"]["resources_available_proportion"]
-        ),
+        number_beds,
     )
 
     user_input["number_ventilators"] = st.number_input(
         f"Número de ventiladores destinados aos pacientes com Covid-19 (50% do reportado em {authors_ventilators}; atualizado: {ventilators_update}):",
         0,
         None,
-        int(
-            user_input["number_ventilators"]
-            * config["br"]["simulacovid"]["resources_available_proportion"]
-        ),
+        number_ventilators,
     )
 
     user_input["population_params"]["I_confirmed"] = st.number_input(
@@ -259,6 +268,7 @@ def genInputFields(user_input, config, session):
         int(user_input["population_params"]["D"]),
     )
 
+    # Faz o update quando clica o botão
     if st.button("Finalizar alteração"):
 
         session.number_beds = user_input["number_beds"]
