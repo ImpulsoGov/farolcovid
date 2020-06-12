@@ -211,8 +211,8 @@ def genHeroSection(title: str, subtitle: str):
 
 def genInputFields(user_input, config, session):
 
-    # Inicia sem update
-    session.update = False
+    # # Inicia sem update
+    # session.update = False
 
     authors_beds = user_input["author_number_beds"]
     beds_update = user_input["last_updated_number_beds"]

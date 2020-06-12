@@ -116,7 +116,7 @@ def update_indicators(indicators, data, config, user_input, session_state):
         user_input["number_beds"] = session_state.number_beds
         user_input["number_ventilators"] = session_state.number_ventilators
 
-        session_state.refresh = False
+        # session_state.refresh = False
 
     # recalcula capacidade hospitalar
     user_input["strategy"] = "isolation"
