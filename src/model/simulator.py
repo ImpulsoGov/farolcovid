@@ -93,8 +93,10 @@ def run_simulation(user_input, config):
         # Get Rts
         if not user_input["state_id"] and not user_input["city_id"]:
             phase["R0"] = 3
-        else:
+        elif np.isnan(user_input["Rt"][bound]) == True:
             phase["R0"] = get_rt(user_input["place_type"], user_input, config, bound)
+        else:
+            phase["R0"] = user_input["Rt"][bound]
 
         res = entrypoint(
             user_input["population_params"],

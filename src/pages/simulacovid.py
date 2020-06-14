@@ -24,15 +24,6 @@ from model import simulator
 from plots import plot_simulation
 from pandas import Timestamp
 
-FIXED = datetime.now().minute
-
-# def refresh_rate(config):
-#     dt = (
-#         math.floor(datetime.now().minute / config["refresh_rate"])
-#         * config["refresh_rate"]
-#     )
-#     return datetime.now().replace(minute=dt, second=0, microsecond=0)
-
 
 def calculate_recovered(user_input, data):
 
@@ -105,11 +96,6 @@ def main(user_input, indicators, data, config, session_state):
 
     else:
 
-        # utils.genInputCustomizationSectionHeader(user_input["locality"])
-        # user_input, session_state = utils.genInputFields(
-        #     user_input, sources, config, session_state
-        # )
-
         # calculate recovered cases
         user_input = calculate_recovered(user_input, data)
 
@@ -132,7 +118,6 @@ def main(user_input, indicators, data, config, session_state):
         dday_ventilators = simulator.get_dmonth(
             dfs, "I3", int(user_input["number_ventilators"])
         )
-        # fig, dday_beds, dday_ventilators = simulator.run_simulation(user_input, config)
 
         utils.genChartSimulationSection(
             SimulatorOutput(
@@ -143,7 +128,6 @@ def main(user_input, indicators, data, config, session_state):
                 max_range_ventilators=dday_ventilators["best"],
             ),
             plot_simulation(dfs, user_input),
-            # plots.plot_simulation_wrapper(user_input, config)
         )
 
 

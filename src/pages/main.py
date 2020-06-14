@@ -116,6 +116,8 @@ def update_indicators(indicators, data, config, user_input, session_state):
         user_input["number_beds"] = session_state.number_beds
         user_input["number_ventilators"] = session_state.number_ventilators
 
+        # session_state.refresh = False
+
     # recalcula capacidade hospitalar
     user_input["strategy"] = "isolation"
     user_input = sm.calculate_recovered(user_input, data)
@@ -242,6 +244,11 @@ def main():
         "D": int(data["deaths"].fillna(0).values[0]),
         "I": int(data["active_cases"].fillna(0).values[0]),
         "I_confirmed": int(data["confirmed_cases"].fillna(0).values[0]),
+    }
+
+    user_input["Rt"] = {
+        "best": data["rt_10days_ago_low"].values[0],
+        "worst": data["rt_10days_ago_high"].values[0],
     }
 
     user_input["last_updated_cases"] = data["last_updated_subnotification"].max()

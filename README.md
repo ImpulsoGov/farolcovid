@@ -1,23 +1,40 @@
-# SimulaCovid
+# FarolCovid 🚦
 
 <p align="left">
 <!-- <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a> -->
 <a href="https://github.com/ImpulsoGov/simulacovid-datasource/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/ImpulsoGov/simulacovid"></a> <a href=""><img alt="Master update" src="https://img.shields.io/github/last-commit/ImpulsoGov/simulacovid/master?label=last%20commit%20%28master%29"></a> <a href=""><img alt="Master update" src="https://img.shields.io/github/last-commit/ImpulsoGov/simulacovid/stable?label=last%20updated%20%28stable%29"></a> <a href=""><img alt="Deploy" src="https://img.shields.io/github/deployments/ImpulsoGov/simulacovid/simulacovid-production?label=deploy%20status%20%28stable%29"></a>
 </p>
 
-Simulação do COVID-19 nos municípios brasileiros | Brazilian municipalities COVID-19 simulation.
+Ferramenta de monitoramento do risco de colapso no sistema de saúde em municípios brasileiros com a Covid-19.
 
-Conteúdo e códigos baseados no repositório do <a href="https://github.com/alsnhll/SEIR_COVID19">Alison Hill</a>, e <a href="https://www.cappra.institute">Cappra Institute for Data Science</a>.
+_Monitoring tool & simulation of the risk of collapse in Brazilian municipalities' health system due to Covid-19._
 
-## Onde acessar?
 
-Ambiente de testes e homologação:
-- branch master -> https://simulacovid-staging.herokuapp.com/
+## Fontes de dados
 
-Ambiente de produção:
-- branch stable -> https://simulacovid.coronacidades.org/
+Os dados utilizados na ferramenta estão na nossa [API](http://datasource.coronacidades.org/br/), cujas fontes são:
+- [Brasil.IO](http://brasil.io)
+- [DataSUS](https://datasus.saude.gov.br/)
+
+Veja mais detalhes na página de Metodologia da ferramenta.
+
+## Referências metodológicas
+
+Os modelos e respectivos códigos utilizados são baseados no trabalho de <a href="https://github.com/alsnhll/SEIR_COVID19">Alison Hill</a> e <a href="https://www.cappra.institute">Cappra Institute for Data Science</a> (modelo SEIR), e [Kevin Systrom (ritmo de contágio)](https://github.com/k-sys/covid-19/blob/master/Realtime%20R0.ipynb), além de diversos estudos utilziados na nossa metodologia:
+
+- CDC, 2019. Severe Outcomes Among Patients with Coronavirus Disease 2019 (COVID-19) — United States, February 12–March 16, 2020. MMWR Morb Mortal Wkly Rep. ePub: 18 March 2020. DOI: http://dx.doi.org/10.15585/mmwr.mm6912e2.
+
+- Li, R., Pei, S., Chen, B., Song, Y., Zhang, T., Yang, W., & Shaman, J., 2020. Substantial undocumented infection facilitates the rapid dissemination of novel coronavirus (SARS-CoV2). Science, 3221(March), eabb3221. DOI: https://doi.org/10.1126/science.abb3221
+
+- Wang, C, et al. (2020) Evolving Epidemiology and Impact of Non-pharmaceutical Interventions on the Outbreak of Coronavirus Disease 2019 in Wuhan, China. DOI: https://doi.org/10.1101/2020.03.03.20030593 e pdf de apresentação https://docs.google.com/presentation/d/1-rvZs0zsXF_0Tw8TNsBxKH4V1LQQXq7Az9kDfCgZDfE/edit#slide=id.p1
+
+- Wang, J., Zhou, M., & Liu, F., 2020. Reasons for healthcare workers becoming infected with novel coronavirus disease 2019 (COVID-19) in China. Journal of Hospital Infection. DOI: https://doi.org/10.1016/j.jhin.2020.03.002
+
+Veja mais detalhes na página de Metodologia da ferramenta.
 
 ## 📊 Como colaborar com análises
+
+**Estamos migrando para outro repositório!**
 
 Todas as análises com dados da ferramenta estão em [`analysis`](/analysis). Veja como colaborar [aqui](/src/analysis/README.md)!
 
