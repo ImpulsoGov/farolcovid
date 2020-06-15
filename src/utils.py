@@ -247,10 +247,13 @@ def localCSS(file_name):
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 
-def genWhatsappButton() -> None:
-    msg = f"Olá Equipe Coronacidades. Vocês podem me ajuda com uma dúvida?"
-    phone = "+5511964373097"
-    url = "whatsapp://send?text={}&phone=${}".format(msg, phone)
+def gen_whatsapp_button(info) -> None:
+    """Generate WPP button
+
+    Args:
+        info: config["contact"]
+    """
+    url = "whatsapp://send?text='{}'&phone=$'{}'".format(info["msg"], info["phone"])
     st.write(
         """ 
          <a href="%s" class="float" target="_blank" id="messenger">
@@ -490,7 +493,7 @@ def genInputCustomizationSectionHeader(locality: str) -> None:
     )
 
 
-def genFooter() -> None:
+def gen_footer() -> None:
 
     st.write(
         """
@@ -525,13 +528,14 @@ def genFooter() -> None:
 # VIEW COMPONENTS SIMULACOVID
 
 
-def genAmbassadorSection() -> None:
+def gen_ambassador_section() -> None:
+
     st.write(
         """
         <div class="base-wrapper">
                 <div class="ambassador-container">
-                        <span class="ambassador-question bold">Você gostaria de atualizar algum dos dados acima? Você tem informações mais recentes e pode colaborar conosco?</span>
-                        <span>Estamos montando uma rede para manter o SimulaCovid sempre atualizado e nossas projeções serem úteis para tomada de decisão na sua cidade. Venha ser parte do nosso time de embaixadores!</span>
+                        <span class="ambassador-question"><b>Quer saber em primeira mão os lançamentos e melhorias do Farol Covid e do Coronacidades?</b>
+                        Seja um Embaixador Coronacidades!</span>
                         <a class="btn-ambassador" href="%s" target="blank">Quero ser embaixador</a>
                 </div>
         </div>

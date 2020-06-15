@@ -376,7 +376,7 @@ def main():
         session.rerun()
 
     # AMBASSADOR SECTION
-    utils.genAmbassadorSection()
+    utils.gen_ambassador_section()
 
     indicators["hospital_capacity"].left_display = user_input["number_beds"]
     indicators["hospital_capacity"].right_display = user_input["number_ventilators"]
@@ -404,8 +404,8 @@ def main():
     elif product == "Saúde em Ordem (em breve)":
         pass
 
-    utils.genWhatsappButton()
-    utils.genFooter()
+    utils.gen_whatsapp_button(config["impulso"]["contact"])
+    utils.gen_footer()
 
 
 if __name__ == "__main__":
