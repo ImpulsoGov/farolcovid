@@ -253,7 +253,7 @@ def gen_whatsapp_button(info) -> None:
     Args:
         info: config["contact"]
     """
-    url = "whatsapp://send?text='{}'&phone=$'{}'".format(info["msg"], info["phone"])
+    url = "whatsapp://send?text={}&phone=${}".format(info["msg"], info["phone"])
     st.write(
         """ 
          <a href="%s" class="float" target="_blank" id="messenger">
@@ -415,18 +415,11 @@ def genKPISection(
         elif alert == "médio":
             stoplight = f"Meu {place_type} está em *ALERTA MÉDIO*! E o seu? %0a%0a"
         else:
-            stoplight = f"Meu {place_type} está em *ALETA ALTO*! E o seu? %0a%0a"
+            stoplight = f"Meu {place_type} está em *ALERTA ALTO*! E o seu? %0a%0a"
 
     cards = list(map(genIndicatorCard, indicators.values()))
     cards = "".join(cards)
-    msg = f"""
-    🚨 BOLETIM CoronaCidades |  *{locality}, {datetime.now().strftime('%d/%m')}*  🚨%0a%0a
-    {stoplight} 😷 _Contágio_: Cada contaminado infecta em média outras *{indicators['rt'].display} pessoas* %0a%0a
-    🏥 _Capacidade_: A capacidade hospitalar será atingida em *{indicators['hospital_capacity'].display.replace("+", "mais")} meses* %0a%0a
-    🔍 _Subnotificação_: A cada 10 pessoas infectadas, *{indicators['subnotification_rate'].display} são diagnosticadas* %0a%0a
-    🏠 _Isolamento_: Na semana passada, *{indicators['social_isolation'].display} das pessoas ficou em casa* %0a%0a
-    👉 _Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui_: https://coronacidades.org/farol-covid/
-    """
+    msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  🚨%0a%0a{stoplight}😷 *Contágio*: Cada contaminado infecta em média outras *{indicators['rt'].display} pessoas* - _semana passada: {indicators['rt'].left_display}, tendência: {indicators['rt'].right_display}_%0a%0a🏥 *Capacidade*: A capacidade hospitalar será atingida em *{indicators['hospital_capacity'].display.replace("+", "mais")} mês(es)* %0a%0a🔍 *Subnotificação*: A cada 10 pessoas infectadas, *{indicators['subnotification_rate'].display} são diagnosticadas* %0a%0a🏠 *Isolamento*: Na última semana, *{indicators['social_isolation'].display} das pessoas ficou em casa* - _semana passada: {indicators['social_isolation'].left_display}, tendência: {indicators['social_isolation'].right_display}_%0a%0a---%0a%0a👉 Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui: https://coronacidades.org/farol-covid/"""
 
     st.write(
         """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;">
