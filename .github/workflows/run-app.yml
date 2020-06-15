@@ -14,8 +14,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
-      - name: Get farolcovid repo
-        uses: ImpulsoGov/farolcovid
+      - name: Get farolcovid repo (master?)
+        uses: ./.github/actions/farolcovid@master
       - name: Run application in venv
         run: |
           make serve
