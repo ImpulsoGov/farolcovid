@@ -10,15 +10,19 @@ endif
 # Python
 create-env:
 	virtualenv venv
+	wget https://github.com/ImpulsoGov/streamlit/raw/develop/builds/streamlit-0.60.0-py2.py3-none-any.whl \
 	source venv/bin/activate; \
 			pip3 install --upgrade -r requirements.txt; \
-			python -m ipykernel install --user --name=venv
+			pip3 install streamlit-0.60.0-py2.py3-none-any.whl;\
+			python3 -m ipykernel install --user --name=venv
 
 create-env-analysis:
 	virtualenv venvanalysis
+	wget https://github.com/ImpulsoGov/streamlit/raw/develop/builds/streamlit-0.60.0-py2.py3-none-any.whl \
 	source venvanalysis/bin/activate; \
 			pip3 install --upgrade -r requirements-analysis.txt; \
-			python -m ipykernel install --user --name=venvanalysis
+			pip3 install streamlit-0.60.0-py2.py3-none-any.whl;\
+			python3 -m ipykernel install --user --name=venvanalysis
 
 update-env:
 	source venv/bin/activate; \
