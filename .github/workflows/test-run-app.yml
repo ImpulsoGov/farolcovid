@@ -1,0 +1,19 @@
+name: Test Application Run
+
+on:
+  pull_request:
+    branches: 
+      - master
+      - stable
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        name: Check out repository       
+#       - uses: ./.github/actions/farolcovid
+#         name: Get farolcovid repo (master?)   
+      - run: make serve
+        name: Run application in venv
