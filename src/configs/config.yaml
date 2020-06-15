@@ -1,9 +1,5 @@
 refresh_rate: 999999 # minutes
 
-# TODO: REMOVE HERE AFTER DATASOURCE CHANGE
-simulator:
-    resources_available_proportion: 0.5
-
 br:
     api:
         external: http://datasource.coronacidades.org:7000/
@@ -24,8 +20,6 @@ br:
         embaixadores: https://docs.google.com/spreadsheets/d/1CASa-MdJS_o2tffWlIS--FSskSxhJUw3pA1L5AGIe04
         CNAE_sectors: https://docs.google.com/spreadsheets/d/1pP8dY9kRa9EvX3KcVPfMWJ8exDaoT1_bBggSKfD3y0k
         reopening_data: https://docs.google.com/spreadsheets/d/1Jc1M-F5cM_tLId5jnn5ojzgXtKgqqVVDmXVqGBwZQ5U
-    health:
-        source: 'DataSUS'
     cases:
         url: https://data.brasil.io/dataset/covid19/caso_full.csv.gz
         rename:
@@ -48,42 +42,8 @@ br:
             # 'state'
         ]
         notification_window_days: 7
-    columns:
-        health: [
-            'number_ventilators',
-            'number_beds',
-            'number_icu_beds'
-        ]
-        cases: [
-            'n_casos',
-            'n_mortes',
-        ]
-        final: [
-            'city_id',
-            'last_updated',
-            'author',
-        ]
-    seir_parameters:
-        # => new values:
-        mild_duration: 6 # time from symptoms to hospitalization
-        severe_duration: 6 # time from symptoms to ICU admit (12) - time from symptoms to hospitalization
-        critical_duration: 8 # time from hospital admit to death (14) - duration of severe infections
-        fatality_ratio: 0.02 # fraction of all symptomatic infected individuals who eventually die
-        # => our values:
-        doubling_rate: 1.15
-        incubation_period: 5
-        i1_percentage: 0.855
-        i2_percentage: 0.12
-        i3_percentage: 0.025
-        infected_health_care_proportion: 0.05
-    rt_parameters:
-        r_t_range_max: 12
-        optimal_sigma: 0.01 # best sigma for Brazil (prior hyperparameters)
-        window_size: 7
-        gaussian_kernel_std: 2
-        gaussian_min_periods: 7
-        gamma_alpha: 4
-        min_days: 14
+    cnes:
+        source: 'DataSUS'
     indicators:
         rt:
             risk: "rt_classification"
@@ -105,8 +65,55 @@ br:
             right_display: "inloco_growth"
             left_display: "inloco_last_week_7days_avg"
             display: "inloco_today_7days_avg"
+    rt_parameters:
+        r_t_range_max: 12
+        optimal_sigma: 0.01 # best sigma for Brazil (prior hyperparameters)
+        window_size: 7
+        gaussian_kernel_std: 2
+        gaussian_min_periods: 7
+        gamma_alpha: 4
+        min_days: 14
+    safereopen:
+        rename:
+            uf: "state_id"
+            emprego: "n_employee"
+            security_1: "security_index"
+            massa_salarial: "total_wage_bill"
+            ln_massa_salarial: "ln_total_wage_bill"
+            sections: "sector"
+    seir_parameters:
+        # => new values:
+        mild_duration: 6 # time from symptoms to hospitalization
+        severe_duration: 6 # time from symptoms to ICU admit (12) - time from symptoms to hospitalization
+        critical_duration: 8 # time from hospital admit to death (14) - duration of severe infections
+        fatality_ratio: 0.02 # fraction of all symptomatic infected individuals who eventually die
+        # => our values:
+        doubling_rate: 1.15
+        incubation_period: 5
+        i1_percentage: 0.855
+        i2_percentage: 0.12
+        i3_percentage: 0.025
+        infected_health_care_proportion: 0.05
     simulacovid:
         resources_available_proportion: 0.5
+        columns:
+            cnes: [
+            "country_iso",
+            "country_name",
+            "state_id",
+            "state_name",
+            "city_id",
+            "city_name",
+            "population",
+            "health_system_region",
+            "last_updated_number_beds",
+            "author_number_beds",
+            "last_updated_number_ventilators",
+            "author_number_ventilators",
+            'number_ventilators',
+            'number_beds',
+            'number_icu_beds'
+        ]
 
 impulso:
     contact:
