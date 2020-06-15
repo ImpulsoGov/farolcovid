@@ -3,25 +3,6 @@ refresh_rate: 999999 # minutes
 # TODO: REMOVE HERE AFTER DATASOURCE CHANGE
 simulator:
     resources_available_proportion: 0.5
-#     max_days: 90
-#     scenarios:
-#         worst:
-#             nothing: 
-#                 R0: 3.97
-#             isolation: 
-#                 R0: 1.31
-#             lockdown:
-#                 R0: 0.37
-#             test_delay: 7
-
-#         best:
-#             nothing:
-#                 R0: 3.74
-#             isolation:
-#                 R0: 1.21
-#             lockdown:
-#                 R0: 0.28
-#             test_delay: 4
 
 br:
     api:
@@ -41,6 +22,8 @@ br:
         cities_population: https://docs.google.com/spreadsheets/d/1k8mXuUggBuBEghHhhLrLtA-5wa4JsAc-D35S5bNlf24
         health_infrastructure: https://docs.google.com/spreadsheets/d/1vprpjmCpzBg3vcbXTHFh1HTnd73ZgSVIHeKpSjd1E5M
         embaixadores: https://docs.google.com/spreadsheets/d/1CASa-MdJS_o2tffWlIS--FSskSxhJUw3pA1L5AGIe04
+        CNAE_sectors: https://docs.google.com/spreadsheets/d/1pP8dY9kRa9EvX3KcVPfMWJ8exDaoT1_bBggSKfD3y0k
+        reopening_data: https://docs.google.com/spreadsheets/d/1Jc1M-F5cM_tLId5jnn5ojzgXtKgqqVVDmXVqGBwZQ5U
     health:
         source: 'DataSUS'
     cases:
@@ -124,3 +107,8 @@ br:
             display: "inloco_today_7days_avg"
     simulacovid:
         resources_available_proportion: 0.5
+
+impulso:
+    contact:
+        msg: "Olá Equipe Coronacidades. Vocês podem me ajuda com uma dúvida?"
+        phone: "+5511971335580"
