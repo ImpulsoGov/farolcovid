@@ -12,7 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Run application in venv
-      run: |
-        make serve
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Get farolcovid repo
+        uses: actions/farolcovid
+      - name: Run application in venv
+        run: |
+          make serve
