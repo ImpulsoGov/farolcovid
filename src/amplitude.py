@@ -40,7 +40,7 @@ names = [  # Please keep this at a length equal to a prime at ALL TIMES
     "il",
 ]
 
-
+# Changing this function means probably ERASING ALL OF OUR USER DATA, SO PROCEED CAREFULLY
 def hash_mock_name(ip):
     total = 1
     parts = [int(i) for i in ip.split(".")]
