@@ -11,7 +11,7 @@ from model.simulator import run_simulation, get_dmonth
 import pages.simulacovid as sm
 import plots
 import utils
-
+import amplitude
 import session
 
 
@@ -212,6 +212,10 @@ def main():
     utils.genHeroSection(
         "Farol", "Entenda e controle a Covid-19 em sua cidade e estado."
     )
+    # Get user info
+    user_analytics = amplitude.gen_user(utils.get_server_session())
+    opening_response = user_analytics.log_event("opened page", dict())
+    st.write(opening_response, unsafe_allow_html=True)
 
     # GET DATA
     config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
