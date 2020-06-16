@@ -2,6 +2,7 @@ import requests
 import yaml
 import json
 
+ipinfo_url = "http://ipinfo.io/json"
 headers = {"Content-Type": "application/json", "Accept": "*/*"}
 secrets = yaml.load(open("../src/configs/secrets.yaml", "r"), Loader=yaml.FullLoader)
 r = requests.post("https://api.amplitude.com/2/httpapi", params={}, headers=headers)
@@ -67,12 +68,26 @@ class Amplitude_user:
         self.key = apikey
         self.ip = inip
         self.name = inname
+        self.has_ip_info = False
+        try:
+            self.ip_data = json.loads(
+                requests.get("https://geolocation-db.com/json/" + str(inip)).content
+            )
+            self.has_ip_info = True
+        except:
+            pass
 
     def log_event(self, event, event_args):
         event_data = {"user_id": self.name}
         event_data["event_type"] = event
         event_data["user_properties"] = event_args
         event_data["ip"] = self.ip
+        if self.has_ip_info:
+            event_data["country"] = self.ip_data["country_name"]
+            event_data["region"] = self.ip_data["state"]
+            event_data["city"] = self.ip_data["city"]
+            event_data["location_lat"] = self.ip_data["latitude"]
+            event_data["location_lng"] = self.ip_data["longitude"]
         request_data = {"api_key": self.key, "events": [event_data]}
         response = requests.post(
             "https://api.amplitude.com/2/httpapi", json=request_data, headers=headers
