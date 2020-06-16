@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit.server.Server import Server
 from datetime import datetime
 from datetime import timedelta
 from typing import List, Dict
@@ -234,6 +235,15 @@ def get_ufs_list():
 
 
 # FRONT-END TOOLS
+
+
+def get_user_ip():
+    return str(
+        list(Server.get_current()._session_info_by_id.values())[0].ws.request.remote_ip
+    )
+def get_user_hash(): #To be changed futurely
+    user_ip = get_user_ip
+    return user_ip
 
 
 def gen_pdf_report():
