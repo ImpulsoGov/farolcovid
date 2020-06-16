@@ -2,7 +2,7 @@ import requests
 import yaml
 import json
 
-ipinfo_url = "http://ipinfo.io/json"
+ipinfo_url = "https://geolocation-db.com/json/"
 headers = {"Content-Type": "application/json", "Accept": "*/*"}
 secrets = yaml.load(open("../src/configs/secrets.yaml", "r"), Loader=yaml.FullLoader)
 r = requests.post("https://api.amplitude.com/2/httpapi", params={}, headers=headers)
@@ -70,9 +70,7 @@ class Amplitude_user:
         self.name = inname
         self.has_ip_info = False
         try:
-            self.ip_data = json.loads(
-                requests.get("https://geolocation-db.com/json/" + str(inip)).content
-            )
+            self.ip_data = json.loads(requests.get(ipinfo_url + str(inip)).content)
             self.has_ip_info = True
         except:
             pass
