@@ -236,6 +236,15 @@ def get_ufs_list():
 # FRONT-END TOOLS
 
 
+def gen_pdf_report():
+    st.write(
+        """
+    <iframe src="resources/ctrlp.html" height="100" width="350" style="border:none;"></iframe>
+    """,
+        unsafe_allow_html=True,
+    )
+
+
 def make_clickable(text, link):
     # target _blank to open new window
     # extract clickable text to display for your link

@@ -311,7 +311,7 @@ def main():
         ),
         unsafe_allow_html=True,
     )
-
+    utils.gen_pdf_report()
     if st.button("Confira a evolução de indicadores-chave"):
 
         if st.button("Esconder"):
@@ -400,6 +400,7 @@ def main():
 
     if product == "SimulaCovid":
         sm.main(user_input, indicators, data, config, session_state)
+        utils.gen_pdf_report()
 
     elif product == "Saúde em Ordem (em breve)":
         pass
