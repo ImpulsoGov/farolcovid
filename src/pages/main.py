@@ -291,8 +291,7 @@ def main():
         indicators=indicators,
     )
 
-    # SPACE AFTER CARDS
-    st.write("<div class='base-wrapper product-section'></div>", unsafe_allow_html=True)
+    # AVAILABLE CAPACITY DISCLAIMER
     st.write(
         """
         <div class='base-wrapper'>
@@ -312,6 +311,10 @@ def main():
         unsafe_allow_html=True,
     )
 
+    # PDF BUTTON
+    utils.gen_pdf_report()
+
+    # INDICATORS PLOTS
     if st.button("Confira a evolução de indicadores-chave"):
 
         if st.button("Esconder"):
@@ -400,6 +403,7 @@ def main():
 
     if product == "SimulaCovid":
         sm.main(user_input, indicators, data, config, session_state)
+        utils.gen_pdf_report()
 
     elif product == "Saúde em Ordem (em breve)":
         pass
