@@ -7,6 +7,7 @@ import plotly.io as pio
 import numpy as np
 import pandas as pd
 import utils
+import amplitude
 
 
 def _get_rolling_amount(grp, time, data_col="last_updated", col_to_roll="new_deaths"):
@@ -240,7 +241,9 @@ def prepare_heatmap(df, place_type, group=None, mavg_days=5):
 
 
 def main():
-
+    user_analytics = amplitude.gen_user(utils.get_server_session())
+    opening_response = user_analytics.log_event("opened analysis")
+    st.write(opening_response, unsafe_allow_html=True)
     utils.localCSS("style.css")
     utils.localCSS("icons.css")
 

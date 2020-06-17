@@ -364,6 +364,8 @@ def genInputFields(user_input, config, session):
         session.cases = user_input["population_params"]["I_confirmed"]
 
         session.update = True
+    else:
+        session.update = False
 
     return user_input, session
 

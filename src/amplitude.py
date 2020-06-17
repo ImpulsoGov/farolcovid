@@ -51,7 +51,7 @@ def hash_mock_name(ip):
     pos2 = (total * parts[0] + 929) % size
     pos3 = (total * parts[0] * 349 * parts[1] + 571) % size
     name = names[pos1] + " " + names[pos2] + " " + names[pos3]
-    print(name)
+    # print(name)
     return name
 
 
@@ -71,12 +71,14 @@ class Amplitude_user:
         self.has_ip_info = False
         try:
             self.ip_data = json.loads(requests.get(ipinfo_url + str(inip)).content)
-            self.has_ip_info = True
+            if self.ip_data["country_code"] != "Not found":
+                self.has_ip_info = True
         except:
             pass
 
-    def log_event(self, event, event_args):
+    def log_event(self, event, event_args=dict()):
         event_data = {"user_id": self.name}
+        # print(self.name + " has " + event)
         event_data["event_type"] = event
         event_data["user_properties"] = event_args
         event_data["ip"] = self.ip
