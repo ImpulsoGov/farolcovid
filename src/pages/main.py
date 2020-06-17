@@ -291,8 +291,7 @@ def main():
         indicators=indicators,
     )
 
-    # SPACE AFTER CARDS
-    st.write("<div class='base-wrapper product-section'></div>", unsafe_allow_html=True)
+    # AVAILABLE CAPACITY DISCLAIMER
     st.write(
         """
         <div class='base-wrapper'>
@@ -311,7 +310,11 @@ def main():
         ),
         unsafe_allow_html=True,
     )
+
+    # PDF BUTTON
     utils.gen_pdf_report()
+
+    # INDICATORS PLOTS
     if st.button("Confira a evolução de indicadores-chave"):
 
         if st.button("Esconder"):
