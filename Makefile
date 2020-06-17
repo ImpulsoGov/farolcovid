@@ -8,17 +8,18 @@ SHELL := /bin/sh
 endif
 
 # Python
+
 create-env:
 	virtualenv venv
-	wget https://github.com/ImpulsoGov/streamlit/raw/develop/builds/streamlit-0.60.0-py2.py3-none-any.whl \
+	curl https://raw.githubusercontent.com/ImpulsoGov/streamlit/develop/builds/streamlit-0.60.0-py2.py3-none-any.whl --output streamlit-0.60.0-py2.py3-none-any.whl; \
 	source venv/bin/activate; \
 			pip3 install --upgrade -r requirements.txt; \
-			pip3 install streamlit-0.60.0-py2.py3-none-any.whl;\
+			pip3 install streamlit-0.60.0-py2.py3-none-any.whl; \
 			python3 -m ipykernel install --user --name=venv
 
 create-env-analysis:
 	virtualenv venvanalysis
-	wget https://github.com/ImpulsoGov/streamlit/raw/develop/builds/streamlit-0.60.0-py2.py3-none-any.whl \
+	curl https://raw.githubusercontent.com/ImpulsoGov/streamlit/develop/builds/streamlit-0.60.0-py2.py3-none-any.whl --output streamlit-0.60.0-py2.py3-none-any.whl \
 	source venvanalysis/bin/activate; \
 			pip3 install --upgrade -r requirements-analysis.txt; \
 			pip3 install streamlit-0.60.0-py2.py3-none-any.whl;\
