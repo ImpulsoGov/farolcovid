@@ -299,8 +299,7 @@ def main():
         indicators=indicators,
     )
 
-    # SPACE AFTER CARDS
-    st.write("<div class='base-wrapper product-section'></div>", unsafe_allow_html=True)
+    # AVAILABLE CAPACITY DISCLAIMER
     st.write(
         """
         <div class='base-wrapper'>
@@ -319,7 +318,11 @@ def main():
         ),
         unsafe_allow_html=True,
     )
+
+    # PDF BUTTON
     utils.gen_pdf_report()
+
+    # INDICATORS PLOTS
     if st.button("Confira a evolução de indicadores-chave"):
         opening_response = user_analytics.log_event("opened key_indicators", dict())
         if st.button("Esconder"):
@@ -394,7 +397,7 @@ def main():
         session.rerun()
 
     # AMBASSADOR SECTION
-    utils.genAmbassadorSection()
+    utils.gen_ambassador_section()
 
     indicators["hospital_capacity"].left_display = user_input["number_beds"]
     indicators["hospital_capacity"].right_display = user_input["number_ventilators"]
@@ -425,8 +428,8 @@ def main():
         user_analytics.log_event("picked saude_em_ordem", dict())
         pass
 
-    utils.genWhatsappButton()
-    utils.genFooter()
+    utils.gen_whatsapp_button(config["impulso"]["contact"])
+    utils.gen_footer()
 
 
 if __name__ == "__main__":
