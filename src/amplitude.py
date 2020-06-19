@@ -38,6 +38,28 @@ names = [  # Please keep this at a length equal to a prime at ALL TIMES
     "joo",
     "young",
     "il",
+    "koto",
+    "buran",
+    "soto",
+    "iji",
+    "shima",
+    "naru",
+    "to",
+    "iwo",
+    "oki",
+    "ya",
+    "ma",
+    "waza",
+    "mura",
+    "jima",
+    "uji",
+    "sama",
+    "uzu",
+    "maki",
+    "ko",
+    "hideo",
+    "saki",
+    "mate",
 ]
 
 # Changing this function means probably ERASING ALL OF OUR USER DATA, SO PROCEED CAREFULLY
@@ -50,7 +72,21 @@ def hash_mock_name(ip):
     pos1 = total % size
     pos2 = (total * parts[0] + 929) % size
     pos3 = (total * parts[0] * 349 * parts[1] + 571) % size
-    name = names[pos1] + " " + names[pos2] + " " + names[pos3]
+    pos4 = (total * parts[1] * 571 * +parts[2] * 191 + 571) % size
+    pos5 = (total * parts[1] * 487 * +parts[2] * 571 + parts[3] * 199 + 929) % size
+    pos6 = (
+        total * parts[0] * 929 * +parts[1] * 199 + parts[3] * 383 + parts[2] * 929 + 571
+    ) % size
+    name = (
+        names[pos1]
+        + names[pos2]
+        + " "
+        + names[pos3]
+        + names[pos4]
+        + " "
+        + names[pos5]
+        + names[pos6]
+    )
     # print(name)
     return name
 
