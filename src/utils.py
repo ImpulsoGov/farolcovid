@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit.server.Server import Server
 from datetime import datetime
 from datetime import timedelta
 from typing import List, Dict
@@ -234,6 +235,8 @@ def get_ufs_list():
 
 
 # FRONT-END TOOLS
+def get_server_session():
+    return Server.get_current()
 
 
 def gen_pdf_report():
@@ -364,6 +367,8 @@ def genInputFields(user_input, config, session):
         session.cases = user_input["population_params"]["I_confirmed"]
 
         session.update = True
+    else:
+        session.update = False
 
     return user_input, session
 

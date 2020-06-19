@@ -14,6 +14,7 @@ from models import (
 )
 from typing import List
 import utils
+import amplitude
 import plotly.express as px
 from datetime import datetime
 import math
@@ -50,7 +51,7 @@ def calculate_recovered(user_input, data):
 
 
 def main(user_input, indicators, data, config, session_state):
-
+    user_analytics = amplitude.gen_user(utils.get_server_session())
     if indicators["rt"].display != "- ":
         st.write(
             f"""
@@ -101,7 +102,12 @@ def main(user_input, indicators, data, config, session_state):
 
         # SIMULATOR SCENARIOS: BEDS & RESPIRATORS
         user_input["strategy"] = dic_scenarios[option]
-
+        if user_input["strategy"] == "isolation":
+            user_analytics.log_event("picked stable_scenario")
+        elif user_input["strategy"] == "lockdown":
+            user_analytics.log_event("picked positive_scenario")
+        elif user_input["strategy"] == "nothing":
+            user_analytics.log_event("picked negative_scenario")
         # TODO: melhorar aqui! como fazer a estimatima de casos ativos quando é modificado?
         if (
             user_input["population_params"]["I"]

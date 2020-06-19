@@ -1,8 +1,11 @@
 import streamlit as st
+import amplitude
+import utils
 
 
 def main():
-
+    user_analytics = amplitude.gen_user(utils.get_server_session())
+    opening_response = user_analytics.log_event("opened spread_rhythm")
     st.header("""$$R_t$$ de Estados e Municípios""")
 
     st.subheader("""Calculo do $$R_t$$""")

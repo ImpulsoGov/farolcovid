@@ -11,8 +11,10 @@ from model.simulator import run_simulation, get_dmonth
 import pages.simulacovid as sm
 import plots
 import utils
-
+import amplitude
 import session
+
+from streamlit.server.Server import Server
 
 
 def fix_type(x, group):
@@ -212,6 +214,9 @@ def main():
     utils.genHeroSection(
         "Farol", "Entenda e controle a Covid-19 em sua cidade e estado."
     )
+    # Get user info
+    user_analytics = amplitude.gen_user(utils.get_server_session())
+    opening_response = user_analytics.log_event("opened farol", dict())
 
     # GET DATA
     config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
@@ -232,7 +237,10 @@ def main():
             ].unique()
         ),
     )
-
+    changed_city = user_analytics.log_event(
+        "picked farol place",
+        {"state": user_input["state_name"], "city": user_input["city_name"]},
+    )
     user_input, data = filter_options(user_input, df_cities, df_states, config)
 
     # SOURCES PARAMS
@@ -316,7 +324,7 @@ def main():
 
     # INDICATORS PLOTS
     if st.button("Confira a evolução de indicadores-chave"):
-
+        opening_response = user_analytics.log_event("opened key_indicators", dict())
         if st.button("Esconder"):
             pass
 
@@ -369,13 +377,23 @@ def main():
 
     # CHANGE DATA SECTION
     utils.genInputCustomizationSectionHeader(user_input["locality"])
+    old_user_input = dict(user_input)
     user_input, session_state = utils.genInputFields(user_input, config, session_state)
-
     if session_state.update:
-
+        opening_response = user_analytics.log_event(
+            "opened key_indicators",
+            {
+                "beds_change": session_state.number_beds
+                - int(old_user_input["number_beds"]),
+                "vent_change": session_state.number_ventilators
+                - int(old_user_input["number_ventilators"]),
+                "cases_change": session_state.cases
+                - int(old_user_input["population_params"]["I_confirmed"]),
+                "deaths_change": 0,
+            },
+        )
         session_state.refresh = True
         session_state.update = False
-
         session.rerun()
 
     # AMBASSADOR SECTION
@@ -402,10 +420,12 @@ def main():
     )
 
     if product == "SimulaCovid":
+        user_analytics.log_event("picked simulacovid", dict())
         sm.main(user_input, indicators, data, config, session_state)
         utils.gen_pdf_report()
 
     elif product == "Saúde em Ordem (em breve)":
+        user_analytics.log_event("picked saude_em_ordem", dict())
         pass
 
     utils.gen_whatsapp_button(config["impulso"]["contact"])
