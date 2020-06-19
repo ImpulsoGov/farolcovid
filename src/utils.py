@@ -242,7 +242,7 @@ def get_server_session():
 def gen_pdf_report():
     st.write(
         """
-    <iframe src="resources/ctrlp.html" height="100" width="350" style="border:none;"></iframe>
+    <iframe src="resources/ctrlp.html" height="100" width="350" style="border:none; float: right;"></iframe>
     """,
         unsafe_allow_html=True,
     )
@@ -259,10 +259,13 @@ def localCSS(file_name):
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 
-def genWhatsappButton() -> None:
-    msg = f"Olá Equipe Coronacidades. Vocês podem me ajuda com uma dúvida?"
-    phone = "+5511964373097"
-    url = "whatsapp://send?text={}&phone=${}".format(msg, phone)
+def gen_whatsapp_button(info) -> None:
+    """Generate WPP button
+
+    Args:
+        info: config["contact"]
+    """
+    url = "whatsapp://send?text={}&phone=${}".format(info["msg"], info["phone"])
     st.write(
         """ 
          <a href="%s" class="float" target="_blank" id="messenger">
@@ -426,18 +429,11 @@ def genKPISection(
         elif alert == "médio":
             stoplight = f"Meu {place_type} está em *ALERTA MÉDIO*! E o seu? %0a%0a"
         else:
-            stoplight = f"Meu {place_type} está em *ALETA ALTO*! E o seu? %0a%0a"
+            stoplight = f"Meu {place_type} está em *ALERTA ALTO*! E o seu? %0a%0a"
 
     cards = list(map(genIndicatorCard, indicators.values()))
     cards = "".join(cards)
-    msg = f"""
-    🚨 BOLETIM CoronaCidades |  *{locality}, {datetime.now().strftime('%d/%m')}*  🚨%0a%0a
-    {stoplight} 😷 _Contágio_: Cada contaminado infecta em média outras *{indicators['rt'].display} pessoas* %0a%0a
-    🏥 _Capacidade_: A capacidade hospitalar será atingida em *{indicators['hospital_capacity'].display.replace("+", "mais")} meses* %0a%0a
-    🔍 _Subnotificação_: A cada 10 pessoas infectadas, *{indicators['subnotification_rate'].display} são diagnosticadas* %0a%0a
-    🏠 _Isolamento_: Na semana passada, *{indicators['social_isolation'].display} das pessoas ficou em casa* %0a%0a
-    👉 _Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui_: https://coronacidades.org/farol-covid/
-    """
+    msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  🚨%0a%0a{stoplight}😷 *Contágio*: Cada contaminado infecta em média outras *{indicators['rt'].display} pessoas* - _semana passada: {indicators['rt'].left_display}, tendência: {indicators['rt'].right_display}_%0a%0a🏥 *Capacidade*: A capacidade hospitalar será atingida em *{indicators['hospital_capacity'].display.replace("+", "mais")} mês(es)* %0a%0a🔍 *Subnotificação*: A cada 10 pessoas infectadas, *{indicators['subnotification_rate'].display} são diagnosticadas* %0a%0a🏠 *Isolamento*: Na última semana, *{indicators['social_isolation'].display} das pessoas ficou em casa* - _semana passada: {indicators['social_isolation'].left_display}, tendência: {indicators['social_isolation'].right_display}_%0a%0a---%0a%0a👉 Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui: https://coronacidades.org/farol-covid/"""
 
     st.write(
         """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;">
@@ -450,6 +446,7 @@ def genKPISection(
                         <div class="flex flex-row flex-m-column">%s</div>
                 </div>
         </div>
+        <div class='base-wrapper product-section'></div>
         """
         % (bg, locality, msg, caption, cards),
         unsafe_allow_html=True,
@@ -496,7 +493,7 @@ def genInputCustomizationSectionHeader(locality: str) -> None:
         <div class="base-wrapper">
                 <span class="section-header primary-span">Verifique os dados disponíveis <span class="yellow-span">(%s)</span></span>
                 <br />
-                <span>Usamos os dados do Brasil.io e DataSUS, mas é possível que eles dados estejam um pouco desatualizados. Se estiverem, é só ajustar os valores abaixo para continuar a simulação.</span>
+                <span>Usamos os dados do Brasil.io e DataSUS, mas é possível que esses dados estejam um pouco desatualizados. Se estiverem, é só ajustar os valores abaixo para continuar a simulação.</span>
                 <br />
         </div>"""
         % locality,
@@ -504,7 +501,7 @@ def genInputCustomizationSectionHeader(locality: str) -> None:
     )
 
 
-def genFooter() -> None:
+def gen_footer() -> None:
 
     st.write(
         """
@@ -539,13 +536,14 @@ def genFooter() -> None:
 # VIEW COMPONENTS SIMULACOVID
 
 
-def genAmbassadorSection() -> None:
+def gen_ambassador_section() -> None:
+
     st.write(
         """
         <div class="base-wrapper">
                 <div class="ambassador-container">
-                        <span class="ambassador-question bold">Você gostaria de atualizar algum dos dados acima? Você tem informações mais recentes e pode colaborar conosco?</span>
-                        <span>Estamos montando uma rede para manter o SimulaCovid sempre atualizado e nossas projeções serem úteis para tomada de decisão na sua cidade. Venha ser parte do nosso time de embaixadores!</span>
+                        <span class="ambassador-question"><b>Quer saber em primeira mão os lançamentos e melhorias do Farol Covid e do Coronacidades?</b>
+                        Seja um Embaixador Coronacidades!</span>
                         <a class="btn-ambassador" href="%s" target="blank">Quero ser embaixador</a>
                 </div>
         </div>
