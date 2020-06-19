@@ -20,7 +20,7 @@ Veja mais detalhes na página de Metodologia da ferramenta.
 
 ## Referências metodológicas
 
-Os modelos e respectivos códigos utilizados são baseados no trabalho de <a href="https://github.com/alsnhll/SEIR_COVID19">Alison Hill</a> e <a href="https://www.cappra.institute">Cappra Institute for Data Science</a> (modelo SEIR), e [Kevin Systrom (ritmo de contágio)](https://github.com/k-sys/covid-19/blob/master/Realtime%20R0.ipynb), além de diversos estudos utilziados na nossa metodologia:
+Os modelos e respectivos códigos utilizados são baseados no trabalho de <a href="https://github.com/alsnhll/SEIR_COVID19">Alison Hill</a> e <a href="https://www.cappra.institute">Cappra Institute for Data Science</a> (modelo SEIR), e [Kevin Systrom (ritmo de contágio)](https://github.com/k-sys/covid-19/blob/master/Realtime%20R0.ipynb), além de diversos estudos utilizados na nossa metodologia:
 
 - CDC, 2019. Severe Outcomes Among Patients with Coronavirus Disease 2019 (COVID-19) — United States, February 12–March 16, 2020. MMWR Morb Mortal Wkly Rep. ePub: 18 March 2020. DOI: http://dx.doi.org/10.15585/mmwr.mm6912e2.
 
@@ -34,9 +34,7 @@ Veja mais detalhes na página de Metodologia da ferramenta.
 
 ## 📊 Como colaborar com análises
 
-**Estamos migrando para outro repositório!**
-
-Todas as análises com dados da ferramenta estão em [`analysis`](/analysis). Veja como colaborar [aqui](/src/analysis/README.md)!
+**Estamos migrando as análises para outro repositório!** Veja mais em [`coronacidades-analysis`](https://github.com/ImpulsoGov/coronacidades-analysis) 😉
 
 
 ## ⚙️ Como executar a aplicação localmente?
