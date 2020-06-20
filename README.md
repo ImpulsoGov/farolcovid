@@ -6,7 +6,7 @@
   <a href=""><img alt="Master update" src="https://img.shields.io/github/last-commit/ImpulsoGov/simulacovid/master?label=last%20commit%20%28master%29"></a>
   <a href=""><img alt="Master update" src="https://img.shields.io/github/last-commit/ImpulsoGov/simulacovid/stable?label=last%20updated%20%28stable%29"></a>
   <a href=""><img alt="Deploy" src="https://img.shields.io/github/deployments/ImpulsoGov/simulacovid/simulacovid-production?label=deploy%20status%20%28stable%29"></a>
-  <a href="https://hub.docker.com/repository/docker/impulsogov/farolcovid"><img alt="docker build" src="https://img.shields.io/docker/build/impulsogov/farolcovid"></a>
+  <a href="https://hub.docker.com/repository/docker/impulsogov/farolcovid"><img alt="docker build" src="https://img.shields.io/docker/cloud/build/impulsogov/farolcovid"></a>
 </p>
 
 Ferramenta de monitoramento do risco de colapso no sistema de saúde em municípios brasileiros com a Covid-19.
