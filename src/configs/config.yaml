@@ -2,7 +2,7 @@ refresh_rate: 999999 # minutes
 
 br:
     api:
-        external: http://datasource.coronacidades.org:7000/
+        external: http://datasource.coronacidades.org/
         local: http://localhost:7000/
         endpoints:
             simulacovid: "br/cities/simulacovid/main"
