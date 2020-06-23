@@ -240,7 +240,7 @@ def moving_average(a, n=7):
     return result
 
 
-def sort_by_date(x, y):
+def sort_by_x(x, y):
     data = [[x[i], y[i]] for i in range(len(x))]
     data.sort(key=lambda element: element[0])
     return zip(*data)
@@ -286,7 +286,7 @@ def gen_social_dist_plots(in_args, in_height=700, set_height=False):
     # Moving average dotted
     x_data = social_dist_plot.data[0]["x"]
     y_data = social_dist_plot.data[0]["y"]
-    x_data, y_data = sort_by_date(x_data, y_data)
+    x_data, y_data = sort_by_x(x_data, y_data)
     social_dist_plot.add_trace(
         go.Scatter(
             x=x_data,
