@@ -332,7 +332,7 @@ def main():
     )
 
     df = pd.read_csv(
-        "https://docs.google.com/spreadsheets/d/1wvg1KFWZp4WhYVI4Gw_82bL_je_2WZHNLCcSnx95MTI/export?format=csv&id"
+        "https://docs.google.com/spreadsheets/d/1wvg1KFWZp4WhYVI4Gw_82bL_je_2WZHNLCcSnx95MTI/export?format=csv"
     ).fillna(
         "-"
     )  # .set_index('Descrição', drop=True)
