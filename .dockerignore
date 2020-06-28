@@ -1,6 +1,7 @@
 .git/
 .vscode/
 tests/
+.env
 
 Procfile
 README.md

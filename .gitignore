@@ -20,3 +20,4 @@ src/configs/secrets.yaml
 src/cities_static.csv
 src/temp.csv
 streamlit-0.*
+.env

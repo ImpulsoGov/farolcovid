@@ -1,11 +1,13 @@
 import requests
 import yaml
 import json
+import os
 
 ipinfo_url = "https://geolocation-db.com/json/"
 headers = {"Content-Type": "application/json", "Accept": "*/*"}
-secrets = yaml.load(open("../src/configs/secrets.yaml", "r"), Loader=yaml.FullLoader)
+
 r = requests.post("https://api.amplitude.com/2/httpapi", params={}, headers=headers)
+
 names = [  # Please keep this at a length equal to a prime at ALL TIMES
     "ho",
     "jung",
@@ -96,7 +98,7 @@ def gen_user(current_server_session):
         0
     ].ws.request.remote_ip
     user_name = hash_mock_name(user_ip)
-    return Amplitude_user(secrets["amplitude"]["api_key"], user_ip, user_name)
+    return Amplitude_user(os.getenv("AMPLITUTE_KEY"), user_ip, user_name)
 
 
 class Amplitude_user:

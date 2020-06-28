@@ -8,3 +8,4 @@ pytest
 ipykernel
 requests
 cufflinks
+python-dotenv
