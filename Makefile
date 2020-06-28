@@ -7,48 +7,42 @@ else
 SHELL := /bin/sh
 endif
 
-# Python
-
-create-env:
-	virtualenv venv
-	curl https://raw.githubusercontent.com/ImpulsoGov/streamlit/develop/builds/streamlit-0.60.0-py2.py3-none-any.whl --output streamlit-0.60.0-py2.py3-none-any.whl; \
-	source venv/bin/activate; \
-			pip3 install --upgrade -r requirements.txt; \
-			pip3 install streamlit-0.60.0-py2.py3-none-any.whl; \
-			python3 -m ipykernel install --user --name=venv
-
-create-env-analysis:
-	virtualenv venvanalysis
-	curl https://raw.githubusercontent.com/ImpulsoGov/streamlit/develop/builds/streamlit-0.60.0-py2.py3-none-any.whl --output streamlit-0.60.0-py2.py3-none-any.whl \
-	source venvanalysis/bin/activate; \
-			pip3 install --upgrade -r requirements-analysis.txt; \
-			pip3 install streamlit-0.60.0-py2.py3-none-any.whl;\
-			python3 -m ipykernel install --user --name=venvanalysis
-
-update-env:
-	source venv/bin/activate; \
-			pip3 install --upgrade -r requirements.txt;
-
-serve:
-	source venv/bin/activate; cd src; export IS_LOCAL=FALSE; streamlit run farolcovid.py
-
-serve-local:
-	source venv/bin/activate; cd src; export IS_LOCAL=TRUE; streamlit run farolcovid.py
-
+###
 # Docker
+###
+
+# Build image
 docker-build:
 	docker build -t $(IMAGE_TAG) .
 
+# Run just like the production environment
 docker-run:
-	docker run -d --restart=unless-stopped -p 80:8501 $(IMAGE_TAG)
+	docker run -d \
+		--restart=unless-stopped \
+		-p 8501:8501 \
+		$(IMAGE_TAG)
 
+# Run development server with file binding from './src'
+docker-dev:
+	touch $(PWD)/.env
+	docker run --rm -it \
+		--name farolcovid-dev \
+		-p 8501:8501 \
+		-v $(PWD)/.env:/home/ubuntu/.env:ro \
+		-v $(PWD)/src:/home/ubuntu/src:ro \
+		$(IMAGE_TAG)
+
+# Groups
 docker-build-run: docker-build docker-run
+docker-build-dev: docker-build docker-dev
 
+# DEBUGING for production environment
 docker-shell:
 	docker run --rm -it \
 		--entrypoint "/bin/bash" \
 		$(IMAGE_TAG)
 
+# DEBUGING for staging environment
 docker-heroku-test: docker-build
 	docker run -it --rm \
 		-e PORT=8080 \
