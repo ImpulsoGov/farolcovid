@@ -4,7 +4,6 @@ import streamlit as st
 import os
 import yaml
 
-
 config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
 
 

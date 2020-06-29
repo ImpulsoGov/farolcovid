@@ -1,7 +1,12 @@
-
 # coding=utf-8
 import streamlit as st
 import yaml
+
+# Environment Variables from '../.env'
+from dotenv import load_dotenv
+from pathlib import Path
+env_path = Path('..') / '.env'
+load_dotenv(dotenv_path=env_path)
 
 import plotly.express as px
 from streamlit import caching

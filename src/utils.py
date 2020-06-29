@@ -50,11 +50,7 @@ def get_inloco_url(config):
         api_inloco["states"] = api_url + os.getenv("INLOCO_STATES_ROUTE")
 
     else:
-        secrets = yaml.load(
-            open("../src/configs/secrets.yaml", "r"), Loader=yaml.FullLoader
-        )
-        api_inloco["cities"] = api_url + secrets["inloco"]["cities"]["route"]
-        api_inloco["states"] = api_url + secrets["inloco"]["states"]["route"]
+        raise "Inloco routes not found in env vars!"
 
     return api_inloco
 
