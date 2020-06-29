@@ -217,7 +217,6 @@ def main():
     # Get user info
     user_analytics = amplitude.gen_user(utils.get_server_session())
     opening_response = user_analytics.log_event("opened farol", dict())
-
     # GET DATA
     config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
     df_cities, df_states = get_data(config)
