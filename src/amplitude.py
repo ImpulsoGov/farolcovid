@@ -98,7 +98,7 @@ def gen_user(current_server_session):
         0
     ].ws.request.remote_ip
     user_name = hash_mock_name(user_ip)
-    return Amplitude_user(os.getenv("AMPLITUTE_KEY"), user_ip, user_name)
+    return Amplitude_user(os.getenv("AMPLITUDE_KEY"), user_ip, user_name)
 
 
 class Amplitude_user:

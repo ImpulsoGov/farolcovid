@@ -19,6 +19,7 @@ docker-build:
 docker-run:
 	docker run -d \
 		--restart=unless-stopped \
+		-v $(PWD)/.env:/home/ubuntu/.env:ro \
 		-p 8501:8501 \
 		$(IMAGE_TAG)
 
@@ -40,6 +41,7 @@ docker-build-dev: docker-build docker-dev
 docker-shell:
 	docker run --rm -it \
 		--entrypoint "/bin/bash" \
+		-v $(PWD)/.env:/home/ubuntu/.env:ro \
 		$(IMAGE_TAG)
 
 # DEBUGING for staging environment
