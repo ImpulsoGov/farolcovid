@@ -30,7 +30,6 @@ docker-dev:
 		--name farolcovid-dev \
 		-p 8501:8501 \
 		-v $(PWD)/.env:/home/ubuntu/.env:ro \
-		-v $(PWD)/src:/home/ubuntu/src:ro \
 		$(IMAGE_TAG)
 
 # Groups
