@@ -198,7 +198,13 @@ def get_data(config):
 
 def main():
 
+    # Get user info
+    user_analytics = amplitude.gen_user(utils.get_server_session())
+    opening_response = user_analytics.log_event("opened farol", dict())
+    # session_state.key = user_analytics.name
+
     session_state = session.SessionState.get(
+        key=user_analytics.name,
         update=False,
         number_beds=None,
         number_ventilators=None,
@@ -214,9 +220,7 @@ def main():
     utils.genHeroSection(
         "Farol", "Entenda e controle a Covid-19 em sua cidade e estado."
     )
-    # Get user info
-    user_analytics = amplitude.gen_user(utils.get_server_session())
-    opening_response = user_analytics.log_event("opened farol", dict())
+
     # GET DATA
     config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
     df_cities, df_states = get_data(config)
