@@ -318,8 +318,8 @@ def main():
         unsafe_allow_html=True,
     )
 
-    # PDF BUTTON
-    utils.gen_pdf_report()
+    # TODO: remove comment on this later!
+    # utils.gen_pdf_report()
 
     # INDICATORS PLOTS
     if st.button("Confira a evolução de indicadores-chave"):
@@ -427,7 +427,8 @@ def main():
         user_analytics.log_event("picked saude_em_ordem", dict())
         pass
 
-    utils.gen_whatsapp_button(config["impulso"]["contact"])
+    # TODO: remove comment on this later!
+    # utils.gen_whatsapp_button(config["impulso"]["contact"])
     utils.gen_footer()
 
 
