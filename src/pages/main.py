@@ -421,14 +421,14 @@ def main():
     if product == "SimulaCovid":
         user_analytics.log_event("picked simulacovid", dict())
         sm.main(user_input, indicators, data, config, session_state)
-        utils.gen_pdf_report()
+        # TODO: remove comment on this later!
+        # utils.gen_pdf_report()
 
     elif product == "Saúde em Ordem (em breve)":
         user_analytics.log_event("picked saude_em_ordem", dict())
         pass
 
-    # TODO: remove comment on this later!
-    # utils.gen_whatsapp_button(config["impulso"]["contact"])
+    utils.gen_whatsapp_button(config["impulso"]["contact"])
     utils.gen_footer()
 
 
