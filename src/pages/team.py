@@ -1,9 +1,12 @@
 import streamlit as st
 import utils
-from models import  Logo
+import amplitude
+from models import Logo
+
 
 def main():
-
+    user_analytics = amplitude.gen_user(utils.get_server_session())
+    opening_response = user_analytics.log_event("opened who_is", dict())
     utils.localCSS("style.css")
 
     st.write(
@@ -35,5 +38,4 @@ def main():
         """ % (Logo.CORONACIDADES.value, Logo.IMPULSO.value), 
         unsafe_allow_html=True
     )
-
 

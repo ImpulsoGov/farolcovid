@@ -2,10 +2,13 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 from PIL import Image
+import amplitude
+import utils
 
 
 def main():
-
+    user_analytics = amplitude.gen_user(utils.get_server_session())
+    opening_response = user_analytics.log_event("opened risk_level")
     st.header("""Níveis de Risco: como saber se estou no controle da Covid-19?""")
 
     st.write(

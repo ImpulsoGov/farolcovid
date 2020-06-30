@@ -1,8 +1,12 @@
 # FarolCovid 🚦
 
 <p align="left">
-<!-- <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a> -->
-<a href="https://github.com/ImpulsoGov/simulacovid-datasource/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/ImpulsoGov/simulacovid"></a> <a href=""><img alt="Master update" src="https://img.shields.io/github/last-commit/ImpulsoGov/simulacovid/master?label=last%20commit%20%28master%29"></a> <a href=""><img alt="Master update" src="https://img.shields.io/github/last-commit/ImpulsoGov/simulacovid/stable?label=last%20updated%20%28stable%29"></a> <a href=""><img alt="Deploy" src="https://img.shields.io/github/deployments/ImpulsoGov/simulacovid/simulacovid-production?label=deploy%20status%20%28stable%29"></a>
+  <!-- <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a> -->
+  <a href="https://github.com/ImpulsoGov/simulacovid-datasource/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/ImpulsoGov/simulacovid"></a>
+  <a href=""><img alt="Master update" src="https://img.shields.io/github/last-commit/ImpulsoGov/simulacovid/master?label=last%20commit%20%28master%29"></a>
+  <a href=""><img alt="Master update" src="https://img.shields.io/github/last-commit/ImpulsoGov/simulacovid/stable?label=last%20updated%20%28stable%29"></a>
+  <a href=""><img alt="Deploy" src="https://img.shields.io/github/deployments/ImpulsoGov/simulacovid/simulacovid-production?label=deploy%20status%20%28stable%29"></a>
+  <a href="https://hub.docker.com/repository/docker/impulsogov/farolcovid"><img alt="docker build" src="https://img.shields.io/docker/cloud/build/impulsogov/farolcovid"></a>
 </p>
 
 Ferramenta de monitoramento do risco de colapso no sistema de saúde em municípios brasileiros com a Covid-19.
@@ -20,7 +24,7 @@ Veja mais detalhes na página de Metodologia da ferramenta.
 
 ## Referências metodológicas
 
-Os modelos e respectivos códigos utilizados são baseados no trabalho de <a href="https://github.com/alsnhll/SEIR_COVID19">Alison Hill</a> e <a href="https://www.cappra.institute">Cappra Institute for Data Science</a> (modelo SEIR), e [Kevin Systrom (ritmo de contágio)](https://github.com/k-sys/covid-19/blob/master/Realtime%20R0.ipynb), além de diversos estudos utilziados na nossa metodologia:
+Os modelos e respectivos códigos utilizados são baseados no trabalho de <a href="https://github.com/alsnhll/SEIR_COVID19">Alison Hill</a> e <a href="https://www.cappra.institute">Cappra Institute for Data Science</a> (modelo SEIR), e [Kevin Systrom (ritmo de contágio)](https://github.com/k-sys/covid-19/blob/master/Realtime%20R0.ipynb), além de diversos estudos utilizados na nossa metodologia:
 
 - CDC, 2019. Severe Outcomes Among Patients with Coronavirus Disease 2019 (COVID-19) — United States, February 12–March 16, 2020. MMWR Morb Mortal Wkly Rep. ePub: 18 March 2020. DOI: http://dx.doi.org/10.15585/mmwr.mm6912e2.
 
@@ -34,9 +38,7 @@ Veja mais detalhes na página de Metodologia da ferramenta.
 
 ## 📊 Como colaborar com análises
 
-**Estamos migrando para outro repositório!**
-
-Todas as análises com dados da ferramenta estão em [`analysis`](/analysis). Veja como colaborar [aqui](/src/analysis/README.md)!
+**Estamos migrando as análises para outro repositório!** Veja mais em [`coronacidades-analysis`](https://github.com/ImpulsoGov/coronacidades-analysis) 😉
 
 
 ## ⚙️ Como executar a aplicação localmente?

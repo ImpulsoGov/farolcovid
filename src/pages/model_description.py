@@ -1,10 +1,13 @@
 import streamlit as st
 import pandas as pd
 from utils import make_clickable
+import amplitude
+import utils
 
 
 def main():
-
+    user_analytics = amplitude.gen_user(utils.get_server_session())
+    opening_response = user_analytics.log_event("opened model")
     st.header("Metodologia")
 
     st.write("v1.3 - Atualizações")

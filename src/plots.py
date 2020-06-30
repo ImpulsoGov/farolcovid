@@ -3,9 +3,9 @@ import os
 
 sys.path.append("..")
 sys.path.append("../src")
-import src.utils as utils
-import src.loader as loader
-import src.model.simulator as simulator
+import utils
+import loader
+import model.simulator as simulator
 
 # Plotting
 import plotly
@@ -24,25 +24,7 @@ cf.set_config_file(offline=False, world_readable=True)
 def iplottitle(title, width=40):
     return "<br>".join(textwrap.wrap(title, width))
 
-
-# Customized themes
-analysis_path = os.path.join(os.path.dirname(__file__), "../analysis/themes/")
-
 import yaml
-
-custom_colorscales = yaml.load(
-    open(os.path.join(analysis_path, "custom_colorscales.yaml"), "r"),
-    Loader=yaml.FullLoader,
-)
-
-cf.themes.THEMES["custom"] = yaml.load(
-    open(os.path.join(analysis_path, "cufflinks_template.yaml"), "r"),
-    Loader=yaml.FullLoader,
-)
-
-cf.colors._custom_scales["qual"].update(custom_colorscales)
-cf.colors.reset_scales()
-
 config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
 
 
@@ -147,6 +129,9 @@ def plot_rt_wrapper(place_id):
             "br", config, config["br"]["api"]["endpoints"]["rt_cities"]
         )
         final_data = pre_data.loc[pre_data["city_id"] == place_id]
+
+    if len(final_data) < 30:
+        return None
 
     fig = plot_rt(final_data)
     fig.update_layout(xaxis=dict(tickformat="%d/%m"))

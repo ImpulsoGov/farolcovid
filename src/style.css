@@ -907,7 +907,7 @@ header>.toolbar { /* Hide toolbar menu */
     text-decoration: underline;
 }
 
-/* CENTRAL COVID */
+/* FAROL COVID */
 .alert-banner {
     width: 100vw;
     height: 400px;
@@ -926,8 +926,24 @@ header>.toolbar { /* Hide toolbar menu */
 
 
 .product-section {
-    margin-top: 150px;
+    margin-top: 100px;
 }
+
+/* .pdf-button {
+    font-family: var(--main-header-font-family); 
+    background-color: var(--main-primary);
+    border: var(--main-primary);
+    color: var(--main-white);
+    border-radius: var(--main-border-radius);
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    margin: 4px 2px;
+  } */
+
+
 @media only screen and (max-width: 425px) {
     .indicator-card {
         height: 350px;

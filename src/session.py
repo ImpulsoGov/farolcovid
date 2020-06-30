@@ -18,7 +18,7 @@ def _get_widget_states():
     ctx = ReportThread.get_report_ctx()
 
     session = None
-    session_infos = Server.get_current()._session_infos.values()
+    session_infos = Server.get_current()._session_info_by_id.values()
 
     for session_info in session_infos:
         session = session_info.session

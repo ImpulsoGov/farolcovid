@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit.server.Server import Server
 from datetime import datetime
 from datetime import timedelta
 from typing import List, Dict
@@ -49,11 +50,7 @@ def get_inloco_url(config):
         api_inloco["states"] = api_url + os.getenv("INLOCO_STATES_ROUTE")
 
     else:
-        secrets = yaml.load(
-            open("../src/configs/secrets.yaml", "r"), Loader=yaml.FullLoader
-        )
-        api_inloco["cities"] = api_url + secrets["inloco"]["cities"]["route"]
-        api_inloco["states"] = api_url + secrets["inloco"]["states"]["route"]
+        raise "Inloco routes not found in env vars!"
 
     return api_inloco
 
@@ -234,6 +231,17 @@ def get_ufs_list():
 
 
 # FRONT-END TOOLS
+def get_server_session():
+    return Server.get_current()
+
+
+def gen_pdf_report():
+    st.write(
+        """
+    <iframe src="resources/ctrlp.html" height="100" width="350" style="border:none; float: right;"></iframe>
+    """,
+        unsafe_allow_html=True,
+    )
 
 
 def make_clickable(text, link):
@@ -355,6 +363,8 @@ def genInputFields(user_input, config, session):
         session.cases = user_input["population_params"]["I_confirmed"]
 
         session.update = True
+    else:
+        session.update = False
 
     return user_input, session
 
@@ -432,6 +442,7 @@ def genKPISection(
                         <div class="flex flex-row flex-m-column">%s</div>
                 </div>
         </div>
+        <div class='base-wrapper product-section'></div>
         """
         % (bg, locality, msg, caption, cards),
         unsafe_allow_html=True,
@@ -478,7 +489,7 @@ def genInputCustomizationSectionHeader(locality: str) -> None:
         <div class="base-wrapper">
                 <span class="section-header primary-span">Verifique os dados disponíveis <span class="yellow-span">(%s)</span></span>
                 <br />
-                <span>Usamos os dados do Brasil.io e DataSUS, mas é possível que eles dados estejam um pouco desatualizados. Se estiverem, é só ajustar os valores abaixo para continuar a simulação.</span>
+                <span>Usamos os dados do Brasil.io e DataSUS, mas é possível que esses dados estejam um pouco desatualizados. Se estiverem, é só ajustar os valores abaixo para continuar a simulação.</span>
                 <br />
         </div>"""
         % locality,
