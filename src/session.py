@@ -21,6 +21,22 @@ def rerun():
     raise RerunException(RerunData(widget_states))
 
 
+def get_user_id():
+    ctx = ReportThread.get_report_ctx()
+    session_infos = Server.get_current()._session_info_by_id.values()
+    # print(dir(session_infos[0]))
+    for session_info in session_infos:
+        # print("Session info session dir:")
+        # print(dir(session_info.session))
+        if session_info.session.enqueue == ctx.enqueue:
+            user_id = session_info.session.id
+            # print("Current: " + str(session_info.session.id))
+        else:
+            # print(session_info.session.id)
+            pass
+    return user_id
+
+
 def _get_widget_states():
     ctx = ReportThread.get_report_ctx()
 
@@ -28,7 +44,8 @@ def _get_widget_states():
     session_infos = Server.get_current()._session_info_by_id.values()
 
     for session_info in session_infos:
-        session = session_info.session
+        if session_info.session.enqueue == ctx.enqueue:
+            session = session_info.session
 
     if session is None:
         raise RuntimeError(
@@ -129,16 +146,17 @@ class SessionState(object):
 
         return this_session._custom_session_state
 
+
 # FROM NEW TRY
 def _get_session_state():
     session = _get_session_object()
 
     curr_thread = threading.current_thread()
 
-    if not hasattr(session, '_session_state'):
+    if not hasattr(session, "_session_state"):
         session._session_state = {}
 
-    if not hasattr(curr_thread, '_key_counts'):
+    if not hasattr(curr_thread, "_key_counts"):
         # Put this in the thread because it gets cleared on every run.
         curr_thread._key_counts = collections.defaultdict(int)
 
@@ -151,10 +169,10 @@ def _get_session_object():
     ctx = ReportThread.get_report_ctx()
 
     this_session = None
-    
+
     current_server = Server.get_current()
-    if hasattr(current_server, '_session_infos'):
-        # Streamlit < 0.56        
+    if hasattr(current_server, "_session_infos"):
+        # Streamlit < 0.56
         session_infos = Server.get_current()._session_infos.values()
     else:
         session_infos = Server.get_current()._session_info_by_id.values()
@@ -163,16 +181,17 @@ def _get_session_object():
         s = session_info.session
         if (
             # Streamlit < 0.54.0
-            (hasattr(s, '_main_dg') and s._main_dg == ctx.main_dg)
+            (hasattr(s, "_main_dg") and s._main_dg == ctx.main_dg)
             or
             # Streamlit >= 0.54.0
-            (not hasattr(s, '_main_dg') and s.enqueue == ctx.enqueue)
+            (not hasattr(s, "_main_dg") and s.enqueue == ctx.enqueue)
         ):
             this_session = s
 
     if this_session is None:
         raise RuntimeError(
             "Oh noes. Couldn't get your Streamlit Session object"
-            'Are you doing something fancy with threads?')
+            "Are you doing something fancy with threads?"
+        )
 
     return this_session

@@ -201,10 +201,8 @@ def main():
     # Get user info
     user_analytics = amplitude.gen_user(utils.get_server_session())
     opening_response = user_analytics.log_event("opened farol", dict())
-    # session_state.key = user_analytics.name
-
     session_state = session.SessionState.get(
-        key=user_analytics.name,
+        key=session.get_user_id(),
         update=False,
         number_beds=None,
         number_ventilators=None,
