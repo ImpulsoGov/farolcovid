@@ -321,9 +321,9 @@ def main():
         """
         <div class='base-wrapper'>
             <i>* Utilizamos %s&percnt; da capacidade hospitalar reportada por %s em %s 
-            para o cálculo da projeção de dias para atingir a capacidade máxima.<br> 
-            Consideramos leitos disponíveis para Covid os tipos de leitos cirúrgicos, clínicos e hospital-dia.
-            Caso tenha dados mais atuais, sugerimos que mude os valores e refaça essa estimação abaixo.</i>
+            para cálculo da projeção de dias para atingir a capacidade máxima.<br>
+            Consideramos leitos disponíveis para Covid-19 os tipos: cirúrgicos, clínicos e hospital-dia.
+            Caso tenha dados mais atuais, sugerimos que mude abaixo e refaça essa estimação.</i>
         </div>
         """
         % (
