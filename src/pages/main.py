@@ -293,21 +293,37 @@ def main():
 
     indicators = update_indicators(indicators, data, config, user_input, session_state)
 
-    utils.genKPISection(
-        place_type=user_input["place_type"],
-        locality=user_input["locality"],
-        alert=data["overall_alert"].values[0],
-        indicators=indicators,
-    )
+    if "state" in user_input["place_type"]:
+        
+        # Add disclaimer to cities in state alert levels
+        total_alert_cities = df_cities[
+            df_cities["state_id"] == data["state_id"].unique()[0]
+        ]["overall_alert"].value_counts()
+        
+        utils.genKPISection(
+            place_type=user_input["place_type"],
+            locality=user_input["locality"],
+            alert=data["overall_alert"].values[0],
+            indicators=indicators,
+            n_colapse_alert_cities=total_alert_cities[total_alert_cities.index.isin(["alto", "médio"])].sum(),
+        )
+
+    else:
+        utils.genKPISection(
+            place_type=user_input["place_type"],
+            locality=user_input["locality"],
+            alert=data["overall_alert"].values[0],
+            indicators=indicators
+        )
 
     # AVAILABLE CAPACITY DISCLAIMER
     st.write(
         """
         <div class='base-wrapper'>
             <i>* Utilizamos %s&percnt; da capacidade hospitalar reportada por %s em %s 
-            para o cálculo da projeção de dias para atingir a capacidade máxima.<br> 
-            Consideramos leitos disponíveis para Covid os tipos de leitos cirúrgicos, clínicos e hospital-dia.
-            Caso tenha dados mais atuais, sugerimos que mude os valores e refaça essa estimação abaixo.</i>
+            para cálculo da projeção de dias para atingir a capacidade máxima.<br>
+            Consideramos leitos disponíveis para Covid-19 os tipos: cirúrgicos, clínicos e hospital-dia.
+            Caso tenha dados mais atuais, sugerimos que mude abaixo e refaça essa estimação.</i>
         </div>
         """
         % (
