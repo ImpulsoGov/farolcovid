@@ -406,7 +406,7 @@ def genIndicatorCard(indicator: Indicator):
 
 
 def genKPISection(
-    place_type: str, locality: str, alert: str, indicators: Dict[str, Indicator]
+    place_type: str, locality: str, alert: str, indicators: Dict[str, Indicator], n_colapse_alert_cities: int = 0
 ):
     if not isinstance(alert, str):
         bg = "gray"
@@ -414,11 +414,13 @@ def genKPISection(
         stoplight = "%0a%0a"
     else:
         bg = AlertBackground(alert).name
-        caption = f"Risco {alert} de colapso no sistema de saúde (Veja Níveis de Risco no menu ao lado)"
+        
         if "state" in place_type:
             place_type = "estado"
+            caption = f"Seu estado está em Risco {alert.upper()}, mas note que <b>{n_colapse_alert_cities} municípios avaliados estão em Risco Médio ou Alto de colapso</b>. Recomenda-se que protocolos de retomada da atividade econômica sejam feitos regionalmente."
         else:
             place_type = "município"
+            caption = f"Risco {alert.upper()} de colapso no sistema de saúde (Veja Níveis de Risco no menu ao lado)"
 
         if alert == "baixo":
             stoplight = f"Meu {place_type} está em *ALERTA BAIXO*! E o seu? %0a%0a"
@@ -433,7 +435,7 @@ def genKPISection(
 
     st.write(
         """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;">
-                <div class="base-wrapper flex flex-column" style="margin-top: 100px;">
+                <div class="base-wrapper flex flex-column" style="margin-top: 0px;">
                         <div class="flex flex-row flex-space-between flex-align-items-center">
                          <span class="white-span header p1">%s</span>
                          <a class="btn-wpp" href="whatsapp://send?text=%s" target="blank">Compartilhar no Whatsapp</a>

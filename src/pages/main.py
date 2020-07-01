@@ -293,12 +293,28 @@ def main():
 
     indicators = update_indicators(indicators, data, config, user_input, session_state)
 
-    utils.genKPISection(
-        place_type=user_input["place_type"],
-        locality=user_input["locality"],
-        alert=data["overall_alert"].values[0],
-        indicators=indicators,
-    )
+    if "state" in user_input["place_type"]:
+        
+        # Add disclaimer to cities in state alert levels
+        total_alert_cities = df_cities[
+            df_cities["state_id"] == data["state_id"].unique()[0]
+        ]["overall_alert"].value_counts()
+        
+        utils.genKPISection(
+            place_type=user_input["place_type"],
+            locality=user_input["locality"],
+            alert=data["overall_alert"].values[0],
+            indicators=indicators,
+            n_colapse_alert_cities=total_alert_cities[total_alert_cities.index.isin(["alto", "médio"])].sum(),
+        )
+
+    else:
+        utils.genKPISection(
+            place_type=user_input["place_type"],
+            locality=user_input["locality"],
+            alert=data["overall_alert"].values[0],
+            indicators=indicators
+        )
 
     # AVAILABLE CAPACITY DISCLAIMER
     st.write(
