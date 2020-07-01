@@ -417,7 +417,7 @@ def genKPISection(
         
         if "state" in place_type:
             place_type = "estado"
-            caption = f"Seu estado está em Risco {alert.upper()}, mas note que <b>{n_colapse_alert_cities} municípios avaliados estão em Risco Médio ou Alto de colapso</b>. Recomenda-se que protocolos de retomada da atividade econômica sejam feitos regionalmente."
+            caption = f"Seu estado está em Risco {alert.upper()}. <b>Note que {n_colapse_alert_cities} municípios avaliados estão em Risco Médio ou Alto de colapso</b>. Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
         else:
             place_type = "município"
             caption = f"Risco {alert.upper()} de colapso no sistema de saúde (Veja Níveis de Risco no menu ao lado)"
@@ -508,15 +508,14 @@ def gen_footer() -> None:
                         <div class="logo-wrapper">
                                 <span><b>Estamos à disposição para apoiar o gestor público a aprofundar a análise para seu estado ou município, de forma inteiramente gratuita. 
                                 <a target="_blank" style="color:#3E758A;" href="https://coronacidades.org/fale-conosco/">Entre em contato conosco</a></span><br/>
-                                <span>A presente ferramenta, voluntária, parte de estudos referenciados já publicados e considera os dados de saúde pública dos municípios 
-                                brasileiros disponibilizados no DataSus. O repositório do projeto pode ser acessado no 
-                                nosso <a class="github-link" href="https://github.com/ImpulsoGov/simulacovid">Github</a>.</span><br/>
-                                Os cenários projetados são meramente indicativos e dependem de variáveis que aqui não podem ser consideradas. 
+                                <span><b>As análises apresentadas são meramente indicativas e dependem de variáveis que aqui não podem ser consideradas.</b>
                                 Trata-se de mera contribuição à elaboração de cenários por parte dos municípios e não configura qualquer obrigação ou 
-                                responsabilidade perante as decisões efetivadas. Saiba mais em nossa Metodologia. 
+                                responsabilidade perante as decisões efetivadas. Saiba mais em nossa Metodologia de Níveis de Risco (menu lateral).<br>
                                 Estamos em constante desenvolvimento e queremos ouvir sua opinião sobre a ferramenta - caso tenha sugestões ou comentários, 
-                                entre em contato via o chat ao lado. Caso seja gestor público e necessite de apoio para preparo de seu município, 
-                                acesse a Checklist e confira o site do CoronaCidades.
+                                entre em contato via chat no canto inferior direito.<br>Caso seja gestor público e necessite de apoio para preparo de seu município, 
+                                acesse a Checklist e confira o site do CoronaCidades.<br><br></span>
+                                <span>A presente ferramenta, voluntária, parte de estudos referenciados já publicados e considera dados do DataSUS e secretarias de saúde estaduais. 
+                                O código pode ser acessado no <a class="github-link" href="https://github.com/ImpulsoGov/simulacovid">Github</a>.</span><br/>
                                 <br/></br></br></span>
                                 <img class="logo-img" src="%s"/>
                                 <div class="logo-section">
