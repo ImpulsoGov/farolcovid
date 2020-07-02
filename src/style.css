@@ -144,6 +144,11 @@
     font-size: 24px;
 }
 
+@media only screen and (max-width: 425px) {
+    .p3 {
+        font-size: 20px;
+    }
+}
 .p4 {
     font-size: 18px;
 }
@@ -618,6 +623,20 @@ header>.toolbar { /* Hide toolbar menu */
     max-height: 50px;
 }
 
+@media only screen and (max-width: 425px) {
+    .secondary-badge {
+        color: white;
+        text-align: center;
+        /* background-color: white; */
+        /* border: 1px solid var(--main-primary); */
+        padding: 4px;
+        border-radius: var(--main-border-radius);
+        font-size: 14px;
+        max-width: 200px;
+        max-height: 35px;
+    }
+}
+
 /* Simulation Output - Banner Style */
 .chart-simulator-instructions {
     margin: 0 0;
@@ -818,6 +837,13 @@ header>.toolbar { /* Hide toolbar menu */
     height: auto;
 }
 
+@media only screen and (max-width: 425px) {
+    .logo-img {
+        width: 150px;
+        height: auto;
+    }
+}
+
 .sidebar-collapse-control {
     background-color: var(--main-primary);
     padding: 1em;
@@ -950,7 +976,7 @@ header>.toolbar { /* Hide toolbar menu */
     }
 
     .product-section {
-        margin-top: 1700px;
+        margin-top: 1550px;
     }
 }
 
@@ -967,4 +993,14 @@ header>.toolbar { /* Hide toolbar menu */
     border-radius: 15px;
     margin-right: var(--main-item-margin);
     padding: var(--main-padding)
+}
+
+@media only screen and (max-width: 425px) {
+    .product-card {
+        width: 320px;
+        height: 370px;
+        border-radius: 15px;
+        margin-right: var(--main-item-margin);
+        padding: var(--main-padding)
+    }
 }
