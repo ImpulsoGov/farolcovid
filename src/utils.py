@@ -490,9 +490,9 @@ def genInputCustomizationSectionHeader(locality: str) -> None:
         """
         <div class="base-wrapper">
                 <span class="section-header primary-span">Verifique os dados disponíveis <span class="yellow-span">(%s)</span></span>
-                <br />
+                <br><br>
                 <span>Usamos os dados do Brasil.io e DataSUS, mas é possível que esses dados estejam um pouco desatualizados. Se estiverem, é só ajustar os valores abaixo para continuar a simulação.</span>
-                <br />
+                <br>
         </div>"""
         % locality,
         unsafe_allow_html=True,
@@ -506,17 +506,16 @@ def gen_footer() -> None:
         <div class="magenta-bg">
                 <div class="base-wrapper">
                         <div class="logo-wrapper">
-                                <span><b>Estamos à disposição para apoiar o gestor público a aprofundar a análise para seu estado ou município, de forma inteiramente gratuita. 
-                                <a target="_blank" style="color:#3E758A;" href="https://coronacidades.org/fale-conosco/">Entre em contato conosco</a></span><br/>
-                                <span><b>As análises apresentadas são meramente indicativas e dependem de variáveis que aqui não podem ser consideradas.</b>
-                                Trata-se de mera contribuição à elaboração de cenários por parte dos municípios e não configura qualquer obrigação ou 
-                                responsabilidade perante as decisões efetivadas. Saiba mais em nossa Metodologia de Níveis de Risco (menu lateral).<br>
-                                Estamos em constante desenvolvimento e queremos ouvir sua opinião sobre a ferramenta - caso tenha sugestões ou comentários, 
-                                entre em contato via chat no canto inferior direito.<br>Caso seja gestor público e necessite de apoio para preparo de seu município, 
-                                acesse a Checklist e confira o site do CoronaCidades.<br><br></span>
-                                <span>A presente ferramenta, voluntária, parte de estudos referenciados já publicados e considera dados do DataSUS e secretarias de saúde estaduais. 
-                                O código pode ser acessado no <a class="github-link" href="https://github.com/ImpulsoGov/simulacovid">Github</a>.</span><br/>
-                                <br/></br></br></span>
+                                <span><b>A equipe do Coronacidades está à disposição para apoiar o gestor público a aprofundar a análise para seu estado ou município, de forma inteiramente gratuita.</b>
+                                Também queremos queremos ouvir sua opinião sobre a ferramenta, entre em contato via chat (canto inferior direito). Outras ferramentas e mais recursos para responder à crise da Covid-19 estão disponíveis em nosso site 
+                                <a target="_blank" style="color:#3E758A;" href="https://coronacidades.org/">coronacidades.org</a>.</span><br/>
+                                <span><b>As análises apresentadas no Farol Covid são indicativas, feitas a partir de dados oficiais públicos e estudos referenciados já publicados, estando sujeitas a variáveis que aqui não podem ser consideradas.</b>
+                                Trata-se de contribuição à elaboração de cenários por parte dos governos e não configura qualquer obrigação ou responsabilidade perante as decisões efetivadas.
+                                Saiba mais sobre os cálculos por trás de análises e indicadores em nossas páginas de Níveis de Risco e Modelo Epidemiológico (menu lateral esquerdo), 
+                                que mantemos atualizadas conforme evoluímos em nossas metodologias.<br><br></span>
+                                <span><i>Todo código da ferramenta pode ser acessado no <a class="github-link" href="https://github.com/ImpulsoGov/farolcovid">Github do projeto</a>
+                                e os dados estão disponíveis em nossa <a class="github-link" href="https://github.com/ImpulsoGov/coronacidades-datasource/blob/master/README.md">API</a>.</i></span>
+                                </br></br></span>
                                 <img class="logo-img" src="%s"/>
                                 <div class="logo-section">
                                         <img class="logo-img" src="%s"/>
