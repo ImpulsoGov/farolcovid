@@ -52,63 +52,55 @@ def update_indicators(indicators, data, config, user_input, session_state):
             else config["br"]["indicators"][group]["display"]
         ][0]
 
+        # Displays
+        indicators[group].display = fix_type(
+            data[config["br"]["indicators"][group]["display"]].fillna("- ").values[0],
+            group,
+        )
+
+        # Risk
+        indicators[group].risk = [
+            str(data[config["br"]["indicators"][group]["risk"]].values[0])
+            if group != "social_isolation"
+            else "Fonte: inloco"
+        ][0]
+
+        # Left display
+        indicators[group].left_display = fix_type(
+            data[config["br"]["indicators"][group]["left_display"]]
+            .fillna("- ")
+            .values[0],
+            group,
+        )
+
+        # Right display
+        indicators[group].right_display = fix_type(
+            data[config["br"]["indicators"][group]["right_display"]]
+            .fillna("- ")
+            .values[0],
+            group,
+        )
+
         if data[ref].fillna("").values[0] == "":
 
             indicators[group].display = "- "
             indicators[group].risk = "nan"
 
-            if group != "hospital_capacity":
+            if group == "rt":  # doesn't show values
                 indicators[group].right_display = "- "
                 indicators[group].left_display = "- "
 
-        else:
-
-            if group == "subnotification_rate":
-                indicators[group].display = str(
-                    int(
-                        10
-                        * data[config["br"]["indicators"][group]["display"]]
-                        .fillna("- ")
-                        .values[0]
-                    )
-                )
-
-            else:
-                indicators[group].display = fix_type(
-                    data[config["br"]["indicators"][group]["display"]]
-                    .fillna("- ")
-                    .values[0],
-                    group,
-                )
-
-            indicators[group].risk = [
-                str(data[config["br"]["indicators"][group]["risk"]].values[0])
-                if group != "social_isolation"
-                else "Fonte: inloco"
-            ][0]
-
-            indicators[group].left_display = fix_type(
-                data[config["br"]["indicators"][group]["left_display"]]
-                .fillna("- ")
-                .values[0],
-                group,
-            )
-
-            indicators[group].right_display = fix_type(
-                data[config["br"]["indicators"][group]["right_display"]]
-                .fillna("- ")
-                .values[0],
-                group,
-            )
-
+    # Update session values
     if (session_state.state != user_input["state_name"]) or (
         session_state.city != user_input["city_name"]
     ):
-
         session_state.state = user_input["state_name"]
         session_state.city = user_input["city_name"]
+        session.number_beds = user_input["number_beds"]
+        session.number_ventilators = user_input["number_ventilators"]
+        session.cases = user_input["population_params"]["I_confirmed"]
 
-    elif session_state.refresh:
+    if session_state.refresh:
 
         indicators["subnotification_rate"].left_display = session_state.cases
 
@@ -118,10 +110,10 @@ def update_indicators(indicators, data, config, user_input, session_state):
         user_input["number_beds"] = session_state.number_beds
         user_input["number_ventilators"] = session_state.number_ventilators
 
-        # session_state.refresh = False
+        session_state.refresh = False
 
-    # recalcula capacidade hospitalar
-    user_input["strategy"] = "isolation"
+    # Recalcula capacidade hospitalar
+    user_input["strategy"] = "estavel"
     user_input = sm.calculate_recovered(user_input, data)
 
     dmonth = get_dmonth(
@@ -164,14 +156,14 @@ def filter_options(user_input, df_cities, df_states, config):
         user_input["place_type"] = "city_id"
 
         # para simulacovid
-        user_input["state_rt"] = (
-            df_states[df_states["state_name"] == user_input["state_name"]][
-                ["rt_10days_ago_low", "rt_10days_ago_high"]
-            ]
-            .astype(str)
-            .agg("-".join, axis=1)
-            .values[0]
-        )
+        user_input["state_rt"] = {
+            "best": df_states[df_states["state_name"] == user_input["state_name"]][
+                "rt_10days_ago_low"
+            ].values[0],
+            "worst": df_states[df_states["state_name"] == user_input["state_name"]][
+                "rt_10days_ago_high"
+            ].values[0],
+        }
 
     user_input["locality"] = utils.choose_place(
         city=user_input["city_name"], state=user_input["state_name"], region="Todos"
@@ -253,11 +245,13 @@ def main():
         "D": int(data["deaths"].fillna(0).values[0]),
         "I": int(data["active_cases"].fillna(0).values[0]),
         "I_confirmed": int(data["confirmed_cases"].fillna(0).values[0]),
+        "I_compare": int(data["confirmed_cases"].fillna(0).values[0]),
     }
 
     user_input["Rt"] = {
         "best": data["rt_10days_ago_low"].values[0],
         "worst": data["rt_10days_ago_high"].values[0],
+        "is_valid": data["rt_classification"].apply(str).values[0],
     }
 
     user_input["last_updated_cases"] = data["last_updated_subnotification"].max()
@@ -294,18 +288,20 @@ def main():
     indicators = update_indicators(indicators, data, config, user_input, session_state)
 
     if "state" in user_input["place_type"]:
-        
+
         # Add disclaimer to cities in state alert levels
         total_alert_cities = df_cities[
             df_cities["state_id"] == data["state_id"].unique()[0]
         ]["overall_alert"].value_counts()
-        
+
         utils.genKPISection(
             place_type=user_input["place_type"],
             locality=user_input["locality"],
             alert=data["overall_alert"].values[0],
             indicators=indicators,
-            n_colapse_alert_cities=total_alert_cities[total_alert_cities.index.isin(["alto", "médio"])].sum(),
+            n_colapse_alert_cities=total_alert_cities[
+                total_alert_cities.index.isin(["alto", "médio"])
+            ].sum(),
         )
 
     else:

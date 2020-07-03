@@ -52,6 +52,7 @@ def calculate_recovered(user_input, data):
 
 def main(user_input, indicators, data, config, session_state):
     user_analytics = amplitude.gen_user(utils.get_server_session())
+
     if indicators["rt"].display != "- ":
         st.write(
             f"""
@@ -65,8 +66,8 @@ def main(user_input, indicators, data, config, session_state):
             </div>""",
             unsafe_allow_html=True,
         )
-    else:
 
+    else:
         st.write(
             f"""
             <div class="base-wrapper">
@@ -74,17 +75,17 @@ def main(user_input, indicators, data, config, session_state):
                     <br><br>
                     <span>Agora é a hora de se preparar para evitar a sobrecarga hospitalar. 
                     No momento, em {user_input["locality"]}, não temos dados suficientes para estimativa do ritmo de contágio. 
-                    Por isso, <b>iremos simular com o ritmo de contágio do seu estado, que está entre {user_input["state_rt"]}</b>, 
-                    ou seja, cada pessoa doente infectará em média entre outras {user_input["state_rt"]} pessoas.
+                    Por isso, <b>iremos simular com o ritmo de contágio do seu estado, que está entre {str(user_input["state_rt"]["best"])}-{str(user_input["state_rt"]["worst"])}</b>, 
+                    ou seja, cada pessoa doente infectará em média entre outras {str(user_input["state_rt"]["best"])}-{str(user_input["state_rt"]["worst"])} pessoas.
                     </span>
             </div>""",
             unsafe_allow_html=True,
         )
 
     dic_scenarios = {
-        "Cenário Estável: O que acontece se seu ritmo de contágio continuar constante?": "isolation",
-        "Cenário Negativo: O que acontece se dobrar o seu ritmo de contágio?": "nothing",
-        "Cenário Positivo: O que acontece se seu ritmo de contágio diminuir pela metade?": "lockdown",
+        "Cenário Estável: O que acontece se seu ritmo de contágio continuar constante?": "estavel",
+        "Cenário Negativo: O que acontece se dobrar o seu ritmo de contágio?": "negativo",
+        "Cenário Positivo: O que acontece se seu ritmo de contágio diminuir pela metade?": "positivo",
     }
 
     option = st.selectbox(
@@ -102,20 +103,17 @@ def main(user_input, indicators, data, config, session_state):
 
         # SIMULATOR SCENARIOS: BEDS & RESPIRATORS
         user_input["strategy"] = dic_scenarios[option]
-        if user_input["strategy"] == "isolation":
+        if user_input["strategy"] == "estavel":
             user_analytics.log_event("picked stable_scenario")
-        elif user_input["strategy"] == "lockdown":
+        elif user_input["strategy"] == "positivo":
             user_analytics.log_event("picked positive_scenario")
-        elif user_input["strategy"] == "nothing":
+        elif user_input["strategy"] == "negativo":
             user_analytics.log_event("picked negative_scenario")
-        # TODO: melhorar aqui! como fazer a estimatima de casos ativos quando é modificado?
-        if (
-            user_input["population_params"]["I"]
-            == user_input["population_params"]["I_confirmed"]
-        ):
-            user_input["population_params"]["I"] = user_input["population_params"][
-                "I_confirmed"
-            ]
+
+        # Caso o usuário altere os casos confirmados, usamos esse valor para a estimação
+
+        if (session_state.cases is not None) and (session_state.cases != user_input["population_params"]["I_compare"]):
+            user_input["population_params"]["I"] = session_state.cases
 
         dfs = simulator.run_simulation(user_input, config)
 
