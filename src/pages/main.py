@@ -448,6 +448,11 @@ def main():
 
     if product == "SimulaCovid":
         user_analytics.log_event("picked simulacovid", dict())
+        # Downloading the saved data from memory
+        user_input["number_beds"] = session_state.number_beds
+        user_input["number_ventilators"] = session_state.number_ventilators
+        user_input["number_deaths"] = session_state.number_deaths
+        user_input["number_cases"] = session_state.number_cases
         sm.main(user_input, indicators, data, config, session_state)
         # TODO: remove comment on this later!
         # utils.gen_pdf_report()
