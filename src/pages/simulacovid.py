@@ -112,8 +112,10 @@ def main(user_input, indicators, data, config, session_state):
 
         # Caso o usuário altere os casos confirmados, usamos esse valor para a estimação
 
-        if (session_state.cases is not None) and (session_state.cases != user_input["population_params"]["I_compare"]):
-            user_input["population_params"]["I"] = session_state.cases
+        if (session_state.number_cases is not None) and (
+            session_state.number_cases != user_input["population_params"]["I_compare"]
+        ):
+            user_input["population_params"]["I"] = session_state.number_cases
 
         dfs = simulator.run_simulation(user_input, config)
 

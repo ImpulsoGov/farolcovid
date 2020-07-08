@@ -105,7 +105,6 @@ def get_sources(user_input, data, cities_sources, resources):
     user_input["last_updated_number_ventilators"] = pd.to_datetime(
         user_input["last_updated_number_ventilators"]
     ).strftime("%d/%m")
-
     # user_input["n_beds"] = sources["number_beds"][0]
     # user_input["n_ventilators"] = sources["number_ventilators"][0]
 

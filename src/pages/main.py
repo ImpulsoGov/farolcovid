@@ -90,29 +90,18 @@ def update_indicators(indicators, data, config, user_input, session_state):
                 indicators[group].right_display = "- "
                 indicators[group].left_display = "- "
 
-    # Update session values
-    if (session_state.state != user_input["state_name"]) or (
-        session_state.city != user_input["city_name"]
-    ):
-        session_state.state = user_input["state_name"]
-        session_state.city = user_input["city_name"]
-        session.number_beds = user_input["number_beds"]
-        session.number_ventilators = user_input["number_ventilators"]
-        session.cases = user_input["population_params"]["I_confirmed"]
-
-    if (
-        session_state.number_beds != None and session_state.reset is False
-    ):  # Loading values from memory
-        indicators["subnotification_rate"].left_display = session_state.number_cases
-
-        indicators["hospital_capacity"].left_display = int(
-            session_state.number_beds
-            / config["br"]["simulacovid"]["resources_available_proportion"]
-        )
-        indicators["hospital_capacity"].right_display = int(
-            session_state.number_ventilators
-            / config["br"]["simulacovid"]["resources_available_proportion"]
-        )
+    # if (
+    # session_state.number_beds != None and session_state.reset is False
+    # ):  # Loading values from memory
+    indicators["subnotification_rate"].left_display = session_state.number_cases
+    indicators["hospital_capacity"].left_display = int(
+        session_state.number_beds
+        # config["br"]["simulacovid"]["resources_available_proportion"]
+    )
+    indicators["hospital_capacity"].right_display = int(
+        session_state.number_ventilators
+        # config["br"]["simulacovid"]["resources_available_proportion"]
+    )
 
     # Recalcula capacidade hospitalar
     user_input["strategy"] = "estavel"
@@ -122,7 +111,7 @@ def update_indicators(indicators, data, config, user_input, session_state):
         run_simulation(user_input, config),
         "I2",
         user_input["number_beds"]
-        * config["br"]["simulacovid"]["resources_available_proportion"],
+        # * config["br"]["simulacovid"]["resources_available_proportion"],
     )["best"]
 
     # TODO: add no config e juntar com farol
@@ -258,6 +247,26 @@ def main():
     }
 
     user_input["last_updated_cases"] = data["last_updated_subnotification"].max()
+    # Update session values to standard ones if changed city or opened page or reseted values
+    if (
+        session_state.state != user_input["state_name"]
+        or session_state.city != user_input["city_name"]
+        or session_state.number_beds is None
+        or session_state.reset
+    ):
+        session_state.state = user_input["state_name"]
+        session_state.city = user_input["city_name"]
+        session_state.number_beds = int(
+            user_input["number_beds"]
+            * config["br"]["simulacovid"]["resources_available_proportion"]
+        )
+        session_state.number_ventilators = int(
+            user_input["number_ventilators"]
+            * config["br"]["simulacovid"]["resources_available_proportion"]
+        )
+        session_state.number_cases = user_input["population_params"]["I_confirmed"]
+        session_state.number_deaths = user_input["population_params"]["D"]
+        session_state.reset = True
 
     if data["confirmed_cases"].sum() == 0:
         st.write(
