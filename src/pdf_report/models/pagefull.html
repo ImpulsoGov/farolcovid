@@ -1,0 +1,553 @@
+<head>
+    <link rel="stylesheet" href="page1v2_model.css">
+    <link rel="stylesheet" href="page2v2_model.css">
+    <link rel="stylesheet" href="page3v2_model.css">
+    <link rel="stylesheet" href="page4v2_model.css">
+    <meta charset="UTF-8">
+    <script src="reportpt1.js"></script>
+    <script>resizeWin();</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@200;300;400;700&display=swap"
+        rel="stylesheet">
+
+</head>
+
+<body>
+    <!-- PDF Report v2 page1 -->
+    <div class="frame" id="n452_2">
+        <!-- Imagem farol igveup -->
+        <img src="/home/ubuntu/src/pdf_report/models/resources/farol.png" id="n452_farol">
+        <!-- Retângulo de risco alto do farol -->
+        <div class="left top rectangle" id="n452_4" style="visibility: $#is_high_risk$#"></div>
+        <!-- Retângulo de risco médio do farol -->
+        <div class="left top rectangle" id="n452_4_2" style="visibility: $#is_medium_risk$#"></div>
+        <!-- Retângulo de risco baixo do farol -->
+        <div class="left top rectangle" id="n452_4_3" style="visibility: $#is_low_risk$#"></div>
+        <!-- Referente a -->
+        <div class="left top text" id="n452_8">REFERENTE A:</div>
+        <!-- Data -->
+        <div class="left top text" id="n452_9">$#data$#</div>
+        <!-- coronacidades -->
+        <div class="subsets left top text" id="n413_2">
+            corona
+        </div>
+        <!-- coronacidades pt2 -->
+        <div class="subsets left top text" id="n413_2pt2">
+            cidades
+        </div>
+        <!-- FAROL COVID -->
+        <div class="left top text" id="n452_13">FAROL<br>COVID
+        </div>
+        <!-- SEU MUNICÍPIO ESTÁ EM -->
+        <div class="left top text" id="n452_14">SEU MUNICÍPIO ESTÁ EM</div>
+        <!-- Entenda e controle a Covid-19 no seu município -->
+        <div class="subsets left top text" id="n452_15">
+            <span id="n452_15-1">Entenda e controle</span>
+            <span id="n452_15-undefined"> a Covid-19 no seu município</span>
+        </div>
+        <!-- Farol Body -->
+        <div class="left top rectangle" id="n452_16" style="visibility: hidden;"></div>
+        <!-- Luz Verde -->
+        <div class="svg-wrapper left top ellipse" id="n452_17" style="visibility: hidden;">
+            <svg height="70" width="70">
+                <ellipse cx="35" cy="35" rx="33" ry="33"
+                    style="fill:rgba(2, 180, 41, 1);stroke:rgba(255, 255, 255, 1);stroke-width:3"></ellipse>
+            </svg>
+        </div>
+        <!-- Luz Amarela -->
+        <div class="svg-wrapper left top ellipse" id="n452_18" style="visibility: hidden;">
+            <svg height="70" width="70">
+                <ellipse cx="35" cy="35" rx="33" ry="33"
+                    style="fill:rgba(242, 201, 76, 1);stroke:rgba(255, 255, 255, 1);stroke-width:3"></ellipse>
+            </svg>
+        </div>
+        <!-- Luz Vermelha -->
+        <div class="svg-wrapper left top ellipse" id="n452_19" style="visibility: hidden;">
+            <svg height="70" width="70">
+                <ellipse cx="35" cy="35" rx="33" ry="33"
+                    style="fill:rgba(255, 95, 107, 1);stroke:rgba(255, 255, 255, 1);stroke-width:3"></ellipse>
+            </svg>
+        </div>
+        <!-- RISCO ALTO -->
+        <div class="left top text" id="n452_20" style="visibility: $#is_high_risk$#">RISCO ALTO</div>
+        <!-- RISCO MÉDIO -->
+        <div class="left top text" id="n452_20_2" style="visibility: $#is_medium_risk$#">RISCO MÉDIO</div>
+        <!-- RISCO BAIXO -->
+        <div class="left top text" id="n452_20_3" style="visibility: $#is_low_risk$#">RISCO BAIXO</div>
+        <!-- Retângulo Subnotificaçao -->
+        <div class="left top rectangle" id="n452_21"></div>
+        <!-- RITMO DE CONTÁGIO -->
+        <div class="left top text" id="n452_22">RITMO DE CONTÁGIO</div>
+        <!-- Cada contaminado infecta em média outras -->
+        <div class="scale text" id="n452_23">Cada contaminado infecta em média outras</div>
+        <!-- Número Ritmo de Contágio Label -->
+        <div class="subsets scale text" id="n452_24">
+            <span id="n452_24-0"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span id="n452_24-2">a</span>
+            <span id="n452_24-0"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span id="n452_24-2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pessoas</span>
+        </div>
+        <!-- Número Ritmo de Contágio Low -->
+        <div class="scale text" id="n452_25">$#numero_contagio_low$#</div>
+        <!-- Número Ritmo de Contágio High -->
+        <div class="scale text" id="n452_26">$#numero_contagio_high$#</div>
+        <!-- Retângulo Colorido Ritmo de Contágio Ruim -->
+        <div class="empty left top vector" width="98" height="43" id="n452_27" style="visibility: $#is_spread_bad$#">
+        </div>
+        <!-- Retângulo Colorido Ritmo de Contágio Instatisfatório -->
+        <div class="empty left top vector" width="98" height="43" id="n452_27_2"
+            style="visibility: $#is_spread_unsatisfactory$#"></div>
+        <!-- Retângulo Colorido Ritmo de Contágio Bom -->
+        <div class="empty left top vector" width="98" height="43" id="n452_27_3" style="visibility: $#is_spread_good$#">
+        </div>
+        <!-- Nível do Ritmo de Contágio Ruim -->
+        <div class="scale text" id="n452_28" style="visibility: $#is_spread_bad$#">Ruim</div>
+        <!-- Nível do Ritmo de Contágio Insatisfatório -->
+        <div class="scale text" id="n452_28_2" style="visibility: $#is_spread_unsatisfactory$#">Insatisfatório</div>
+        <!-- Nível do Ritmo de Contágio Bom -->
+        <div class="scale text" id="n452_28_3" style="visibility: $#is_spread_good$#">Bom</div>
+        <!-- Semana passada Contágio Label -->
+        <div class="subsets left top text" id="n452_29">
+            <span id="n452_29-8">Semana passada:</span>
+            <span id="n452_29-7"> </span>
+        </div>
+        <!-- Ritmo de Contágio Semana Passada -->
+        <div class="left top text" id="n452_30">$#numero_contagio_sempass_low$# - $#numero_contagio_sempass_high$#</div>
+        <!-- Tendência Contágio Label -->
+        <div class="subsets left top text" id="n452_31">
+            <span id="n452_31-8">Tendência:</span>
+            <span id="n452_31-7"> </span>
+        </div>
+        <!-- Tendência Contágio -->
+        <div class="left top text" id="n452_32">$#tendencia_contagio$# </div>
+        <!-- Linha Contágio Design -->
+        <div class="empty left top line" width="0" height="46" id="n452_33"></div>
+        <!-- Retângulo Subnotificação -->
+        <div class="left top rectangle" id="n452_34"></div>
+        <!-- TAXA DE SUBNOTIFICAÇÃO -->
+        <div class="left top text" id="n452_35">TAXA DE SUBNOTIFICAÇÃO</div>
+        <!-- A cada 10 pessoas infectadas, somente -->
+        <div class="scale text" id="n452_36">A cada 10 pessoas infectadas, somente</div>
+        <!-- Retângulo Colorido Subnotificação Ruim -->
+        <div class="empty left top vector" width="163" height="43" id="n452_37" style="visibility: $#is_sub_bad$#">
+        </div>
+        <!-- Retângulo Colorido Subnotificação Insatisfatório -->
+        <div class="empty left top vector" width="163" height="43" id="n452_37_2"
+            style="visibility: $#is_sub_unsatisfactory$#"></div>
+        <!-- Retângulo Colorido Subnotificação Bom -->
+        <div class="empty left top vector" width="163" height="43" id="n452_37_3" style="visibility: $#is_sub_good$#">
+        </div>
+        <!-- Nível do alerta subnotificação ruim-->
+        <div class="scale text" id="n452_38" style="visibility: $#is_sub_bad$#">Ruim</div>
+        <!-- Nível do alerta subnotificação insatisfatório-->
+        <div class="scale text" id="n452_38_2" style="visibility: $#is_sub_unsatisfactory$#">Insatisfatório</div>
+        <!-- Nível do alerta subnotificação bom-->
+        <div class="scale text" id="n452_38_3" style="visibility: $#is_sub_good$#">Bom</div>
+        <!-- Ranking Brasil Label -->
+        <div class="left top text" id="n452_39">Ranking na UF:</div>
+        <!-- Taxa de Subnotificação Ranking Número -->
+        <div class="left top text" id="n452_40">$#ranking_subnot_uf$#°</div>
+        <!-- Tendência Subnotificação Label -->
+        <div class="subsets left top text" id="n452_41">
+            <span id="n452_41-8">Tendência:</span>
+            <span id="n452_41-9"> </span>
+        </div>
+        <!-- Tendência Subnotificação -->
+        <div class="left top text" id="n452_42">-</div>
+        <!-- Linha Subnotificação Design -->
+        <div class="empty left top line" width="0" height="46" id="n452_43"></div>
+        <!-- Número Subnotificação Label -->
+        <div class="scale text" id="n452_44">são diagnosticadas</div>
+        <!-- Número Subnotificaçao -->
+        <div class="scale text" id="n452_45">$#contagem_subnot$#</div>
+        <!-- Retângulo Hospitalar -->
+        <div class="left top rectangle" id="n452_46"></div>
+        <!-- CAPACIDADE HOSPITALAR -->
+        <div class="left top text" id="n452_47">CAPACIDADE HOSPITALAR</div>
+        <!-- A capacidade hospitalar será atingida em -->
+        <div class="scale text" id="n452_48">A capacidade hospitalar será atingida em</div>
+        <!-- Retângulo Colorido Hospitalar Ruim -->
+        <div class="empty left top vector" width="97" height="43" id="n452_49" style="visibility: $#is_hospital_bad$#">
+        </div>
+        <!-- Retângulo Colorido Hospitalar Insatisfatório -->
+        <div class="empty left top vector" width="97" height="43" id="n452_49_2"
+            style="visibility: $#is_hospital_unsatisfactory$#"></div>
+        <!-- Retângulo Colorido Hospitalar Bom -->
+        <div class="empty left top vector" width="97" height="43" id="n452_49_3"
+            style="visibility: $#is_hospital_good$#"></div>
+        <!-- Nível do alerta Hospitalar Ruim -->
+        <div class="scale text" id="n452_50" style="visibility: $#is_hospital_bad$#">Ruim </div>
+        <!-- Nível do alerta Hospitalar Insatisfatório -->
+        <div class="scale text" id="n452_50_2" style="visibility: $#is_hospital_unsatisfactory$#">Insatisfatório</div>
+        <!-- Nível do alerta Hospitalar Bom -->
+        <div class="scale text" id="n452_50_3" style="visibility: $#is_hospital_good$#">Bom</div>
+        <!-- Semana Passada Hospitalar Label -->
+        <div class="left top text" id="n452_51">Semana Passada:</div>
+        <!-- Capacidade Hospitalar Semana Passada Número -->
+        <div class="left top text" id="n452_52">-</div>
+        <!-- Tendência Hospitalar Label -->
+        <div class="subsets left top text" id="n452_53">
+            <span id="n452_53-8">Tendência:</span>
+            <span id="n452_53-9"> </span>
+        </div>
+        <!-- Tendência Hospitalar -->
+        <div class="left top text" id="n452_54">-</div>
+        <!-- Linha Hospitalar Design -->
+        <div class="empty left top line" width="0" height="46" id="n452_55"></div>
+        <!-- Número Capacidade Hospitalar Label End -->
+        <div class="scale text" id="n452_56">mês(es)</div>
+        <!-- Número Capacidade Hospitalar Low -->
+        <div class="scale text" id="n452_57">$#numero_capacidade_hospitalar$#</div>
+        <!-- Retângulo Isolamento -->
+        <div class="left top rectangle" id="n452_58"></div>
+        <!-- ISOLAMENTO SOCIAL -->
+        <div class="left top text" id="n452_59">ISOLAMENTO SOCIAL</div>
+        <!-- Na última semana, ficaram em casa: -->
+        <div class="scale text" id="n452_60">Na última semana, ficaram em casa:</div>
+        <!-- Nível do alerta Isolamento -->
+        <div class="scale text" id="n452_61">Fonte: inloco</div>
+        <!-- Semana Passada Isolamento Label -->
+        <div class="left top text" id="n452_62">Semana Passada:</div>
+        <!-- Isolamento Social Semana Passada Número -->
+        <div class="left top text" id="n452_63">$#taxa_isolamento_sempass$#</div>
+        <!-- Tendência Isolamento Label -->
+        <div class="subsets left top text" id="n452_64">
+            <span id="n452_64-8">Tendência:</span>
+            <span id="n452_64-9"> </span>
+        </div>
+        <!-- Tendência Isolamento -->
+        <div class="left top text" id="n452_65">$#tendencia_isolamento$#</div>
+        <!-- Linha Isolamento Design -->
+        <div class="empty left top line" width="0" height="46" id="n452_66"></div>
+        <!-- Número Isolamento Social Label -->
+        <div class="scale text" id="n452_67">das pessoas</div>
+        <!-- Número Isolamento Social -->
+        <div class="scale text" id="n452_68">$#taxa_isolamento$#</div>
+        <!-- coronacidades rodape -->
+        <div class="subsets left top text" id="n464_22p1">
+            corona
+        </div>
+        <div class="subsets left top text" id="n464_22p1pt2">
+            cidades
+        </div>
+        <!-- impulso rodape -->
+        <img src="/home/ubuntu/src/pdf_report/models/resources/impulsologo.png" class="left top rectangle" id="n464_23">
+        <!-- Saiba mais sobre a metologia em https://farolcovid.coronacidades.org/ -->
+        <div class="left top text" id="n464_24">Saiba mais sobre a metologia em https://farolcovid.coronacidades.org/
+        </div>
+        <!-- pagenumber -->
+        <div class="left top text" id="n464_25">1</div>
+        <!-- Dados principais covid-19 -->
+        <div class="left top text" id="n452_69">DADOS PRINCIPAIS COVID-19</div>
+        <!-- Frame casos de coronavirus -->
+        <div class="empty left top vector" width="1327" height="176" id="n452_70"></div>
+        <!-- Fonte: Brasil.IO atualizado diariamente com base em boletins das secretarias de saúde ESTADUAIS. -->
+        <div class="subsets left top text" id="n452_71">
+            <span id="n452_71-28"><b>Fonte:</b> Brasil.IO atualizado diariamente com base em boletins das secretarias de
+                saúde
+                <b>ESTADUAIS.</b>
+            </span>
+        </div>
+        <!-- Coluna casos 2 -->
+        <div class="empty left top line" width="0" height="175" id="n452_72"></div>
+        <!-- Coluna casos 1 -->
+        <div class="empty left top line" width="0" height="172" id="n452_73"></div>
+        <!-- Coluna hospitalar 1 -->
+        <div class="empty left top line" width="0" height="175" id="n452_74"></div>
+        <!-- Coluna casos 3 -->
+        <div class="empty left top line" width="0" height="175" id="n452_75"></div>
+        <!-- casos confirmados num -->
+        <div class="left top text" id="n452_76">$#casos_confirmados$#</div>
+        <!-- confirmados label -->
+        <div class="left top text" id="n452_77">confirmados</div>
+        <!-- casos ativos num -->
+        <div class="left top text" id="n452_78">$#casos_ativos$#</div>
+        <!-- casos ativos estimados* label -->
+        <div class="left top text" id="n452_79">casos ativos estimados*</div>
+        <!-- mortes num -->
+        <div class="left top text" id="n452_80">$#mortes$#</div>
+        <!-- mortes label -->
+        <div class="left top text" id="n452_81">mortes</div>
+        <!-- Fonte: DATASUS CNes, maio/2020. -->
+        <div class="subsets left top text" id="n452_82">
+            <b>Fonte:</b> DATASUS CNes, maio/2020.
+        </div>
+        <!-- asterisco disclaimer -->
+        <div class="left top text" id="n452_83">*Calculamos os casos ativos estimados com base nos novos casos dos
+            últimos 14 dias ajustados pela taxa de notificação. Para mais informações, confira nossa
+            metodologia.<br><br>**Incluímos leitos clínicos, cirúrgicos e hospital-dia da rede SUS e não-SUS. <br><br>
+        </div>
+        <!-- Frame capacidade hospitalar -->
+        <div class="empty left top vector" width="1327" height="176" id="n452_84"></div>
+        <!-- Casos de Coronavírus -->
+        <div class="left top text" id="n452_85">Casos de Coronavírus</div>
+        <!-- coluna hospitalar 2 -->
+        <div class="empty left top line" width="0" height="175" id="n452_86"></div>
+        <!-- coluna hospitalar 3 -->
+        <div class="empty left top line" width="0" height="175" id="n452_87"></div>
+        <!-- leitos num -->
+        <div class="left top text" id="n452_88">$#leitos$#</div>
+        <!-- leitos** label -->
+        <div class="left top text" id="n452_89">leitos**</div>
+        <!-- ventiladores num -->
+        <div class="left top text" id="n452_90">$#ventiladores$#</div>
+        <!-- ventiladores label -->
+        <div class="left top text" id="n452_91">ventiladores</div>
+        <!-- Capacidade Hospitalar -->
+        <div class="left top text" id="n452_92">Capacidade Hospitalar</div>
+        <!-- Nome da cidade -->
+        <div class="left top text" id="n452_7">$#nome_lugar$#</div>
+        <!-- Indicadores de nivel de alerta -->
+        <div class="left top text" id="n467_124">INDICADORES DE NÍVEL DE ALERTA</div>
+        <!-- Quer ajuda no combate ao Coronavírus na sua cidade ou estado? -->
+        <div class="left top text" id="n452_10">Quer ajuda no combate ao Coronavírus na sua cidade ou estado?</div>
+        <!-- Estamos à disposicao label -->
+        <div class="left top text" id="n452_11">Estamos à disposição para apoiar o(a) gestor(a) público a aprofundar a
+            análise para seu estado ou município, de forma inteiramente gratuita. Entre em contato conosco aqui:
+            https://coronacidades.org/fale-conosco</div>
+    </div>
+    <!-- <p style="page-break-before: always"></p> -->
+    <!-- PDF Report v2 page2 -->
+    <div class="frame" id="n452_138">
+        <!-- HISTÓRICO DE INDICADORES CHAVE -->
+        <div class="left top text" id="n452_142">HISTÓRICO DE INDICADORES CHAVE</div>
+        <!-- QUAIS SÃO NOSSOS INDICADORES? -->
+        <div class="left top text" id="n467_155">QUAIS SÃO NOSSOS INDICADORES?</div>
+        <!-- Hoje label isolamento -->
+        <div class="left top text" id="n467_153">Hoje</div>
+        <!-- ISOLAMENTO SOCIAL -->
+        <div class="left top text" id="n452_143">ISOLAMENTO SOCIAL</div>
+        <!-- Explanation -->
+        <div class="left top text" id="n467_156">
+            😷 <b>RITMO DE CONTÁGIO:</b> Quantas pessoas em média um contaminado infecta naquela data. <b>Consideramos
+                <b style="color:green;">BOM</b> o ritmo abaixo de 1.</b>
+            <br>🔍 <b>TAXA DE SUBNOTIFICAÇÃO:</b> Quantas de pessoas doentes que não são diagnosticadas.
+            <b>Consideramos <b style="color:green;">BOM</b> a notificação acima de 70%.</b>
+            <br>🏥 <b>CAPACIDADE HOSPITALAR:</b> Quanto tempo até todos os leitos da rede de saúde estarem
+            ocupados.<b>Consideramos <b style="color:green;">BOM</b> + de 2 meses.</b>
+            <br>🏡 <b>ISOLAMENTO SOCIAL:</b> Percentual de smartphones que não deixou o local de residência, em cada
+            dia,calculado pela inloco. (não classificado)
+        </div>
+        <!-- RITMO DE CONTÁGIO -->
+        <div class="left top text" id="n452_145">RITMO DE CONTÁGIO</div>
+        <!-- Isolamento Social plot -->
+        <div class="left top rectangle" id="n454_2" style="background-image: url('$#isolamento_plot_path$#')">
+        </div>
+        <!-- Isolamento Social label -->
+        <div class="left top rectangle" id="n454_3" style="background-image: url('$#isolamento_plot_path$#')">
+        </div>
+        <!-- Contagio plot -->
+        <div class="left top rectangle" id="n454_4" style="background-image: url('$#contagio_plot_path$#')"></div>
+        <!-- Contagio label -->
+        <div class="left top rectangle" id="n452_153" style="background-image: url('$#contagio_plot_path$#')">
+        </div>
+        <!-- Número Isolamento Social -->
+        <div class="scale text" id="n467_123">$#taxa_isolamento$#</div>
+        <!-- Retangulo final -->
+        <div class="left top rectangle" id="n467_127"></div>
+        <!-- Legal Desclaimer 1 -->
+        <div class="subsets left top text" id="n467_130">
+            <b>As análises apresentadas são meramente indicativas e dependem de variáveis que aqui
+                não podem ser consideradas.</b><br>
+            Trata-se de mera contribuição à elaboração de cenários por parte dos
+            municípios e não configura qualquer obrigação ou responsabilidade perante as decisões efetivadas. Saiba
+            mais em nossa Metodologia. Estamos em constante desenvolvimento e queremos ouvir sua opinião sobre a
+            ferramenta - caso tenha sugestões ou comentários, entre em contato via chat. Caso seja gestor público e
+            necessite de apoio para preparo de seu município, acesse a Checklist e confira o site do
+            CoronaCidades.<br>
+        </div>
+        <!-- Legal disclaimer 2 -->
+        <div class="left top text" id="n467_129">A presente ferramenta, voluntária, parte de estudos referenciados já
+            publicados e considera os dados do DataSUS e secretarias de saúde estaduais. O código pode ser acessado em
+            nosso Github: https://github.com/ImpulsoGov/farolcovid</div>
+        <!-- Data -->
+        <div class="left top text" id="n467_147">$#data$#</div>
+        <!-- Hoje label contagio -->
+        <div class="left top text" id="n467_152">Hoje</div>
+        <!-- Para mais detalhes da nossa metodologia, visite https://farolcovid.coronacidades.org/ e acesse ”Níveis de Risco” -->
+        <div class="subsets left top text" id="n464_62">
+            <span id="n464_62-0">Para mais detalhes da nossa metodologia, visite </span>
+            <span id="n464_62-25">https://farolcovid.coronacidades.org/</span>
+            <span id="n464_62-undefined"> e acesse ”Níveis de Risco”</span>
+        </div>
+        <!-- coronacidades rodape -->
+        <div class="subsets left top text" id="n464_22p2">
+            corona
+        </div>
+        <div class="subsets left top text" id="n464_22p2pt2">
+            cidades
+        </div>
+        <!-- impulso rodape -->
+        <img src="/home/ubuntu/src/pdf_report/models/resources/impulsologo.png" class="left top rectangle" id="n464_23">
+        <!-- Metodologia rodape -->
+        <div class="left top text" id="n464_30">Saiba mais sobre a metologia em https://farolcovid.coronacidades.org/
+        </div>
+        <!-- pagenumber -->
+        <div class="left top text" id="n464_31">2</div>
+    </div>
+    <!-- <p style="page-break-before: always"></p> -->
+    <!-- PDF Report v2 page3 -->
+    <div class="frame" id="n452_93">
+        <!-- Retângulo Panorama Casos 1 -->
+        <div class="empty left top vector" width="1210" height="189" id="n467_136_1"></div>
+        <!-- Retângulo Panorama Casos 2 -->
+        <div class="empty left top vector" width="1210" height="189" id="n467_136_2"></div>
+        <!-- dias value cenario estavel leitos -->
+        <div class="left top text" id="n464_35">$#tempo_colapso_estavel_leitos$#</div>
+        <!-- dias value cenario estavel ventiladores -->
+        <div class="left top text" id="n464_36">$#tempo_colapso_estavel_ventiladores$#</div>
+        <!-- Retângulo Panorama Casos 3 -->
+        <div class="empty left top vector" width="1210" height="189" id="n467_136_3"></div>
+        <!-- linha positivo 2 -->
+        <div class="empty left top line" width="0" height="189" id="n464_59"></div>
+        <!-- linha negativo 2 -->
+        <div class="empty left top line" width="0" height="189" id="n464_60"></div>
+        <!-- dias value cenario positivo leitos -->
+        <div class="left top text" id="n464_37">$#tempo_colapso_positivo_leitos$#</div>
+        <!-- dias value cenario positivo ventiladores -->
+        <div class="left top text" id="n464_38">$#tempo_colapso_positivo_ventiladores$#</div>
+        <!-- dias value cenario negativo leitos -->
+        <div class="left top text" id="n464_39">$#tempo_colapso_negativo_leitos$#</div>
+        <!-- dias value cenario negativo ventiladores -->
+        <div class="left top text" id="n464_40">$#tempo_colapso_negativo_ventiladores$#</div>
+        <!-- SIMULACOVID | PROJEÇÃO DE CENÁRIOS -->
+        <div class="left top text" id="n452_94">SIMULACOVID | PROJEÇÃO DE CENÁRIOS</div>
+        <!-- Cenario Estavel Desc -->
+        <div class="subsets left top text" id="n452_98">
+            Tudo permanence como está.<br> <b>Consideramos o mesmo ritmo de contágio da média dos últimos 7
+                dias.</b>
+        </div>
+        <!-- cenario positivo descricao -->
+        <div class="subsets left top text" id="n452_104">
+            Há mudanças de comportamento que fazem <b>o ritmo de contágio cair pela metade.</b>
+        </div>
+        <!-- Cenário Negativo Hospital Label -->
+        <div class="left top text" id="n452_107">Cenário Negativo</div>
+        <!-- Cenário Positivo Hospital Label -->
+        <div class="left top text" id="n452_109">Cenário Positivo</div>
+        <!-- cenario negativo descricao -->
+        <div class="subsets left top text" id="n452_111">
+            Há mudanças de comportamento que fazem <b>o ritmo de contágio dobrar de valor.</b>
+        </div>
+        <!-- Descricao -->
+        <div class="subsets left top text" id="n452_122">
+            <b>⚠️ Utilizamos por padrão 50% da capacidade hospitalar reportada no DataSUS em 01/05
+                para projeção.</b><br><br>
+            Consideramos leitos disponíveis para Covid os leitos clínicos, cirúrgicos e
+            hospital-dia da rede SUS e não-SUS. <br><br>
+            <i>Caso tenha dados mais atuais, sugerimos que altere os valores na plataforma FarolCovid
+                e gere novamente o relatório.</i>
+        </div>
+        <!-- Cenário Estável Hospital Label -->
+        <div class="left top text" id="n452_96">Cenário Estável</div>
+        <!-- bed_fig_estavel -->
+        <div class="left top rectangle" id="n464_33"
+            style="background: url('/home/ubuntu/src/pdf_report/models/resources/bed_fig.png')"></div>
+        <!-- ventilador_fig_estavel -->
+        <div class="left top rectangle" id="n464_34"
+            style="background: url('/home/ubuntu/src/pdf_report/models/resources/ventilador_fig.png')"></div>
+        <!-- VISÃO DETALHADA DA SIMULAÇÃO -->
+        <div class="left top text" id="n464_42">VISÃO DETALHADA DA SIMULAÇÃO</div>
+        <!-- Cenário Estável: Assumindo que o ritmo de contágio permaneça o mesmo. -->
+        <div class="subsets left top text" id="n464_43">
+            <span id="n464_43-1">Cenário Estável</span>
+            <span id="n464_43-undefined">: Assumindo que o ritmo de contágio permaneça o mesmo.</span>
+        </div>
+        <!-- Na área amarela está o intervalo de confiança dos valores da demanda por leitos a cada dia no seu local, e em verde a por ventiladores. Para evitar uma sobrecarga hospitalar, a sua demanda (a curva 📈) deve estar abaixo da respectiva linhas tracejadas (a reta horizontal ➖). Em outras palavras, a quantidade de pessoas que precisam ser internadas por dia não deve ultrapassar o número de equipamentos disponíveis. -->
+        <div class="subsets left top text" id="n464_44">
+            Na área amarela está o intervalo de confiança dos valores da demanda por leitos a cada
+            dia no seu local, e em verde a por ventiladores.<br>
+            <b>Para evitar uma sobrecarga hospitalar, a sua demanda (a curva 📈) deve estar abaixo da
+                respectiva linhas tracejadas (a reta horizontal ➖).</b><br>
+            Em outras palavras, a quantidade de pessoas que precisam ser internadas
+            por dia não deve ultrapassar o número de equipamentos disponíveis.
+        </div>
+        <!-- label 2 -->
+        <div class="left top rectangle" id="n464_45" style="background-image: url('$#simulacovid_plot_path$#')"></div>
+        <!-- newplot (3) 2 -->
+        <div class="left top rectangle" id="n464_46" style="background-image: url('$#simulacovid_plot_path$#')"></div>
+        <!-- Hoje -->
+        <div class="left top text" id="n464_47">Hoje</div>
+        <!-- Arrow 10 -->
+        <div class="empty left top vector" width="19" height="15" id="n464_48"></div>
+        <!-- Arrow 11 -->
+        <div class="empty left top vector" width="19" height="15" id="n467_149">
+        </div>
+        <!-- image 25 -->
+        <div class="left top rectangle" id="n464_55"></div>
+        <!-- image 26 -->
+        <div class="left top rectangle" id="n464_56"></div>
+        <!-- Saiba mais sobre a metologia em https://farolcovid.coronacidades.org/ -->
+        <div class="left top text" id="n464_57">Saiba mais sobre a metologia em https://farolcovid.coronacidades.org/
+        </div>
+        <!-- 3 -->
+        <div class="left top text" id="n464_58">3</div>
+        <!-- Data -->
+        <div class="left top text" id="n467_140">$#data$#</div>
+        <!-- capacidade maxima desc label -->
+        <div class="left top text" id="n464_53">Em quanto tempo será atingida a capacidade máxima de:</div>
+        <!-- leitos label tabela -->
+        <div class="left top text" id="n467_141">LEITOS</div>
+        <!-- ventiladores label tabela -->
+        <div class="left top text" id="n467_142">VENTILADORES</div>
+        <!-- linha estavel 1 -->
+        <div class="empty left top line" width="0" height="189" id="n467_143"></div>
+        <!-- linha negativo 1 -->
+        <div class="empty left top line" width="0" height="189" id="n467_145"></div>
+        <!-- linha positivo 1 -->
+        <div class="empty left top line" width="0" height="189" id="n467_146"></div>
+        <!-- linha estavel 2 -->
+        <div class="empty left top line" width="0" height="189" id="n467_144"></div>
+        <!-- coronacidades rodape -->
+        <div class="subsets left top text" id="n464_22p3">
+            corona
+        </div>
+        <div class="subsets left top text" id="n464_22p3pt2">
+            cidades
+        </div>
+        <!-- impulso rodape -->
+        <img src="/home/ubuntu/src/pdf_report/models/resources/impulsologo.png" class="left top rectangle" id="n464_23">
+    </div>
+    <!-- <p style="page-break-before: always"></p> -->
+    <!-- PDF Report v2 page4 -->
+    <div class="frame" id="n452_156">
+        <!-- Retângulo final -->
+        <div class="left top rectangle" id="n452_157"></div>
+        <!-- Nosso código -->
+        <div class="left top text" id="n452_159">Nosso código pode ser acessado no Github do projeto em
+            https://github.com/ImpulsoGov/farolcovid e nossos dados estão disponíveis em nossa API.</div>
+        <!-- Impulso logo -->
+        <img src="/home/ubuntu/src/pdf_report/models/resources/impulsologo.png" class="left top rectangle"
+            id="n452_161">
+        <!-- Coronacidades logo -->
+        <div class="left top rectangle" id="n452_162"></div>
+        <!-- coronacidades rodape -->
+        <div class="subsets left top text" id="n464_22p4">
+            corona
+        </div>
+        <div class="subsets left top text" id="n464_22p4pt2">
+            cidades
+        </div>
+        <!-- arapyau logo -->
+        <img src="/home/ubuntu/src/pdf_report/models/resources/arapyaulogo.png" class="left top rectangle"
+            id="n452_163">
+        <!-- ÁREA EM CONSTRUÇÃO -->
+        <div class="left top text" id="n452_164">ÁREA EM CONSTRUÇÃO</div>
+        <!-- As análises apresentadas -->
+        <div class="left top text" id="n481_123">As análises apresentadas no Farol Covid são indicativas, feitas a
+            partir de dados oficiais públicos e estudos referenciados já publicados, estando sujeitas a variáveis que
+            aqui não podem ser consideradas. Trata-se de contribuição à elaboração de cenários por parte dos governos e
+            não configura qualquer obrigação ou responsabilidade perante as decisões efetivadas. Saiba mais sobre os
+            cálculos por trás das análises e indicadores em nossas páginas de Níveis de Risco e Modelo Epidemiológico no
+            menu lateral, que mantemos atualizadas conforme evoluímos em nossas metodologias.<br>
+        </div>
+        <!-- A equipe coronacidades -->
+        <div class="left top text" id="n481_122">A equipe do Coronacidades está à disposição para apoiar o gestor
+            público a aprofundar a análise para seu estado ou município, de forma inteiramente gratuita. Também queremos
+            queremos ouvir sua opinião sobre a ferramenta. Entre em contato via chat no canto inferior direito em
+            https://coronacidades.org/fale-conosco/ &nbsp;ou através do formulário na página. Outras ferramentas e mais
+            recursos para responder à crise da Covid-19 estão disponíveis em nossos site.
+            &nbsp;https://coronacidades.org/</div>
+    </div>
+</body>

@@ -50,7 +50,7 @@ def get_inloco_url(config):
         api_inloco["states"] = api_url + os.getenv("INLOCO_STATES_ROUTE")
 
     else:
-        raise "Inloco routes not found in env vars!"
+        raise ValueError("Inloco routes not found in env vars!")
 
     return api_inloco
 
@@ -406,7 +406,11 @@ def genIndicatorCard(indicator: Indicator):
 
 
 def genKPISection(
-    place_type: str, locality: str, alert: str, indicators: Dict[str, Indicator], n_colapse_alert_cities: int = 0
+    place_type: str,
+    locality: str,
+    alert: str,
+    indicators: Dict[str, Indicator],
+    n_colapse_alert_cities: int = 0,
 ):
     if not isinstance(alert, str):
         bg = "gray"
@@ -414,7 +418,7 @@ def genKPISection(
         stoplight = "%0a%0a"
     else:
         bg = AlertBackground(alert).name
-        
+
         if "state" in place_type:
             place_type = "estado"
             caption = f"Seu estado está em Risco {alert.upper()}. <b>Note que {n_colapse_alert_cities} municípios avaliados estão em Risco Médio ou Alto de colapso</b>. Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."

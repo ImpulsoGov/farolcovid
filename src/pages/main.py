@@ -8,6 +8,7 @@ import pandas as pd
 from models import IndicatorType, IndicatorCards, ProductCards
 
 from model.simulator import run_simulation, get_dmonth
+import pdf_report.pdfgen as pdfgen
 import pages.simulacovid as sm
 import plots
 import utils
@@ -294,18 +295,20 @@ def main():
     indicators = update_indicators(indicators, data, config, user_input, session_state)
 
     if "state" in user_input["place_type"]:
-        
+
         # Add disclaimer to cities in state alert levels
         total_alert_cities = df_cities[
             df_cities["state_id"] == data["state_id"].unique()[0]
         ]["overall_alert"].value_counts()
-        
+
         utils.genKPISection(
             place_type=user_input["place_type"],
             locality=user_input["locality"],
             alert=data["overall_alert"].values[0],
             indicators=indicators,
-            n_colapse_alert_cities=total_alert_cities[total_alert_cities.index.isin(["alto", "médio"])].sum(),
+            n_colapse_alert_cities=total_alert_cities[
+                total_alert_cities.index.isin(["alto", "médio"])
+            ].sum(),
         )
 
     else:
@@ -313,7 +316,7 @@ def main():
             place_type=user_input["place_type"],
             locality=user_input["locality"],
             alert=data["overall_alert"].values[0],
-            indicators=indicators
+            indicators=indicators,
         )
 
     # AVAILABLE CAPACITY DISCLAIMER
@@ -421,7 +424,13 @@ def main():
     indicators["subnotification_rate"].left_display = user_input["population_params"][
         "D"
     ]
-
+    # PDF-REPORT GEN BUTTON
+    if st.button("Gerar Relatório PDF"):
+        st.write("Aguarde um momento por favor...")
+        st.markdown(
+            pdfgen.gen_pdf_report(user_input, indicators, data, config, compress=True),
+            unsafe_allow_html=True,
+        )
     # TOOLS
     products = ProductCards
     products[1].recommendation = f'Risco {data["overall_alert"].values[0]}'
