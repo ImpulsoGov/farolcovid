@@ -426,9 +426,12 @@ def main():
     ]
     # PDF-REPORT GEN BUTTON
     if st.button("Gerar Relatório PDF"):
-        st.write("Aguarde um momento por favor...")
+        st.write(
+            """<div class="base-wrapper">Aguarde um momento por favor...</div>""",
+            unsafe_allow_html=True,
+        )
         st.markdown(
-            pdfgen.gen_pdf_report(user_input, indicators, data, config, compress=True),
+            pdfgen.gen_pdf_report(user_input, indicators, data, config),
             unsafe_allow_html=True,
         )
     # TOOLS
