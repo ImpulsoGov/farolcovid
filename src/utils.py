@@ -306,18 +306,24 @@ def genInputFields(user_input, config, session):
 
     authors_ventilators = user_input["author_number_ventilators"]
     ventilators_update = user_input["last_updated_number_ventilators"]
-
-    number_beds = int(user_input["number_beds"])
-    number_ventilators = int(user_input["number_ventilators"])
-
-    if not session.refresh:
+    if session.reset or session.number_beds == None:
         number_beds = int(
-            number_beds * config["br"]["simulacovid"]["resources_available_proportion"]
-        )
-        number_ventilators = int(
-            number_ventilators
+            user_input["number_beds"]
             * config["br"]["simulacovid"]["resources_available_proportion"]
         )
+
+        number_ventilators = int(
+            user_input["number_ventilators"]
+            * config["br"]["simulacovid"]["resources_available_proportion"]
+        )
+        number_cases = int(user_input["population_params"]["I_confirmed"])
+        number_deaths = int(user_input["population_params"]["D"])
+        session.reset = False
+    else:
+        number_beds = int(session.number_beds)
+        number_ventilators = int(session.number_ventilators)
+        number_cases = int(session.number_cases)
+        number_deaths = int(session.number_deaths)
 
     cases_update = pd.to_datetime(user_input["last_updated_cases"]).strftime("%d/%m")
 
@@ -345,26 +351,30 @@ def genInputFields(user_input, config, session):
         f"Casos confirmados (fonte: Brasil.IO; atualizado: {cases_update}):",
         0,
         None,
-        user_input["population_params"]["I_confirmed"],
+        number_cases,
     )
 
     user_input["population_params"]["D"] = st.number_input(
         f"Mortes confirmadas (fonte: Brasil.IO; atualizado: {cases_update}):",
         0,
         None,
-        int(user_input["population_params"]["D"]),
+        number_deaths,
     )
 
     # Faz o update quando clica o botão
     if st.button("Finalizar alteração"):
 
-        session.number_beds = user_input["number_beds"]
-        session.number_ventilators = user_input["number_ventilators"]
-        session.cases = user_input["population_params"]["I_confirmed"]
+        session.number_beds = int(user_input["number_beds"])
+        session.number_ventilators = int(user_input["number_ventilators"])
+        session.number_cases = int(user_input["population_params"]["I_confirmed"])
+        session.number_deaths = int(user_input["population_params"]["D"])
 
         session.update = True
     else:
         session.update = False
+
+    if st.button("Resetar aos valores oficais"):
+        session.reset = True
 
     return user_input, session
 
@@ -406,7 +416,11 @@ def genIndicatorCard(indicator: Indicator):
 
 
 def genKPISection(
-    place_type: str, locality: str, alert: str, indicators: Dict[str, Indicator], n_colapse_alert_cities: int = 0
+    place_type: str,
+    locality: str,
+    alert: str,
+    indicators: Dict[str, Indicator],
+    n_colapse_alert_cities: int = 0,
 ):
     if not isinstance(alert, str):
         bg = "gray"
@@ -414,7 +428,7 @@ def genKPISection(
         stoplight = "%0a%0a"
     else:
         bg = AlertBackground(alert).name
-        
+
         if "state" in place_type:
             place_type = "estado"
             caption = f"Seu estado está em Risco {alert.upper()}. <b>Note que {n_colapse_alert_cities} municípios avaliados estão em Risco Médio ou Alto de colapso</b>. Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."

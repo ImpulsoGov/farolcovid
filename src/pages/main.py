@@ -100,17 +100,19 @@ def update_indicators(indicators, data, config, user_input, session_state):
         session.number_ventilators = user_input["number_ventilators"]
         session.cases = user_input["population_params"]["I_confirmed"]
 
-    if session_state.refresh:
+    if (
+        session_state.number_beds != None and session_state.reset is False
+    ):  # Loading values from memory
+        indicators["subnotification_rate"].left_display = session_state.number_cases
 
-        indicators["subnotification_rate"].left_display = session_state.cases
-
-        indicators["hospital_capacity"].left_display = session_state.number_beds
-        indicators["hospital_capacity"].right_display = session_state.number_ventilators
-
-        user_input["number_beds"] = session_state.number_beds
-        user_input["number_ventilators"] = session_state.number_ventilators
-
-        session_state.refresh = False
+        indicators["hospital_capacity"].left_display = int(
+            session_state.number_beds
+            / config["br"]["simulacovid"]["resources_available_proportion"]
+        )
+        indicators["hospital_capacity"].right_display = int(
+            session_state.number_ventilators
+            / config["br"]["simulacovid"]["resources_available_proportion"]
+        )
 
     # Recalcula capacidade hospitalar
     user_input["strategy"] = "estavel"
@@ -198,11 +200,12 @@ def main():
         update=False,
         number_beds=None,
         number_ventilators=None,
-        deaths=None,
-        cases=None,
+        number_cases=None,
+        number_deaths=None,
         state="Acre",
         city="Todos",
         refresh=False,
+        reset=False,
     )
 
     utils.localCSS("style.css")
@@ -309,7 +312,7 @@ def main():
             place_type=user_input["place_type"],
             locality=user_input["locality"],
             alert=data["overall_alert"].values[0],
-            indicators=indicators
+            indicators=indicators,
         )
 
     # AVAILABLE CAPACITY DISCLAIMER
@@ -392,6 +395,8 @@ def main():
     utils.genInputCustomizationSectionHeader(user_input["locality"])
     old_user_input = dict(user_input)
     user_input, session_state = utils.genInputFields(user_input, config, session_state)
+    if session_state.reset:
+        session.rerun()
     if session_state.update:
         opening_response = user_analytics.log_event(
             "opened key_indicators",
@@ -400,12 +405,12 @@ def main():
                 - int(old_user_input["number_beds"]),
                 "vent_change": session_state.number_ventilators
                 - int(old_user_input["number_ventilators"]),
-                "cases_change": session_state.cases
+                "cases_change": session_state.number_cases
                 - int(old_user_input["population_params"]["I_confirmed"]),
-                "deaths_change": 0,
+                "deaths_change": session_state.number_deaths
+                - int(old_user_input["population_params"]["D"]),
             },
         )
-        session_state.refresh = True
         session_state.update = False
         session.rerun()
 
