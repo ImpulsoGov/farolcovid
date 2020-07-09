@@ -76,7 +76,7 @@ br:
                 "number_beds": sum,
                 "number_ventilators": sum
             }   
-           health_region_agg: {
+            health_region_agg: {
                 "population": sum,
                 "confirmed_cases": sum,
                 "active_cases": sum,
