@@ -15,6 +15,7 @@ br:
                 cases: "br/cities/cases/full"
                 owid: "world/owid/heatmap"
     drive_paths:
+        br_id_state_region_city: https://docs.google.com/spreadsheets/d/1Qo18XeP7Jxaj0IgVw-ISDf-MSpt2ZzbaUj9u3PT4hvc
         cities_population: https://docs.google.com/spreadsheets/d/1k8mXuUggBuBEghHhhLrLtA-5wa4JsAc-D35S5bNlf24
         health_infrastructure: https://docs.google.com/spreadsheets/d/1Zz5WqIj6-oO4skuHPkq3-W9VZxe-XMPThtI-vUghkFI
         embaixadores: https://docs.google.com/spreadsheets/d/1CASa-MdJS_o2tffWlIS--FSskSxhJUw3pA1L5AGIe04
@@ -75,6 +76,15 @@ br:
                     "number_beds": sum,
                     "number_ventilators": sum
             }   
+           health_region_agg: {
+                    "population": sum,
+                    "confirmed_cases": sum,
+                    "active_cases": sum,
+                    "deaths": sum,
+                    "notification_rate": median,
+                    "number_beds": sum,
+                    "number_ventilators": sum
+            }  
         rules:
             rt_classification:
                 column_name: 'rt_10days_ago_most_likely'
