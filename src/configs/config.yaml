@@ -19,7 +19,8 @@ br:
         health_infrastructure: https://docs.google.com/spreadsheets/d/1Zz5WqIj6-oO4skuHPkq3-W9VZxe-XMPThtI-vUghkFI
         embaixadores: https://docs.google.com/spreadsheets/d/1CASa-MdJS_o2tffWlIS--FSskSxhJUw3pA1L5AGIe04
         CNAE_sectors: https://docs.google.com/spreadsheets/d/1pP8dY9kRa9EvX3KcVPfMWJ8exDaoT1_bBggSKfD3y0k
-        reopening_data: https://docs.google.com/spreadsheets/d/13yz7YC1jRlZsrnswqW_TOCkH9MLVFZxYrMkdTf9DGqo
+        br_states_reopening_data: https://docs.google.com/spreadsheets/d/16cAO0nK9EuFY6vSeZ_rDU50GEe6qUbOI
+        br_health_region_reopening_data: "TO BE ADDED"
     cases:
         url: https://data.brasil.io/dataset/covid19/caso_full.csv.gz
         rename:
@@ -75,7 +76,7 @@ br:
         min_days: 14
     safereopen:
         rename:
-            uf: "state_id"
+            uf: "state_num_id"
             emprego: "n_employee"
             security_1: "security_index"
             massa_salarial: "total_wage_bill"
