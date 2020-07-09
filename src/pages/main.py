@@ -52,83 +52,66 @@ def update_indicators(indicators, data, config, user_input, session_state):
             else config["br"]["indicators"][group]["display"]
         ][0]
 
+        # Displays
+        indicators[group].display = fix_type(
+            data[config["br"]["indicators"][group]["display"]].fillna("- ").values[0],
+            group,
+        )
+
+        # Risk
+        indicators[group].risk = [
+            str(data[config["br"]["indicators"][group]["risk"]].values[0])
+            if group != "social_isolation"
+            else "Fonte: inloco"
+        ][0]
+
+        # Left display
+        indicators[group].left_display = fix_type(
+            data[config["br"]["indicators"][group]["left_display"]]
+            .fillna("- ")
+            .values[0],
+            group,
+        )
+
+        # Right display
+        indicators[group].right_display = fix_type(
+            data[config["br"]["indicators"][group]["right_display"]]
+            .fillna("- ")
+            .values[0],
+            group,
+        )
+
         if data[ref].fillna("").values[0] == "":
 
             indicators[group].display = "- "
             indicators[group].risk = "nan"
 
-            if group != "hospital_capacity":
+            if group == "rt":  # doesn't show values
                 indicators[group].right_display = "- "
                 indicators[group].left_display = "- "
 
-        else:
+    # if (
+    # session_state.number_beds != None and session_state.reset is False
+    # ):  # Loading values from memory
+    indicators["subnotification_rate"].left_display = session_state.number_cases
+    indicators["hospital_capacity"].left_display = int(
+        session_state.number_beds
+        # config["br"]["simulacovid"]["resources_available_proportion"]
+    )
+    indicators["hospital_capacity"].right_display = int(
+        session_state.number_ventilators
+        # config["br"]["simulacovid"]["resources_available_proportion"]
+    )
 
-            if group == "subnotification_rate":
-                indicators[group].display = str(
-                    int(
-                        10
-                        * data[config["br"]["indicators"][group]["display"]]
-                        .fillna("- ")
-                        .values[0]
-                    )
-                )
-
-            else:
-                indicators[group].display = fix_type(
-                    data[config["br"]["indicators"][group]["display"]]
-                    .fillna("- ")
-                    .values[0],
-                    group,
-                )
-
-            indicators[group].risk = [
-                str(data[config["br"]["indicators"][group]["risk"]].values[0])
-                if group != "social_isolation"
-                else "Fonte: inloco"
-            ][0]
-
-            indicators[group].left_display = fix_type(
-                data[config["br"]["indicators"][group]["left_display"]]
-                .fillna("- ")
-                .values[0],
-                group,
-            )
-
-            indicators[group].right_display = fix_type(
-                data[config["br"]["indicators"][group]["right_display"]]
-                .fillna("- ")
-                .values[0],
-                group,
-            )
-
-    if (session_state.state != user_input["state_name"]) or (
-        session_state.city != user_input["city_name"]
-    ):
-
-        session_state.state = user_input["state_name"]
-        session_state.city = user_input["city_name"]
-
-    elif session_state.refresh:
-
-        indicators["subnotification_rate"].left_display = session_state.cases
-
-        indicators["hospital_capacity"].left_display = session_state.number_beds
-        indicators["hospital_capacity"].right_display = session_state.number_ventilators
-
-        user_input["number_beds"] = session_state.number_beds
-        user_input["number_ventilators"] = session_state.number_ventilators
-
-        # session_state.refresh = False
-
-    # recalcula capacidade hospitalar
-    user_input["strategy"] = "isolation"
+    # Recalcula capacidade hospitalar
+    user_input["strategy"] = "estavel"
     user_input = sm.calculate_recovered(user_input, data)
 
     dmonth = get_dmonth(
         run_simulation(user_input, config),
         "I2",
         user_input["number_beds"]
-        * config["br"]["simulacovid"]["resources_available_proportion"],
+        # * config["br"]["simulacovid"]["resources_available_proportion"],
     )["best"]
 
     # TODO: add no config e juntar com farol
@@ -164,14 +147,14 @@ def filter_options(user_input, df_cities, df_states, config):
         user_input["place_type"] = "city_id"
 
         # para simulacovid
-        user_input["state_rt"] = (
-            df_states[df_states["state_name"] == user_input["state_name"]][
-                ["rt_10days_ago_low", "rt_10days_ago_high"]
-            ]
-            .astype(str)
-            .agg("-".join, axis=1)
-            .values[0]
-        )
+        user_input["state_rt"] = {
+            "best": df_states[df_states["state_name"] == user_input["state_name"]][
+                "rt_10days_ago_low"
+            ].values[0],
+            "worst": df_states[df_states["state_name"] == user_input["state_name"]][
+                "rt_10days_ago_high"
+            ].values[0],
+        }
 
     user_input["locality"] = utils.choose_place(
         city=user_input["city_name"], state=user_input["state_name"], region="Todos"
@@ -206,11 +189,12 @@ def main():
         update=False,
         number_beds=None,
         number_ventilators=None,
-        deaths=None,
-        cases=None,
+        number_cases=None,
+        number_deaths=None,
         state="Acre",
         city="Todos",
         refresh=False,
+        reset=False,
     )
 
     utils.localCSS("style.css")
@@ -253,14 +237,36 @@ def main():
         "D": int(data["deaths"].fillna(0).values[0]),
         "I": int(data["active_cases"].fillna(0).values[0]),
         "I_confirmed": int(data["confirmed_cases"].fillna(0).values[0]),
+        "I_compare": int(data["confirmed_cases"].fillna(0).values[0]),
     }
 
     user_input["Rt"] = {
         "best": data["rt_10days_ago_low"].values[0],
         "worst": data["rt_10days_ago_high"].values[0],
+        "is_valid": data["rt_classification"].apply(str).values[0],
     }
 
     user_input["last_updated_cases"] = data["last_updated_subnotification"].max()
+    # Update session values to standard ones if changed city or opened page or reseted values
+    if (
+        session_state.state != user_input["state_name"]
+        or session_state.city != user_input["city_name"]
+        or session_state.number_beds is None
+        or session_state.reset
+    ):
+        session_state.state = user_input["state_name"]
+        session_state.city = user_input["city_name"]
+        session_state.number_beds = int(
+            user_input["number_beds"]
+            * config["br"]["simulacovid"]["resources_available_proportion"]
+        )
+        session_state.number_ventilators = int(
+            user_input["number_ventilators"]
+            * config["br"]["simulacovid"]["resources_available_proportion"]
+        )
+        session_state.number_cases = user_input["population_params"]["I_confirmed"]
+        session_state.number_deaths = user_input["population_params"]["D"]
+        session_state.reset = True
 
     if data["confirmed_cases"].sum() == 0:
         st.write(
@@ -294,18 +300,20 @@ def main():
     indicators = update_indicators(indicators, data, config, user_input, session_state)
 
     if "state" in user_input["place_type"]:
-        
+
         # Add disclaimer to cities in state alert levels
         total_alert_cities = df_cities[
             df_cities["state_id"] == data["state_id"].unique()[0]
         ]["overall_alert"].value_counts()
-        
+
         utils.genKPISection(
             place_type=user_input["place_type"],
             locality=user_input["locality"],
             alert=data["overall_alert"].values[0],
             indicators=indicators,
-            n_colapse_alert_cities=total_alert_cities[total_alert_cities.index.isin(["alto", "médio"])].sum(),
+            n_colapse_alert_cities=total_alert_cities[
+                total_alert_cities.index.isin(["alto", "médio"])
+            ].sum(),
         )
 
     else:
@@ -313,7 +321,7 @@ def main():
             place_type=user_input["place_type"],
             locality=user_input["locality"],
             alert=data["overall_alert"].values[0],
-            indicators=indicators
+            indicators=indicators,
         )
 
     # AVAILABLE CAPACITY DISCLAIMER
@@ -396,6 +404,8 @@ def main():
     utils.genInputCustomizationSectionHeader(user_input["locality"])
     old_user_input = dict(user_input)
     user_input, session_state = utils.genInputFields(user_input, config, session_state)
+    if session_state.reset:
+        session.rerun()
     if session_state.update:
         opening_response = user_analytics.log_event(
             "opened key_indicators",
@@ -404,12 +414,12 @@ def main():
                 - int(old_user_input["number_beds"]),
                 "vent_change": session_state.number_ventilators
                 - int(old_user_input["number_ventilators"]),
-                "cases_change": session_state.cases
+                "cases_change": session_state.number_cases
                 - int(old_user_input["population_params"]["I_confirmed"]),
-                "deaths_change": 0,
+                "deaths_change": session_state.number_deaths
+                - int(old_user_input["population_params"]["D"]),
             },
         )
-        session_state.refresh = True
         session_state.update = False
         session.rerun()
 
@@ -438,6 +448,11 @@ def main():
 
     if product == "SimulaCovid":
         user_analytics.log_event("picked simulacovid", dict())
+        # Downloading the saved data from memory
+        user_input["number_beds"] = session_state.number_beds
+        user_input["number_ventilators"] = session_state.number_ventilators
+        user_input["number_deaths"] = session_state.number_deaths
+        user_input["number_cases"] = session_state.number_cases
         sm.main(user_input, indicators, data, config, session_state)
         # TODO: remove comment on this later!
         # utils.gen_pdf_report()
