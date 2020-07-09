@@ -105,7 +105,6 @@ def get_sources(user_input, data, cities_sources, resources):
     user_input["last_updated_number_ventilators"] = pd.to_datetime(
         user_input["last_updated_number_ventilators"]
     ).strftime("%d/%m")
-
     # user_input["n_beds"] = sources["number_beds"][0]
     # user_input["n_ventilators"] = sources["number_ventilators"][0]
 
@@ -306,18 +305,24 @@ def genInputFields(user_input, config, session):
 
     authors_ventilators = user_input["author_number_ventilators"]
     ventilators_update = user_input["last_updated_number_ventilators"]
-
-    number_beds = int(user_input["number_beds"])
-    number_ventilators = int(user_input["number_ventilators"])
-
-    if not session.refresh:
+    if session.reset or session.number_beds == None:
         number_beds = int(
-            number_beds * config["br"]["simulacovid"]["resources_available_proportion"]
-        )
-        number_ventilators = int(
-            number_ventilators
+            user_input["number_beds"]
             * config["br"]["simulacovid"]["resources_available_proportion"]
         )
+
+        number_ventilators = int(
+            user_input["number_ventilators"]
+            * config["br"]["simulacovid"]["resources_available_proportion"]
+        )
+        number_cases = int(user_input["population_params"]["I_confirmed"])
+        number_deaths = int(user_input["population_params"]["D"])
+        session.reset = False
+    else:
+        number_beds = int(session.number_beds)
+        number_ventilators = int(session.number_ventilators)
+        number_cases = int(session.number_cases)
+        number_deaths = int(session.number_deaths)
 
     cases_update = pd.to_datetime(user_input["last_updated_cases"]).strftime("%d/%m")
 
@@ -345,26 +350,30 @@ def genInputFields(user_input, config, session):
         f"Casos confirmados (fonte: Brasil.IO; atualizado: {cases_update}):",
         0,
         None,
-        user_input["population_params"]["I_confirmed"],
+        number_cases,
     )
 
     user_input["population_params"]["D"] = st.number_input(
         f"Mortes confirmadas (fonte: Brasil.IO; atualizado: {cases_update}):",
         0,
         None,
-        int(user_input["population_params"]["D"]),
+        number_deaths,
     )
 
     # Faz o update quando clica o botão
     if st.button("Finalizar alteração"):
 
-        session.number_beds = user_input["number_beds"]
-        session.number_ventilators = user_input["number_ventilators"]
-        session.cases = user_input["population_params"]["I_confirmed"]
+        session.number_beds = int(user_input["number_beds"])
+        session.number_ventilators = int(user_input["number_ventilators"])
+        session.number_cases = int(user_input["population_params"]["I_confirmed"])
+        session.number_deaths = int(user_input["population_params"]["D"])
 
         session.update = True
     else:
         session.update = False
+
+    if st.button("Resetar aos valores oficais"):
+        session.reset = True
 
     return user_input, session
 
@@ -406,7 +415,11 @@ def genIndicatorCard(indicator: Indicator):
 
 
 def genKPISection(
-    place_type: str, locality: str, alert: str, indicators: Dict[str, Indicator], n_colapse_alert_cities: int = 0
+    place_type: str,
+    locality: str,
+    alert: str,
+    indicators: Dict[str, Indicator],
+    n_colapse_alert_cities: int = 0,
 ):
     if not isinstance(alert, str):
         bg = "gray"
@@ -414,7 +427,7 @@ def genKPISection(
         stoplight = "%0a%0a"
     else:
         bg = AlertBackground(alert).name
-        
+
         if "state" in place_type:
             place_type = "estado"
             caption = f"Seu estado está em Risco {alert.upper()}. <b>Note que {n_colapse_alert_cities} municípios avaliados estão em Risco Médio ou Alto de colapso</b>. Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
@@ -490,9 +503,9 @@ def genInputCustomizationSectionHeader(locality: str) -> None:
         """
         <div class="base-wrapper">
                 <span class="section-header primary-span">Verifique os dados disponíveis <span class="yellow-span">(%s)</span></span>
-                <br />
+                <br><br>
                 <span>Usamos os dados do Brasil.io e DataSUS, mas é possível que esses dados estejam um pouco desatualizados. Se estiverem, é só ajustar os valores abaixo para continuar a simulação.</span>
-                <br />
+                <br>
         </div>"""
         % locality,
         unsafe_allow_html=True,
@@ -506,17 +519,16 @@ def gen_footer() -> None:
         <div class="magenta-bg">
                 <div class="base-wrapper">
                         <div class="logo-wrapper">
-                                <span><b>Estamos à disposição para apoiar o gestor público a aprofundar a análise para seu estado ou município, de forma inteiramente gratuita. 
-                                <a target="_blank" style="color:#3E758A;" href="https://coronacidades.org/fale-conosco/">Entre em contato conosco</a></span><br/>
-                                <span><b>As análises apresentadas são meramente indicativas e dependem de variáveis que aqui não podem ser consideradas.</b>
-                                Trata-se de mera contribuição à elaboração de cenários por parte dos municípios e não configura qualquer obrigação ou 
-                                responsabilidade perante as decisões efetivadas. Saiba mais em nossa Metodologia de Níveis de Risco (menu lateral).<br>
-                                Estamos em constante desenvolvimento e queremos ouvir sua opinião sobre a ferramenta - caso tenha sugestões ou comentários, 
-                                entre em contato via chat no canto inferior direito.<br>Caso seja gestor público e necessite de apoio para preparo de seu município, 
-                                acesse a Checklist e confira o site do CoronaCidades.<br><br></span>
-                                <span>A presente ferramenta, voluntária, parte de estudos referenciados já publicados e considera dados do DataSUS e secretarias de saúde estaduais. 
-                                O código pode ser acessado no <a class="github-link" href="https://github.com/ImpulsoGov/simulacovid">Github</a>.</span><br/>
-                                <br/></br></br></span>
+                                <span><b>A equipe do Coronacidades está à disposição para apoiar o gestor público a aprofundar a análise para seu estado ou município, de forma inteiramente gratuita.</b>
+                                Também queremos queremos ouvir sua opinião sobre a ferramenta, entre em contato via chat (canto inferior direito). Outras ferramentas e mais recursos para responder à crise da Covid-19 estão disponíveis em nosso site 
+                                <a target="_blank" style="color:#3E758A;" href="https://coronacidades.org/">coronacidades.org</a>.</span><br/>
+                                <span><b>As análises apresentadas no Farol Covid são indicativas, feitas a partir de dados oficiais públicos e estudos referenciados já publicados, estando sujeitas a variáveis que aqui não podem ser consideradas.</b>
+                                Trata-se de contribuição à elaboração de cenários por parte dos governos e não configura qualquer obrigação ou responsabilidade perante as decisões efetivadas.
+                                Saiba mais sobre os cálculos por trás de análises e indicadores em nossas páginas de Níveis de Risco e Modelo Epidemiológico (menu lateral esquerdo), 
+                                que mantemos atualizadas conforme evoluímos em nossas metodologias.<br><br></span>
+                                <span><i>Todo código da ferramenta pode ser acessado no <a class="github-link" href="https://github.com/ImpulsoGov/farolcovid">Github do projeto</a>
+                                e os dados estão disponíveis em nossa <a class="github-link" href="https://github.com/ImpulsoGov/coronacidades-datasource/blob/master/README.md">API</a>.</i></span>
+                                </br></br></span>
                                 <img class="logo-img" src="%s"/>
                                 <div class="logo-section">
                                         <img class="logo-img" src="%s"/>

@@ -27,35 +27,24 @@ def iterate_simulation(current_state, seir_parameters, phase, initial):
     return res, current_state
 
 
-# Get reproduction rate
 def get_rt(place_type, user_input, config, bound):
+    """
+    Get reproduction rate from scenario choice.
+    """
 
-    if place_type == "city_id":
-        col = place_type
-        endpoint = config["br"]["api"]["endpoints"]["rt_cities"]
+    rules = {
+        "estavel": lambda x: x,  # cenario estavel
+        "positivo": lambda x: x / 2,  # cenario positivo
+        "negativo": lambda x: x * 2,  # cenario negativo
+    }
 
-    if place_type == "state_id":
-        col = "state"
-        endpoint = config["br"]["api"]["endpoints"]["rt_states"]
+    # Caso tenha Rt
+    if user_input["Rt"]["is_valid"] != "nan":
+        return rules[user_input["strategy"]](user_input["Rt"][bound])
 
-    rt = loader.read_data("br", config, endpoint=endpoint)
-    # pegando estimacao de 10 dias atras
-    rt = rt[rt["last_updated"] == (rt["last_updated"].max() - dt.timedelta(10))]
-
-    # caso nao tenha rt, usa o rt do estado
-    if (place_type == "city_id") & (user_input[place_type] not in rt[col].values):
-        return get_rt("state_id", user_input, config, bound)
-
-    cols = {"best": "Rt_low_95", "worst": "Rt_high_95"}
-
-    if user_input["strategy"] == "isolation":  # current
-        return rt[rt[col] == user_input[place_type]][cols[bound]].values[0]
-
-    if user_input["strategy"] == "lockdown":  # smaller_rt
-        return rt[rt[col] == user_input[place_type]][cols[bound]] / 2
-
-    if user_input["strategy"] == "nothing":  # greater_rt
-        return rt[rt[col] == user_input[place_type]][cols[bound]] * 2
+    # Caso não tenha Rt, usa o Rt do estado
+    else:
+        return rules[user_input["strategy"]](user_input["state_rt"][bound])
 
 
 def run_simulation(user_input, config):
@@ -93,10 +82,8 @@ def run_simulation(user_input, config):
         # Get Rts
         if not user_input["state_id"] and not user_input["city_id"]:
             phase["R0"] = 3
-        elif np.isnan(user_input["Rt"][bound]) == True:
-            phase["R0"] = get_rt(user_input["place_type"], user_input, config, bound)
         else:
-            phase["R0"] = user_input["Rt"][bound]
+            phase["R0"] = get_rt(user_input["place_type"], user_input, config, bound)
 
         res = entrypoint(
             user_input["population_params"],
