@@ -68,22 +68,22 @@ br:
                 "state_notification_rate"
             ]   
             state_agg: {
-                    "population": sum,
-                    "confirmed_cases": sum,
-                    "active_cases": sum,
-                    "deaths": sum,
-                    "state_notification_rate": max,
-                    "number_beds": sum,
-                    "number_ventilators": sum
+                "population": sum,
+                "confirmed_cases": sum,
+                "active_cases": sum,
+                "deaths": sum,
+                "state_notification_rate": max,
+                "number_beds": sum,
+                "number_ventilators": sum
             }   
            health_region_agg: {
-                    "population": sum,
-                    "confirmed_cases": sum,
-                    "active_cases": sum,
-                    "deaths": sum,
-                    "notification_rate": median,
-                    "number_beds": sum,
-                    "number_ventilators": sum
+                "population": sum,
+                "confirmed_cases": sum,
+                "active_cases": sum,
+                "deaths": sum,
+                "notification_rate": median,
+                "number_beds": sum,
+                "number_ventilators": sum
             }  
         rules:
             rt_classification:
