@@ -164,6 +164,14 @@ br:
             right_display: "inloco_growth"
             left_display: "inloco_last_week_7days_avg"
             display: "inloco_today_7days_avg"
+    inloco:
+        replace: 
+            "São Valério da Natividade":
+                "state_name": "Tocantins"
+                "correct_name": "São Valério"
+            "Campo Grande":
+                "state_name": "Rio Grande do Norte"
+                "correct_name": "Augusto Severo (Campo Grande)"
     rt_parameters:
         r_t_range_max: 12
         optimal_sigma: 0.01 # best sigma for Brazil (prior hyperparameters)
