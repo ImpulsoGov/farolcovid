@@ -70,7 +70,9 @@ def plot_rt(t, title=""):
         "Rt_most_likely": {
             "fill": None,
             "showlegend": True,
-            "name": "Valor médio <b>(atual=%0.2f)" % (t["Rt_most_likely"].iloc[-1]),
+            "name": "<b>Valor médio em {}={}</b>".format(
+                t["last_updated"].max().strftime("%d/%m"), t["Rt_most_likely"].iloc[-1]
+            ),
             "layout": {"color": "rgba(63, 61, 87, 0.8)", "width": 3},
         },
     }
@@ -122,13 +124,17 @@ def plot_rt_wrapper(place_id):
             "br", config, config["br"]["api"]["endpoints"]["rt_states"]
         )
         state_str_id = utils.get_state_str_id_by_id(place_id)
-        final_data = pre_data.loc[pre_data["state"] == state_str_id]
+        final_data = pre_data.loc[pre_data["state"] == state_str_id].sort_values(
+            "last_updated"
+        )[:-10]
 
     else:
         pre_data = loader.read_data(
             "br", config, config["br"]["api"]["endpoints"]["rt_cities"]
         )
-        final_data = pre_data.loc[pre_data["city_id"] == place_id]
+        final_data = pre_data.loc[pre_data["city_id"] == place_id].sort_values(
+            "last_updated"
+        )[:-10]
 
     if len(final_data) < 30:
         return None
