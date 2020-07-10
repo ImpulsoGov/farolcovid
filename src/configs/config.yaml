@@ -34,7 +34,6 @@ br:
             new_confirmed: 'daily_cases'
             daily_cases_sum: 'infectious_period_cases'
         drop: [
-            'city',
             'estimated_population_2019',
             'is_last',
             'is_repeated',
