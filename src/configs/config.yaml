@@ -211,10 +211,8 @@ br:
             cnes: [
             "country_iso",
             "country_name",
-            "state_id",
-            "state_name",
+            "state_num_id",
             "city_id",
-            "city_name",
             "population",
             "health_system_region",
             "last_updated_number_beds",
