@@ -51,8 +51,12 @@ br:
         simulacovid:
             columns: [
                 "state_num_id",
+                "state_id",
+                "state_name",
                 "health_region_id",
+                "health_system_region",
                 "city_id",
+                "city_name",
                 "population",
                 "health_system_region",
                 "last_updated_number_beds",
