@@ -50,11 +50,9 @@ br:
     farolcovid:
         simulacovid:
             columns: [
-                "city_id",
-                "city_name",
-                "state_id",
                 "state_num_id",
-                "state_name",
+                "health_region_id",
+                "city_id",
                 "population",
                 "health_system_region",
                 "last_updated_number_beds",
