@@ -58,7 +58,6 @@ br:
                 "city_id",
                 "city_name",
                 "population",
-                "health_system_region",
                 "last_updated_number_beds",
                 "author_number_beds",
                 "number_beds",
