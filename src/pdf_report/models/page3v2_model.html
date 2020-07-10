@@ -1,0 +1,131 @@
+<head>
+    <link rel="stylesheet" href="page3v2_model.css">
+    <meta charset="UTF-8">
+    <script src="reportpt1.js"></script>
+    <script>resizeWin();</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@200;300;400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- PDF Report v2 page3 -->
+    <div class="frame" id="n452_93">
+        <!-- Retângulo Panorama Casos 1 -->
+        <div class="empty left top vector" width="1210" height="189" id="n467_136_1"></div>
+        <!-- Retângulo Panorama Casos 2 -->
+        <div class="empty left top vector" width="1210" height="189" id="n467_136_2"></div>
+        <!-- dias value cenario estavel leitos -->
+        <div class="left top text" id="n464_35">$#tempo_colapso_estavel_leitos$#</div>
+        <!-- dias value cenario estavel ventiladores -->
+        <div class="left top text" id="n464_36">$#tempo_colapso_estavel_ventiladores$#</div>
+        <!-- Retângulo Panorama Casos 3 -->
+        <div class="empty left top vector" width="1210" height="189" id="n467_136_3"></div>
+        <!-- linha positivo 2 -->
+        <div class="empty left top line" width="0" height="189" id="n464_59"></div>
+        <!-- linha negativo 2 -->
+        <div class="empty left top line" width="0" height="189" id="n464_60"></div>
+        <!-- dias value cenario positivo leitos -->
+        <div class="left top text" id="n464_37">$#tempo_colapso_positivo_leitos$#</div>
+        <!-- dias value cenario positivo ventiladores -->
+        <div class="left top text" id="n464_38">$#tempo_colapso_positivo_ventiladores$#</div>
+        <!-- dias value cenario negativo leitos -->
+        <div class="left top text" id="n464_39">$#tempo_colapso_negativo_leitos$#</div>
+        <!-- dias value cenario negativo ventiladores -->
+        <div class="left top text" id="n464_40">$#tempo_colapso_negativo_ventiladores$#</div>
+        <!-- SIMULACOVID | PROJEÇÃO DE CENÁRIOS -->
+        <div class="left top text" id="n452_94">SIMULACOVID | PROJEÇÃO DE CENÁRIOS</div>
+        <!-- Cenario Estavel Desc -->
+        <div class="subsets left top text" id="n452_98">
+            Tudo permanence como está.<br> <b>Consideramos o mesmo ritmo de contágio da média dos últimos 7
+                dias.</b>
+        </div>
+        <!-- cenario positivo descricao -->
+        <div class="subsets left top text" id="n452_104">
+            Há mudanças de comportamento que fazem <b>o ritmo de contágio cair pela metade.</b>
+        </div>
+        <!-- Cenário Negativo Hospital Label -->
+        <div class="left top text" id="n452_107">Cenário Negativo</div>
+        <!-- Cenário Positivo Hospital Label -->
+        <div class="left top text" id="n452_109">Cenário Positivo</div>
+        <!-- cenario negativo descricao -->
+        <div class="subsets left top text" id="n452_111">
+            Há mudanças de comportamento que fazem <b>o ritmo de contágio dobrar de valor.</b>
+        </div>
+        <!-- Descricao -->
+        <div class="subsets left top text" id="n452_122">
+            <b>⚠️ Utilizamos por padrão 50% da capacidade hospitalar reportada no DataSUS em 01/05
+                para projeção.</b><br><br>
+            Consideramos leitos disponíveis para Covid os leitos clínicos, cirúrgicos e
+            hospital-dia da rede SUS e não-SUS. <br><br>
+            <i>Caso tenha dados mais atuais, sugerimos que altere os valores na plataforma FarolCovid
+                e gere novamente o relatório.</i>
+        </div>
+        <!-- Cenário Estável Hospital Label -->
+        <div class="left top text" id="n452_96">Cenário Estável</div>
+        <!-- bed_fig_estavel -->
+        <div class="left top rectangle" id="n464_33"
+            style="background: url('/home/ubuntu/src/pdf_report/models/resources/bed_fig.png')"></div>
+        <!-- ventilador_fig_estavel -->
+        <div class="left top rectangle" id="n464_34"
+            style="background: url('/home/ubuntu/src/pdf_report/models/resources/ventilador_fig.png')"></div>
+        <!-- VISÃO DETALHADA DA SIMULAÇÃO -->
+        <div class="left top text" id="n464_42">VISÃO DETALHADA DA SIMULAÇÃO</div>
+        <!-- Cenário Estável: Assumindo que o ritmo de contágio permaneça o mesmo. -->
+        <div class="subsets left top text" id="n464_43">
+            <span id="n464_43-1">Cenário Estável</span>
+            <span id="n464_43-undefined">: Assumindo que o ritmo de contágio permaneça o mesmo.</span>
+        </div>
+        <!-- Na área amarela está o intervalo de confiança dos valores da demanda por leitos a cada dia no seu local, e em verde a por ventiladores. Para evitar uma sobrecarga hospitalar, a sua demanda (a curva 📈) deve estar abaixo da respectiva linhas tracejadas (a reta horizontal ➖). Em outras palavras, a quantidade de pessoas que precisam ser internadas por dia não deve ultrapassar o número de equipamentos disponíveis. -->
+        <div class="subsets left top text" id="n464_44">
+            Na área amarela está o intervalo de confiança dos valores da demanda por leitos a cada
+            dia no seu local, e em verde a por ventiladores.<br>
+            <b>Para evitar uma sobrecarga hospitalar, a sua demanda (a curva 📈) deve estar abaixo da
+                respectiva linhas tracejadas (a reta horizontal ➖).</b><br>
+            Em outras palavras, a quantidade de pessoas que precisam ser internadas
+            por dia não deve ultrapassar o número de equipamentos disponíveis.
+        </div>
+        <!-- label 2 -->
+        <div class="left top rectangle" id="n464_45" style="background-image: url('$#simulacovid_plot_path$#')"></div>
+        <!-- newplot (3) 2 -->
+        <div class="left top rectangle" id="n464_46" style="background-image: url('$#simulacovid_plot_path$#')"></div>
+        <!-- Hoje -->
+        <div class="left top text" id="n464_47">Hoje</div>
+        <!-- Arrow 10 -->
+        <div class="empty left top vector" width="19" height="15" id="n464_48"></div>
+        <!-- Arrow 11 -->
+        <div class="empty left top vector" width="19" height="15" id="n467_149">
+        </div>
+        <!-- Saiba mais sobre a metologia em https://farolcovid.coronacidades.org/ -->
+        <div class="left top text" id="n464_57">Saiba mais sobre a metologia em https://farolcovid.coronacidades.org/
+        </div>
+        <!-- 3 -->
+        <div class="left top text" id="n464_58">3</div>
+        <!-- Data -->
+        <div class="left top text" id="n467_140">$#data$#</div>
+        <!-- capacidade maxima desc label -->
+        <div class="left top text" id="n464_53">Em quanto tempo será atingida a capacidade máxima de:</div>
+        <!-- leitos label tabela -->
+        <div class="left top text" id="n467_141">LEITOS</div>
+        <!-- ventiladores label tabela -->
+        <div class="left top text" id="n467_142">VENTILADORES</div>
+        <!-- linha estavel 1 -->
+        <div class="empty left top line" width="0" height="189" id="n467_143"></div>
+        <!-- linha negativo 1 -->
+        <div class="empty left top line" width="0" height="189" id="n467_145"></div>
+        <!-- linha positivo 1 -->
+        <div class="empty left top line" width="0" height="189" id="n467_146"></div>
+        <!-- linha estavel 2 -->
+        <div class="empty left top line" width="0" height="189" id="n467_144"></div>
+        <!-- coronacidades rodape -->
+        <div class="subsets left top text" id="n464_22p3">
+            corona
+        </div>
+        <div class="subsets left top text" id="n464_22p3pt2">
+            cidades
+        </div>
+        <!-- impulso rodape -->
+        <img src="resources/impulsologo.png" class="left top rectangle" id="n464_23">
+    </div>
+</body>

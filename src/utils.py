@@ -50,7 +50,7 @@ def get_inloco_url(config):
         api_inloco["states"] = api_url + os.getenv("INLOCO_STATES_ROUTE")
 
     else:
-        raise "Inloco routes not found in env vars!"
+        raise ValueError("Inloco routes not found in env vars!")
 
     return api_inloco
 

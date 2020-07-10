@@ -1,0 +1,189 @@
+@page {
+    width: 1440px;
+    height: 2036px;
+
+  }
+/* PDF Report v2 page4 */
+
+#n452_156{
+position: relative;
+width: 1440px;
+height: 2036px;
+
+background: #FFFFFF;
+
+
+}
+/* Retângulo final */
+
+#n452_157{
+position: absolute;
+width: 1440px;
+height: 589px;
+left: 0px;
+top: 1447px;
+
+background: #FFFFFF;
+border: 3px solid #000000;
+box-sizing: border-box;
+
+
+}
+/* Nosso código */
+
+#n452_159{
+position: absolute;
+width: 1113px;
+height: 139px;
+left: 163px;
+top: 1675px;
+
+font-family: IBM Plex Sans;
+font-style: normal;
+font-weight: normal;
+font-size: 20px;
+line-height: 26px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+
+
+}
+/* Impulso logo */
+
+#n452_161{
+position: absolute;
+width: 418px;
+height: 85px;
+left: 511px;
+top: 1776px;
+}
+/* Coronacidades logo */
+
+#n452_162{
+position: absolute;
+width: 450px;
+height: 50px;
+left: 198px;
+top: 1919px;
+border: 0px solid black;
+
+
+}
+/* coronacidades rodape */
+
+#n464_22p4{
+    position: absolute;
+    width: 270px;
+    height: 30px;
+    left: 200px;
+    top: 1930px;
+    font-family: IBM Plex Sans;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 70px;
+    line-height: 83px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    
+    color: #0097A7;
+    
+    
+}
+/* coronacidades rodape pt2 */
+
+#n464_22p4pt2{
+    position: absolute;
+    width: 270px;
+    height: 30px;
+    left: 430px;
+    top: 1930px;
+    font-family: IBM Plex Sans;
+    font-style: normal;
+    font-weight: 200;
+    font-size: 70px;
+    line-height: 83px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    
+    color: #0097A7;
+}
+/* arapyau logo */
+
+#n452_163{
+position: absolute;
+width: 522px;
+height: 107px;
+left: 760px;
+top: 1890px;
+
+
+}
+/* ÁREA EM CONSTRUÇÃO */
+
+#n452_164{
+position: absolute;
+width: 1207px;
+height: 535px;
+left: 116px;
+top: 308px;
+
+font-family: IBM Plex Sans;
+font-style: normal;
+font-weight: normal;
+font-size: 144px;
+line-height: 187px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+
+
+}
+/* As análises apresentadas */
+
+#n481_123{
+position: absolute;
+width: 1273px;
+height: 128px;
+left: 83px;
+top: 1588px;
+
+font-family: Roboto;
+font-style: normal;
+font-weight: normal;
+font-size: 20px;
+line-height: 23px;
+text-align: center;
+
+color: #000000;
+
+
+
+}
+/* A equipe coronacidades */
+
+#n481_122{
+position: absolute;
+width: 1269px;
+height: 84px;
+left: 85px;
+top: 1470px;
+
+font-family: Roboto;
+font-style: normal;
+font-weight: bold;
+font-size: 20px;
+line-height: 23px;
+text-align: center;
+
+color: #000000;
+
+}

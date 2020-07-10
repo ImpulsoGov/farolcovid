@@ -8,6 +8,7 @@ import pandas as pd
 from models import IndicatorType, IndicatorCards, ProductCards
 
 from model.simulator import run_simulation, get_dmonth
+import pdf_report.pdfgen as pdfgen
 import pages.simulacovid as sm
 import plots
 import utils
@@ -431,7 +432,16 @@ def main():
     indicators["subnotification_rate"].left_display = user_input["population_params"][
         "D"
     ]
-
+    # PDF-REPORT GEN BUTTON
+    if st.button("Gerar Relatório PDF"):
+        st.write(
+            """<div class="base-wrapper">Aguarde um momento por favor...</div>""",
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            pdfgen.gen_pdf_report(user_input, indicators, data, config),
+            unsafe_allow_html=True,
+        )
     # TOOLS
     products = ProductCards
     products[1].recommendation = f'Risco {data["overall_alert"].values[0]}'
