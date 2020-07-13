@@ -10,6 +10,7 @@ from models import IndicatorType, IndicatorCards, ProductCards
 from model.simulator import run_simulation, get_dmonth
 import pdf_report.pdfgen as pdfgen
 import pages.simulacovid as sm
+import pages.saude_em_ordem as so
 import plots
 import utils
 import amplitude
@@ -196,6 +197,7 @@ def main():
         city="Todos",
         refresh=False,
         reset=False,
+        saude_ordem_data=None,
     )
 
     utils.localCSS("style.css")
@@ -448,12 +450,7 @@ def main():
     utils.genProductsSection(products)
 
     product = st.selectbox(
-        "",
-        [
-            "Como você gostaria de prosseguir?",
-            "SimulaCovid",
-            "Saúde em Ordem (em breve)",
-        ],
+        "", ["Como você gostaria de prosseguir?", "SimulaCovid", "Saúde em Ordem",],
     )
 
     if product == "SimulaCovid":
@@ -467,8 +464,9 @@ def main():
         # TODO: remove comment on this later!
         # utils.gen_pdf_report()
 
-    elif product == "Saúde em Ordem (em breve)":
+    elif product == "Saúde em Ordem":
         user_analytics.log_event("picked saude_em_ordem", dict())
+        so.main(user_input, indicators, data, config, session_state)
         pass
 
     utils.gen_whatsapp_button(config["impulso"]["contact"])

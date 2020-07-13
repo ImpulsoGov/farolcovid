@@ -1004,3 +1004,544 @@ header>.toolbar { /* Hide toolbar menu */
         padding: var(--main-padding)
     }
 }
+
+.saude-veja-title{
+    font-family: Oswald;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 58px;
+    line-height: 92px;
+    /* identical to box height */
+
+    display: inline-block;
+    text-align:center;
+    align-items: center;
+
+    color: #0097A7;
+}
+
+.saude-veja-desc{
+    font-family: IBM Plex Sans;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 39px;
+    display: inline-block;
+    align-items: center;
+
+    color: #000000;
+}
+.saude-sector-basic-plot-area{
+    background: #F2F9FC;
+    text-align:center;
+}
+.saude-plot-axis{
+    border: 0px solid black;
+    position: relative;
+}
+.saude-sector-basic-plot-disc{
+    position: relative;
+    left: 5%;
+    width: 90%;
+    border: 5px dashed #F2C94C;
+    box-sizing: border-box;
+    border-radius: 10px;
+}
+.saude-sector-basic-plot-title{
+    font-family: Oswald;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 30px;
+    line-height: 71px;
+    text-transform: uppercase;
+
+    color: #000000;
+
+}
+.saude-arrow {
+    border: solid black;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 6px;
+}
+  
+.up {
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+}
+.right {
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+}
+
+.saude-horizontal-line{
+    width: 80vw;
+    left:10vw;
+    height: 2px;
+    border-bottom: 3px solid black;
+    position: relative;
+}
+.saude-vertical-line{
+    width: 2px;
+    height: 70vw;
+    left:10vw;
+    border-right: 3px solid black;
+    position: relative;
+}
+.saude-horizontal-arrow-full{
+    top:400px;
+}
+.saude-arrow-right-pos{
+    left:40vw;
+    top:-12px;
+    position: relative;
+}
+.saude-arrow-up-pos{
+    left:-39.66vw;
+    top:14px;
+    position: relative;
+}
+.saude-economia-eixo-label{
+    font-family: IBM Plex Sans;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 3vw;
+    line-height: auto;
+    display: flex;
+    align-items: center;
+    text-align: right;
+    position:relative;
+    left:60vw;
+    width:auto;
+    height:auto;
+    color: #000000;
+
+}
+
+.saude-segurança-eixo-label{
+    font-family: IBM Plex Sans;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 3vw;
+    line-height: auto;
+
+    display: flex;
+    align-items: center;
+    text-align: left;
+    left:-45vw;
+    top:10vh;
+    width: auto;
+    color: #000000;
+    position: relative;
+    transform: rotate(-90deg);
+    border: 0px solid black;
+}
+
+.saude-sector-b-frame{
+    width: 30vw;
+    height: 0;
+    padding-bottom: 26vw;
+    top:8vw;
+    left:17vw;
+    position:absolute;
+    background: #FFFFFF;
+    border-radius: 15px;
+    border: 0px solid black;
+}
+
+.saude-sector-d-frame{
+    width: 30vw;
+    height: 0;
+    padding-bottom: 26vw;
+    top:40vw;
+    left:17vw;
+    position:absolute;
+    background: #FFFFFF;
+    border-radius: 15px;
+    border: 0px solid black;
+}
+.saude-sector-c-frame{
+    width: 30vw;
+    height: 0;
+    padding-bottom: 26vw;
+    top:40vw;
+    left:60vw;
+    z-index:2;
+    position:absolute;
+    background: #FFFFFF;
+    border-radius: 15px;
+    border: 0px solid black;
+}
+.saude-sector-a-frame{
+    width: 30vw;
+    height: 0;
+    padding-bottom: 26vw;
+    top:8vw;
+    left:60vw;
+    z-index:2;
+    position:absolute;
+    background: #FFFFFF;
+    border-radius: 15px;
+    border: 0px solid black;
+}
+
+.saude-plot-group-title{
+    font-family: Oswald;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 2.6vw;
+    line-height: auto;
+    align-items: center;
+    color: #000000;
+    position: relative;
+    left:0%;
+    top:0%;
+}
+
+.saude-plot-group-sectors-list{
+    font-family: IBM Plex Sans;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 1.2vw;
+    width: 85%;
+    left:10%;
+    top:20%;
+    display: inline-block;
+    line-height: auto;
+    align-items: left;
+    text-align:left;
+    position:absolute;
+    color: #000000;
+    border: 0px solid black;
+}
+
+.saude-plot-group-massa-salarial-label{
+    font-family: IBM Plex Sans;
+    font-style: normal;
+    line-height: auto;
+    font-weight: 300;
+    font-size: 1.5vw;
+    line-height: 21px;
+    width:40%;
+    display: inline-block;
+    align-items: center;
+    line-height: 100%;
+    position:absolute;
+    text-align:left;
+    top:70%;
+    left: 5%;
+    color: #212529;
+    border: 0px solid black;
+}
+
+.saude-plot-group-massa-salarial-value{
+    font-family: IBM Plex Sans;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 1.5vw;
+    line-height: 21px;
+    display: inline-block;
+    align-items: center;
+    position:absolute;
+    height: 20px;
+    top:85%;
+    left:3%;
+    width: 45%;
+    height: auto;
+    color: #212529;
+    border: 0px solid black;
+
+}
+
+.saude-plot-group-separator-line{
+    width: 0px;
+    height: 10%;
+    left:50%;
+    border-right: 1px solid black;
+    position: absolute;
+    top:85%;
+    left:50%;
+}
+.saude-plot-group-pessoas-label{
+    font-family: IBM Plex Sans;
+    font-style: normal;
+    line-height: 10px;
+    font-weight: 300;
+    font-size: 1.5vw;
+    line-height: 21px;
+    width:45%;
+    display: inline-block;
+    line-height: 100%;
+    align-items: center;
+    position:absolute;
+    text-align:left;
+    top:70%;
+    left: 55%;
+    color: #212529;
+    border: 0px solid black;
+}
+.saude-plot-group-pessoas-value{
+    font-family: IBM Plex Sans;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 1.5vw;
+    line-height: 21px;
+    display: inline-block;
+    align-items: center;
+    position:absolute;
+    height: 20px;
+    top:85%;
+    left:55%;
+    width: 45%;
+    height: auto;
+    color: #212529;
+    border: 0px solid black;
+
+}
+
+.saude-slider-wrapper{
+    position:relative;
+}
+
+.saude-slider-title{
+
+}
+
+.saude-slider-value-display{
+    position: relative;
+    left: 50%;
+
+    font-family: IBM Plex Sans;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 2vw;
+    line-height: auto;
+    display: flex;
+    align-items: center;
+    text-align: center;
+
+    color: #000000;
+
+}
+.saude-table{
+    box-sizing: border-box;
+    position:relative;
+    width:90vw;
+    left:5vw;
+    top:0%;
+}
+.saude-table-title-box{
+    position:relative;
+    height:10vw;
+}
+.saude-table-title{
+    position:absolute;
+    left:5%;
+    top:2vw;
+    font-family: Oswald;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 3vw;
+    line-height: auto;
+    display: flex;
+    align-items: center;
+    color: #000000;
+}
+.saude-table-title-security-label{
+    position:absolute;
+    left:30%;
+    top:0.5vw;
+    font-family: Oswald;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 2.5vw;
+    line-height: auto;
+    display: flex;
+    align-items: center;
+    text-align: center;
+
+    color: #000000;
+}
+.saude-table-title-economy-label{
+    position:absolute;
+    left:60%;
+    top:0.5vw;
+    font-family: Oswald;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 2.5vw;
+    line-height: auto;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+}
+.saude-table-title-button{
+    position: absolute;
+    width: 10vw;
+    height: 3vw;
+    top: 5vw;
+    border-radius: 1.5vw;
+    font-size:1.5vw;
+    font-family: Oswald;
+    font-style: normal;
+    font-weight: normal;
+    color: #FFFFFF;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+    
+}
+.tbsecurity{
+    left:34%;
+}
+.tbeconomy{
+    left:67%;
+}
+.saude-table-head-box{
+    position: relative;
+    width:100%;
+    height: 5vw;
+    left:0%;
+    top:0%;
+    background: #FFFFFF;
+    border: 2px solid #000000;
+    box-sizing: border-box;
+}
+
+.saude-table-line{
+    position: absolute;
+    width: 0;
+    top:0vw;
+    z-index:1;
+    height:100%;
+    border-right: 2px solid #000000;
+}
+.tl1{
+    left: 30%;
+}
+.tl2{
+    left: 47%;
+}
+.tl3{
+    left: 65%;
+}
+.tl4{
+    left: 82%;
+}
+.saude-table-field {
+    position: absolute;
+    font-size:2vw;
+    top:0.5vw;
+    height:4vw;
+    font-family: IBM Plex Sans;
+    font-style: normal;
+    font-weight: normal;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+}
+/* tt is for title and tf is for field and te for the end(total) row */
+.tt1 {
+    left:0%;
+    width:30%;
+    font-size:2vw;
+}
+.tt2{
+    left:30%;
+    width:17%;
+    font-size:1.2vw;
+}
+.tt3{
+    left:47%;
+    width:18%;
+    font-size:1.5vw;
+}
+.tt4{
+    left:65%;
+    width:17%;
+    font-size:2vw;
+}
+.tt5{
+    left:82%;
+    width:18%;
+    font-size:1.2vw;
+}
+.tf1 {
+    left:0%;
+    top:1.5vw;
+    width:30%;
+    font-size:1.2vw;
+}
+.tf2{
+    left:30%;
+    width:17%;
+    font-size:2vw;
+}
+.tf3{
+    left:47%;
+    top:1.2vw;
+    width:18%;
+    font-size:1.5vw;
+}
+.tf4{
+    left:65%;
+    top:1.2vw;
+    width:17%;
+    font-size:1.5vw;
+}
+.tf5{
+    left:82%;
+    width:18%;
+    font-size:2vw;
+}
+.te1 {
+    left:0%;
+    width:30%;
+    font-size:2vw;
+}
+.te2{
+    left:30%;
+    width:17%;
+    font-size:1.2vw;
+}
+.te3{
+    left:47%;
+    width:18%;
+    font-size:1.5vw;
+}
+.te4{
+    left:65%;
+    width:17%;
+    font-size:1.5vw;
+}
+.te5{
+    left:82%;
+    width:18%;
+    font-size:1.2vw;
+}
+.saude-table-endspacer{
+    height: 5vw;
+}
+.saude-table-row{
+    position: relative;
+    width: 100%;
+    height: 5vw;
+    left:0%;
+    box-sizing: border-box;
+}
+.tlblue{
+    background: #F2F9FC;
+}
+.tlwhite{
+    background: #FFFFFF;
+}
+.saude-table-total-box{
+    position: relative;
+    width: 100%;
+    height: 5vw;
+    left:0%;
+    top:0%;
+    background: #FFFFFF;
+    border-top: 2px solid #000000;
+    box-sizing: border-box;
+}

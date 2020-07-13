@@ -187,6 +187,8 @@ br:
         gamma_alpha: 4
         min_days: 14
     safereopen:
+        economic_data: "br/states/safereopen/main"
+        cnae_sectors: "br/cnae/sectors"
         rename:
             uf: "state_num_id"
             emprego: "n_employee"

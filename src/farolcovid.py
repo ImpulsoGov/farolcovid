@@ -20,6 +20,7 @@ import pages.data_analysis as anal
 import pages.main as fc
 import pages.risk_description as rd
 import pages.rt_description as rt
+import pages.saude_em_ordem_description as sod
 
 
 def main():
@@ -31,6 +32,7 @@ def main():
             "Níveis de Risco",
             "Estimando Ritmo de Contágio",
             "Modelo Epidemiológico",
+            "Metodologia do Saúde em Ordem",
             "Quem somos?",
         ],
     )  # "Central COVID19",
@@ -58,6 +60,9 @@ def main():
     elif page == "Estimando Ritmo de Contágio":
         if __name__ == "__main__":
             rt.main()
+    elif page == "Metodologia do Saúde em Ordem":
+        if __name__ == "__main__":
+            sod.main()
 
 
 if __name__ == "__main__":
