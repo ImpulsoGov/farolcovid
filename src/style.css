@@ -1014,8 +1014,8 @@ header>.toolbar { /* Hide toolbar menu */
     /* identical to box height */
 
     display: inline-block;
-    text-align:center;
-    align-items: center;
+    text-align:left;
+    align-items: left;
 
     color: #0097A7;
 }
@@ -1043,9 +1043,11 @@ header>.toolbar { /* Hide toolbar menu */
     left: 5%;
     width: 90%;
     border: 5px dashed #F2C94C;
+    padding: 1em;
+    margin-top: var(--main-item-margin);
     box-sizing: border-box;
     border-radius: 10px;
-    font-size: 24px;
+    font-size: 16px;
 }
 .saude-sector-basic-plot-title{
     font-family: Oswald;
@@ -1308,18 +1310,13 @@ header>.toolbar { /* Hide toolbar menu */
 }
 
 .saude-slider-value-display{
-    position: relative;
-    left: 50%;
-
+    position: realtive;
+    /* left: 5%; */
+    text-align: center;
     font-family: IBM Plex Sans;
     font-style: normal;
-    font-weight: bold;
-    font-size: 2vw;
-    line-height: auto;
-    display: flex;
+    font-size: 20px;
     align-items: center;
-    text-align: center;
-
     color: #000000;
 
 }
@@ -1548,7 +1545,8 @@ header>.toolbar { /* Hide toolbar menu */
 }
 .saude-reopening-protocol-img-1{
     position:relative;
-    width:70vw;
+    padding: var(--minor-padding);
+    max-width:70%;
     height:auto;
     left:15vw;
 }

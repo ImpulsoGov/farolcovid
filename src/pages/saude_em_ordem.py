@@ -105,7 +105,7 @@ def chunks(l, n):
         yield l[si : si + (d + 1 if i < r else d)]
 
 
-# GENERATION OF INITIAL HTML
+# SEÇÃO DE INTRODUÇÃO
 def gen_header():
     st.write(
         """
@@ -128,16 +128,14 @@ def gen_intro():
     st.write(
         """
         <div class="base-wrapper">
-                <div class="section-header primary-span">VEJA OS SETORES MAIS SEGUROS PARA REABRIR</div>
+                <div class="section-header primary-span">VEJA OS SETORES MAIS SEGUROS PARA REABRIR</div><br>
                 <div class="ambassador-question"><b>Se o seu município ou estado se encontra em ordem e com risco <span style="color:#02B529;">BAIXO</span>, você já pode começar a pensar um plano de reabertura.</b> Nós compilamos aqui dados econômicos do seu estado para lhe ajudar a planejar quais setores devem ser reabertos.</div>
         </div>""",
         unsafe_allow_html=True,
     )
 
 
-# ILLUSTRATIVE PLOT SECTION
-
-
+# SEÇÃO PLOT SAUDE EM ORDEM
 def gen_illustrative_plot(sectors_data, session_state):
     """ Generates our illustrative sector diagram """
     if session_state.city == "Todos":
@@ -146,9 +144,11 @@ def gen_illustrative_plot(sectors_data, session_state):
         section_title = session_state.city.upper()
     text = f"""
     <div class="saude-sector-basic-plot-area">
-        <div class="saude-veja-title" style="text-align:left;">SAUDE EM ORDEM | {section_title}</div>
-        <div class="saude-sector-basic-plot-disc">
-            Os dois principais indicadores utilizados são a Importância Econômica (medida pela soma dos salários pagos) e o Nível de Segurança Sanitária do setor. A ideia é que devemos iniciar a reabertura pelos setores de mais seguros do ponto de vista da saúde e de maior importância econômica.
+        <div class="base-wrapper">
+                <div class="saude-veja-title">SAÚDE EM ORDEM | {section_title}</div>
+                <div class="saude-sector-basic-plot-disc">
+                    Os dois principais indicadores utilizados são a Contribuição Econômica, medida pela soma dos salários pagos, e o Nível de Segurança Sanitária do setor (mais detalhes na Metodologia). <b>Partimos da ideia que a reabertura deve ser iniciada pelos setores de mais seguros do ponto de vista da saúde e de maior importância econômica.</b>Logo, os Grupos A, B, C e D são ordenados primeiro pela Segurança Sanitária e depois pela sua Contribuição Econômica.
+                </b></div>
         </div>
         <div class="saude-sector-basic-plot-title">
             Top 5 Setores por grupo de custo-benefício
@@ -209,7 +209,7 @@ def convert_money(money):
     return f"{int(money):,}".replace(",", ".")
 
 
-# SLIDER SECTION
+# SEÇÃO DE SELEÇÃO DE PESOS
 def gen_slider(session_state):
     """ Generates the weight slider we see after the initial sector diagram and saves it to session_state"""
     st.write(
@@ -217,41 +217,33 @@ def gen_slider(session_state):
         <div class="base-wrapper">
             <div class="saude-slider-wrapper">
                 <span class="section-header primary-span">ESCOLHA O PESO PARA A SEGURANÇA SANITÁRIA</span><p>
-                <span class="ambassador-question" style="width:80%;max-width:1000px;"><b>O peso padrão da simulação atribui 70% para Segurança Sanitária e 30% para Contribuição Econômica,</b> seguindo decisão do RS, principal inspiração para a ferramenta. 
-                <br>Este parâmetro pode ser alterado abaixo; entre em contato conosco para mais detalhes.</span><p>
+                <span class="ambassador-question" style="width:80%;max-width:1000px;"><br><b>O peso padrão da simulação atribui 70% para Segurança Sanitária e 30% para Contribuição Econômica,</b> seguindo decisão do RS, principal inspiração para a ferramenta. 
+                Este parâmetro pode ser alterado abaixo; entre em contato conosco para mais detalhes.</span><p>
             </div>
         </div>""",
         unsafe_allow_html=True,
     )
     session_state.saude_ordem_data["slider_value"] = st.slider(
-        "Selecione o valor abaixo", 70, 100, step=10
+        "Selecione o peso para Segurança Sanitária abaixo:", 70, 100, step=10
     )
     st.write(
         f"""
         <div class="base-wrapper">
-            <div class="saude-slider-value-display">Valor selecionado (Segurança): {session_state.saude_ordem_data["slider_value"]}% </div>
-            <div class="saude-slider-value-display">Valor selecionado (Economia): {100 - session_state.saude_ordem_data["slider_value"]}% </div>
+            <div class="saude-slider-value-display"><b>Peso selecionado (Segurança): {session_state.saude_ordem_data["slider_value"]}%</b>&nbsp;&nbsp;|  &nbsp;Peso restante para Economia: {100 - session_state.saude_ordem_data["slider_value"]}%</div>
         </div>""",
         unsafe_allow_html=True,
     )
 
 
-# DETAILS SECTION
-# INCLUDES THE DETAILED PLOT AND THE FULL DATA DOWNLOAD BUTTON
+# SEÇÃO DE DETALHES (INCLUDES THE DETAILED PLOT AND THE FULL DATA DOWNLOAD BUTTON)
 def gen_detailed_vision(economic_data, session_state, config):
     """ Uses session_state to decided wheter to hide or show the plot """
     st.write(
         f"""
         <div class="base-wrapper">
-            <span class="ambassador-question" style="width: 80%; max-width: 1000px;">
-                Clique em "Visão Detalhada" para ver o gráfico completo com todas as informações.
-            </span>
-            <div class="saude-download-clean-data-button-div">
-                <a href="{get_state_clean_data_url(session_state,config)}" download="dados_estado.csv" class="btn-ambassador">
-                    Baixar dados completos do estado
-                </a>
-            </div>
-        </div>""",
+            <span class="ambassador-question" style="width: 80%; max-width: 1000px;"><i>
+                Clique em "Visão Detalhada" para ver o gráfico completo com todas as informações.</i>
+            </span><br>""",
         unsafe_allow_html=True,
     )
     if st.button(
@@ -292,7 +284,7 @@ def display_detailed_plot(economic_data, session_state):
         </div>""",
         unsafe_allow_html=True,
     )
-    st.plotly_chart(fig, use_container_width=False)
+    st.plotly_chart(fig, use_container_width=True)
 
 
 def plot_cnae(economic_data, slider_value, by_range=True):
@@ -323,7 +315,7 @@ def plot_cnae(economic_data, slider_value, by_range=True):
         xaxis_type="log",
         xaxis_title="Contribuição Econômica",
         yaxis_title="Índice de Segurança",
-        font=dict(family="Oswald", size=18, color="#000000"),
+        font=dict(family="Oswald", size=12, color="#000000"),
     )
     wage_range = [
         int(np.amin(economic_data["total_wage_bill"].values)),
@@ -416,14 +408,27 @@ def gen_isoscore_lines(fig, score_parts, wage_range, weight):
         )
 
 
-# TABLES SECTION
-def gen_sector_tables(session_state, score_groups, default_size=5):
+# SEÇÃO DE TABELAS DE SETORES
+def gen_sector_tables(session_state, score_groups, config, default_size=5):
     """
     Major function that will generate all the tables from all the sectors.
     Uses session_state to decided if the table is open or closed
     """
     text = ""
     titles = ["D", "C", "B", "A"]
+
+    st.write("""
+        <div class="base-wrapper">
+            <span class="section-header primary-span">TABELAS DE CONTRIBUIÇÃO DOS SETORES</span><p><br>
+            <span class="ambassador-question">Abaixo você pode conferir todos os setores de cada grupo de apresentados, ordenados pelo <b>índice de priorização de reabertura Saúde em Ordem.</b></span>
+            <div><br>
+            <div class="saude-download-clean-data-button-div">
+                <a href="{get_state_clean_data_url(session_state,config)}" download="dados_estado.csv" class="btn-ambassador">
+                    Baixar dados completos do estado
+                </a>
+            </div>
+    """, unsafe_allow_html=True)
+
     for table_index in reversed(range(4)):
         # We create it all under a button but the table will be shown either way
         # The button is merely to alternate the state between open and closed
@@ -501,7 +506,7 @@ def gen_sector_table_row(sector_data, row_index):
         </div>"""
 
 
-# PROTOCOLS SECTION
+# SEÇÃO DE PROTOCOLOS
 def gen_protocols_section():
     st.write(
         """
@@ -510,6 +515,14 @@ def gen_protocols_section():
             DIRETRIZES PARA A ELABORAÇÃO DE PROTOCOLOS DE REABERTURA
         </span><br><br>
         <span class="ambassador-question">
+            Com base nos estudos referência do Guia SESI de prevenção da Covid-19 nas empresas e a lista de Prevenção e Controle de Perigos do departamento de Trabalho dos EUA, apresentamos algumas <b>recomendações para criação de protocolos de reabertura que garantam maior segurança para trabalhadores(as)</b>.<br>
+            As recomendações seguem uma Hierarquia de controles medidos pela sua efetividade e facilidade de se colocar em prática, como é apresentado abaixo:</span><br><br><br>
+        <figure>
+            <img class="saude-reopening-protocol-img-1" alt="Fonte: Guia SESI de prevenção da Covid-19 nas empresas (26/5/2020)" src="https://i.imgur.com/St9fAMB.png"><br>
+            <figcaption><i>Fonte: Guia SESI de prevenção da Covid-19 nas empresas (26/5/2020) ??</i></figcaption>
+        </figure>
+        <span class="ambassador-question"><br>
+            Em detalhe, os controles são entendidos por:<br><br>
             <b>Eliminação</b> – contempla a transferência para o trabalho remoto, ou seja, elimina riscos ocupacionais. Mesmo que a residência do funcionário não tenha a infraestrutura necessária, a transferência de computadores ou melhorias de acesso à internet são medidas possíveis e de baixo custo, com fácil implementação.
             <br><br>
             <b>Substituição</b>  – consiste em substituir riscos onde eles são inevitáveis, por um de menor magnitude. Vale assinalar os times que são ou não essenciais no trabalho presencial e segmentar a força de trabalho, mantendo somente o mínimo necessário de operação presencial e reduzindo o contato próximo entre times diferentes. 
@@ -520,21 +533,19 @@ def gen_protocols_section():
             <br><br>
             <b>EPIs</b>  – definição de qual é o EPI necessário para cada função, levando em conta o risco de cada atividade e também o ambiente. Trabalhos mais fisicamente exaustivos geralmente requerem troca de EPI mais constante ou especificações diferentes de outras atividades. É preciso garantir o correto uso desses equipamentos. No caso de máscaras simples, convém que a empresa distribua para os funcionários, garantindo certas especificações. Por exemplo, 
             <br><br>
-            <b>OBSERVAÇÃO:</b>   quanto mais alto na hierarquia, menos capacidade de supervisão e enforcement é exigida do empregador. Por isso, a primeira pergunta é sempre “quem pode ficar em casa?”. Treinar supervisores e garantir alinhamento institucional e cumprimento impecável de protocolos, etc. tem um custo e são medidas de difícil controle. 
+            <i>OBSERVAÇÃO: quanto mais alto na hierarquia, menos capacidade de supervisão e execução é exigida do empregador. Por isso, a primeira pergunta é sempre “quem pode ficar em casa?”. Treinar supervisores, garantir alinhamento institucional e cumprimento impecável de protocolos, etc. tem um custo e são medidas de difícil controle.</i>
             <br><br>
-            <b>Materiais que podem ser úteis:</b><br>
-            Guia do SESI para indústria (26/5/2020) ou a versão anterior dele.<br>
-            <a href="https://www.osha.gov/shpguidelines/hazard-prevention.html" style="color: blue;">Recommended Practices for Safety and Health Programs - United States Department of Labor</a>
+            <b>Referênicas:</b><br>
+            <a href="http://www.pe.sesi.org.br/Documents/Guia_SESI_de_prevencao_2805_2%20(1).pdf" style="color: blue;">[1] Guia SESI de prevenção da Covid-19 nas empresas (atualizado em 26/5/2020).</a><br>
+            <a href="https://www.osha.gov/shpguidelines/hazard-prevention.html" style="color: blue;">[2] Recommended Practices for Safety and Health Programs - United States Department of Labor</a></br>
+            <br><br>
         </span>
-        <img class="saude-reopening-protocol-img-1" src="https://i.imgur.com/St9fAMB.png">
     </div>""",
         unsafe_allow_html=True,
     )
 
 
-# END OF SAUDE EM ORDEM
-
-
+# MAIN
 def main(user_input, indicators, data, config, session_state):
     st.write(
         '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
@@ -554,5 +565,5 @@ def main(user_input, indicators, data, config, session_state):
     gen_illustrative_plot(score_groups, session_state)
     gen_slider(session_state)
     gen_detailed_vision(economic_data, session_state, config)
-    gen_sector_tables(session_state, score_groups, default_size=5)
+    gen_sector_tables(session_state, score_groups, config, default_size=5)
     gen_protocols_section()
