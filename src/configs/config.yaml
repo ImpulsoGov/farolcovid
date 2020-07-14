@@ -14,6 +14,9 @@ br:
             analysis:
                 cases: "br/cities/cases/full"
                 owid: "world/owid/heatmap"
+            safereopen:
+                economic_data: "br/states/safereopen/main"
+                cnae_sectors: "br/cnae/sectors"
     drive_paths:
         br_id_state_region_city: https://docs.google.com/spreadsheets/d/1Qo18XeP7Jxaj0IgVw-ISDf-MSpt2ZzbaUj9u3PT4hvc
         cities_population: https://docs.google.com/spreadsheets/d/1k8mXuUggBuBEghHhhLrLtA-5wa4JsAc-D35S5bNlf24
@@ -22,6 +25,8 @@ br:
         CNAE_sectors: https://docs.google.com/spreadsheets/d/1pP8dY9kRa9EvX3KcVPfMWJ8exDaoT1_bBggSKfD3y0k
         br_states_reopening_data: https://docs.google.com/spreadsheets/d/1-uU-CbE8k7ctRD-n8veEz0l--_ECcUyaa6ZcjhraO_o
         br_health_region_reopening_data: https://docs.google.com/spreadsheets/d/17FzeuXoHD5e9cqOHD1lcwyH7AgWTZ0UQ-7gwgA7VMok
+    drive_ids:
+        br_states_clean_data_index: 1D1ksrSGJUdDLUuYP7cLG3qdd-y9eFTkD
     cases:
         url: https://data.brasil.io/dataset/covid19/caso_full.csv.gz
         rename:
