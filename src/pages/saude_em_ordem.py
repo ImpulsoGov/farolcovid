@@ -417,7 +417,7 @@ def gen_sector_tables(session_state, score_groups, config, default_size=5):
     text = ""
     titles = ["D", "C", "B", "A"]
 
-    st.write("""
+    st.write(f"""
         <div class="base-wrapper">
             <span class="section-header primary-span">TABELAS DE CONTRIBUIÇÃO DOS SETORES</span><p><br>
             <span class="ambassador-question">Abaixo você pode conferir todos os setores de cada grupo de apresentados, ordenados pelo <b>índice de priorização de reabertura Saúde em Ordem.</b></span>
@@ -426,8 +426,7 @@ def gen_sector_tables(session_state, score_groups, config, default_size=5):
                 <a href="{get_state_clean_data_url(session_state,config)}" download="dados_estado.csv" class="btn-ambassador">
                     Baixar dados completos do estado
                 </a>
-            </div>
-    """, unsafe_allow_html=True)
+            </div>""", unsafe_allow_html=True)
 
     for table_index in reversed(range(4)):
         # We create it all under a button but the table will be shown either way
