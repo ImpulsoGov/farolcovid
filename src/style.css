@@ -1045,6 +1045,7 @@ header>.toolbar { /* Hide toolbar menu */
     border: 5px dashed #F2C94C;
     box-sizing: border-box;
     border-radius: 10px;
+    font-size: 24px;
 }
 .saude-sector-basic-plot-title{
     font-family: Oswald;
@@ -1544,4 +1545,16 @@ header>.toolbar { /* Hide toolbar menu */
     background: #FFFFFF;
     border-top: 2px solid #000000;
     box-sizing: border-box;
+}
+.saude-reopening-protocol-img-1{
+    position:relative;
+    width:70vw;
+    height:auto;
+    left:15vw;
+}
+.saude-download-clean-data-button-div{
+    position:relative;
+    float:right;
+    width: 300px;
+
 }

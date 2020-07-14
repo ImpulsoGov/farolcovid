@@ -9,67 +9,42 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 import math
+import os
+import pandas as pd
 
-DO_IT_BY_RANGE = True
+DO_IT_BY_RANGE = (
+    True  # DEFINES IF WE SHOULD RUN OUR CODE BY METHOD 1 (TRUE) OR 2 (FALSE)
+)
+# METHOD 1 IS DIVIDING THE RANGE OF VALUES IN 4 EQUAL PARTS IN SCORE VALUE
+# METHOD 2 IS DIVIDING OUR ACTIVITIES IN GROUPS OF ROUGHLY EQUAL SIZE AFTER RANKING THEM
 
-
-def chunks(l, n):
-    """
-    Yields n sequential chunks from l. Used for our sector splitting protocol
-    """
-    d, r = divmod(len(l), n)
-    for i in range(n):
-        si = (d + 1) * (i if i < r else r) + d * (0 if i < r else i - r)
-        yield l[si : si + (d + 1 if i < r else d)]
-
-
-def chunk_indexes(size, n):
-    """
-    Similar to the one above except it gives us splitting indexes
-    """
-    last = 0
-    while n > 1:
-        new_index = last + math.ceil(size / n)
-        yield new_index
-        size = size - math.ceil(size / n)
-        last = new_index
-        n = n - 1
-
-
-def range_separators_indexes(values, n):
-    # Values must be ordered from lowest to highest
-    separations = [
-        (((values[-1] - values[0]) / (n)) * (order + 1)) + values[0]
-        for order in range(n - 1)
-    ]
-    # print(separations)
-    return [
-        bisect.bisect_right(values, separationvalue) for separationvalue in separations
-    ]
-
-
-def chunks_by_range(target_list, key, n):
-    # For use in a list of dicts and to sort them by a specific key
-    split_indexes = range_separators_indexes(
-        [element[key] for element in target_list], n
+# INITIAL DATA PROCESSING
+def get_score_groups(config, session_state):
+    """ Takes our data and splits it into 4 sectors for use by our diagram generator """
+    uf_num = utils.get_place_id_by_names(session_state.state)
+    CNAE_sectors = loader.read_data(
+        "br", config, config["br"]["api"]["endpoints"]["safereopen"]["cnae_sectors"]
     )
-    chunks = []
-    last = 0
-    for i in range(n - 1):
-        chunks.append(target_list[last : split_indexes[i]])
-        last = split_indexes[i]
-    chunks.append(target_list[last::])
-    return chunks
-
-
-def convert_money(money):
-    """ Can be used later to make money look like whatever we want, but a of
-        now just adding the decimal separator should be enough
-    """
-    return f"{int(money):,}".replace(",", ".")
+    CNAE_sectors = dict(zip(CNAE_sectors.cnae, CNAE_sectors.activity))
+    economic_data = loader.read_data(
+        "br", config, config["br"]["api"]["endpoints"]["safereopen"]["economic_data"]
+    )
+    economic_data = economic_data.loc[economic_data["state_num_id"] == uf_num]
+    economic_data["activity_name"] = economic_data.apply(
+        lambda row: CNAE_sectors[row["cnae"]], axis=1
+    )
+    return (
+        gen_sorted_sectors(
+            economic_data,
+            session_state.saude_ordem_data["slider_value"],
+            DO_IT_BY_RANGE,
+        ),
+        economic_data,
+    )
 
 
 def gen_sorted_sectors(sectors_data, slider_value, by_range=True):
+    """ Cleans the data and separates in those 4 groups for later use by the table generator """
     column_name = "cd_id_" + "%02d" % (int(slider_value / 10))
     kept_columns = [
         "cnae",
@@ -91,52 +66,46 @@ def gen_sorted_sectors(sectors_data, slider_value, by_range=True):
     return sector_groups
 
 
-def main(user_input, indicators, data, config, session_state):
-    st.write(
-        '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
-        unsafe_allow_html=True,
+def chunks_by_range(target_list, key, n):
+    """ Divides a list of dictionaries by a given key through the method 1 group division method"""
+    # For use in a list of dicts and to sort them by a specific key
+    split_indexes = range_separators_indexes(
+        [element[key] for element in target_list], n
     )
-    if (
-        session_state.saude_ordem_data == None
-    ):  # If not loaded, load the data we are going to use in the user database
-        session_state.saude_ordem_data = {
-            "slider_value": 70,
-            "opened_tables": [False, False, False, False],
-            "opened_detailed_view": False,
-        }
-    score_groups, economic_data = get_score_groups(config, session_state)
-    # gen_header()
-    gen_intro()
-    gen_illustrative_plot(score_groups, session_state)
-    gen_slider(session_state)
-    gen_detailed_vision(economic_data, session_state)
-    gen_sector_tables(session_state, score_groups, default_size=5)
+    chunks = []
+    last = 0
+    for i in range(n - 1):
+        chunks.append(target_list[last : split_indexes[i]])
+        last = split_indexes[i]
+    chunks.append(target_list[last::])
+    return chunks
 
 
-def get_score_groups(config, session_state):
-    """ Takes our data and splits it into 4 sectors for use by our diagram generator """
-    uf_num = utils.get_place_id_by_names(session_state.state)
-    CNAE_sectors = loader.read_data(
-        "br", config, config["br"]["safereopen"]["cnae_sectors"]
-    )
-    CNAE_sectors = dict(zip(CNAE_sectors.cnae, CNAE_sectors.activity))
-    economic_data = loader.read_data(
-        "br", config, config["br"]["safereopen"]["economic_data"]
-    )
-    economic_data = economic_data.loc[economic_data["state_num_id"] == uf_num]
-    economic_data["activity_name"] = economic_data.apply(
-        lambda row: CNAE_sectors[row["cnae"]], axis=1
-    )
-    return (
-        gen_sorted_sectors(
-            economic_data,
-            session_state.saude_ordem_data["slider_value"],
-            DO_IT_BY_RANGE,
-        ),
-        economic_data,
-    )
+def range_separators_indexes(values, n):
+    """ Given a list of values separates them into n chunks by the method 1 and returns the index of cutting"""
+    # Values must be ordered from lowest to highest
+    separations = [
+        (((values[-1] - values[0]) / (n)) * (order + 1)) + values[0]
+        for order in range(n - 1)
+    ]
+    # print(separations)
+    return [
+        bisect.bisect_right(values, separationvalue) for separationvalue in separations
+    ]
 
 
+def chunks(l, n):
+    """
+    Yields n sequential chunks of l. Used for our sector splitting protocol in method2
+    """
+    # Values should be sorted
+    d, r = divmod(len(l), n)
+    for i in range(n):
+        si = (d + 1) * (i if i < r else r) + d * (0 if i < r else i - r)
+        yield l[si : si + (d + 1 if i < r else d)]
+
+
+# GENERATION OF INITIAL HTML
 def gen_header():
     st.write(
         """
@@ -166,6 +135,9 @@ def gen_intro():
     )
 
 
+# ILLUSTRATIVE PLOT SECTION
+
+
 def gen_illustrative_plot(sectors_data, session_state):
     """ Generates our illustrative sector diagram """
     if session_state.city == "Todos":
@@ -176,7 +148,7 @@ def gen_illustrative_plot(sectors_data, session_state):
     <div class="saude-sector-basic-plot-area">
         <div class="saude-veja-title" style="text-align:left;">SAUDE EM ORDEM | {section_title}</div>
         <div class="saude-sector-basic-plot-disc">
-            Os indicadores utilizados para o Saúde em Ordem são o tamanho da Contribuição Econômica e o Nível de Segurança do setor. <b>Quanto mais seguro de infecções o setor for e mais volumoso na produção do estado, mais vale a pena pensar em reabri-lo.</b>
+            Os dois principais indicadores utilizados são a Importância Econômica (medida pela soma dos salários pagos) e o Nível de Segurança Sanitária do setor. A ideia é que devemos iniciar a reabertura pelos setores de mais seguros do ponto de vista da saúde e de maior importância econômica.
         </div>
         <div class="saude-sector-basic-plot-title">
             Top 5 Setores por grupo de custo-benefício
@@ -230,6 +202,14 @@ def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
     return text
 
 
+def convert_money(money):
+    """ Can be used later to make money look like whatever we want, but a of
+        now just adding the decimal separator should be enough
+    """
+    return f"{int(money):,}".replace(",", ".")
+
+
+# SLIDER SECTION
 def gen_slider(session_state):
     """ Generates the weight slider we see after the initial sector diagram and saves it to session_state"""
     st.write(
@@ -256,8 +236,24 @@ def gen_slider(session_state):
     )
 
 
-def gen_detailed_vision(economic_data, session_state):
+# DETAILS SECTION
+# INCLUDES THE DETAILED PLOT AND THE FULL DATA DOWNLOAD BUTTON
+def gen_detailed_vision(economic_data, session_state, config):
     """ Uses session_state to decided wheter to hide or show the plot """
+    st.write(
+        f"""
+        <div class="base-wrapper">
+            <span class="ambassador-question" style="width: 80%; max-width: 1000px;">
+                Clique em "Visão Detalhada" para ver o gráfico completo com todas as informações.
+            </span>
+            <div class="saude-download-clean-data-button-div">
+                <a href="{get_state_clean_data_url(session_state,config)}" download="dados_estado.csv" class="btn-ambassador">
+                    Baixar dados completos do estado
+                </a>
+            </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
     if st.button(
         "Visão Detalhada"
     ):  # If the button is clicked just alternate the opened flag and plot it
@@ -269,6 +265,17 @@ def gen_detailed_vision(economic_data, session_state):
     else:  # If the button is not clicked plot it as well but do not alter the flag
         if session_state.saude_ordem_data["opened_detailed_view"] is True:
             display_detailed_plot(economic_data, session_state)
+
+
+def get_state_clean_data_url(session_state, config):
+    """Reads which state are we using and returns the correct file download url for it"""
+    state_num_id = utils.get_place_id_by_names(session_state.state)
+    index_file_url = f'https://drive.google.com/uc?export=download&id={config["br"]["drive_ids"]["br_states_clean_data_index"]}'
+    state_data_index = pd.read_csv(index_file_url)
+    uf_file_id = state_data_index.loc[state_data_index["state_num_id"] == state_num_id][
+        "file_id"
+    ].values[0]
+    return f"https://drive.google.com/uc?export=download&id={uf_file_id}"
 
 
 def display_detailed_plot(economic_data, session_state):
@@ -357,6 +364,19 @@ def plot_cnae(economic_data, slider_value, by_range=True):
     return fig
 
 
+def chunk_indexes(size, n):
+    """
+    Similar to the chunks() method but it gives us the splitting indexes
+    """
+    last = 0
+    while n > 1:
+        new_index = last + math.ceil(size / n)
+        yield new_index
+        size = size - math.ceil(size / n)
+        last = new_index
+        n = n - 1
+
+
 def gen_isoscore_lines(fig, score_parts, wage_range, weight):
     """
     Goes through each value defining a iso-score line and draws it on the plot with a colored area.
@@ -396,6 +416,7 @@ def gen_isoscore_lines(fig, score_parts, wage_range, weight):
         )
 
 
+# TABLES SECTION
 def gen_sector_tables(session_state, score_groups, default_size=5):
     """
     Major function that will generate all the tables from all the sectors.
@@ -479,3 +500,59 @@ def gen_sector_table_row(sector_data, row_index):
             <div class="saude-table-field tf5">{"%0.2f"%sector_data["score"]}</div>
         </div>"""
 
+
+# PROTOCOLS SECTION
+def gen_protocols_section():
+    st.write(
+        """
+    <div class="base-wrapper">
+        <span class="section-header primary-span">
+            DIRETRIZES PARA A ELABORAÇÃO DE PROTOCOLOS DE REABERTURA
+        </span><br><br>
+        <span class="ambassador-question">
+            <b>Eliminação</b> – contempla a transferência para o trabalho remoto, ou seja, elimina riscos ocupacionais. Mesmo que a residência do funcionário não tenha a infraestrutura necessária, a transferência de computadores ou melhorias de acesso à internet são medidas possíveis e de baixo custo, com fácil implementação.
+            <br><br>
+            <b>Substituição</b>  – consiste em substituir riscos onde eles são inevitáveis, por um de menor magnitude. Vale assinalar os times que são ou não essenciais no trabalho presencial e segmentar a força de trabalho, mantendo somente o mínimo necessário de operação presencial e reduzindo o contato próximo entre times diferentes. 
+            <br><br>
+            <b>Controles de engenharia</b>  – fala de aspectos estruturais do ambiente de trabalho. No caso do coronavírus, podem ser citados como exemplos o controle de ventilação e purificação de ar, reduzindo o risco da fonte e não no nível individual. São fatores altamente ligados ao contexto, seja da atividade, seja do espaço físico onde ocorrem.
+            <br><br>
+            <b>Controles administrativos</b>  – consiste nos controles de fluxo e quantidade de pessoas no ambiente de trabalho (de-densificação do ambiente) e sobre protocolos e regras a serem seguidos, como periodicidade e métodos de limpeza, montagem de plantões e/ou escala, organização de filas para elevadores e uso de áreas comuns, proibição de reuniões presenciais, reorganização das estações de trabalho para aumentar distância entre pessoas para 2m ou mais, etc. 
+            <br><br>
+            <b>EPIs</b>  – definição de qual é o EPI necessário para cada função, levando em conta o risco de cada atividade e também o ambiente. Trabalhos mais fisicamente exaustivos geralmente requerem troca de EPI mais constante ou especificações diferentes de outras atividades. É preciso garantir o correto uso desses equipamentos. No caso de máscaras simples, convém que a empresa distribua para os funcionários, garantindo certas especificações. Por exemplo, 
+            <br><br>
+            <b>OBSERVAÇÃO:</b>   quanto mais alto na hierarquia, menos capacidade de supervisão e enforcement é exigida do empregador. Por isso, a primeira pergunta é sempre “quem pode ficar em casa?”. Treinar supervisores e garantir alinhamento institucional e cumprimento impecável de protocolos, etc. tem um custo e são medidas de difícil controle. 
+            <br><br>
+            <b>Materiais que podem ser úteis:</b><br>
+            Guia do SESI para indústria (26/5/2020) ou a versão anterior dele.<br>
+            <a href="https://www.osha.gov/shpguidelines/hazard-prevention.html" style="color: blue;">Recommended Practices for Safety and Health Programs - United States Department of Labor</a>
+        </span>
+        <img class="saude-reopening-protocol-img-1" src="https://i.imgur.com/St9fAMB.png">
+    </div>""",
+        unsafe_allow_html=True,
+    )
+
+
+# END OF SAUDE EM ORDEM
+
+
+def main(user_input, indicators, data, config, session_state):
+    st.write(
+        '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+        unsafe_allow_html=True,
+    )
+    if (
+        session_state.saude_ordem_data == None
+    ):  # If not loaded, load the data we are going to use in the user database
+        session_state.saude_ordem_data = {
+            "slider_value": 70,
+            "opened_tables": [False, False, False, False],
+            "opened_detailed_view": False,
+        }
+    score_groups, economic_data = get_score_groups(config, session_state)
+    # gen_header()
+    gen_intro()
+    gen_illustrative_plot(score_groups, session_state)
+    gen_slider(session_state)
+    gen_detailed_vision(economic_data, session_state, config)
+    gen_sector_tables(session_state, score_groups, default_size=5)
+    gen_protocols_section()

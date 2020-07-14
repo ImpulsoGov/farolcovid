@@ -233,7 +233,7 @@ def upload_file_gdrive(filepath):
 
 def generate_download_button(file_id):
     file_url = f"https://drive.google.com/uc?export=download&id={file_id}"
-    return f'<div class="base-wrapper"><a style="color: blue;" href="{file_url}" download="relatorio.pdf">Clique aqui para baixar</a></div>'
+    return f'<div class="base-wrapper"><a href="{file_url}" download="relatorio.pdf" class="btn-ambassador">Clique aqui para baixar</a></div>'
 
 
 def gen_dict_from_card(card):
