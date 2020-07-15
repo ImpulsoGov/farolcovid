@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Cookie machine</title>
+    <link href='https://fonts.googleapis.com/css?family=IBM Plex Sans Condensed' rel='stylesheet'>
+    <style>
+        body {
+            font-family: 'IBM Plex Sans Condensed';
+            font-size: 22px;
+        }
+    </style>
+    <script>
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        function decideWhatToDo(urlParams) {
+            if (("load_user_data" in urlParams.keys()) || (urlParams["load_user_data"] == true)) {
+                getUserData('https://json.geoiplookup.io/'); //OUR API URL
+            } else {
+                setCookie(urlParams.get('cookie_name'), urlParams.get('cookie_value'), urlParams.get('cookie_days'));
+            }
+
+        }
+        function setCookie(name, value, days) {
+            var expires = "";
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "") + expires + "; path=/";
+        }
+        function listCookies() {
+            var theCookies = document.cookie.split(';');
+            var aString = '';
+            for (var i = 1; i <= theCookies.length; i++) {
+                aString += i + ' ' + theCookies[i - 1] + "\n";
+            }
+            return aString;
+        }
+        var getJSON = function (url, callback) {
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.responseType = 'json';
+
+            xhr.onload = function () {
+
+                var status = xhr.status;
+
+                if (status == 200) {
+                    callback(null, xhr.response);
+                } else {
+                    callback(status);
+                }
+            };
+
+            xhr.send();
+        };
+        function getUserData(in_url) {
+            getJSON(in_url, function (err, data) {
+                if (err != null) {
+                    console.error(err);
+                } else {
+                    console.log(Object.keys(data));
+                    //Put the cookie in the browser
+                    var sep = "|%"
+                    var data_fields = ["ip", "isp", "org", "latitude", "longitude", "city", "country_name", "region"];
+                    for (var i = 0; i < data_fields.length; i++) {
+                        data_fields[i] = data_fields[i] + "|:" + data[data_fields[i]];
+                    }
+                    var cookie_data = data_fields.join(sep);
+                    setCookie("user_public_data", cookie_data, 1);
+                }
+            });
+        }
+    </script>
+</head>
+
+<body onload="decideWhatToDo(urlParams);">
+    <button onclick="window.alert(listCookies());">Check your current cookies</button>
+    <button onclick="window.alert(getUserData('https://json.geoiplookup.io/'))">Check your local info</button>
+</body>
+
+</html>

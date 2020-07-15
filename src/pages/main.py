@@ -181,24 +181,11 @@ def get_data(config):
     )
 
 
-def main():
+def main(session_state):
 
     # Get user info
     user_analytics = amplitude.gen_user(utils.get_server_session())
     opening_response = user_analytics.log_event("opened farol", dict())
-    session_state = session.SessionState.get(
-        key=session.get_user_id(),
-        update=False,
-        number_beds=None,
-        number_ventilators=None,
-        number_cases=None,
-        number_deaths=None,
-        state="Acre",
-        city="Todos",
-        refresh=False,
-        reset=False,
-        saude_ordem_data=None,
-    )
 
     utils.localCSS("style.css")
 
@@ -448,11 +435,9 @@ def main():
     products = ProductCards
     products[1].recommendation = f'Risco {data["overall_alert"].values[0]}'
     utils.genProductsSection(products)
-
     product = st.selectbox(
         "", ["Como você gostaria de prosseguir?", "SimulaCovid", "Saúde em Ordem",],
     )
-
     if product == "SimulaCovid":
         user_analytics.log_event("picked simulacovid", dict())
         # Downloading the saved data from memory
@@ -463,7 +448,6 @@ def main():
         sm.main(user_input, indicators, data, config, session_state)
         # TODO: remove comment on this later!
         # utils.gen_pdf_report()
-
     elif product == "Saúde em Ordem":
         user_analytics.log_event("picked saude_em_ordem", dict())
         so.main(user_input, indicators, data, config, session_state)

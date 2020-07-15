@@ -21,9 +21,27 @@ import pages.main as fc
 import pages.risk_description as rd
 import pages.rt_description as rt
 import pages.saude_em_ordem_description as sod
+import utils
+import session
 
 
 def main():
+    session_state = session.SessionState.get(
+        key=session.get_user_id(),
+        update=False,
+        number_beds=None,
+        number_ventilators=None,
+        number_cases=None,
+        number_deaths=None,
+        state="Acre",
+        city="Todos",
+        refresh=False,
+        reset=False,
+        saude_ordem_data=None,
+        already_generated_user_id=None,
+        pages_open=None,
+    )
+    utils.manage_user_existence(utils.get_server_session(), session_state)
     page = st.sidebar.radio(
         "Menu",
         [
@@ -43,7 +61,7 @@ def main():
 
     elif page == "FarolCovid":
         if __name__ == "__main__":
-            fc.main()
+            fc.main(session_state)
 
     elif page == "Análises":
         if __name__ == "__main__":

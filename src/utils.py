@@ -3,6 +3,7 @@ from streamlit.server.Server import Server
 from datetime import datetime
 from datetime import timedelta
 from typing import List, Dict
+import session
 from models import (
     SimulatorOutput,
     ContainmentStrategy,
@@ -28,6 +29,7 @@ import functools
 import inspect
 import textwrap
 import yaml
+import random
 
 configs_path = os.path.join(os.path.dirname(__file__), "configs")
 cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
@@ -230,9 +232,72 @@ def get_ufs_list():
 
 
 # FRONT-END TOOLS
+# AMPLITUDE ANALYTICS HELPER METHODS
+# PLUS SOME EXTRA STREAMLIT HACKING
+# Kept for backwards compatibility reasons
 def get_server_session():
-    return Server.get_current()
+    return session._get_session_raw()
 
+
+def manage_user_existence(user_session, session_state):
+    """ 
+        Decides if the user is new or not and if it is new generates a random id 
+        Will not try to do it twice because we can have the case of the user refusing to hold our cookies
+        therefore we will consider him the anonymous user and give up trying to give him our cookie.
+    """
+    user_data = parse_headers(user_session.ws.request)
+    if session_state.already_generated_user_id is None:
+        session_state.already_generated_user_id = False
+    if (
+        "user_unique_id" not in user_data["Cookie"].keys()
+        and session_state.already_generated_user_id is False
+    ):
+        hash_id = gen_hash_code(size=32)
+        session_state.already_generated_user_id = True
+        give_cookies("user_unique_id", hash_id, 99999, True)
+
+
+def gen_hash_code(size=16):
+    return "".join(
+        random.choice("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuv")
+        for i in range(size)
+    )
+
+
+def parse_headers(request):
+    """ Takes a raw streamlit request header and converts it to a nicer dictionary """
+    data = dict(request.headers.items())
+    ip = request.remote_ip
+    data["Cookie"] = dict([i.split("=") for i in data["Cookie"].split("; ")])
+    if "user_public_data" in data["Cookie"].keys():
+        data["Cookie"]["user_public_data"] = dict(
+            [i.split("|:") for i in data["Cookie"]["user_public_data"].split("|%")]
+        )
+    data["Remote_ip"] = ip
+    return data
+
+
+def give_cookies(cookie_name, cookie_info, cookie_days=99999, rerun=False):
+    """ Gives the user a browser cookie """
+    # Cookie days is how long in days will the cookie last
+    st.write(
+        f"""
+        <iframe src="resources/cookiegen.html?cookie_name={cookie_name}&cookie_value={cookie_info}&cookies_days={cookie_days}" height="0" width="0" style="border: none; float: right;"></iframe>""",
+        unsafe_allow_html=True,
+    )
+    if rerun:
+        session.rerun()
+
+
+def update_user_public_info():
+    """ updates the user's public data for us like his ip address and geographical location """
+    st.write(
+        f"""
+        <iframe src="resources/cookiegen.html?load_user_data=true" height="0" width="0" style="border: none; float: right;"></iframe>""",
+        unsafe_allow_html=True,
+    )
+
+#END OF AMPLITUDE HELPER METHODS
 
 def gen_pdf_report():
     st.write(

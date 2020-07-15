@@ -437,7 +437,7 @@ def gen_sector_tables(session_state, score_groups, default_size=5):
 
 
 def gen_single_table(session_state, score_groups, data_index, n=5):
-    """ Generates an entire table fro one sector given the data we have and the index of such sector from D to A """
+    """ Generates an entire table for one sector given the data we have and the index of such sector from D to A """
     text = ""  # Our HTML will be stored here
     # Constants
     titles = ["Grupo D ⚠", "Grupo C ‼", "Grupo B 🙌", "Grupo A ✅"]

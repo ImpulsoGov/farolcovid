@@ -2,6 +2,8 @@ import requests
 import yaml
 import json
 import os
+import amplitude
+import utils
 
 ipinfo_url = "https://geolocation-db.com/json/"
 headers = {"Content-Type": "application/json", "Accept": "*/*"}
@@ -94,38 +96,40 @@ def hash_mock_name(ip):
 
 
 def gen_user(current_server_session):
-    user_ip = list(current_server_session._session_info_by_id.values())[
-        0
-    ].ws.request.remote_ip
-    user_name = hash_mock_name(user_ip)
-    return Amplitude_user(os.getenv("AMPLITUDE_KEY"), user_ip, user_name)
+    data = utils.parse_headers(current_server_session.ws.request)
+    user_data = {"has_precise_ip": False}
+    if "user_public_data" in data["Cookie"].keys():
+        for key in data["Cookie"]["user_public_data"].keys():
+            user_data[key] = data["Cookie"]["user_public_data"][key]
+        user_data["has_precise_ip"] = True
+    else:
+        user_data["ip"] = data["Remote_ip"]
+    if "user_unique_id" in data["Cookie"].keys():
+        user_data["user_id"] = data["Cookie"]["user_unique_id"]
+    else:
+        user_data["user_id"] = "anonymous"
+
+    return Amplitude_user(os.getenv("AMPLITUDE_KEY"), user_data)
 
 
 class Amplitude_user:
-    def __init__(self, apikey, inip, inname):
+    def __init__(self, apikey, inuser_data):
         self.key = apikey
-        self.ip = inip
-        self.name = inname
-        self.has_ip_info = False
-        try:
-            self.ip_data = json.loads(requests.get(ipinfo_url + str(inip)).content)
-            if self.ip_data["country_code"] != "Not found":
-                self.has_ip_info = True
-        except:
-            pass
+        self.user_data = inuser_data
 
     def log_event(self, event, event_args=dict()):
-        event_data = {"user_id": self.name}
+        event_data = {"user_id": self.user_data["user_id"]}
         # print(self.name + " has " + event)
         event_data["event_type"] = event
         event_data["user_properties"] = event_args
-        event_data["ip"] = self.ip
-        if self.has_ip_info:
-            event_data["country"] = self.ip_data["country_name"]
-            event_data["region"] = self.ip_data["state"]
-            event_data["city"] = self.ip_data["city"]
-            event_data["location_lat"] = self.ip_data["latitude"]
-            event_data["location_lng"] = self.ip_data["longitude"]
+        event_data["ip"] = self.user_data["ip"]
+        if self.user_data["has_precise_ip"]:
+            event_data["country"] = self.user_data["country_name"]
+            event_data["region"] = self.user_data["region"]
+            event_data["city"] = self.user_data["city"]
+            event_data["location_lat"] = self.user_data["latitude"]
+            event_data["location_lng"] = self.user_data["longitude"]
+            event_data["carrier"] = self.user_data["isp"]
         request_data = {"api_key": self.key, "events": [event_data]}
         response = requests.post(
             "https://api.amplitude.com/2/httpapi", json=request_data, headers=headers
