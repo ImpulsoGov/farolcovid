@@ -110,7 +110,7 @@ def update_indicators(indicators, data, config, user_input, session_state):
     dmonth = get_dmonth(
         run_simulation(user_input, config),
         "I2",
-        user_input["number_beds"]
+        session_state.number_beds
         # * config["br"]["simulacovid"]["resources_available_proportion"],
     )["best"]
 
