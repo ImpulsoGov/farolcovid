@@ -22,7 +22,6 @@ from streamlit.server.Server import Server
 def fix_type(x, group):
 
     if type(x) == np.ndarray:
-        print("algum valor aqui:", x)
         return " a ".join(
             [str(round(i, 1)) if type(i) != str else i.strip() for i in x]
         )
@@ -165,12 +164,12 @@ def get_data(config):
             "br",
             config,
             endpoint=config["br"]["api"]["endpoints"]["farolcovid"]["cities"],
-        ),  # .replace({"medio": "médio", "insatisfatorio": "insatisfatório"}),
+        ).replace({"medio": "médio", "insatisfatorio": "insatisfatório"}),
         loader.read_data(
             "br",
             config,
             endpoint=config["br"]["api"]["endpoints"]["farolcovid"]["states"],
-        ),  # .replace({"medio": "médio", "insatisfatorio": "insatisfatório"}),
+        ).replace({"medio": "médio", "insatisfatorio": "insatisfatório"}),
     )
 
 
