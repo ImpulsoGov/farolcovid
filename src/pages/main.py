@@ -22,7 +22,10 @@ from streamlit.server.Server import Server
 def fix_type(x, group):
 
     if type(x) == np.ndarray:
-        return " a ".join([str(round(i, 1)) for i in x])
+        print("algum valor aqui:", x)
+        return " a ".join(
+            [str(round(i, 1)) if type(i) != str else i.strip() for i in x]
+        )
 
     if (type(x) == str) or (type(x) == np.int64) or (type(x) == int):
         return x
@@ -92,17 +95,10 @@ def update_indicators(indicators, data, config, user_input, session_state):
                 indicators[group].right_display = "- "
                 indicators[group].left_display = "- "
 
-    # if (
-    # session_state.number_beds != None and session_state.reset is False
-    # ):  # Loading values from memory
     indicators["subnotification_rate"].left_display = session_state.number_cases
-    indicators["hospital_capacity"].left_display = int(
-        session_state.number_beds
-        # config["br"]["simulacovid"]["resources_available_proportion"]
-    )
+    indicators["hospital_capacity"].left_display = int(session_state.number_beds)
     indicators["hospital_capacity"].right_display = int(
         session_state.number_ventilators
-        # config["br"]["simulacovid"]["resources_available_proportion"]
     )
 
     # Recalcula capacidade hospitalar
@@ -110,10 +106,7 @@ def update_indicators(indicators, data, config, user_input, session_state):
     user_input = sm.calculate_recovered(user_input, data)
 
     dmonth = get_dmonth(
-        run_simulation(user_input, config),
-        "I2",
-        user_input["number_beds"]
-        # * config["br"]["simulacovid"]["resources_available_proportion"],
+        run_simulation(user_input, config), "I2", session_state.number_beds
     )["best"]
 
     # TODO: add no config e juntar com farol
@@ -172,12 +165,12 @@ def get_data(config):
             "br",
             config,
             endpoint=config["br"]["api"]["endpoints"]["farolcovid"]["cities"],
-        ).replace({"medio": "médio", "insatisfatorio": "insatisfatório"}),
+        ),  # .replace({"medio": "médio", "insatisfatorio": "insatisfatório"}),
         loader.read_data(
             "br",
             config,
             endpoint=config["br"]["api"]["endpoints"]["farolcovid"]["states"],
-        ).replace({"medio": "médio", "insatisfatorio": "insatisfatório"}),
+        ),  # .replace({"medio": "médio", "insatisfatorio": "insatisfatório"}),
     )
 
 
@@ -380,7 +373,10 @@ def main():
             fig = plots.gen_social_dist_plots_placeid(locality_id)
             st.plotly_chart(fig, use_container_width=True)
         except:
-            st.write("Seu município ou estado não possui mais de 30 dias de dado.")
+            st.write(
+                """<div class="base-wrapper"><b>Seu município ou estado não possui mais de 30 dias de dados, ou não possui o índice calculado pela inloco.</b>""",
+                unsafe_allow_html=True,
+            )
         st.write(
             f"""
             <div class="base-wrapper">
@@ -397,7 +393,10 @@ def main():
             fig2 = plots.plot_rt_wrapper(locality_id)
             st.plotly_chart(fig2, use_container_width=True)
         except:
-            st.write("Seu município ou estado não possui mais de 30 dias de dado.")
+            st.write(
+                """<div class="base-wrapper"><b>Seu município ou estado não possui mais de 30 dias de dados de casos confirmados.</b>""",
+                unsafe_allow_html=True,
+            )
         st.write(
             "<div class='base-wrapper'><i>Em breve:</i> gráficos de subnotificação.</div>",
             unsafe_allow_html=True,
