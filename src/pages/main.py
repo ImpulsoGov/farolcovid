@@ -20,7 +20,7 @@ from streamlit.server.Server import Server
 def fix_type(x, group):
 
     if type(x) == np.ndarray:
-        return " a ".join([str(round(i, 1)) for i in x])
+        return " a ".join([str(round(i, 1)) if type(i) != str else i.strip() for i in x])
 
     if (type(x) == str) or (type(x) == np.int64) or (type(x) == int):
         return x
