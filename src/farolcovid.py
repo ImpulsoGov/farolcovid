@@ -48,6 +48,9 @@ def main():
     # in each state, the value will be something that allows us to identify there is a change or not
     # which in turn allows us to decide if we should log the event or not"""
     utils.manage_user_existence(utils.get_server_session(), session_state)
+    utils.update_user_public_info()
+    u_data = utils.parse_headers(utils.get_server_session().ws.request)
+    # st.write(u_data)
     page = st.sidebar.radio(
         "Menu",
         [

@@ -5,6 +5,7 @@ import os
 import amplitude
 import utils
 import datetime
+from ua_parser import user_agent_parser
 
 headers = {"Content-Type": "application/json", "Accept": "*/*"}
 
@@ -25,7 +26,9 @@ def gen_user(current_server_session):
         user_data["user_id"] = data["Cookie"]["user_unique_id"]
     else:
         user_data["user_id"] = "anonymous"
-
+    for inkey in data.keys():
+        if inkey[:3] == "ua_":
+            user_data[inkey] = data[inkey]
     return Amplitude_user(os.getenv("AMPLITUDE_KEY"), user_data)
 
 
@@ -52,6 +55,9 @@ class Amplitude_user:
             event_data["location_lat"] = self.user_data["latitude"]
             event_data["location_lng"] = self.user_data["longitude"]
             event_data["carrier"] = self.user_data["isp"]
+        for inkey in self.user_data.keys():
+            if inkey[:3] == "ua_":
+                event_data[inkey[3:]] = self.user_data[inkey]
         request_data = {"api_key": self.key, "events": [event_data]}
         response = requests.post(
             "https://api.amplitude.com/2/httpapi", json=request_data, headers=headers

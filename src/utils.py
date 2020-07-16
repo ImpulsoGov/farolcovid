@@ -30,6 +30,7 @@ import inspect
 import textwrap
 import yaml
 import random
+from ua_parser import user_agent_parser
 
 configs_path = os.path.join(os.path.dirname(__file__), "configs")
 cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
@@ -254,6 +255,7 @@ def manage_user_existence(user_session, session_state):
     ):
         hash_id = gen_hash_code(size=32)
         session_state.already_generated_user_id = True
+        update_user_public_info()
         give_cookies("user_unique_id", hash_id, 99999, True)
 
 
@@ -274,7 +276,27 @@ def parse_headers(request):
             [i.split("|:") for i in data["Cookie"]["user_public_data"].split("|%")]
         )
     data["Remote_ip"] = ip
+    data.update(parse_user_agent(data["User-Agent"]))
     return data
+
+
+def parse_user_agent(ua_string):
+    in_data = user_agent_parser.Parse(ua_string)
+    out_data = dict()
+    data_reference = [
+        ["os_name", ["os", "family"]],
+        ["os_version", ["os", "major"]],
+        ["device_manufacturer", ["device", "brand"]],
+        ["device_model", ["device", "model"]],
+        ["platform", ["user_agent", "family"]],
+        ["app_version", ["user_agent", "major"]],
+    ]
+    for key_in, keys_out in data_reference:
+        try:
+            out_data["ua_" + key_in] = in_data[keys_out[0]][keys_out[1]]
+        except:
+            out_data["ua_" + key_in] = None
+    return out_data
 
 
 def give_cookies(cookie_name, cookie_info, cookie_days=99999, rerun=False):
@@ -297,7 +319,9 @@ def update_user_public_info():
         unsafe_allow_html=True,
     )
 
-#END OF AMPLITUDE HELPER METHODS
+
+# END OF AMPLITUDE HELPER METHODS
+
 
 def gen_pdf_report():
     st.write(

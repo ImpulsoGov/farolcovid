@@ -13,8 +13,9 @@
     <script>
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
+        const proxyurl = "https://cors-anywhere.herokuapp.com/";
         function decideWhatToDo(urlParams) {
-            if (("load_user_data" in urlParams.keys()) || (urlParams["load_user_data"] == true)) {
+            if (urlParams.get("load_user_data") == "true") {
                 getUserData('https://json.geoiplookup.io/'); //OUR API URL
             } else {
                 setCookie(urlParams.get('cookie_name'), urlParams.get('cookie_value'), urlParams.get('cookie_days'));
@@ -42,6 +43,7 @@
 
             var xhr = new XMLHttpRequest();
             xhr.open('GET', url, true);
+            xhr.setRequestHeader('Accept', '*/*');
             xhr.responseType = 'json';
 
             xhr.onload = function () {
@@ -71,6 +73,7 @@
                     }
                     var cookie_data = data_fields.join(sep);
                     setCookie("user_public_data", cookie_data, 1);
+                    //window.parent.alert("done");
                 }
             });
         }
