@@ -26,6 +26,7 @@ import session
 
 
 def main():
+    # Defines the db structure of our makeshift session db
     session_state = session.SessionState.get(
         key=session.get_user_id(),
         update=False,
@@ -40,7 +41,12 @@ def main():
         saude_ordem_data=None,
         already_generated_user_id=None,
         pages_open=None,
+        amplitude_events=None,
+        old_amplitude_events=None,
     )
+    # In those amplitude events objects we are going to save a dict with every state as keys
+    # in each state, the value will be something that allows us to identify there is a change or not
+    # which in turn allows us to decide if we should log the event or not"""
     utils.manage_user_existence(utils.get_server_session(), session_state)
     page = st.sidebar.radio(
         "Menu",
@@ -57,7 +63,7 @@ def main():
 
     if page == "Modelo Epidemiológico":
         if __name__ == "__main__":
-            md.main()
+            md.main(session_state)
 
     elif page == "FarolCovid":
         if __name__ == "__main__":
@@ -65,22 +71,22 @@ def main():
 
     elif page == "Análises":
         if __name__ == "__main__":
-            anal.main()
+            anal.main(session_state)
 
     elif page == "Quem somos?":
         if __name__ == "__main__":
-            tm.main()
+            tm.main(session_state)
 
     elif page == "Níveis de Risco":
         if __name__ == "__main__":
-            rd.main()
+            rd.main(session_state)
 
     elif page == "Estimando Ritmo de Contágio":
         if __name__ == "__main__":
-            rt.main()
+            rt.main(session_state)
     elif page == "Metodologia do Saúde em Ordem":
         if __name__ == "__main__":
-            sod.main()
+            sod.main(session_state)
 
 
 if __name__ == "__main__":

@@ -240,9 +240,11 @@ def prepare_heatmap(df, place_type, group=None, mavg_days=5):
     )
 
 
-def main():
+def main(session_state):
     user_analytics = amplitude.gen_user(utils.get_server_session())
-    opening_response = user_analytics.log_event("opened analysis")
+    opening_response = user_analytics.safe_log_event(
+        "opened analysis", session_state, is_new_page=True
+    )
     utils.localCSS("style.css")
     utils.localCSS("icons.css")
 

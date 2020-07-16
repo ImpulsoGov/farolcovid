@@ -197,7 +197,7 @@ def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
         <div class="saude-plot-group-massa-salarial-value">R$ {convert_money(average_wage)}</div>
         <div class="saude-plot-group-separator-line"></div>
         <div class="saude-plot-group-pessoas-label">Número de pessoas: </div>
-        <div class="saude-plot-group-pessoas-value">{num_people}</div>
+        <div class="saude-plot-group-pessoas-value">{convert_money(num_people)}</div>
     </div>"""
     return text
 
@@ -225,6 +225,11 @@ def gen_slider(session_state):
     )
     session_state.saude_ordem_data["slider_value"] = st.slider(
         "Selecione o valor abaixo", 70, 100, step=10
+    )
+    amplitude.gen_user(utils.get_server_session()).safe_log_event(
+        "chose saude_slider_value",
+        session_state,
+        event_args={"slider_value": session_state.saude_ordem_data["slider_value"]},
     )
     st.write(
         f"""
@@ -257,6 +262,11 @@ def gen_detailed_vision(economic_data, session_state, config):
     if st.button(
         "Visão Detalhada"
     ):  # If the button is clicked just alternate the opened flag and plot it
+        amplitude.gen_user(utils.get_server_session()).safe_log_event(  # Logs the event
+            "picked saude_em_ordem_detailed_view",
+            session_state,
+            event_args={"state": session_state.state, "city": session_state.city,},
+        )
         session_state.saude_ordem_data[
             "opened_detailed_view"
         ] = not session_state.saude_ordem_data["opened_detailed_view"]
@@ -480,7 +490,7 @@ def gen_single_table(session_state, score_groups, data_index, n=5):
         text += gen_sector_table_row(sector_data, index)
     text += f"""<div class="saude-table-total-box">
             <div class="saude-table-field te1">Total</div>
-            <div class="saude-table-field te3">{total_workers}</div>
+            <div class="saude-table-field te3">{convert_money(total_workers)}</div>
             <div class="saude-table-field te4">R$ {convert_money(total_wages)}</div>
         </div>
         <div class="saude-table-endspacer">
@@ -495,7 +505,7 @@ def gen_sector_table_row(sector_data, row_index):
     return f"""<div class="saude-table-row {["tlblue","tlwhite"][row_index % 2]}">
             <div class="saude-table-field tf1">{sector_data["activity_name"]}</div>
             <div class="saude-table-field tf2">{"%0.2f"%sector_data["security_index"]}</div>
-            <div class="saude-table-field tf3">{sector_data["n_employee"]}</div>
+            <div class="saude-table-field tf3">{convert_money(sector_data["n_employee"])}</div>
             <div class="saude-table-field tf4">R$ {convert_money(sector_data["total_wage_bill"])}</div>
             <div class="saude-table-field tf5">{"%0.2f"%sector_data["score"]}</div>
         </div>"""
