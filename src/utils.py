@@ -31,6 +31,7 @@ import textwrap
 import yaml
 import random
 from ua_parser import user_agent_parser
+import time
 
 configs_path = os.path.join(os.path.dirname(__file__), "configs")
 cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
@@ -249,17 +250,20 @@ def manage_user_existence(user_session, session_state):
     user_data = parse_headers(user_session.ws.request)
     if session_state.already_generated_user_id is None:
         session_state.already_generated_user_id = False
+
     if user_data["cookies_initialized"] is False:
         # Sometimes the browser doesn't load up upfront so we need this
         reload_window()
-    if (
-        "user_unique_id" not in user_data["Cookie"].keys()
-        and session_state.already_generated_user_id is False
-    ):
-        hash_id = gen_hash_code(size=32)
-        session_state.already_generated_user_id = True
-        update_user_public_info()
-        give_cookies("user_unique_id", hash_id, 99999, True)
+        time.sleep(1)
+    else:
+        if (
+            "user_unique_id" not in user_data["Cookie"].keys()
+            and session_state.already_generated_user_id is False
+        ):
+            hash_id = gen_hash_code(size=32)
+            session_state.already_generated_user_id = True
+            update_user_public_info()
+            give_cookies("user_unique_id", hash_id, 99999, True)
 
 
 def gen_hash_code(size=16):
@@ -311,12 +315,13 @@ def give_cookies(cookie_name, cookie_info, cookie_days=99999, rerun=False):
     """ Gives the user a browser cookie """
     # Cookie days is how long in days will the cookie last
     st.write(
-        f"""
-        <iframe src="resources/cookiegen.html?cookie_name={cookie_name}&cookie_value={cookie_info}&cookies_days={cookie_days}" height="0" width="0" style="border: none; float: right;"></iframe>""",
+        f"""<iframe src="resources/cookiegen.html?cookie_name={cookie_name}&cookie_value={cookie_info}&cookies_days={cookie_days}" height="0" width="0" style="border: 1px solid black; float: right;"></iframe>""",
         unsafe_allow_html=True,
     )
     if rerun:
-        session.rerun()
+        time.sleep(1)
+        reload_window()
+        # session.rerun()
 
 
 def update_user_public_info():
@@ -335,6 +340,7 @@ def reload_window():
         <iframe src="resources/window_reload.html?load_user_data=true" height="0" width="0" style="border: none; float: right;"></iframe>""",
         unsafe_allow_html=True,
     )
+    time.sleep(1)
 
 
 # END OF AMPLITUDE HELPER METHODS

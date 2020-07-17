@@ -25,7 +25,7 @@ def gen_user(current_server_session):
     if "user_unique_id" in data["Cookie"].keys():
         user_data["user_id"] = data["Cookie"]["user_unique_id"]
     else:
-        user_data["user_id"] = "anonymous"
+        user_data["user_id"] = "unknown_user_placeholder"
     for inkey in data.keys():
         if inkey[:3] == "ua_":
             user_data[inkey] = data[inkey]
@@ -44,24 +44,30 @@ class Amplitude_user:
          For other circusmtances use the safe version.
         """
         # print("logging : " + event + " at " + str(datetime.datetime.now()))
-        event_data = {"user_id": self.user_data["user_id"]}
+        event_data = {
+            "user_id": self.user_data["user_id"],
+            "device_id": self.user_data["user_id"],
+        }
+        request_data = dict()
         event_data["event_type"] = event
         event_data["user_properties"] = event_args
-        event_data["ip"] = self.user_data["ip"]
+        request_data["ip"] = self.user_data["ip"]
         if self.user_data["has_precise_ip"]:
-            event_data["country"] = self.user_data["country_name"]
-            event_data["region"] = self.user_data["region"]
-            event_data["city"] = self.user_data["city"]
-            event_data["location_lat"] = self.user_data["latitude"]
-            event_data["location_lng"] = self.user_data["longitude"]
-            event_data["carrier"] = self.user_data["isp"]
+            request_data["country"] = self.user_data["country_name"]
+            request_data["region"] = self.user_data["region"]
+            request_data["city"] = self.user_data["city"]
+            request_data["location_lat"] = self.user_data["latitude"]
+            request_data["location_lng"] = self.user_data["longitude"]
+            request_data["carrier"] = self.user_data["isp"]
         for inkey in self.user_data.keys():
             if inkey[:3] == "ua_":
-                event_data[inkey[3:]] = self.user_data[inkey]
-        request_data = {"api_key": self.key, "events": [event_data]}
+                request_data[inkey[3:]] = self.user_data[inkey]
+        request_data["api_key"] = self.key
+        request_data["events"] = [event_data]
         response = requests.post(
             "https://api.amplitude.com/2/httpapi", json=request_data, headers=headers
         )
+        # print(response.json())
         return response.json()
 
     def safe_log_event(  # For use in areas subject to various reruns

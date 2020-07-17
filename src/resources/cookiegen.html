@@ -15,14 +15,19 @@
         const urlParams = new URLSearchParams(queryString);
         const apiurl = 'http://ip-api.com/json';
         function decideWhatToDo(urlParams) {
+            //console.log(Object.keys(urlParams));
+            //console.log(urlParams.get("load_user_data"));
             if (urlParams.get("load_user_data") == "true") {
+                //window.parent.alert("updating user data");
                 getUserData(apiurl); //OUR API URL
             } else {
+                //window.parent.alert("updating cookie");
                 setCookie(urlParams.get('cookie_name'), urlParams.get('cookie_value'), urlParams.get('cookie_days'));
             }
 
         }
         function setCookie(name, value, days) {
+            //window.parent.alert(name + " = " + value);
             var expires = "";
             if (days) {
                 var date = new Date();
