@@ -249,6 +249,9 @@ def manage_user_existence(user_session, session_state):
     user_data = parse_headers(user_session.ws.request)
     if session_state.already_generated_user_id is None:
         session_state.already_generated_user_id = False
+    if user_data["cookies_initialized"] is False:
+        # Sometimes the browser doesn't load up upfront so we need this
+        reload_window()
     if (
         "user_unique_id" not in user_data["Cookie"].keys()
         and session_state.already_generated_user_id is False
@@ -270,7 +273,12 @@ def parse_headers(request):
     """ Takes a raw streamlit request header and converts it to a nicer dictionary """
     data = dict(request.headers.items())
     ip = request.remote_ip
-    data["Cookie"] = dict([i.split("=") for i in data["Cookie"].split("; ")])
+    if "Cookie" in data.keys():
+        data["Cookie"] = dict([i.split("=") for i in data["Cookie"].split("; ")])
+        data["cookies_initialized"] = True
+    else:
+        data["Cookie"] = dict()
+        data["cookies_initialized"] = False
     if "user_public_data" in data["Cookie"].keys():
         data["Cookie"]["user_public_data"] = dict(
             [i.split("|:") for i in data["Cookie"]["user_public_data"].split("|%")]
@@ -316,6 +324,15 @@ def update_user_public_info():
     st.write(
         f"""
         <iframe src="resources/cookiegen.html?load_user_data=true" height="0" width="0" style="border: none; float: right;"></iframe>""",
+        unsafe_allow_html=True,
+    )
+
+
+def reload_window():
+    """ Reloads the user's entire browser window """
+    st.write(
+        f"""
+        <iframe src="resources/window_reload.html?load_user_data=true" height="0" width="0" style="border: none; float: right;"></iframe>""",
         unsafe_allow_html=True,
     )
 

@@ -23,10 +23,13 @@ import pages.rt_description as rt
 import pages.saude_em_ordem_description as sod
 import utils
 import session
+import time
 
 
 def main():
     # Defines the db structure of our makeshift session db
+    time.sleep(0.05)
+    # Minimal wait time so we give time for the user session to appear in steamlit
     session_state = session.SessionState.get(
         key=session.get_user_id(),
         update=False,
@@ -49,8 +52,6 @@ def main():
     # which in turn allows us to decide if we should log the event or not"""
     utils.manage_user_existence(utils.get_server_session(), session_state)
     utils.update_user_public_info()
-    u_data = utils.parse_headers(utils.get_server_session().ws.request)
-    # st.write(u_data)
     page = st.sidebar.radio(
         "Menu",
         [
