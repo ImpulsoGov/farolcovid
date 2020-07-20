@@ -89,7 +89,7 @@ br:
                 "confirmed_cases": sum,
                 "active_cases": sum,
                 "deaths": sum,
-                "notification_rate": median,
+                "health_region_notification_rate": max,
                 "number_beds": sum,
                 "number_ventilators": sum
             }  
