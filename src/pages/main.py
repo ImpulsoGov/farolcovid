@@ -201,7 +201,6 @@ def main():
             script_tag_loader.string = GA_JS
             soup.head.append(script_tag_loader)
             index_path.write_text(str(soup))
-            print(index_path.read_text())
     # END Google Analytics
 
 
