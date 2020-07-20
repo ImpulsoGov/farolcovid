@@ -46,27 +46,29 @@ class Amplitude_user:
         # print("logging : " + event + " at " + str(datetime.datetime.now()))
         event_data = {
             "user_id": self.user_data["user_id"],
-            "device_id": self.user_data["user_id"],
+            "event_type": event,
+            "event_properties": event_args,
+            "ip": self.user_data["ip"],
+            # "device_id": self.user_data["user_id"],
         }
         request_data = dict()
-        event_data["event_type"] = event
-        event_data["user_properties"] = event_args
-        request_data["ip"] = self.user_data["ip"]
         if self.user_data["has_precise_ip"]:
-            request_data["country"] = self.user_data["country_name"]
-            request_data["region"] = self.user_data["region"]
-            request_data["city"] = self.user_data["city"]
-            request_data["location_lat"] = self.user_data["latitude"]
-            request_data["location_lng"] = self.user_data["longitude"]
-            request_data["carrier"] = self.user_data["isp"]
+            event_data["dma"] = self.user_data["city"]
+            event_data["country"] = self.user_data["country_name"]
+            event_data["region"] = self.user_data["region"]
+            event_data["city"] = self.user_data["city"]
+            event_data["location_lat"] = self.user_data["latitude"]
+            event_data["location_lng"] = self.user_data["longitude"]
+            event_data["carrier"] = self.user_data["isp"]
         for inkey in self.user_data.keys():
             if inkey[:3] == "ua_":
-                request_data[inkey[3:]] = self.user_data[inkey]
+                event_data[inkey[3:]] = self.user_data[inkey]
         request_data["api_key"] = self.key
         request_data["events"] = [event_data]
         response = requests.post(
             "https://api.amplitude.com/2/httpapi", json=request_data, headers=headers
         )
+        # print(request_data)
         # print(response.json())
         return response.json()
 

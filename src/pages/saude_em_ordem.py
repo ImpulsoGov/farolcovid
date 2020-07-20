@@ -140,13 +140,9 @@ def gen_intro():
 
 def gen_illustrative_plot(sectors_data, session_state):
     """ Generates our illustrative sector diagram """
-    if session_state.city == "Todos":
-        section_title = session_state.state.upper() + " (ESTADO)"
-    else:
-        section_title = session_state.city.upper()
     text = f"""
     <div class="saude-sector-basic-plot-area">
-        <div class="saude-veja-title" style="text-align:left;">SAUDE EM ORDEM | {section_title}</div>
+        <div class="saude-veja-title" style="text-align:left;">SAUDE EM ORDEM | {session_state.state.upper() + " (ESTADO)"}</div>
         <div class="saude-sector-basic-plot-disc">
             Os dois principais indicadores utilizados são a Importância Econômica (medida pela soma dos salários pagos) e o Nível de Segurança Sanitária do setor. A ideia é que devemos iniciar a reabertura pelos setores de mais seguros do ponto de vista da saúde e de maior importância econômica.
         </div>
