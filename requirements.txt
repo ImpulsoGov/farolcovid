@@ -9,3 +9,5 @@ ipykernel
 requests
 cufflinks
 python-dotenv
+bs4
+lxml
