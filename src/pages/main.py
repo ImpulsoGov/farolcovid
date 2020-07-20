@@ -180,6 +180,30 @@ def get_data(config):
 
 
 def main():
+    # START Google Analytics
+    import os
+    GOOGLE_ANALYTICS_CODE=os.getenv("GOOGLE_ANALYTICS_CODE")
+    if GOOGLE_ANALYTICS_CODE:
+        import pathlib
+        from bs4 import BeautifulSoup
+        GA_JS = """
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '%s');
+        """ % GOOGLE_ANALYTICS_CODE
+        index_path = pathlib.Path(st.__file__).parent / "static" / "index.html"
+        soup = BeautifulSoup(index_path.read_text(), features="lxml")
+        if not soup.find(id='google-analytics-loader'):
+            script_tag_import = soup.new_tag("script", src='https://www.googletagmanager.com/gtag/js?id=%s' % GOOGLE_ANALYTICS_CODE)
+            soup.head.append(script_tag_import)
+            script_tag_loader = soup.new_tag("script", id='google-analytics-loader')
+            script_tag_loader.string = GA_JS
+            soup.head.append(script_tag_loader)
+            index_path.write_text(str(soup))
+            print(index_path.read_text())
+    # END Google Analytics
+
 
     # Get user info
     user_analytics = amplitude.gen_user(utils.get_server_session())

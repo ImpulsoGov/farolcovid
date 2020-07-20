@@ -21,8 +21,8 @@ import pages.main as fc
 import pages.risk_description as rd
 import pages.rt_description as rt
 
-
 def main():
+
     page = st.sidebar.radio(
         "Menu",
         [
