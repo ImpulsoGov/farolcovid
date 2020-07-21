@@ -491,7 +491,8 @@ def genProductsSection(products: List[Product]):
         f"""
         <div class="base-wrapper">
                 <span class="section-header primary-span">COMO SEGUIR COM SEGURANÇA?</span>
-                <div class="flex flex-row flex-space-around mt flex-m-column">{cards}</div>
+                <div class="flex flex-row flex-space-around mt flex-m-column">{cards}</div><br>
+                <span class="section-header primary-span">ESCOLHA NO MENU ABAIXO</span>
         </div>
         """,
         unsafe_allow_html=True,

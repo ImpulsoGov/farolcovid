@@ -35,8 +35,30 @@ def main():
             "Metodologia do Saúde em Ordem",
             "Quem somos?",
         ],
-    )  # "Central COVID19",
-
+    )  # "Central COVID19"
+    # Changing the style of the button
+    st.markdown(
+        """<style>
+                button[data-baseweb="button"] {
+                    border: 1px solid var(--main-white);
+                    box-sizing: border-box;
+                    border-radius: 15px;
+                    width: auto;
+                    padding: 0.5em;
+                    text-transform: uppercase;
+                    font-family: var(--main-header-font-family);
+                    color: var(--main-white);
+                    background-color: var(--main-primary);
+                    font-weight: bold;
+                    text-align: center;
+                    text-decoration: none;
+                    font-size: 18px;
+                    animation-name: fadein;
+                    animation-duration: 3s;
+                    margin-top: 1em;
+                } </style>""",
+        unsafe_allow_html=True,
+    )
     if page == "Modelo Epidemiológico":
         if __name__ == "__main__":
             md.main()

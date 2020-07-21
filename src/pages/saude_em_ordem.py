@@ -147,7 +147,7 @@ def gen_illustrative_plot(sectors_data, session_state):
         <div class="base-wrapper">
                 <div class="saude-veja-title">SAÚDE EM ORDEM | {section_title}</div>
                 <div class="saude-sector-basic-plot-disc">
-                    Os dois principais indicadores utilizados são a Contribuição Econômica, medida pela soma dos salários pagos, e o Nível de Segurança Sanitária do setor (mais detalhes na Metodologia). <b>Partimos da ideia que a reabertura deve ser iniciada pelos setores de mais seguros do ponto de vista da saúde e de maior importância econômica.</b>Logo, os Grupos A, B, C e D são ordenados primeiro pela Segurança Sanitária e depois pela sua Contribuição Econômica.
+                    Os dois principais indicadores utilizados são a Contribuição Econômica, medida pela soma dos salários pagos, e o Nível de Segurança Sanitária do setor (mais detalhes na Metodologia). <b>Partimos da ideia que a reabertura deve ser iniciada pelos setores mais seguros do ponto de vista da saúde e de maior importância econômica.</b> Logo, os Grupos A, B, C e D são ordenados primeiro pela Segurança Sanitária e depois pela sua Contribuição Econômica.
                 </b></div>
         </div>
         <div class="saude-sector-basic-plot-title">
@@ -179,7 +179,7 @@ def gen_illustrative_plot(sectors_data, session_state):
 
 def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
     """ Generates One specific card from the sector diagram  """
-    titles = {"a": "Grupo A ✅", "b": "Grupo B 🙌", "c": "Grupo C ‼", "d": "Grupo D ⚠"}
+    titles = {"a": "Grupo A ✅", "b": "Grupo B ⚠", "c": "Grupo C ‼", "d": "Grupo D ❌"}
     top_n_sectors = sector_data[-size_sectors::]
     # The last 5 are the best
     item_list = "<br>".join(["- " + i["activity_name"] for i in top_n_sectors])
@@ -196,8 +196,8 @@ def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
         <div class="saude-plot-group-massa-salarial-label">Massa Salarial média:</div>
         <div class="saude-plot-group-massa-salarial-value">R$ {convert_money(average_wage)}</div>
         <div class="saude-plot-group-separator-line"></div>
-        <div class="saude-plot-group-pessoas-label">Número de pessoas: </div>
-        <div class="saude-plot-group-pessoas-value">{num_people}</div>
+        <div class="saude-plot-group-pessoas-label">Número de trabalhadores: </div>
+        <div class="saude-plot-group-pessoas-value">{convert_money(num_people)}</div>
     </div>"""
     return text
 
@@ -217,7 +217,7 @@ def gen_slider(session_state):
         <div class="base-wrapper">
             <div class="saude-slider-wrapper">
                 <span class="section-header primary-span">ESCOLHA O PESO PARA A SEGURANÇA SANITÁRIA</span><p>
-                <span class="ambassador-question" style="width:80%;max-width:1000px;"><br><b>O peso padrão da simulação atribui 70% para Segurança Sanitária e 30% para Contribuição Econômica,</b> seguindo decisão do RS, principal inspiração para a ferramenta. 
+                <span class="ambassador-question" style="width:80%;max-width:1000px;"><br><b>O peso padrão da simulação atribui 70% para Segurança Sanitária e 30% para Contribuição Econômica,</b> seguindo decisão do Rio Grande do Sul, principal inspiração para a ferramenta. 
                 Este parâmetro pode ser alterado abaixo; entre em contato conosco para mais detalhes.</span><p>
             </div>
         </div>""",
@@ -242,7 +242,7 @@ def gen_detailed_vision(economic_data, session_state, config):
         f"""
         <div class="base-wrapper">
             <span class="ambassador-question" style="width: 80%; max-width: 1000px;"><i>
-                Clique em "Visão Detalhada" para ver o gráfico completo com todas as informações.</i>
+                <b>Clique em "Visão Detalhada" para ver o gráfico completo com todas as informações.</b></i>
             </span><br>""",
         unsafe_allow_html=True,
     )
@@ -417,17 +417,21 @@ def gen_sector_tables(session_state, score_groups, config, default_size=5):
     text = ""
     titles = ["D", "C", "B", "A"]
 
-    st.write(f"""
+    st.write(
+        f"""
         <div class="base-wrapper">
-            <span class="section-header primary-span">TABELAS DE CONTRIBUIÇÃO DOS SETORES</span><p><br>
-            <span class="ambassador-question">Abaixo você pode conferir todos os setores de cada grupo de apresentados, ordenados pelo <b>índice de priorização de reabertura Saúde em Ordem.</b></span>
+            <span class="section-header primary-span">EXPLORE A CONTRIBUIÇÃO DE CADA SETOR</span><p><br>
+            <span class="ambassador-question">Abaixo você pode conferir todos os setores de cada grupo de apresentados, ordenados pelo <b>índice de priorização de reabertura Saúde em Ordem.</b>
+            <br> Por padrão estamos mostrando os todos os setores mas você pode clicar em <b>"Mostrar/Ocultar mais"</b> para alternar entre mostrar todos ou apenas os top 5.
+            </span>
             <div><br>
             <div class="saude-download-clean-data-button-div">
                 <a href="{get_state_clean_data_url(session_state,config)}" download="dados_estado.csv" class="btn-ambassador">
                     Baixar dados completos do estado
                 </a>
-            </div>""", unsafe_allow_html=True)
-
+            </div>""",
+        unsafe_allow_html=True,
+    )
     for table_index in reversed(range(4)):
         # We create it all under a button but the table will be shown either way
         # The button is merely to alternate the state between open and closed
@@ -444,7 +448,7 @@ def gen_single_table(session_state, score_groups, data_index, n=5):
     """ Generates an entire table fro one sector given the data we have and the index of such sector from D to A """
     text = ""  # Our HTML will be stored here
     # Constants
-    titles = ["Grupo D ⚠", "Grupo C ‼", "Grupo B 🙌", "Grupo A ✅"]
+    titles = ["Grupo D ❌", "Grupo C ‼", "Grupo B ⚠", "Grupo A ✅"]
     safety_statuses = [
         [["Inseguro", "#FF5F6B"], ["Fraco", "#FF5F6B"]],
         [["Inseguro", "#FF5F6B"], ["Forte", "#02BC17"]],
@@ -484,7 +488,7 @@ def gen_single_table(session_state, score_groups, data_index, n=5):
         text += gen_sector_table_row(sector_data, index)
     text += f"""<div class="saude-table-total-box">
             <div class="saude-table-field te1">Total</div>
-            <div class="saude-table-field te3">{total_workers}</div>
+            <div class="saude-table-field te3">{convert_money(total_workers)}</div>
             <div class="saude-table-field te4">R$ {convert_money(total_wages)}</div>
         </div>
         <div class="saude-table-endspacer">
@@ -499,7 +503,7 @@ def gen_sector_table_row(sector_data, row_index):
     return f"""<div class="saude-table-row {["tlblue","tlwhite"][row_index % 2]}">
             <div class="saude-table-field tf1">{sector_data["activity_name"]}</div>
             <div class="saude-table-field tf2">{"%0.2f"%sector_data["security_index"]}</div>
-            <div class="saude-table-field tf3">{sector_data["n_employee"]}</div>
+            <div class="saude-table-field tf3">{convert_money(sector_data["n_employee"])}</div>
             <div class="saude-table-field tf4">R$ {convert_money(sector_data["total_wage_bill"])}</div>
             <div class="saude-table-field tf5">{"%0.2f"%sector_data["score"]}</div>
         </div>"""
@@ -517,8 +521,8 @@ def gen_protocols_section():
             Com base nos estudos referência do Guia SESI de prevenção da Covid-19 nas empresas e a lista de Prevenção e Controle de Perigos do departamento de Trabalho dos EUA, apresentamos algumas <b>recomendações para criação de protocolos de reabertura que garantam maior segurança para trabalhadores(as)</b>.<br>
             As recomendações seguem uma Hierarquia de controles medidos pela sua efetividade e facilidade de se colocar em prática, como é apresentado abaixo:</span><br><br><br>
         <figure>
-            <img class="saude-reopening-protocol-img-1" alt="Fonte: Guia SESI de prevenção da Covid-19 nas empresas (26/5/2020)" src="https://i.imgur.com/St9fAMB.png"><br>
-            <figcaption><i>Fonte: Guia SESI de prevenção da Covid-19 nas empresas (26/5/2020) ??</i></figcaption>
+            <img class="saude-reopening-protocol-img-1" alt="Fonte: HIERARCHY OF CONTROLS -The National Institute for Occupational Safety and Health (NIOSH); disponível em https://www.cdc.gov/niosh/topics/hierarchy/default.html" src="https://i.imgur.com/St9fAMB.png"><br>
+            <figcaption><i>Fonte: HIERARCHY OF CONTROLS -The National Institute for Occupational Safety and Health (NIOSH); disponível em https://www.cdc.gov/niosh/topics/hierarchy/default.html</i></figcaption>
         </figure>
         <span class="ambassador-question"><br>
             Em detalhe, os controles são entendidos por:<br><br>
@@ -555,7 +559,7 @@ def main(user_input, indicators, data, config, session_state):
     ):  # If not loaded, load the data we are going to use in the user database
         session_state.saude_ordem_data = {
             "slider_value": 70,
-            "opened_tables": [False, False, False, False],
+            "opened_tables": [True, True, True, True],
             "opened_detailed_view": False,
         }
     score_groups, economic_data = get_score_groups(config, session_state)
