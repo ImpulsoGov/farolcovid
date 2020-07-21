@@ -18,13 +18,13 @@ br:
                 economic_data: "br/states/safereopen/main"
                 cnae_sectors: "br/cnae/sectors"
     drive_paths:
-        br_id_state_region_city: https://docs.google.com/spreadsheets/d/1pHkH9FZj-c_bCEdvCH9k54uog5QDEd_x5xi4YmDsqyY
+        br_id_state_region_city: https://docs.google.com/spreadsheets/d/1Qo18XeP7Jxaj0IgVw-ISDf-MSpt2ZzbaUj9u3PT4hvc
         cities_population: https://docs.google.com/spreadsheets/d/1k8mXuUggBuBEghHhhLrLtA-5wa4JsAc-D35S5bNlf24
         health_infrastructure: https://docs.google.com/spreadsheets/d/1Zz5WqIj6-oO4skuHPkq3-W9VZxe-XMPThtI-vUghkFI
         embaixadores: https://docs.google.com/spreadsheets/d/1CASa-MdJS_o2tffWlIS--FSskSxhJUw3pA1L5AGIe04
         CNAE_sectors: https://docs.google.com/spreadsheets/d/1pP8dY9kRa9EvX3KcVPfMWJ8exDaoT1_bBggSKfD3y0k
-        br_states_reopening_data: https://docs.google.com/spreadsheets/d/1H20RNeTJqON8cqhwiZJdfXqVYbFVKrG5
-        br_health_region_reopening_data: https://docs.google.com/spreadsheets/d/1FB5GfHN0TGcC6YYCvoMLwZPN0chpHRMi
+        br_states_reopening_data: https://docs.google.com/spreadsheets/d/1-uU-CbE8k7ctRD-n8veEz0l--_ECcUyaa6ZcjhraO_o
+        br_health_region_reopening_data: https://docs.google.com/spreadsheets/d/17FzeuXoHD5e9cqOHD1lcwyH7AgWTZ0UQ-7gwgA7VMok
     drive_ids:
         br_states_clean_data_index: 1D1ksrSGJUdDLUuYP7cLG3qdd-y9eFTkD
     cases:
@@ -59,7 +59,7 @@ br:
                 "state_id",
                 "state_name",
                 "health_region_id",
-                "health_region_name",
+                "health_system_region",
                 "city_id",
                 "city_name",
                 "population",
@@ -89,7 +89,7 @@ br:
                 "confirmed_cases": sum,
                 "active_cases": sum,
                 "deaths": sum,
-                "health_region_notification_rate": max,
+                "notification_rate": median,
                 "number_beds": sum,
                 "number_ventilators": sum
             }  
@@ -179,7 +179,10 @@ br:
                 "correct_name": "São Valério"
             "Campo Grande":
                 "state_name": "Rio Grande do Norte"
-                "correct_name": "Augusto Severo"
+                "correct_name": "Augusto Severo (Campo Grande)"
+            "Boa Saúde":
+                "state_name": "Rio Grande do Norte"
+                "correct_name": "Boa Saúde (Januário Cicco)"
     rt_parameters:
         r_t_range_max: 12
         optimal_sigma: 0.01 # best sigma for Brazil (prior hyperparameters)
@@ -219,7 +222,7 @@ br:
             "state_id",
             "state_name",
             "health_region_id",
-            "health_region_name",
+            "health_system_region",
             "city_id",
             "city_name",
             "population",

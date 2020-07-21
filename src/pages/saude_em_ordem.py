@@ -138,17 +138,11 @@ def gen_intro():
 # SEÇÃO PLOT SAUDE EM ORDEM
 def gen_illustrative_plot(sectors_data, session_state):
     """ Generates our illustrative sector diagram """
-    if session_state.city == "Todos":
-        section_title = session_state.state.upper() + " (ESTADO)"
-    else:
-        section_title = session_state.city.upper()
     text = f"""
     <div class="saude-sector-basic-plot-area">
-        <div class="base-wrapper">
-                <div class="saude-veja-title">SAÚDE EM ORDEM | {section_title}</div>
-                <div class="saude-sector-basic-plot-disc">
-                    Os dois principais indicadores utilizados são a Contribuição Econômica, medida pela soma dos salários pagos, e o Nível de Segurança Sanitária do setor (mais detalhes na Metodologia). <b>Partimos da ideia que a reabertura deve ser iniciada pelos setores de mais seguros do ponto de vista da saúde e de maior importância econômica.</b>Logo, os Grupos A, B, C e D são ordenados primeiro pela Segurança Sanitária e depois pela sua Contribuição Econômica.
-                </b></div>
+        <div class="saude-veja-title" style="text-align:left;">SAUDE EM ORDEM | {session_state.state.upper() + " (ESTADO)"}</div>
+        <div class="saude-sector-basic-plot-disc">
+            Os dois principais indicadores utilizados são a Importância Econômica (medida pela soma dos salários pagos) e o Nível de Segurança Sanitária do setor. A ideia é que devemos iniciar a reabertura pelos setores de mais seguros do ponto de vista da saúde e de maior importância econômica.
         </div>
         <div class="saude-sector-basic-plot-title">
             Top 5 Setores por grupo de custo-benefício
@@ -197,7 +191,7 @@ def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
         <div class="saude-plot-group-massa-salarial-value">R$ {convert_money(average_wage)}</div>
         <div class="saude-plot-group-separator-line"></div>
         <div class="saude-plot-group-pessoas-label">Número de pessoas: </div>
-        <div class="saude-plot-group-pessoas-value">{num_people}</div>
+        <div class="saude-plot-group-pessoas-value">{convert_money(num_people)}</div>
     </div>"""
     return text
 
@@ -226,6 +220,11 @@ def gen_slider(session_state):
     session_state.saude_ordem_data["slider_value"] = st.slider(
         "Selecione o peso para Segurança Sanitária abaixo:", 70, 100, step=10
     )
+    amplitude.gen_user(utils.get_server_session()).safe_log_event(
+        "chose saude_slider_value",
+        session_state,
+        event_args={"slider_value": session_state.saude_ordem_data["slider_value"]},
+    )
     st.write(
         f"""
         <div class="base-wrapper">
@@ -249,6 +248,11 @@ def gen_detailed_vision(economic_data, session_state, config):
     if st.button(
         "Visão Detalhada"
     ):  # If the button is clicked just alternate the opened flag and plot it
+        amplitude.gen_user(utils.get_server_session()).safe_log_event(  # Logs the event
+            "picked saude_em_ordem_detailed_view",
+            session_state,
+            event_args={"state": session_state.state, "city": session_state.city,},
+        )
         session_state.saude_ordem_data[
             "opened_detailed_view"
         ] = not session_state.saude_ordem_data["opened_detailed_view"]
@@ -441,7 +445,7 @@ def gen_sector_tables(session_state, score_groups, config, default_size=5):
 
 
 def gen_single_table(session_state, score_groups, data_index, n=5):
-    """ Generates an entire table fro one sector given the data we have and the index of such sector from D to A """
+    """ Generates an entire table for one sector given the data we have and the index of such sector from D to A """
     text = ""  # Our HTML will be stored here
     # Constants
     titles = ["Grupo D ⚠", "Grupo C ‼", "Grupo B 🙌", "Grupo A ✅"]
@@ -484,7 +488,7 @@ def gen_single_table(session_state, score_groups, data_index, n=5):
         text += gen_sector_table_row(sector_data, index)
     text += f"""<div class="saude-table-total-box">
             <div class="saude-table-field te1">Total</div>
-            <div class="saude-table-field te3">{total_workers}</div>
+            <div class="saude-table-field te3">{convert_money(total_workers)}</div>
             <div class="saude-table-field te4">R$ {convert_money(total_wages)}</div>
         </div>
         <div class="saude-table-endspacer">
@@ -499,7 +503,7 @@ def gen_sector_table_row(sector_data, row_index):
     return f"""<div class="saude-table-row {["tlblue","tlwhite"][row_index % 2]}">
             <div class="saude-table-field tf1">{sector_data["activity_name"]}</div>
             <div class="saude-table-field tf2">{"%0.2f"%sector_data["security_index"]}</div>
-            <div class="saude-table-field tf3">{sector_data["n_employee"]}</div>
+            <div class="saude-table-field tf3">{convert_money(sector_data["n_employee"])}</div>
             <div class="saude-table-field tf4">R$ {convert_money(sector_data["total_wage_bill"])}</div>
             <div class="saude-table-field tf5">{"%0.2f"%sector_data["score"]}</div>
         </div>"""
