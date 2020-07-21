@@ -100,6 +100,14 @@ def update_indicators(indicators, data, config, user_input, session_state):
         session_state.number_ventilators
     )
 
+    # Caso o usuário altere os casos confirmados, usamos esse novo valor para a estimação
+    # TODO: vamos acabar com o user_iput e manter só session_state?
+    if (session_state.number_cases is not None) and (
+        session_state.number_cases != user_input["population_params"]["I_compare"]
+    ):
+        user_input["population_params"]["I"] = session_state.number_cases
+        user_input["population_params"]["D"] = session_state.number_cases
+
     # Recalcula capacidade hospitalar
     user_input["strategy"] = "estavel"
     user_input = sm.calculate_recovered(user_input, data)
