@@ -1,0 +1,447 @@
+@page {
+    width: 1440px;
+    height: 2036px;
+
+  }
+/* PDF Report v2 page2 */
+
+#n452_138{
+position: relative;
+width: 1440px;
+height: 2036px;
+
+background: #FFFFFF;
+
+
+}
+/* HISTÓRICO DE INDICADORES CHAVE */
+
+#n452_142{
+position: absolute;
+width: 927px;
+height: 80px;
+left: 48px;
+top: 431px;
+
+font-family: Oswald;
+font-style: normal;
+font-weight: bold;
+font-size: 52px;
+line-height: 77px;
+display: flex;
+align-items: center;
+
+color: #0097A7;
+
+
+
+}
+/* QUAIS SÃO NOSSOS INDICADORES? */
+
+#n467_155{
+position: absolute;
+width: 927px;
+height: 80px;
+left: 46px;
+top: 72px;
+
+font-family: Oswald;
+font-style: normal;
+font-weight: bold;
+font-size: 52px;
+line-height: 77px;
+display: flex;
+align-items: center;
+
+color: #0097A7;
+
+
+
+}
+/* Hoje label isolamento */
+
+#n467_153{
+position: absolute;
+width: 40px;
+height: 36px;
+left: 1352px;
+top: 960px;
+
+font-family: Oswald;
+font-style: normal;
+font-weight: normal;
+font-size: 24px;
+line-height: 36px;
+display: flex;
+align-items: center;
+
+color: #000000;
+
+
+
+}
+/* ISOLAMENTO SOCIAL */
+
+#n452_143{
+position: absolute;
+width: 1378px;
+height: 80px;
+left: 54px;
+top: 518px;
+
+font-family: Oswald;
+font-style: normal;
+font-weight: bold;
+font-size: 40px;
+line-height: 59px;
+display: flex;
+align-items: center;
+
+color: #0097A7;
+
+
+
+}
+/* Explanation */
+
+#n467_156{
+position: absolute;
+width: 1328px;
+height: 113px;
+left: 55px;
+top: 186px;
+
+font-family: IBM Plex Sans;
+font-style: normal;
+font-size: 20px;
+line-height: 26px;
+/*display: flex;*/
+/*align-items: center;*/
+
+color: #000000;
+
+
+
+}
+/* RITMO DE CONTÁGIO */
+
+#n452_145{
+position: absolute;
+width: 1405px;
+height: 80px;
+left: 54px;
+top: 1026px;
+
+font-family: Oswald;
+font-style: normal;
+font-weight: bold;
+font-size: 40px;
+line-height: 59px;
+display: flex;
+align-items: center;
+
+color: #0097A7;
+
+
+
+}
+/* Isolamento Social plot */
+
+#n454_2{
+/*background-image: url('resources/sampleisolamento.png');*/
+background-size: 1527px 450px;
+background-position: -10px 10px;
+position: absolute;
+width: 1292px;
+height: 386px;
+left: 60px;
+top: 602px;
+border: 0px solid black;
+
+
+}
+/* Isolamento Social label */
+
+#n454_3{
+/*background-image: url('resources/sampleisolamento.png');*/
+background-size: 1882px 510px;
+background-position: -1620px -20px;
+position: absolute;
+width: 258px;
+height: 50px;
+left: 1094px;
+top: 890px;
+border: 0px solid black;
+
+
+}
+/* Contagio plot */
+
+#n454_4{
+/*background-image: url('resources/samplecontagio.png');*/
+background-size: 1882px 510px;
+background-position: -35px 10px;
+position: absolute;
+width: 1379px;
+height: 449px;
+left: 16px;
+top: 1088px;
+object-fit: cover;
+object-position: 0% 0%; 
+border: 0px solid black;
+}
+/* Contagio label */
+
+#n452_153{
+/*background-image: url('resources/samplecontagio.png');*/
+background-size: 1882px 510px;
+background-position: -1430px -22px;
+position: absolute;
+width: 456px;
+height: 88px;
+left: 909px;
+top: 1113px;
+border: 0px solid black;
+
+
+}
+/* Número Isolamento Social */
+
+#n467_123{
+position: absolute;
+left: 94.2%;
+right: 3.06%;
+top: 39.64%;
+bottom: 58.84%;
+
+font-family: IBM Plex Sans;
+font-style: normal;
+font-weight: bold;
+font-size: 24px;
+line-height: 31px;
+
+color: #212529;
+
+
+
+}
+/* Retangulo final */
+
+#n467_127{
+position: absolute;
+width: 1440px;
+height: 342px;
+left: 0px;
+top: 1599px;
+
+background: #FFFFFF;
+border: 3px solid #000000;
+box-sizing: border-box;
+
+
+}
+/* Legal Desclaimer 1 */
+
+#n467_130{
+position: absolute;
+width: 1373px;
+height: 177px;
+left: 33px;
+top: 1647px;
+
+font-family: IBM Plex Sans;
+font-style: normal;
+/*font-weight: bold;*/
+font-size: 24px;
+line-height: 31px;
+/*display: flex;*/
+/*align-items: center;*/
+text-align: center;
+
+color: #000000;
+
+
+
+}
+/* Legal disclaimer 2 */
+
+#n467_129{
+position: absolute;
+width: 1302px;
+height: 139px;
+left: 87px;
+top: 1802px;
+
+font-family: IBM Plex Sans;
+font-style: normal;
+font-weight: normal;
+font-size: 24px;
+line-height: 31px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+
+
+}
+/* Data */
+
+#n467_147{
+position: absolute;
+width: 289px;
+height: 75px;
+left: 1124px;
+top: 16px;
+
+font-family: Oswald;
+font-style: normal;
+font-weight: bold;
+font-size: 40px;
+line-height: 59px;
+display: flex;
+align-items: center;
+text-align: right;
+
+color: #000000;
+
+
+
+}
+/* Hoje label contagio */
+
+#n467_152{
+position: absolute;
+width: 40px;
+height: 36px;
+left: 1372px;
+top: 1512px;
+
+font-family: Oswald;
+font-style: normal;
+font-weight: normal;
+font-size: 24px;
+line-height: 36px;
+display: flex;
+align-items: center;
+
+color: #000000;
+
+
+
+}
+/* Para mais detalhes da nossa metodologia, visite https://farolcovid.coronacidades.org/ e acesse ”Níveis de Risco” */
+
+#n464_62{
+position: absolute;
+width: 1325px;
+height: 48px;
+left: 54px;
+top: 353px;
+
+font-family: Oswald;
+font-style: normal;
+font-weight: normal;
+font-size: 24px;
+line-height: 36px;
+
+color: #000000;
+
+
+
+}
+
+/* coronacidades rodape */
+
+#n464_22p2{
+    position: absolute;
+    width: 270px;
+    height: 30px;
+    left: 45px;
+    top: 1982px;
+    font-family: IBM Plex Sans;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 40px;
+    line-height: 83px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    
+    color: #0097A7;
+    
+    
+}
+/* coronacidades rodape pt2 */
+
+#n464_22p2pt2{
+    position: absolute;
+    width: 270px;
+    height: 30px;
+    left: 175px;
+    top: 1982px;
+    font-family: IBM Plex Sans;
+    font-style: normal;
+    font-weight: 200;
+    font-size: 40px;
+    line-height: 83px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    
+    color: #0097A7;
+}
+/* impulso rodape */
+
+#n464_23{
+    position: absolute;
+    width: 200px;
+    height: 42px;
+    left: 338px;
+    top: 1980px;
+    
+    
+}
+/* Metodologia rodape */
+
+#n464_30{
+position: absolute;
+width: 637px;
+height: 57px;
+left: 611px;
+top: 1967px;
+
+font-family: IBM Plex Sans;
+font-style: normal;
+font-weight: bold;
+font-size: 18px;
+line-height: 23px;
+display: flex;
+align-items: center;
+
+color: #000000;
+
+
+
+}
+/* pagenumber */
+
+#n464_31{
+position: absolute;
+width: 15px;
+height: 31px;
+left: 1388px;
+top: 1977px;
+
+font-family: IBM Plex Sans;
+font-style: normal;
+font-weight: 300;
+font-size: 24px;
+line-height: 31px;
+display: flex;
+align-items: center;
+
+color: #000000;
+
+}

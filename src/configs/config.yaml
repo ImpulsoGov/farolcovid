@@ -14,13 +14,19 @@ br:
             analysis:
                 cases: "br/cities/cases/full"
                 owid: "world/owid/heatmap"
+            safereopen:
+                economic_data: "br/states/safereopen/main"
+                cnae_sectors: "br/cnae/sectors"
     drive_paths:
+        br_id_state_region_city: https://docs.google.com/spreadsheets/d/1Qo18XeP7Jxaj0IgVw-ISDf-MSpt2ZzbaUj9u3PT4hvc
         cities_population: https://docs.google.com/spreadsheets/d/1k8mXuUggBuBEghHhhLrLtA-5wa4JsAc-D35S5bNlf24
         health_infrastructure: https://docs.google.com/spreadsheets/d/1Zz5WqIj6-oO4skuHPkq3-W9VZxe-XMPThtI-vUghkFI
         embaixadores: https://docs.google.com/spreadsheets/d/1CASa-MdJS_o2tffWlIS--FSskSxhJUw3pA1L5AGIe04
         CNAE_sectors: https://docs.google.com/spreadsheets/d/1pP8dY9kRa9EvX3KcVPfMWJ8exDaoT1_bBggSKfD3y0k
         br_states_reopening_data: https://docs.google.com/spreadsheets/d/1H20RNeTJqON8cqhwiZJdfXqVYbFVKrG5
         br_health_region_reopening_data: https://docs.google.com/spreadsheets/d/1FB5GfHN0TGcC6YYCvoMLwZPN0chpHRMi
+        drive_ids:
+            br_states_clean_data_index: 1D1ksrSGJUdDLUuYP7cLG3qdd-y9eFTkD
     cases:
         url: https://data.brasil.io/dataset/covid19/caso_full.csv.gz
         rename:
@@ -76,7 +82,7 @@ br:
         min_days: 14
     safereopen:
         rename:
-            uf: "state_id"
+            uf: "state_num_id"
             emprego: "n_employee"
             security_1: "security_index"
             massa_salarial: "total_wage_bill"

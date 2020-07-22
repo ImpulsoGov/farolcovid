@@ -8,19 +8,24 @@ import pandas as pd
 from models import IndicatorType, IndicatorCards, ProductCards
 
 from model.simulator import run_simulation, get_dmonth
+import pdf_report.pdfgen as pdfgen
 import pages.simulacovid as sm
+import pages.saude_em_ordem as so
 import plots
 import utils
 import amplitude
 import session
 
 from streamlit.server.Server import Server
+import os
 
 
 def fix_type(x, group):
 
     if type(x) == np.ndarray:
-        return " a ".join([str(round(i, 1)) if type(i) != str else i.strip() for i in x])
+        return " a ".join(
+            [str(round(i, 1)) if type(i) != str else i.strip() for i in x]
+        )
 
     if (type(x) == str) or (type(x) == np.int64) or (type(x) == int):
         return x
@@ -90,28 +95,26 @@ def update_indicators(indicators, data, config, user_input, session_state):
                 indicators[group].right_display = "- "
                 indicators[group].left_display = "- "
 
-    # if (
-    # session_state.number_beds != None and session_state.reset is False
-    # ):  # Loading values from memory
     indicators["subnotification_rate"].left_display = session_state.number_cases
-    indicators["hospital_capacity"].left_display = int(
-        session_state.number_beds
-        # config["br"]["simulacovid"]["resources_available_proportion"]
-    )
+    indicators["hospital_capacity"].left_display = int(session_state.number_beds)
     indicators["hospital_capacity"].right_display = int(
         session_state.number_ventilators
-        # config["br"]["simulacovid"]["resources_available_proportion"]
     )
+
+    # Caso o usuário altere os casos confirmados, usamos esse novo valor para a estimação
+    # TODO: vamos acabar com o user_iput e manter só session_state?
+    if (session_state.number_cases is not None) and (
+        session_state.number_cases != user_input["population_params"]["I_compare"]
+    ):
+        user_input["population_params"]["I"] = session_state.number_cases
+        user_input["population_params"]["D"] = session_state.number_cases
 
     # Recalcula capacidade hospitalar
     user_input["strategy"] = "estavel"
     user_input = sm.calculate_recovered(user_input, data)
 
     dmonth = get_dmonth(
-        run_simulation(user_input, config),
-        "I2",
-        session_state.number_beds
-        # * config["br"]["simulacovid"]["resources_available_proportion"],
+        run_simulation(user_input, config), "I2", session_state.number_beds
     )["best"]
 
     # TODO: add no config e juntar com farol
@@ -179,45 +182,41 @@ def get_data(config):
     )
 
 
-def main():
+def main(session_state):
     # START Google Analytics
-    import os
-    GOOGLE_ANALYTICS_CODE=os.getenv("GOOGLE_ANALYTICS_CODE")
+    GOOGLE_ANALYTICS_CODE = os.getenv("GOOGLE_ANALYTICS_CODE")
     if GOOGLE_ANALYTICS_CODE:
         import pathlib
         from bs4 import BeautifulSoup
-        GA_JS = """
+
+        GA_JS = (
+            """
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
         gtag('config', '%s');
-        """ % GOOGLE_ANALYTICS_CODE
+        """
+            % GOOGLE_ANALYTICS_CODE
+        )
         index_path = pathlib.Path(st.__file__).parent / "static" / "index.html"
         soup = BeautifulSoup(index_path.read_text(), features="lxml")
-        if not soup.find(id='google-analytics-loader'):
-            script_tag_import = soup.new_tag("script", src='https://www.googletagmanager.com/gtag/js?id=%s' % GOOGLE_ANALYTICS_CODE)
+        if not soup.find(id="google-analytics-loader"):
+            script_tag_import = soup.new_tag(
+                "script",
+                src="https://www.googletagmanager.com/gtag/js?id=%s"
+                % GOOGLE_ANALYTICS_CODE,
+            )
             soup.head.append(script_tag_import)
-            script_tag_loader = soup.new_tag("script", id='google-analytics-loader')
+            script_tag_loader = soup.new_tag("script", id="google-analytics-loader")
             script_tag_loader.string = GA_JS
             soup.head.append(script_tag_loader)
             index_path.write_text(str(soup))
     # END Google Analytics
 
-
     # Get user info
     user_analytics = amplitude.gen_user(utils.get_server_session())
-    opening_response = user_analytics.log_event("opened farol", dict())
-    session_state = session.SessionState.get(
-        key=session.get_user_id(),
-        update=False,
-        number_beds=None,
-        number_ventilators=None,
-        number_cases=None,
-        number_deaths=None,
-        state="Acre",
-        city="Todos",
-        refresh=False,
-        reset=False,
+    opening_response = user_analytics.safe_log_event(
+        "opened farol", session_state, is_new_page=True
     )
 
     utils.localCSS("style.css")
@@ -245,9 +244,10 @@ def main():
             ].unique()
         ),
     )
-    changed_city = user_analytics.log_event(
+    changed_city = user_analytics.safe_log_event(
         "picked farol place",
-        {"state": user_input["state_name"], "city": user_input["city_name"]},
+        session_state,
+        event_args={"state": user_input["state_name"], "city": user_input["city_name"]},
     )
     user_input, data = filter_options(user_input, df_cities, df_states, config)
 
@@ -372,7 +372,7 @@ def main():
 
     # INDICATORS PLOTS
     if st.button("Confira a evolução de indicadores-chave"):
-        opening_response = user_analytics.log_event("opened key_indicators", dict())
+        opening_response = user_analytics.log_event("picked key_indicators", dict())
         if st.button("Esconder"):
             pass
 
@@ -400,7 +400,10 @@ def main():
             fig = plots.gen_social_dist_plots_placeid(locality_id)
             st.plotly_chart(fig, use_container_width=True)
         except:
-            st.write("Seu município ou estado não possui mais de 30 dias de dado.")
+            st.write(
+                """<div class="base-wrapper"><b>Seu município ou estado não possui mais de 30 dias de dados, ou não possui o índice calculado pela inloco.</b>""",
+                unsafe_allow_html=True,
+            )
         st.write(
             f"""
             <div class="base-wrapper">
@@ -417,7 +420,10 @@ def main():
             fig2 = plots.plot_rt_wrapper(locality_id)
             st.plotly_chart(fig2, use_container_width=True)
         except:
-            st.write("Seu município ou estado não possui mais de 30 dias de dado.")
+            st.write(
+                """<div class="base-wrapper"><b>Seu município ou estado não possui mais de 30 dias de dados de casos confirmados.</b>""",
+                unsafe_allow_html=True,
+            )
         st.write(
             "<div class='base-wrapper'><i>Em breve:</i> gráficos de subnotificação.</div>",
             unsafe_allow_html=True,
@@ -431,7 +437,7 @@ def main():
         session.rerun()
     if session_state.update:
         opening_response = user_analytics.log_event(
-            "opened key_indicators",
+            "updated sim_numbers",
             {
                 "beds_change": session_state.number_beds
                 - int(old_user_input["number_beds"]),
@@ -454,23 +460,36 @@ def main():
     indicators["subnotification_rate"].left_display = user_input["population_params"][
         "D"
     ]
-
+    # PDF-REPORT GEN BUTTON
+    if st.button("Gerar Relatório PDF"):
+        user_analytics.log_event("generated pdf")
+        st.write(
+            """<div class="base-wrapper">Aguarde um momento por favor...</div>""",
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            pdfgen.gen_pdf_report(user_input, indicators, data, config),
+            unsafe_allow_html=True,
+        )
     # TOOLS
     products = ProductCards
     products[1].recommendation = f'Risco {data["overall_alert"].values[0]}'
     utils.genProductsSection(products)
-
     product = st.selectbox(
         "",
         [
             "Como você gostaria de prosseguir?",
             "SimulaCovid",
-            "Saúde em Ordem (em breve)",
+            "Saúde em Ordem (Em Breve)",
         ],
     )
-
     if product == "SimulaCovid":
-        user_analytics.log_event("picked simulacovid", dict())
+        user_analytics.safe_log_event(
+            "picked simulacovid",
+            session_state,
+            event_args={"state": session_state.state, "city": session_state.city,},
+            alternatives=["picked saude_em_ordem", "picked simulacovid"],
+        )
         # Downloading the saved data from memory
         user_input["number_beds"] = session_state.number_beds
         user_input["number_ventilators"] = session_state.number_ventilators
@@ -479,13 +498,19 @@ def main():
         sm.main(user_input, indicators, data, config, session_state)
         # TODO: remove comment on this later!
         # utils.gen_pdf_report()
-
-    elif product == "Saúde em Ordem (em breve)":
-        user_analytics.log_event("picked saude_em_ordem", dict())
+    elif product == "Saúde em Ordem (Em Breve)":
+        user_analytics.safe_log_event(
+            "picked saude_em_ordem",
+            session_state,
+            event_args={"state": session_state.state, "city": session_state.city,},
+            alternatives=["picked saude_em_ordem", "picked simulacovid"],
+        )
+        # so.main(user_input, indicators, data, config, session_state)
         pass
 
     utils.gen_whatsapp_button(config["impulso"]["contact"])
     utils.gen_footer()
+    user_analytics.conclude_user_session(session_state)
 
 
 if __name__ == "__main__":

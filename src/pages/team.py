@@ -4,9 +4,11 @@ import amplitude
 from models import Logo
 
 
-def main():
+def main(session_state):
     user_analytics = amplitude.gen_user(utils.get_server_session())
-    opening_response = user_analytics.log_event("opened who_is", dict())
+    opening_response = user_analytics.safe_log_event(
+        "opened who_is", session_state, is_new_page=True
+    )
     utils.localCSS("style.css")
 
     st.write(
@@ -35,7 +37,8 @@ def main():
                 políticas.
                 </span><br><br>
         </div>
-        """ % (Logo.CORONACIDADES.value, Logo.IMPULSO.value), 
-        unsafe_allow_html=True
+        """
+        % (Logo.CORONACIDADES.value, Logo.IMPULSO.value),
+        unsafe_allow_html=True,
     )
 
