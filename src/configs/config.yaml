@@ -14,7 +14,7 @@ br:
             analysis:
                 cases: "br/cities/cases/full"
                 owid: "world/owid/heatmap"
-            safereopen:
+        safereopen:
                 economic_data: "br/states/safereopen/main"
                 cnae_sectors: "br/cnae/sectors"
     drive_paths:
@@ -31,14 +31,13 @@ br:
         url: https://data.brasil.io/dataset/covid19/caso_full.csv.gz
         rename:
             city_ibge_code: 'city_id'
-            city: 'city_name'
-            state: 'state_id'
             date: 'last_updated'
             last_available_deaths: 'deaths'
             last_available_confirmed: 'confirmed_cases'
             new_confirmed: 'daily_cases'
             daily_cases_sum: 'infectious_period_cases'
         drop: [
+            'city',
             'estimated_population_2019',
             'is_last',
             'is_repeated',
@@ -52,105 +51,6 @@ br:
         notification_window_days: 7
     cnes:
         source: 'DataSUS'
-    farolcovid:
-        simulacovid:
-            columns: [
-                "state_num_id",
-                "state_id",
-                "state_name",
-                "health_region_id",
-                "health_system_region",
-                "city_id",
-                "city_name",
-                "population",
-                "last_updated_number_beds",
-                "author_number_beds",
-                "number_beds",
-                "last_updated_number_ventilators",
-                "author_number_ventilators",
-                "number_ventilators",
-                "confirmed_cases",
-                "active_cases",
-                "deaths",
-                "notification_rate",
-                "state_notification_rate"
-            ]   
-            state_agg: {
-                "population": sum,
-                "confirmed_cases": sum,
-                "active_cases": sum,
-                "deaths": sum,
-                "state_notification_rate": max,
-                "number_beds": sum,
-                "number_ventilators": sum
-            }   
-            health_region_agg: {
-                "population": sum,
-                "confirmed_cases": sum,
-                "active_cases": sum,
-                "deaths": sum,
-                "notification_rate": median,
-                "number_beds": sum,
-                "number_ventilators": sum
-            }  
-        rules:
-            rt_classification:
-                column_name: 'rt_10days_ago_most_likely'
-                cuts: [0, 1, 1.2, 10]
-                categories: ['bom', 'insatisfatório', 'ruim'] # [1, 0, -1]
-
-            rt_growth:
-                column_name: "rt_ratio_week_avg"
-                cuts: [0, 0.9, 1.1, 1000]
-                categories: ['melhorando', 'estabilizando', 'piorando'] # [1, 0, -1]
-
-            dday_classification:
-                column_name: 'dday_beds_best'
-                cuts: [0, 30, 60, 91.001]
-                categories: ['ruim', 'insatisfatório', 'bom'] # [-1, 0, 1]
-
-            subnotification_classification:
-                column_name: 'subnotification_rate'
-                cuts: [0, 0.5, 0.7, 1.001]
-                categories: ['bom', 'insatisfatório', 'ruim']  # [1, 0, -1]
-
-            inloco_growth:
-                column_name: 'inloco_ratio_week_avgs'
-                cuts: [0, 0.9, 1.1, 1000]
-                categories: ['piorando', 'estabilizando', 'melhorando'] # [-1, 0, 1]       
-        alerts:
-            alto: 
-                conditions: {
-                    rt_classification: "ruim",
-                    rt_growth: "piorando",
-                    dday_classification: "ruim",
-                    subnotification_classification: "ruim"
-                }
-                how: "any"
-            medio: 
-                conditions: {
-                    rt_classification: "insatisfatório",
-                    rt_growth: "melhorando|estabilizando",
-                    dday_classification: "bom|insatisfatório",
-                    subnotification_classification: "bom|insatisfatório"  
-                }
-                how: "all"
-            medio2: 
-                conditions: {
-                    rt_classification: "bom|insatisfatório",
-                    rt_growth: "melhorando|estabilizando",
-                    dday_classification: "bom|insatisfatório",
-                    subnotification_classification: "insatisfatório"  
-                }
-                how: "all"
-            baixo:
-                conditions: {
-                    rt_classification: "bom",
-                    rt_growth: "melhorando|estabilizando",
-                    dday_classification: "bom|insatisfatório",
-                    subnotification_classification: "bom"            
-                }
-                how: "all"
     indicators:
         rt:
             risk: "rt_classification"
@@ -172,17 +72,6 @@ br:
             right_display: "inloco_growth"
             left_display: "inloco_last_week_7days_avg"
             display: "inloco_today_7days_avg"
-    inloco:
-        replace: 
-            "São Valério da Natividade":
-                "state_name": "Tocantins"
-                "correct_name": "São Valério"
-            "Campo Grande":
-                "state_name": "Rio Grande do Norte"
-                "correct_name": "Augusto Severo (Campo Grande)"
-            "Boa Saúde":
-                "state_name": "Rio Grande do Norte"
-                "correct_name": "Boa Saúde (Januário Cicco)"
     rt_parameters:
         r_t_range_max: 12
         optimal_sigma: 0.01 # best sigma for Brazil (prior hyperparameters)
@@ -218,14 +107,12 @@ br:
             cnes: [
             "country_iso",
             "country_name",
-            "state_num_id",
             "state_id",
             "state_name",
-            "health_region_id",
-            "health_system_region",
             "city_id",
             "city_name",
             "population",
+            "health_system_region",
             "last_updated_number_beds",
             "author_number_beds",
             "last_updated_number_ventilators",
