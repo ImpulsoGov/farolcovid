@@ -446,7 +446,12 @@ def main(session_state):
     products[1].recommendation = f'Risco {data["overall_alert"].values[0]}'
     utils.genProductsSection(products)
     product = st.selectbox(
-        "", ["Como você gostaria de prosseguir?", "SimulaCovid", "Saúde em Ordem",],
+        "",
+        [
+            "Como você gostaria de prosseguir?",
+            "SimulaCovid",
+            "Saúde em Ordem (Em Breve)",
+        ],
     )
     if product == "SimulaCovid":
         user_analytics.safe_log_event(
@@ -463,14 +468,14 @@ def main(session_state):
         sm.main(user_input, indicators, data, config, session_state)
         # TODO: remove comment on this later!
         # utils.gen_pdf_report()
-    elif product == "Saúde em Ordem":
+    elif product == "Saúde em Ordem (Em Breve)":
         user_analytics.safe_log_event(
             "picked saude_em_ordem",
             session_state,
             event_args={"state": session_state.state, "city": session_state.city,},
             alternatives=["picked saude_em_ordem", "picked simulacovid"],
         )
-        so.main(user_input, indicators, data, config, session_state)
+        # so.main(user_input, indicators, data, config, session_state)
         pass
 
     utils.gen_whatsapp_button(config["impulso"]["contact"])
