@@ -1,0 +1,16 @@
+<head>
+</head>
+<script>
+    function close_sidebar() {
+        sideCloseSection = window.parent.document.querySelectorAll(".sidebar:not(.--collapsed)");
+        sideCloseButt = window.parent.document.getElementsByClassName("sidebar-close btn btn-outline-secondary")[0];
+        if (sideCloseSection[0]) {
+            sideCloseButt.click();
+        }
+    }
+
+</script>
+
+<body onload="close_sidebar();">
+    <button onclick="close_sidebar();" style="position: relative;">Click here to close the sidebar</button>
+</body>
