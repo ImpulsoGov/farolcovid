@@ -100,6 +100,14 @@ def update_indicators(indicators, data, config, user_input, session_state):
         session_state.number_ventilators
     )
 
+    # Caso o usuário altere os casos confirmados, usamos esse novo valor para a estimação
+    # TODO: vamos acabar com o user_iput e manter só session_state?
+    if (session_state.number_cases is not None) and (
+        session_state.number_cases != user_input["population_params"]["I_compare"]
+    ):
+        user_input["population_params"]["I"] = session_state.number_cases
+        user_input["population_params"]["D"] = session_state.number_cases
+
     # Recalcula capacidade hospitalar
     user_input["strategy"] = "estavel"
     user_input = sm.calculate_recovered(user_input, data)
@@ -173,23 +181,12 @@ def get_data(config):
     )
 
 
-def main():
+def main(session_state):
 
     # Get user info
     user_analytics = amplitude.gen_user(utils.get_server_session())
-    opening_response = user_analytics.log_event("opened farol", dict())
-    session_state = session.SessionState.get(
-        key=session.get_user_id(),
-        update=False,
-        number_beds=None,
-        number_ventilators=None,
-        number_cases=None,
-        number_deaths=None,
-        state="Acre",
-        city="Todos",
-        refresh=False,
-        reset=False,
-        saude_ordem_data=None,
+    opening_response = user_analytics.safe_log_event(
+        "opened farol", session_state, is_new_page=True
     )
 
     utils.localCSS("style.css")
@@ -217,9 +214,10 @@ def main():
             ].unique()
         ),
     )
-    changed_city = user_analytics.log_event(
+    changed_city = user_analytics.safe_log_event(
         "picked farol place",
-        {"state": user_input["state_name"], "city": user_input["city_name"]},
+        session_state,
+        event_args={"state": user_input["state_name"], "city": user_input["city_name"]},
     )
     user_input, data = filter_options(user_input, df_cities, df_states, config)
 
@@ -344,7 +342,7 @@ def main():
 
     # INDICATORS PLOTS
     if st.button("Confira a evolução de indicadores-chave"):
-        opening_response = user_analytics.log_event("opened key_indicators", dict())
+        opening_response = user_analytics.log_event("picked key_indicators", dict())
         if st.button("Esconder"):
             pass
 
@@ -409,7 +407,7 @@ def main():
         session.rerun()
     if session_state.update:
         opening_response = user_analytics.log_event(
-            "opened key_indicators",
+            "updated sim_numbers",
             {
                 "beds_change": session_state.number_beds
                 - int(old_user_input["number_beds"]),
@@ -434,6 +432,7 @@ def main():
     ]
     # PDF-REPORT GEN BUTTON
     if st.button("Gerar Relatório PDF"):
+        user_analytics.log_event("generated pdf")
         st.write(
             """<div class="base-wrapper">Aguarde um momento por favor...</div>""",
             unsafe_allow_html=True,
@@ -446,13 +445,16 @@ def main():
     products = ProductCards
     products[1].recommendation = f'Risco {data["overall_alert"].values[0]}'
     utils.genProductsSection(products)
-
     product = st.selectbox(
         "", ["Como você gostaria de prosseguir?", "SimulaCovid", "Saúde em Ordem",],
     )
-
     if product == "SimulaCovid":
-        user_analytics.log_event("picked simulacovid", dict())
+        user_analytics.safe_log_event(
+            "picked simulacovid",
+            session_state,
+            event_args={"state": session_state.state, "city": session_state.city,},
+            alternatives=["picked saude_em_ordem", "picked simulacovid"],
+        )
         # Downloading the saved data from memory
         user_input["number_beds"] = session_state.number_beds
         user_input["number_ventilators"] = session_state.number_ventilators
@@ -461,14 +463,19 @@ def main():
         sm.main(user_input, indicators, data, config, session_state)
         # TODO: remove comment on this later!
         # utils.gen_pdf_report()
-
     elif product == "Saúde em Ordem":
-        user_analytics.log_event("picked saude_em_ordem", dict())
+        user_analytics.safe_log_event(
+            "picked saude_em_ordem",
+            session_state,
+            event_args={"state": session_state.state, "city": session_state.city,},
+            alternatives=["picked saude_em_ordem", "picked simulacovid"],
+        )
         so.main(user_input, indicators, data, config, session_state)
         pass
 
     utils.gen_whatsapp_button(config["impulso"]["contact"])
     utils.gen_footer()
+    user_analytics.conclude_user_session(session_state)
 
 
 if __name__ == "__main__":

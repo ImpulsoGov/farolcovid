@@ -163,7 +163,7 @@ def _get_session_state():
     return session._session_state, curr_thread._key_counts
 
 
-def _get_session_object():
+def _get_session_raw():
     # Hack to get the session object from Streamlit.
 
     ctx = ReportThread.get_report_ctx()
@@ -178,13 +178,13 @@ def _get_session_object():
         session_infos = Server.get_current()._session_info_by_id.values()
 
     for session_info in session_infos:
-        s = session_info.session
+        s = session_info
         if (
             # Streamlit < 0.54.0
-            (hasattr(s, "_main_dg") and s._main_dg == ctx.main_dg)
+            (hasattr(s, "_main_dg") and s.session._main_dg == ctx.main_dg)
             or
             # Streamlit >= 0.54.0
-            (not hasattr(s, "_main_dg") and s.enqueue == ctx.enqueue)
+            (not hasattr(s, "_main_dg") and s.session.enqueue == ctx.enqueue)
         ):
             this_session = s
 
@@ -193,5 +193,8 @@ def _get_session_object():
             "Oh noes. Couldn't get your Streamlit Session object"
             "Are you doing something fancy with threads?"
         )
-
     return this_session
+
+
+def _get_session_object():
+    return _get_session_raw().session

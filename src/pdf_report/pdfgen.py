@@ -37,12 +37,6 @@ def convert_path(fpath):
     return fpath
 
 
-def gen_hash_code(size=16):
-    return "".join(
-        random.choice("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuv")
-        for i in range(size)
-    )
-
 
 def check_necessary_values(model_path=None):
     if model_path != None:
@@ -215,7 +209,7 @@ def upload_file_gdrive(filepath):
         drive_service.files()
         .create(
             body={
-                "name": str(gen_hash_code(size=16)) + ".pdf",
+                "name": str(utils.gen_hash_code(size=16)) + ".pdf",
                 "parents": [os.getenv("PDF_FOLDER_ID")],
             },
             media_body=MediaFileUpload(
