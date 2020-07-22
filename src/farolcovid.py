@@ -25,7 +25,6 @@ import utils
 import session
 import time
 
-
 def main():
     # Defines the db structure of our makeshift session db
     time.sleep(0.05)
