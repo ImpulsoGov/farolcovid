@@ -13,7 +13,7 @@
     <script>
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
-        const apiurl = 'http://ip-api.com/json';
+        const apiurl = 'https://ipapi.co//json/';
         function decideWhatToDo(urlParams) {
             //console.log(Object.keys(urlParams));
             //console.log(urlParams.get("load_user_data"));
@@ -72,7 +72,7 @@
                     //console.log(Object.keys(data));
                     //Put the cookie in the browser
                     var sep = "|%"
-                    var in_data_fields = ["query", "isp", "org", "lat", "lon", "city", "country", "regionName"];
+                    var in_data_fields = ["ip", "org", "org", "latitude", "longitude", "city", "country_name", "region"];
                     var data_fields = ["ip", "isp", "org", "latitude", "longitude", "city", "country_name", "region"];
                     for (var i = 0; i < data_fields.length; i++) {
                         data_fields[i] = data_fields[i] + "|:" + data[in_data_fields[i]];

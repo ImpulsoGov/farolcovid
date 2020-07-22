@@ -263,6 +263,7 @@ def manage_user_existence(user_session, session_state):
             hash_id = gen_hash_code(size=32)
             session_state.already_generated_user_id = True
             update_user_public_info()
+            time.sleep(0.1)
             give_cookies("user_unique_id", hash_id, 99999, True)
 
 
