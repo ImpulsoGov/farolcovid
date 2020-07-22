@@ -14,7 +14,7 @@ br:
             analysis:
                 cases: "br/cities/cases/full"
                 owid: "world/owid/heatmap"
-        safereopen:
+            safereopen:
                 economic_data: "br/states/safereopen/main"
                 cnae_sectors: "br/cnae/sectors"
     drive_paths:
