@@ -52,6 +52,8 @@ def main():
     # which in turn allows us to decide if we should log the event or not"""
     utils.manage_user_existence(utils.get_server_session(), session_state)
     utils.update_user_public_info()
+    # For Http debug
+    # st.write(utils.parse_headers(utils.get_server_session().ws.request))
     page = st.sidebar.radio(
         "Menu",
         [
