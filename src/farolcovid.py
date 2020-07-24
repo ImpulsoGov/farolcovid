@@ -52,6 +52,13 @@ def main():
     # which in turn allows us to decide if we should log the event or not"""
     utils.manage_user_existence(utils.get_server_session(), session_state)
     utils.update_user_public_info()
+    # CLOSES THE SIDEBAR WHEN THE USER LOADS THE PAGE
+    st.write(
+        """
+    <iframe src="resources/sidebar-closer.html" height=0 width=0">
+    </iframe>""",
+        unsafe_allow_html=True,
+    )
     # For Http debug
     # st.write(utils.parse_headers(utils.get_server_session().ws.request))
     page = st.sidebar.radio(
