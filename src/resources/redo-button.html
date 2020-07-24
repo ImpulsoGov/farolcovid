@@ -34,7 +34,11 @@
             return node;
         }
         function makeItBinarySelection(button, pos) {
-            button.classList.add("flex");
+            try {
+                button.classList.add("flex");
+            } catch (err) {
+                window.parent.location.reload();
+            }
             button.classList.add("flex-column");
             button.classList.add("elevated");
             button.classList.add("pr");
