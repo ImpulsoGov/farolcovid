@@ -128,38 +128,57 @@ def update_indicators(indicators, data, config, user_input, session_state):
     return indicators
 
 
-def filter_options(user_input, df_cities, df_states, config):
+def update_user_input_places(data, user_input):
+    
+    user_input["state_id"] = data["state_id"].values[0]
+    user_input["health_region_id"] = False
+    user_input["city_id"] = False
 
-    if user_input["city_name"] == "Todos":
+    if user_input["place_type"] == "state_id":
+        return user_input
+    
+    # health region level
+    user_input["health_region_id"] = data["health_region_id"].values[0]
+    if user_input["place_type"] == "health_region_id":
+        return user_input
 
-        data = df_states[df_states["state_name"] == user_input["state_name"]]
+    # city level
+    user_input["city_id"] = data["city_id"].values[0]
+    return user_input
 
-        user_input["state_id"] = data["state_id"].values[0]
-        user_input["city_id"] = False
+
+def filter_options(user_input, dfs, config):
+
+    if user_input["city_name"] == "Todos" and user_input["health_region_name"] == "Todos":
+        data = dfs["states"][dfs["states"]["state_name"] == user_input["state_name"]]
         user_input["place_type"] = "state_id"
 
+    elif user_input["city_name"] == "Todos":
+        data = dfs["health_region"][dfs["health_region"]["health_region_name"] == user_input["health_region_name"]]
+        user_input["place_type"] = "health_region_id"
+
     else:
-        data = df_cities[
-            (df_cities["state_name"] == user_input["state_name"])
-            & (df_cities["city_name"] == user_input["city_name"])
+        data = dfs["cities"][
+            (dfs["cities"]["state_name"] == user_input["state_name"])
+            & (dfs["cities"]["city_name"] == user_input["city_name"])
         ]
 
-        user_input["state_id"] = data["state_id"].values[0]
-        user_input["city_id"] = data["city_id"].values[0]
         user_input["place_type"] = "city_id"
 
         # para simulacovid
         user_input["state_rt"] = {
-            "best": df_states[df_states["state_name"] == user_input["state_name"]][
+            "best": dfs["states"][dfs["states"]["state_name"] == user_input["state_name"]][
                 "rt_10days_ago_low"
             ].values[0],
-            "worst": df_states[df_states["state_name"] == user_input["state_name"]][
+            "worst": dfs["states"][dfs["states"]["state_name"] == user_input["state_name"]][
                 "rt_10days_ago_high"
             ].values[0],
         }
+    
+    user_input = update_user_input_places(data, user_input)
 
     user_input["locality"] = utils.choose_place(
-        city=user_input["city_name"], state=user_input["state_name"], region="Todos"
+        city=user_input["city_name"], state=user_input["state_name"], region=user_input["health_region_name"]
     )
 
     return user_input, data
@@ -167,18 +186,15 @@ def filter_options(user_input, df_cities, df_states, config):
 
 @st.cache(suppress_st_warning=True)
 def get_data(config):
-    return (
-        loader.read_data(
+
+    dfs = {place: loader.read_data(
             "br",
             config,
-            endpoint=config["br"]["api"]["endpoints"]["farolcovid"]["cities"],
-        ).replace({"medio": "médio", "insatisfatorio": "insatisfatório"}),
-        loader.read_data(
-            "br",
-            config,
-            endpoint=config["br"]["api"]["endpoints"]["farolcovid"]["states"],
-        ).replace({"medio": "médio", "insatisfatorio": "insatisfatório"}),
-    )
+            endpoint=config["br"]["api"]["endpoints"]["farolcovid"][place],
+        ).replace({"medio": "médio", "insatisfatorio": "insatisfatório"})
+        for place in ["cities", "health_region", "states"]}
+
+    return dfs
 
 
 def main(session_state):
@@ -197,19 +213,28 @@ def main(session_state):
 
     # GET DATA
     config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
-    df_cities, df_states = get_data(config)
+    dfs = get_data(config)
 
     # REGION/CITY USER INPUT
     user_input = dict()
 
     user_input["state_name"] = st.selectbox(
-        "Estado", df_cities["state_name"].sort_values().unique()
+        "Estado", dfs["cities"]["state_name"].sort_values().unique()
+    )
+
+    user_input["health_region_name"] = st.selectbox(
+        "Regional de Saúde", 
+        utils.add_all(
+            dfs["cities"][dfs["cities"]["state_name"] == user_input["state_name"]][
+                "health_region_name"
+            ].unique()
+        ),
     )
 
     user_input["city_name"] = st.selectbox(
         "Município",
         utils.add_all(
-            df_cities[df_cities["state_name"] == user_input["state_name"]][
+            dfs["cities"][dfs["cities"]["state_name"] == user_input["state_name"]][
                 "city_name"
             ].unique()
         ),
@@ -219,10 +244,10 @@ def main(session_state):
         session_state,
         event_args={"state": user_input["state_name"], "city": user_input["city_name"]},
     )
-    user_input, data = filter_options(user_input, df_cities, df_states, config)
+    user_input, data = filter_options(user_input, dfs, config)
 
     # SOURCES PARAMS
-    user_input = utils.get_sources(user_input, data, df_cities, ["beds", "ventilators"])
+    user_input = utils.get_sources(user_input, data, dfs["cities"], ["beds", "ventilators"])
 
     # POPULATION PARAMS
     user_input["population_params"] = {
@@ -243,11 +268,13 @@ def main(session_state):
     # Update session values to standard ones if changed city or opened page or reseted values
     if (
         session_state.state != user_input["state_name"]
+        or session_state.health_region != user_input["health_region_name"]
         or session_state.city != user_input["city_name"]
         or session_state.number_beds is None
         or session_state.reset
     ):
         session_state.state = user_input["state_name"]
+        session_state.state = user_input["health_region_name"]
         session_state.city = user_input["city_name"]
         session_state.number_beds = int(
             user_input["number_beds"]
@@ -295,8 +322,8 @@ def main(session_state):
     if "state" in user_input["place_type"]:
 
         # Add disclaimer to cities in state alert levels
-        total_alert_cities = df_cities[
-            df_cities["state_id"] == data["state_id"].unique()[0]
+        total_alert_cities = dfs["cities"][
+            dfs["cities"]["state_id"] == data["state_id"].unique()[0]
         ]["overall_alert"].value_counts()
 
         utils.genKPISection(
@@ -391,7 +418,7 @@ def main(session_state):
             st.plotly_chart(fig2, use_container_width=True)
         except:
             st.write(
-                """<div class="base-wrapper"><b>Seu município ou estado não possui mais de 30 dias de dados de casos confirmados.</b>""",
+                """<div class="base-wrapper"><b>Seu município, regional ou estado não possui mais de 30 dias de dados de casos confirmados.</b>""",
                 unsafe_allow_html=True,
             )
         st.write(

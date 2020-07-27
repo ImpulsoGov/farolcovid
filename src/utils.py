@@ -90,17 +90,14 @@ def get_sources(user_input, data, cities_sources, resources):
 
             col = "_".join([item, x])
 
-            if user_input["place_type"] == "state_id":
+            if user_input["place_type"] == "state_id" or user_input["place_type"] == "health_region_id":
 
                 user_input[col] = cities_sources[
-                    cities_sources["state_id"] == data["state_id"].iloc[0]
+                    cities_sources[user_input["place_type"]] == data[user_input["place_type"]].iloc[0]
                 ][col].agg(cols_agg[item])
 
             if user_input["place_type"] == "city_id":
                 user_input[col] = data[col].fillna(0).values[0]
-
-                # if "last_updated" in col:
-                #     user_input[col] = pd.to_datetime(user_input[col]).strftime("%d/%m")
 
     user_input["last_updated_number_beds"] = pd.to_datetime(
         user_input["last_updated_number_beds"]
@@ -118,6 +115,7 @@ def get_sources(user_input, data, cities_sources, resources):
     # user_input["last_updated_beds"] = sources["last_updated_number_beds"].max()
     # user_input["last_updated_ventilators"] = sources["last_updated_number_ventilators"].max()
 
+    # print(user_input)
     return user_input
 
 

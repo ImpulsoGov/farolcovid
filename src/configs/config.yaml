@@ -10,6 +10,7 @@ br:
             rt_states: "br/states/rt"
             farolcovid: 
                 cities: "br/cities/farolcovid/main"
+                health_region: "br/health_region/farolcovid/main"
                 states: "br/states/farolcovid/main"
             analysis:
                 cases: "br/cities/cases/full"
