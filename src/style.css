@@ -609,6 +609,9 @@ header>.toolbar { /* Hide toolbar menu */
     animation-duration: 3s;
     margin-top: 1em;
 }
+.disabled{
+    pointer-events: none;
+}
 
 .btn-ambassador:hover {
     color: var(--main-primary);
@@ -1672,13 +1675,13 @@ header>.toolbar { /* Hide toolbar menu */
     font-size: 36px;
 }
 .saude-card-list-v2{
-    width:90%;
+    width:86%;
     top:80px;
     position:absolute;
     font-family: IBM Plex Sans;
     font-style: normal;
     font-weight: normal;
-    font-size: 18px;
+    font-size: 16px;
     line-height: 23px;
 }
 .saude-card-display-region-v2{

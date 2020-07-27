@@ -83,6 +83,7 @@ def main():
     elif page == "FarolCovid":
         if __name__ == "__main__":
             fc.main(session_state)
+            utils.applyButtonStyles(session_state)
 
     elif page == "Análises":
         if __name__ == "__main__":
@@ -102,7 +103,6 @@ def main():
     elif page == "Metodologia do Saúde em Ordem":
         if __name__ == "__main__":
             sod.main(session_state)
-    utils.applyButtonStyles(session_state)
 
 
 if __name__ == "__main__":

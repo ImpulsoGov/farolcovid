@@ -371,9 +371,15 @@ def applyButtonStyles(session_state):
             [str(key) + "=" + str(value) for key, value in style[1].items()]
         )
         html += f"""
-        <iframe src="resources/redo-button.html?name={name}&{parts}&{other_args}" heigth = 0 width = 0>
+        <iframe src="resources/redo-button.html?name={name}&{parts}&{other_args}" height = 0 width = 0>
         </iframe>"""
     st.write(html, unsafe_allow_html=True)
+
+
+def get_radio_horizontalization_html(radio_label):
+    """ Takes a normal radio and restilizes it to make it horizontal and bigger"""
+    html = f"""<iframe src="resources/horizontalize-radio.html?radioText={radio_label}" height = 0 width = 0></iframe>"""
+    return html
 
 
 # END OF JAVASCRIPT HACK METHODS

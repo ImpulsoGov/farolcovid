@@ -33,7 +33,7 @@ def get_score_groups(config, session_state):
     )
     economic_data = economic_data.loc[economic_data["state_num_id"] == uf_num]
     # REMOVE LINE BELOW ASAP
-    economic_data = economic_data[economic_data["cnae"] != 44]
+    # economic_data = economic_data[economic_data["cnae"] != 44]
     economic_data["activity_name"] = economic_data.apply(
         lambda row: CNAE_sectors[row["cnae"]], axis=1
     )
@@ -92,7 +92,6 @@ def range_separators_indexes(values, n):
         (((values[-1] - values[0]) / (n)) * (order + 1)) + values[0]
         for order in range(n - 1)
     ]
-    # print(separations)
     return [
         bisect.bisect_right(values, separationvalue) for separationvalue in separations
     ]
@@ -133,13 +132,14 @@ def gen_intro():
         """
         <div class="base-wrapper">
                 <div class="section-header primary-span">VEJA OS SETORES MAIS SEGUROS PARA REABRIR</div><br>
-                <div class="ambassador-question"><b>Se o seu município ou estado se encontra em ordem e com risco <span style="color:#02B529;">BAIXO</span>, você já pode começar a pensar um plano de reabertura.</b> Nós compilamos aqui dados econômicos do seu estado para lhe ajudar a planejar quais setores devem ser reabertos.</div>
+                <div class="ambassador-question"><b>Se o seu município ou estado se encontra em ordem e com risco <span style="color:#02B529;">BAIXO</span>, você já pode começar a pensar um plano de reabertura.</b> Nós compilamos aqui dados econômicos do seu estado para retomada segura de atividades econômicas, ordenadas a com critérios objetivos.</div>
         </div>""",
         unsafe_allow_html=True,
     )
 
 
 def gen_illustrative_plot_2(sectors_data, session_state):
+    """ Generates our illustrative sector diagram Version saude v2 """
     text = f""" 
     <div class="saude-alert-banner saude-blue-bg mb" style="margin-bottom: 0px;">
         <div class="base-wrapper flex flex-column" style="margin-top: 0px;">
@@ -216,13 +216,13 @@ def gen_illustrative_plot(sectors_data, session_state):
 
 
 def gen_sector_plot_card_2(sector_name, sector_data, size_sectors=5):
-    """ Generates One specific card from the sector diagram  """
+    """ Generates One specific card from the sector diagram version saude v2"""
     titles = {"a": "Fase 1 ✅", "b": "Fase 2 🙌", "c": "Fase 3 ‼", "d": "Fase 4 ⚠"}
     redirect_id_conversion = {"a": 3, "b": 2, "c": 1, "d": 0}
     redirect_id = "saude-table-" + str(redirect_id_conversion[sector_name])
     top_n_sectors = sector_data[-size_sectors::]
     size_rest = max(0, len(sector_data) - size_sectors)
-    continuation_text = f"+ {size_rest} setor{['','es'][int(size_rest >= 2)]} do grupo <a href='#{redirect_id}' style='color:blue;'>(clique aqui para acessar)</a>"
+    continuation_text = f"<b>+ {size_rest} setor{['','es'][int(size_rest >= 2)]} do grupo<br> <a href='#{redirect_id}' style='color:#00003d;'>(clique aqui para acessar)</a></b>"
     # The last 5 are the best
     item_list = "<br>".join(["- " + i["activity_name"] for i in top_n_sectors])
     average_wage = int(
@@ -271,7 +271,7 @@ def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
         <div class="saude-plot-group-massa-salarial-label">Massa Salarial média:</div>
         <div class="saude-plot-group-massa-salarial-value">R$ {convert_money(average_wage)}</div>
         <div class="saude-plot-group-separator-line"></div>
-        <div class="saude-plot-group-pessoas-label">Número de pessoas: </div>
+        <div class="saude-plot-group-pessoas-label">Número de trabalhadores: </div>
         <div class="saude-plot-group-pessoas-value">{convert_money(num_people)}</div>
     </div>"""
     return text
@@ -328,8 +328,11 @@ def gen_slider_2(session_state):
         </div>""",
         unsafe_allow_html=True,
     )
+    radio_label = "Caso queira, altere abaixo o peso dado à Segurança Sanitária:"
+    # Code in order to horizontalize the radio buttons
+    radio_horizontalization_html = utils.get_radio_horizontalization_html(radio_label)
     session_state.saude_ordem_data["slider_value"] = st.radio(
-        "Selecione o peso para Segurança Sanitária abaixo:", [70, 80, 90, 100]
+        radio_label, [70, 80, 90, 100]
     )
     amplitude.gen_user(utils.get_server_session()).safe_log_event(
         "chose saude_slider_value",
@@ -339,6 +342,7 @@ def gen_slider_2(session_state):
     st.write(
         f"""
         <div class="base-wrapper">
+            {radio_horizontalization_html}
             <div class="saude-slider-value-display"><b>Peso selecionado (Segurança): {session_state.saude_ordem_data["slider_value"]}%</b>&nbsp;&nbsp;|  &nbsp;Peso restante para Economia: {100 - session_state.saude_ordem_data["slider_value"]}%</div>
         </div>""",
         unsafe_allow_html=True,
@@ -351,8 +355,8 @@ def gen_detailed_vision(economic_data, session_state, config):
     st.write(
         f"""
         <div class="base-wrapper">
-            <span class="ambassador-question" style="width: 80%; max-width: 1000px;"><i>
-                Clique em "Visão Detalhada" para ver o gráfico completo com todas as informações.</i>
+            <span class="ambassador-question" style="width: 80%; max-width: 1000px;">
+            <i><b>Clique em "Visão Detalhada" para ver o gráfico completo com todas as informações.</b></i>
             </span><br>""",
         unsafe_allow_html=True,
     )
@@ -544,7 +548,7 @@ def gen_sector_tables(
                 </a>"""
     else:
         download_text = f"""
-                <a href="" download="dados_estado.csv" class="btn-ambassador">
+                <a href="" download="dados_estado.csv" class="btn-ambassador disabled">
                     Baixar dados (Desativado)
                 </a>"""
     st.write(
@@ -644,15 +648,7 @@ def gen_protocols_section():
         <span class="section-header primary-span">
             DIRETRIZES PARA A ELABORAÇÃO DE PROTOCOLOS DE REABERTURA
         </span><br><br>
-        <span class="ambassador-question">
-            Com base nos estudos referência do Guia SESI de prevenção da Covid-19 nas empresas e a lista de Prevenção e Controle de Perigos do departamento de Trabalho dos EUA, apresentamos algumas <b>recomendações para criação de protocolos de reabertura que garantam maior segurança para trabalhadores(as)</b>.<br>
-            As recomendações seguem uma Hierarquia de controles medidos pela sua efetividade e facilidade de se colocar em prática, como é apresentado abaixo:</span><br><br><br>
-        <figure>
-            <img class="saude-reopening-protocol-img-1" alt="Fonte: Guia SESI de prevenção da Covid-19 nas empresas (26/5/2020)" src="https://i.imgur.com/St9fAMB.png"><br>
-            <figcaption><i>Fonte: Guia SESI de prevenção da Covid-19 nas empresas (26/5/2020) ??</i></figcaption>
-        </figure>
         <span class="ambassador-question"><br>
-            Em detalhe, os controles são entendidos por:<br><br>
             <b>Eliminação</b> – contempla a transferência para o trabalho remoto, ou seja, elimina riscos ocupacionais. Mesmo que a residência do funcionário não tenha a infraestrutura necessária, a transferência de computadores ou melhorias de acesso à internet são medidas possíveis e de baixo custo, com fácil implementação.
             <br><br>
             <b>Substituição</b>  – consiste em substituir riscos onde eles são inevitáveis, por um de menor magnitude. Vale assinalar os times que são ou não essenciais no trabalho presencial e segmentar a força de trabalho, mantendo somente o mínimo necessário de operação presencial e reduzindo o contato próximo entre times diferentes. 
@@ -663,13 +659,17 @@ def gen_protocols_section():
             <br><br>
             <b>EPIs</b>  – definição de qual é o EPI necessário para cada função, levando em conta o risco de cada atividade e também o ambiente. Trabalhos mais fisicamente exaustivos geralmente requerem troca de EPI mais constante ou especificações diferentes de outras atividades. É preciso garantir o correto uso desses equipamentos. No caso de máscaras simples, convém que a empresa distribua para os funcionários, garantindo certas especificações. Por exemplo, 
             <br><br>
-            <i>OBSERVAÇÃO: quanto mais alto na hierarquia, menos capacidade de supervisão e execução é exigida do empregador. Por isso, a primeira pergunta é sempre “quem pode ficar em casa?”. Treinar supervisores, garantir alinhamento institucional e cumprimento impecável de protocolos, etc. tem um custo e são medidas de difícil controle.</i>
+            <i>OBSERVAÇÃO:</i> quanto mais alto na hierarquia, menos capacidade de supervisão e execução é exigida do empregador. Por isso, a primeira pergunta é sempre “quem pode ficar em casa?”. Treinar supervisores, garantir alinhamento institucional e cumprimento impecável de protocolos, etc. tem um custo e são medidas de difícil controle.
             <br><br>
-            <b>Referênicas:</b><br>
+            <b>Materiais de Referência:</b><br>
             <a href="http://www.pe.sesi.org.br/Documents/Guia_SESI_de_prevencao_2805_2%20(1).pdf" style="color: blue;">[1] Guia SESI de prevenção da Covid-19 nas empresas (atualizado em 26/5/2020).</a><br>
             <a href="https://www.osha.gov/shpguidelines/hazard-prevention.html" style="color: blue;">[2] Recommended Practices for Safety and Health Programs - United States Department of Labor</a></br>
             <br><br>
         </span>
+        <figure>
+            <img class="saude-reopening-protocol-img-1" alt="Fonte: HIERARCHY OF CONTROLS -The National Institute for Occupational Safety and Health (NIOSH); disponível em https://www.cdc.gov/niosh/topics/hierarchy/default.html" src="https://i.imgur.com/St9fAMB.png"><br>
+            <figcaption><i>Fonte: HIERARCHY OF CONTROLS -The National Institute for Occupational Safety and Health (NIOSH); disponível em https://www.cdc.gov/niosh/topics/hierarchy/default.html</i></figcaption>
+        </figure>
     </div>""",
         unsafe_allow_html=True,
     )
@@ -686,7 +686,7 @@ def main(user_input, indicators, data, config, session_state):
     ):  # If not loaded, load the data we are going to use in the user database
         session_state.saude_ordem_data = {
             "slider_value": 70,
-            "opened_tables": [False, False, False, False],
+            "opened_tables": [True, True, True, True],
             "opened_detailed_view": False,
         }
     score_groups, economic_data = get_score_groups(config, session_state)
