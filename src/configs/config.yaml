@@ -26,8 +26,6 @@ br:
         CNAE_sectors: https://docs.google.com/spreadsheets/d/1pP8dY9kRa9EvX3KcVPfMWJ8exDaoT1_bBggSKfD3y0k
         br_states_reopening_data: https://docs.google.com/spreadsheets/d/1-uU-CbE8k7ctRD-n8veEz0l--_ECcUyaa6ZcjhraO_o
         br_health_region_reopening_data: https://docs.google.com/spreadsheets/d/17FzeuXoHD5e9cqOHD1lcwyH7AgWTZ0UQ-7gwgA7VMok
-    drive_ids:
-        br_states_clean_data_index: 1D1ksrSGJUdDLUuYP7cLG3qdd-y9eFTkD
     cases:
         url: https://data.brasil.io/dataset/covid19/caso_full.csv.gz
         rename:

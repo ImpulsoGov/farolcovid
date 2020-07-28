@@ -11,8 +11,6 @@ import numpy as np
 import math
 import os
 import pandas as pd
-import io
-import requests
 
 DO_IT_BY_RANGE = (
     True  # DEFINES IF WE SHOULD RUN OUR CODE BY METHOD 1 (TRUE) OR 2 (FALSE)
@@ -26,7 +24,7 @@ def get_score_groups(config, session_state):
     uf_num = utils.get_place_id_by_names(session_state.state)
     if session_state.city != "Todos":  # city
         city_id = utils.get_place_id_by_names(session_state.state, session_state.city)
-        dictionary_data = pd.read_csv(url)
+        dictionary_data = pd.read_csv("CHANGE FOR URL")
         health_region_id = dictionary_data.loc[dictionary_data["city_id"] == city_id][
             "health_region_id"
         ].values[0]
@@ -406,19 +404,24 @@ def gen_detailed_vision(economic_data, session_state, config):
     utils.stylizeButton("Visão Detalhada", detailed_button_style, session_state)
 
 
-def get_state_clean_data_url(session_state, config):
-    """Reads which state are we using and returns the correct file download url for it"""
-    state_num_id = utils.get_place_id_by_names(session_state.state)
-    index_file_url = f'https://drive.google.com/uc?export=download&id={config["br"]["drive_ids"]["br_states_clean_data_index"]}'
-    state_data_index = pd.read_csv(
-        io.BytesIO(requests.get(index_file_url).content),
-        encoding="utf8",
-        # index_col="state_num_id",
-    )
-    uf_file_id = state_data_index.loc[state_data_index["state_num_id"] == state_num_id][
-        "file_id"
-    ].values[0]
-    return f"https://drive.google.com/uc?export=download&id={uf_file_id}"
+def get_clean_data(in_econ_data):
+    cols = in_econ_data.columns.tolist()
+    cols.insert(2, "activity_name")
+    cols = cols[:-1]
+    economic_data = in_econ_data[cols]
+    to_drop_columns = [
+        i
+        for i in list(economic_data.columns)
+        if ("cd_id" in i and (i.split("_")[-1] not in ["07", "08", "09", "10"]))
+    ]
+    economic_data = economic_data.drop(to_drop_columns, axis=1)
+    return economic_data
+
+
+def convert_dataframe_to_html(df, name="dados"):
+    uri = df.to_csv(index=False).replace(",", "%2C").replace("\n", "%0A")
+    file_name = "saude_em_ordem_" + name.replace(" ", "_") + ".csv"
+    return f'<a href="data:application/octet-stream,{uri}" download="{file_name}" class="btn-ambassador">Baixar Dados Completos</a>'
 
 
 def display_detailed_plot(economic_data, session_state):
@@ -561,7 +564,13 @@ def gen_isoscore_lines(fig, score_parts, wage_range, weight):
 
 # SEÇÃO DE TABELAS DE SETORES
 def gen_sector_tables(
-    session_state, score_groups, config, default_size=5, download=False
+    session_state,
+    score_groups,
+    config,
+    default_size=5,
+    download=False,
+    econ_data=None,
+    download_name="dados",
 ):
     """
     Major function that will generate all the tables from all the sectors.
@@ -570,10 +579,8 @@ def gen_sector_tables(
     text = ""
     titles = ["D", "C", "B", "A"]
     if download:
-        download_text = f"""
-                <a href="{get_state_clean_data_url(session_state,config)}" download="dados_estado.csv" class="btn-ambassador">
-                    Baixar dados completos do estado
-                </a>"""
+        clean_econ_data = get_clean_data(econ_data)
+        download_text = convert_dataframe_to_html(clean_econ_data, name=download_name)
     else:
         # download_text = f"""
         # <a href="" download="dados_estado.csv" class="btn-ambassador disabled">
@@ -730,5 +737,13 @@ def main(user_input, indicators, data, config, session_state):
     gen_illustrative_plot(score_groups, session_state, place_name)
     gen_slider(session_state)
     gen_detailed_vision(economic_data, session_state, config)
-    gen_sector_tables(session_state, score_groups, config, default_size=5)
+    gen_sector_tables(
+        session_state,
+        score_groups,
+        config,
+        default_size=5,
+        download=True,
+        econ_data=economic_data,
+        download_name=place_name,
+    )
     gen_protocols_section()
