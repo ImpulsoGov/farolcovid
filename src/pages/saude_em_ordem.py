@@ -24,14 +24,40 @@ DO_IT_BY_RANGE = (
 def get_score_groups(config, session_state):
     """ Takes our data and splits it into 4 sectors for use by our diagram generator """
     uf_num = utils.get_place_id_by_names(session_state.state)
+    if session_state.city != "Todos":  # city
+        city_id = utils.get_place_id_by_names(session_state.state, session_state.city)
+        dictionary_data = pd.read_csv(url)
+        health_region_id = dictionary_data.loc[dictionary_data["city_id"] == city_id][
+            "health_region_id"
+        ].values[0]
+        economic_data = loader.read_data(
+            "br",
+            config,
+            config["br"]["api"]["endpoints"]["safereopen"][
+                "economic_data_health_region"
+            ],
+        )
+        economic_data = economic_data.loc[
+            economic_data["health_region_id"] == health_region_id
+        ]
+        place_name = (
+            dictionary_data.loc[
+                dictionary_data["health_region_id"] == health_region_id
+            ]["health_region_name"].values[0]
+            + " (Região de Sáude)"
+        )
+    else:
+        place_name = session_state.state + " (Estado)"
+        economic_data = loader.read_data(
+            "br",
+            config,
+            config["br"]["api"]["endpoints"]["safereopen"]["economic_data"],
+        )
+        economic_data = economic_data.loc[economic_data["state_num_id"] == uf_num]
     CNAE_sectors = loader.read_data(
         "br", config, config["br"]["api"]["endpoints"]["safereopen"]["cnae_sectors"]
     )
     CNAE_sectors = dict(zip(CNAE_sectors.cnae, CNAE_sectors.activity))
-    economic_data = loader.read_data(
-        "br", config, config["br"]["api"]["endpoints"]["safereopen"]["economic_data"]
-    )
-    economic_data = economic_data.loc[economic_data["state_num_id"] == uf_num]
     # REMOVE LINE BELOW ASAP
     # economic_data = economic_data[economic_data["cnae"] != 44]
     economic_data["activity_name"] = economic_data.apply(
@@ -44,6 +70,7 @@ def get_score_groups(config, session_state):
             DO_IT_BY_RANGE,
         ),
         economic_data,
+        place_name,
     )
 
 
@@ -138,13 +165,13 @@ def gen_intro():
     )
 
 
-def gen_illustrative_plot(sectors_data, session_state):
+def gen_illustrative_plot(sectors_data, session_state, place_name):
     """ Generates our illustrative sector diagram Version saude v2 """
     text = f""" 
     <div class="saude-alert-banner saude-blue-bg mb" style="margin-bottom: 0px;">
         <div class="base-wrapper flex flex-column" style="margin-top: 0px;">
             <div class="flex flex-row flex-space-between flex-align-items-center">
-                <span class="white-span header p1"> Ordem de Retomada dos Setores | {session_state.state + " (Estado)"}</span>
+                <span class="white-span header p1"> Ordem de Retomada dos Setores | {place_name}</span>
             </div>
             <span class="white-span p3">Sugerimos uma retomada <b>em fases</b>, a começar pelos <b>setores mais seguros</b> e com <b>maior contribuição econômica.</b></span>
             <div class="flex flex-row flex-m-column">"""
@@ -697,10 +724,10 @@ def main(user_input, indicators, data, config, session_state):
             "opened_tables": [True, True, True, True],
             "opened_detailed_view": False,
         }
-    score_groups, economic_data = get_score_groups(config, session_state)
+    score_groups, economic_data, place_name = get_score_groups(config, session_state)
     # gen_header()
     gen_intro()
-    gen_illustrative_plot(score_groups, session_state)
+    gen_illustrative_plot(score_groups, session_state, place_name)
     gen_slider(session_state)
     gen_detailed_vision(economic_data, session_state, config)
     gen_sector_tables(session_state, score_groups, config, default_size=5)

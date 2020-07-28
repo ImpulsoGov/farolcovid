@@ -16,6 +16,7 @@ br:
                 owid: "world/owid/heatmap"
             safereopen:
                 economic_data: "br/states/safereopen/main"
+                economic_data_health_region: "br/health_region/safereopen/main"
                 cnae_sectors: "br/cnae/sectors"
     drive_paths:
         br_id_state_region_city: https://docs.google.com/spreadsheets/d/1Qo18XeP7Jxaj0IgVw-ISDf-MSpt2ZzbaUj9u3PT4hvc
