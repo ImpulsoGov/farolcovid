@@ -853,7 +853,7 @@ header>.toolbar { /* Hide toolbar menu */
 
 .sidebar-collapse-control {
     background-color: var(--main-primary);
-    padding: 1em;
+    padding: 0.7em;
     color: white;
 }
 
@@ -1069,7 +1069,7 @@ header>.toolbar { /* Hide toolbar menu */
 }
 .saude-arrow {
     border: solid black;
-    border-width: 0 3px 3px 0;
+    border-width: 0 2px 2px 0;
     display: inline-block;
     padding: 6px;
 }
@@ -1385,7 +1385,7 @@ header>.toolbar { /* Hide toolbar menu */
     width: 10vw;
     height: 3vw;
     top: 5vw;
-    border-radius: 1.5vw;
+    border-radius: 1.8vw;
     font-size:1.5vw;
     font-family: Oswald;
     font-style: normal;
@@ -1569,11 +1569,11 @@ header>.toolbar { /* Hide toolbar menu */
     height: auto;
 }
 .saude-white-banner-pt0{
-    height:200px;
+    height: 400px;
     width:100%;
     background-color: white;
     position:absolute;
-    bottom:200px;
+    bottom: 100px;
     z-index: 0;
 }
 @media only screen and (max-width: 425px) {
@@ -1603,10 +1603,10 @@ header>.toolbar { /* Hide toolbar menu */
 }
 .saude-banner-button{
     position: absolute;
-    width: 130px;
-    height: 50px;
+    width: 120px;
+    height: 40px;
     border-radius: 14px;
-    font-size:30px;
+    font-size: 24px;
     font-family: Oswald;
     font-style: normal;
     font-weight: normal;
@@ -1622,7 +1622,7 @@ header>.toolbar { /* Hide toolbar menu */
 }
 .high-economy{
     background: rgb(2, 188, 23);
-    top:calc(10% + 70px);
+    top:calc(3% + 70px);
 }
 .low-security{
     background: rgb(255, 95, 107);
@@ -1632,20 +1632,21 @@ header>.toolbar { /* Hide toolbar menu */
 .low-economy{
     background: rgb(255, 95, 107);
     left: 1090px;
-    top:calc(10% + 70px);
+    top:calc(3% + 70px);
 }
 
 .saude-banner-desc{
     position: relative;
     width: 883px;
-    height: 72px;
+    /* height: 72px; */
     left: 180px;
+    padding: var(--minor-padding);
     top:-30px;
     font-family: IBM Plex Sans;
     font-style: normal;
     font-weight: normal;
-    font-size: 28px;
-    line-height: 36px;
+    font-size: 16px;
+    line-height: 28px;
     display: inline-block;
     align-items: center;
 
@@ -1657,7 +1658,7 @@ header>.toolbar { /* Hide toolbar menu */
     height: 0px;
     left: 50px;
     top: 0px;
-    border: 2px solid #000000;
+    border: 1px solid #000000;
     box-sizing: border-box;
 }
 .saude-banner-arrow-tip{
@@ -1707,10 +1708,11 @@ header>.toolbar { /* Hide toolbar menu */
 .saude-card-redirect{
     position:absolute;
     width:80%;
-    bottom:100px;
+    bottom:130px;
+    font-size: 14px;
 }
 .saude-indicator-card {
-    margin-top: 50px;
+    margin-top: 30px;
     padding: var(--main-padding);
     width: 280px;
     height: 400px;
