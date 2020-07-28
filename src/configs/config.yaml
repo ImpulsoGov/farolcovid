@@ -3,15 +3,15 @@ refresh_rate: 999999 # minutes
 br:
     api:
         external: http://datasource.coronacidades.org/
-        local: http://localhost:7000/
+        local: http://45.55.43.231:7000/
         endpoints:
             simulacovid: "br/cities/simulacovid/main"
             rt_cities: "br/cities/rt"
             rt_states: "br/states/rt"
             farolcovid: 
-                cities: "br/cities/farolcovid/main"
+                city: "br/cities/farolcovid/main"
                 health_region: "br/health_region/farolcovid/main"
-                states: "br/states/farolcovid/main"
+                state: "br/states/farolcovid/main"
             analysis:
                 cases: "br/cities/cases/full"
                 owid: "world/owid/heatmap"
@@ -60,7 +60,7 @@ br:
                 "state_id",
                 "state_name",
                 "health_region_id",
-                "health_system_region",
+                "health_region_name",
                 "city_id",
                 "city_name",
                 "population",
@@ -223,7 +223,7 @@ br:
             "state_id",
             "state_name",
             "health_region_id",
-            "health_system_region",
+            "health_region_name",
             "city_id",
             "city_name",
             "population",
