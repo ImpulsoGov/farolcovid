@@ -38,11 +38,6 @@ def get_rt(user_input, bound):
         "negativo": lambda x: x * 2,  # cenario negativo
     }
 
-    # # Caso tenha Rt
-    # if user_input["Rt"]["is_valid"] != "nan":
-    #     return rules[user_input["strategy"]](user_input["Rt"][bound])
-    # Caso não tenha Rt, usa o Rt do estado
-    # else:
     return rules[user_input["strategy"]](user_input["rt_values"][bound])
 
 
