@@ -138,20 +138,20 @@ def gen_intro():
     )
 
 
-def gen_illustrative_plot_2(sectors_data, session_state):
+def gen_illustrative_plot(sectors_data, session_state):
     """ Generates our illustrative sector diagram Version saude v2 """
     text = f""" 
     <div class="saude-alert-banner saude-blue-bg mb" style="margin-bottom: 0px;">
         <div class="base-wrapper flex flex-column" style="margin-top: 0px;">
             <div class="flex flex-row flex-space-between flex-align-items-center">
-                <span class="white-span header p1"> ORDEM DE RETOMADA DOS SETORES | {session_state.state.upper() + " (ESTADO)"}</span>
+                <span class="white-span header p1"> Ordem de Retomada dos Setores | {session_state.state + " (Estado)"}</span>
             </div>
-            <span class="white-span p3">Sugerimos uma retomada <b>em fases</b>, a começar pelos <b>setores mais seguros</b> e com <b>maior contribuição econômica.</b> (Veja mais em nossa Metodologia)</span>
+            <span class="white-span p3">Sugerimos uma retomada <b>em fases</b>, a começar pelos <b>setores mais seguros</b> e com <b>maior contribuição econômica.</b></span>
             <div class="flex flex-row flex-m-column">"""
     names_in_order = list(reversed(["d", "c", "b", "a"]))
     for index, sector_dict in enumerate(reversed(sectors_data)):
-        text += gen_sector_plot_card_2(
-            names_in_order[index], sector_dict, size_sectors=5
+        text += gen_sector_plot_card(
+            names_in_order[index], sector_dict, size_sectors=3
         )
     text += """
             </div>
@@ -167,10 +167,10 @@ def gen_illustrative_plot_2(sectors_data, session_state):
             <div class="saude-banner-button high-security">Seguro</div>
             <div class="saude-banner-button high-economy">Forte</div>
             <div class="saude-banner-desc">
-                <b>Segurança Sanitária</b> mede o risco de exposição à Covid-19 dos trabalhadores de cada atividade econômica
+                <b>Segurança Sanitária</b> mede o risco de exposição à Covid-19 dos trabalhadores de cada atividade econômica.
             </div>
             <div class="saude-banner-desc">
-                <b>Contribuição Econômica</b> é medida da massa salarial dos setores formais e informais de cada atividade econômica
+                <b>Contribuição Econômica</b> é medida da massa salarial dos setores formais e informais de cada atividade econômica.<br>(Veja mais em Metodologia)
             </div>
             <div class="saude-banner-button low-security">Inseguro</div>
             <div class="saude-banner-button low-economy">Fraca</div>
@@ -180,42 +180,42 @@ def gen_illustrative_plot_2(sectors_data, session_state):
 
 
 # SEÇÃO PLOT SAUDE EM ORDEM
-def gen_illustrative_plot(sectors_data, session_state):
-    """ Generates our illustrative sector diagram """
-    text = f"""
-    <div class="saude-sector-basic-plot-area">
-        <div class="saude-veja-title" style="text-align:left;">SAUDE EM ORDEM | {session_state.state.upper() + " (ESTADO)"}</div>
-        <div class="saude-sector-basic-plot-disc">
-            Os dois principais indicadores utilizados são a Importância Econômica (medida pela soma dos salários pagos) e o Nível de Segurança Sanitária do setor. A ideia é que devemos iniciar a reabertura pelos setores de mais seguros do ponto de vista da saúde e de maior importância econômica.
-        </div>
-        <div class="saude-sector-basic-plot-title">
-            Top 5 Setores por grupo de custo-benefício
-        </div>
-        <div class="saude-segurança-eixo-label">Segurança Sanitária</div>
-        <div class="saude-plot-axis">"""
-    names_in_order = ["d", "c", "b", "a"]
-    for index, sector_dict in enumerate(sectors_data):
-        text += gen_sector_plot_card(names_in_order[index], sector_dict, size_sectors=5)
-    text += """
-            <div class="saude-vertical-arrow-full">
-                <div class="saude-arrow-up-pos">
-                    <i class="saude-arrow up"></i>
-                </div>
-                <div class="saude-vertical-line"></div>
-            </div>
-            <div class="saude-horizontal-arrow-full">
-                <div class="saude-horizontal-line"></div>
-                <div class="saude-arrow-right-pos">
-                    <i class="saude-arrow right"></i>
-                </div>
-            </div>
-            <div class="saude-economia-eixo-label">Contribuição Econômica</div>
-        </div>
-    </div>"""
-    st.write(text, unsafe_allow_html=True)
+# def gen_illustrative_plot(sectors_data, session_state):
+#     """ Generates our illustrative sector diagram """
+#     text = f"""
+#     <div class="saude-sector-basic-plot-area">
+#         <div class="saude-veja-title" style="text-align:left;">SAUDE EM ORDEM | {session_state.state.upper() + " (ESTADO)"}</div>
+#         <div class="saude-sector-basic-plot-disc">
+#             Os dois principais indicadores utilizados são a Importância Econômica (medida pela soma dos salários pagos) e o Nível de Segurança Sanitária do setor. A ideia é que devemos iniciar a reabertura pelos setores de mais seguros do ponto de vista da saúde e de maior importância econômica.
+#         </div>
+#         <div class="saude-sector-basic-plot-title">
+#             Top 5 Setores por grupo de custo-benefício
+#         </div>
+#         <div class="saude-segurança-eixo-label">Segurança Sanitária</div>
+#         <div class="saude-plot-axis">"""
+#     names_in_order = ["d", "c", "b", "a"]
+#     for index, sector_dict in enumerate(sectors_data):
+#         text += gen_sector_plot_card(names_in_order[index], sector_dict, size_sectors=5)
+#     text += """
+#             <div class="saude-vertical-arrow-full">
+#                 <div class="saude-arrow-up-pos">
+#                     <i class="saude-arrow up"></i>
+#                 </div>
+#                 <div class="saude-vertical-line"></div>
+#             </div>
+#             <div class="saude-horizontal-arrow-full">
+#                 <div class="saude-horizontal-line"></div>
+#                 <div class="saude-arrow-right-pos">
+#                     <i class="saude-arrow right"></i>
+#                 </div>
+#             </div>
+#             <div class="saude-economia-eixo-label">Contribuição Econômica</div>
+#         </div>
+#     </div>"""
+#     st.write(text, unsafe_allow_html=True)
 
 
-def gen_sector_plot_card_2(sector_name, sector_data, size_sectors=5):
+def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
     """ Generates One specific card from the sector diagram version saude v2"""
     titles = {"a": "Fase 1 ✅", "b": "Fase 2 🙌", "c": "Fase 3 ‼", "d": "Fase 4 ⚠"}
     redirect_id_conversion = {"a": 3, "b": 2, "c": 1, "d": 0}
@@ -252,29 +252,29 @@ def gen_sector_plot_card_2(sector_name, sector_data, size_sectors=5):
     return text
 
 
-def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
-    """ Generates One specific card from the sector diagram  """
-    titles = {"a": "Grupo A ✅", "b": "Grupo B 🙌", "c": "Grupo C ‼", "d": "Grupo D ⚠"}
-    top_n_sectors = sector_data[-size_sectors::]
-    # The last 5 are the best
-    item_list = "<br>".join(["- " + i["activity_name"] for i in top_n_sectors])
-    average_wage = int(
-        sum([float(i["total_wage_bill"]) for i in top_n_sectors]) / size_sectors
-    )
-    num_people = sum([int(i["n_employee"]) for i in top_n_sectors])
-    text = f"""
-    <div class="saude-sector-{sector_name}-frame">
-        <div class="saude-plot-group-title">{titles[sector_name]}</div>
-        <div class="saude-plot-group-sectors-list">
-            {item_list}
-        </div>
-        <div class="saude-plot-group-massa-salarial-label">Massa Salarial média:</div>
-        <div class="saude-plot-group-massa-salarial-value">R$ {convert_money(average_wage)}</div>
-        <div class="saude-plot-group-separator-line"></div>
-        <div class="saude-plot-group-pessoas-label">Número de trabalhadores: </div>
-        <div class="saude-plot-group-pessoas-value">{convert_money(num_people)}</div>
-    </div>"""
-    return text
+# def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
+#     """ Generates One specific card from the sector diagram  """
+#     titles = {"a": "Grupo A ✅", "b": "Grupo B 🙌", "c": "Grupo C ‼", "d": "Grupo D ⚠"}
+#     top_n_sectors = sector_data[-size_sectors::]
+#     # The last 5 are the best
+#     item_list = "<br>".join(["- " + i["activity_name"] for i in top_n_sectors])
+#     average_wage = int(
+#         sum([float(i["total_wage_bill"]) for i in top_n_sectors]) / size_sectors
+#     )
+#     num_people = sum([int(i["n_employee"]) for i in top_n_sectors])
+#     text = f"""
+#     <div class="saude-sector-{sector_name}-frame">
+#         <div class="saude-plot-group-title">{titles[sector_name]}</div>
+#         <div class="saude-plot-group-sectors-list">
+#             {item_list}
+#         </div>
+#         <div class="saude-plot-group-massa-salarial-label">Massa Salarial média:</div>
+#         <div class="saude-plot-group-massa-salarial-value">R$ {convert_money(average_wage)}</div>
+#         <div class="saude-plot-group-separator-line"></div>
+#         <div class="saude-plot-group-pessoas-label">Número de trabalhadores: </div>
+#         <div class="saude-plot-group-pessoas-value">{convert_money(num_people)}</div>
+#     </div>"""
+#     return text
 
 
 def convert_money(money):
@@ -285,37 +285,37 @@ def convert_money(money):
 
 
 # SEÇÃO DE SELEÇÃO DE PESOS
+# def gen_slider(session_state):
+#     """ Generates the weight slider we see after the initial sector diagram and saves it to session_state"""
+#     st.write(
+#         """
+#         <div class="base-wrapper">
+#             <div class="saude-slider-wrapper">
+#                 <span class="section-header primary-span">ESCOLHA O PESO PARA A SEGURANÇA SANITÁRIA</span><p>
+#                 <span class="ambassador-question" style="width:80%;max-width:1000px;"><br><b>O peso padrão da simulação atribui 70% para Segurança Sanitária e 30% para Contribuição Econômica,</b> seguindo decisão do RS, principal inspiração para a ferramenta. 
+#                 Este parâmetro pode ser alterado abaixo; entre em contato conosco para mais detalhes.</span><p>
+#             </div>
+#         </div>""",
+#         unsafe_allow_html=True,
+#     )
+#     session_state.saude_ordem_data["slider_value"] = st.slider(
+#         "Selecione o peso para Segurança Sanitária abaixo:", 70, 100, step=10
+#     )
+#     amplitude.gen_user(utils.get_server_session()).safe_log_event(
+#         "chose saude_slider_value",
+#         session_state,
+#         event_args={"slider_value": session_state.saude_ordem_data["slider_value"]},
+#     )
+#     st.write(
+#         f"""
+#         <div class="base-wrapper">
+#             <div class="saude-slider-value-display"><b>Peso selecionado (Segurança): {session_state.saude_ordem_data["slider_value"]}%</b>&nbsp;&nbsp;|  &nbsp;Peso restante para Economia: {100 - session_state.saude_ordem_data["slider_value"]}%</div>
+#         </div>""",
+#         unsafe_allow_html=True,
+#     )
+
+
 def gen_slider(session_state):
-    """ Generates the weight slider we see after the initial sector diagram and saves it to session_state"""
-    st.write(
-        """
-        <div class="base-wrapper">
-            <div class="saude-slider-wrapper">
-                <span class="section-header primary-span">ESCOLHA O PESO PARA A SEGURANÇA SANITÁRIA</span><p>
-                <span class="ambassador-question" style="width:80%;max-width:1000px;"><br><b>O peso padrão da simulação atribui 70% para Segurança Sanitária e 30% para Contribuição Econômica,</b> seguindo decisão do RS, principal inspiração para a ferramenta. 
-                Este parâmetro pode ser alterado abaixo; entre em contato conosco para mais detalhes.</span><p>
-            </div>
-        </div>""",
-        unsafe_allow_html=True,
-    )
-    session_state.saude_ordem_data["slider_value"] = st.slider(
-        "Selecione o peso para Segurança Sanitária abaixo:", 70, 100, step=10
-    )
-    amplitude.gen_user(utils.get_server_session()).safe_log_event(
-        "chose saude_slider_value",
-        session_state,
-        event_args={"slider_value": session_state.saude_ordem_data["slider_value"]},
-    )
-    st.write(
-        f"""
-        <div class="base-wrapper">
-            <div class="saude-slider-value-display"><b>Peso selecionado (Segurança): {session_state.saude_ordem_data["slider_value"]}%</b>&nbsp;&nbsp;|  &nbsp;Peso restante para Economia: {100 - session_state.saude_ordem_data["slider_value"]}%</div>
-        </div>""",
-        unsafe_allow_html=True,
-    )
-
-
-def gen_slider_2(session_state):
     """ Generates the weight slider we see after the initial sector diagram and saves it to session_state"""
     st.write(
         """
@@ -343,7 +343,6 @@ def gen_slider_2(session_state):
         f"""
         <div class="base-wrapper">
             {radio_horizontalization_html}
-            <div class="saude-slider-value-display"><b>Peso selecionado (Segurança): {session_state.saude_ordem_data["slider_value"]}%</b>&nbsp;&nbsp;|  &nbsp;Peso restante para Economia: {100 - session_state.saude_ordem_data["slider_value"]}%</div>
         </div>""",
         unsafe_allow_html=True,
     )
@@ -355,8 +354,8 @@ def gen_detailed_vision(economic_data, session_state, config):
     st.write(
         f"""
         <div class="base-wrapper">
-            <span class="ambassador-question" style="width: 80%; max-width: 1000px;">
-            <i><b>Clique em "Visão Detalhada" para ver o gráfico completo com todas as informações.</b></i>
+            <span style="width: 80%; max-width: 1000px; margin-top: -50px;">
+            <i>Clique em "Visão Detalhada" para ver o gráfico completo com todas as informações.</i>
             </span><br>""",
         unsafe_allow_html=True,
     )
@@ -692,10 +691,8 @@ def main(user_input, indicators, data, config, session_state):
     score_groups, economic_data = get_score_groups(config, session_state)
     # gen_header()
     gen_intro()
-    # gen_illustrative_plot(score_groups, session_state)
-    gen_illustrative_plot_2(score_groups, session_state)
-    # gen_slider(session_state)
-    gen_slider_2(session_state)
+    gen_illustrative_plot(score_groups, session_state)
+    gen_slider(session_state)
     gen_detailed_vision(economic_data, session_state, config)
     gen_sector_tables(session_state, score_groups, config, default_size=5)
     gen_protocols_section()
