@@ -90,10 +90,14 @@ def get_sources(user_input, data, cities_sources, resources):
 
             col = "_".join([item, x])
 
-            if user_input["place_type"] == "state_id" or user_input["place_type"] == "health_region_id":
+            if (
+                user_input["place_type"] == "state_num_id"
+                or user_input["place_type"] == "health_region_id"
+            ):
 
                 user_input[col] = cities_sources[
-                    cities_sources[user_input["place_type"]] == data[user_input["place_type"]].iloc[0]
+                    cities_sources[user_input["place_type"]]
+                    == data[user_input["place_type"]].iloc[0]
                 ][col].agg(cols_agg[item])
 
             if user_input["place_type"] == "city_id":
@@ -106,16 +110,7 @@ def get_sources(user_input, data, cities_sources, resources):
     user_input["last_updated_number_ventilators"] = pd.to_datetime(
         user_input["last_updated_number_ventilators"]
     ).strftime("%d/%m")
-    # user_input["n_beds"] = sources["number_beds"][0]
-    # user_input["n_ventilators"] = sources["number_ventilators"][0]
 
-    # user_input["authors_beds"] = ", ".join(sources["author_number_beds"])
-    # user_input["authors_ventilators"] = ", ".join(sources["author_number_ventilators"])
-
-    # user_input["last_updated_beds"] = sources["last_updated_number_beds"].max()
-    # user_input["last_updated_ventilators"] = sources["last_updated_number_ventilators"].max()
-
-    # print(user_input)
     return user_input
 
 
@@ -127,12 +122,10 @@ def add_all(x, all_string="Todos"):
 
 
 def choose_place(city, region, state):
-    if city == "Todos" and region == "Todos" and state == "Todos":
-        return "Brasil"
     if city == "Todos" and region == "Todos":
-        return state + " (Estado)" if state != "Todos" else "Brasil"
+        return state + " (Estado)"
     if city == "Todos":
-        return region + " (Região SUS)" if region != "Todos" else "Todas as regiões SUS"
+        return region + " (Região SUS)"
     return city
 
 
