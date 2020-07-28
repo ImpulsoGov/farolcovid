@@ -150,9 +150,7 @@ def gen_illustrative_plot(sectors_data, session_state):
             <div class="flex flex-row flex-m-column">"""
     names_in_order = list(reversed(["d", "c", "b", "a"]))
     for index, sector_dict in enumerate(reversed(sectors_data)):
-        text += gen_sector_plot_card(
-            names_in_order[index], sector_dict, size_sectors=3
-        )
+        text += gen_sector_plot_card(names_in_order[index], sector_dict, size_sectors=3)
     text += """
             </div>
         </div>
@@ -292,7 +290,7 @@ def convert_money(money):
 #         <div class="base-wrapper">
 #             <div class="saude-slider-wrapper">
 #                 <span class="section-header primary-span">ESCOLHA O PESO PARA A SEGURANÇA SANITÁRIA</span><p>
-#                 <span class="ambassador-question" style="width:80%;max-width:1000px;"><br><b>O peso padrão da simulação atribui 70% para Segurança Sanitária e 30% para Contribuição Econômica,</b> seguindo decisão do RS, principal inspiração para a ferramenta. 
+#                 <span class="ambassador-question" style="width:80%;max-width:1000px;"><br><b>O peso padrão da simulação atribui 70% para Segurança Sanitária e 30% para Contribuição Econômica,</b> seguindo decisão do RS, principal inspiração para a ferramenta.
 #                 Este parâmetro pode ser alterado abaixo; entre em contato conosco para mais detalhes.</span><p>
 #             </div>
 #         </div>""",
@@ -317,35 +315,37 @@ def convert_money(money):
 
 def gen_slider(session_state):
     """ Generates the weight slider we see after the initial sector diagram and saves it to session_state"""
+    radio_label = "Caso queira, altere abaixo o peso dado à Segurança Sanitária:"
+    # Code in order to horizontalize the radio buttons
+    radio_horizontalization_html = utils.get_radio_horizontalization_html(radio_label)
     st.write(
-        """
+        f"""
         <div class="base-wrapper">
             <div class="saude-slider-wrapper">
                 <span class="section-header primary-span">ESCOLHA O PESO PARA A SEGURANÇA SANITÁRIA</span><p>
                 <span class="ambassador-question" style="width:80%;max-width:1000px;"><br><b>O peso determina em qual fase classificamos cada setor econômico.</b> O peso padrão utilizado é de <b>70% para Segurança Sanitária e 30% para Contribuição Econômica</b> - a partir desse valor você pode atribuir mais peso para Segurança (mais detalhes na Metodologia).
                 Este parâmetro pode ser alterado abaixo; entre em contato conosco para mais detalhes.</span><p>
             </div>
+            {radio_horizontalization_html}
         </div>""",
         unsafe_allow_html=True,
     )
-    radio_label = "Caso queira, altere abaixo o peso dado à Segurança Sanitária:"
-    # Code in order to horizontalize the radio buttons
-    radio_horizontalization_html = utils.get_radio_horizontalization_html(radio_label)
     session_state.saude_ordem_data["slider_value"] = st.radio(
         radio_label, [70, 80, 90, 100]
+    )
+    st.write(
+        f"""
+        <div class="base-wrapper">
+            <div class="saude-slider-value-display"><b>Peso selecionado (Segurança): {session_state.saude_ordem_data["slider_value"]}%</b>&nbsp;&nbsp;|  &nbsp;Peso restante para Economia: {100 - session_state.saude_ordem_data["slider_value"]}%</div>
+        </div>""",
+        unsafe_allow_html=True,
     )
     amplitude.gen_user(utils.get_server_session()).safe_log_event(
         "chose saude_slider_value",
         session_state,
         event_args={"slider_value": session_state.saude_ordem_data["slider_value"]},
     )
-    st.write(
-        f"""
-        <div class="base-wrapper">
-            {radio_horizontalization_html}
-        </div>""",
-        unsafe_allow_html=True,
-    )
+    # st.write(radio_horizontalization_html,unsafe_allow_html=True)
 
 
 # SEÇÃO DE DETALHES (INCLUDES THE DETAILED PLOT AND THE FULL DATA DOWNLOAD BUTTON)
@@ -355,7 +355,7 @@ def gen_detailed_vision(economic_data, session_state, config):
         f"""
         <div class="base-wrapper">
             <span style="width: 80%; max-width: 1000px; margin-top: -50px;">
-            <i>Clique em "Visão Detalhada" para ver o gráfico completo com todas as informações.</i>
+            <i><b>Clique em "Visão Detalhada" para ver o gráfico completo com todas as informações.</b></i>
             </span><br>""",
         unsafe_allow_html=True,
     )
@@ -375,6 +375,8 @@ def gen_detailed_vision(economic_data, session_state, config):
     else:  # If the button is not clicked plot it as well but do not alter the flag
         if session_state.saude_ordem_data["opened_detailed_view"] is True:
             display_detailed_plot(economic_data, session_state)
+    detailed_button_style = """border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
+    utils.stylizeButton("Visão Detalhada", detailed_button_style, session_state)
 
 
 def get_state_clean_data_url(session_state, config):
@@ -546,10 +548,11 @@ def gen_sector_tables(
                     Baixar dados completos do estado
                 </a>"""
     else:
-        download_text = f"""
-                <a href="" download="dados_estado.csv" class="btn-ambassador disabled">
-                    Baixar dados (Desativado)
-                </a>"""
+        # download_text = f"""
+        # <a href="" download="dados_estado.csv" class="btn-ambassador disabled">
+        # Baixar dados (Desativado)
+        # </a>"""
+        download_text = " "
     st.write(
         f"""
         <div class="base-wrapper">
@@ -571,6 +574,12 @@ def gen_sector_tables(
             gen_single_table(session_state, score_groups, table_index, default_size)
         else:
             gen_single_table(session_state, score_groups, table_index, default_size)
+        table_button_style = """border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
+        utils.stylizeButton(
+            "Mostrar/Ocultar mais do Grupo " + titles[table_index],
+            table_button_style,
+            session_state,
+        )
 
 
 def gen_single_table(session_state, score_groups, data_index, n=5):

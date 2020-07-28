@@ -382,6 +382,13 @@ def get_radio_horizontalization_html(radio_label):
     return html
 
 
+def hide_iframes():
+    st.write(
+        f"""<iframe src="resources/hide-iframes.html" height = 0 width = 0></iframe>""",
+        unsafe_allow_html=True,
+    )
+
+
 # END OF JAVASCRIPT HACK METHODS
 
 

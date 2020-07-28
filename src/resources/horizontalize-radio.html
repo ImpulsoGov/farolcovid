@@ -22,6 +22,10 @@
         }
         function repositionButtons(radio_div) {
             radio_div.childNodes[1].style["height"] = "40px";
+            radio_div.childNodes[1].style["align-items"] = "center";
+            radio_div.childNodes[1].style["padding-left"] = "calc(50% - 161px)";
+            radio_div.childNodes[1].style["padding-right"] = "calc(50% - 161px)";
+            radio_div.childNodes[1].style["display"] = "flex";
             buttons = radio_div.childNodes[1].childNodes;
             for (var i = 0; i < buttons.length; i++) {
                 button = buttons[i];
