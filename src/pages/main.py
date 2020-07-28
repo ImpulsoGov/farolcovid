@@ -445,10 +445,29 @@ def main(session_state):
     products = ProductCards
     products[1].recommendation = f'Risco {data["overall_alert"].values[0]}'
     utils.genProductsSection(products)
-    product = st.selectbox(
-        "", ["Como você gostaria de prosseguir?", "SimulaCovid", "Saúde em Ordem",],
+    # SELECTION BUTTONS
+    if session_state.continuation_selection is None:
+        session_state.continuation_selection = [False, False]
+    simula_button_name = "Clique Aqui"  # Simula covid 0space
+    saude_button_name = "Clique Aqui "  # Saude em ordem 1space
+    if st.button(simula_button_name):
+        session_state.continuation_selection = [True, False]
+    if st.button(saude_button_name):
+        session_state.continuation_selection = [False, True]
+    # utils.applyButtonStyles(session_state)
+    # simula_selected = st.button("Simulacovid")
+    simulastyle = """border: 1px solid black;"""
+    utils.stylizeButton(
+        simula_button_name, simulastyle, session_state, others={"ui_binSelect": 1}
     )
-    if product == "SimulaCovid":
+    # saude_selected = st.button("Saude em Ordem")
+    utils.stylizeButton(
+        saude_button_name, simulastyle, session_state, others={"ui_binSelect": 2}
+    )
+    # product = st.selectbox(
+    # "", ["Como você gostaria de prosseguir?", "SimulaCovid", "Saúde em Ordem",],
+    # )
+    if session_state.continuation_selection[0]:
         user_analytics.safe_log_event(
             "picked simulacovid",
             session_state,
@@ -463,7 +482,7 @@ def main(session_state):
         sm.main(user_input, indicators, data, config, session_state)
         # TODO: remove comment on this later!
         # utils.gen_pdf_report()
-    elif product == "Saúde em Ordem":
+    elif session_state.continuation_selection[1]:
         user_analytics.safe_log_event(
             "picked saude_em_ordem",
             session_state,

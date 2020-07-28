@@ -46,6 +46,8 @@ def main():
         pages_open=None,
         amplitude_events=None,
         old_amplitude_events=None,
+        button_styles=dict(),
+        continuation_selection=None,
     )
     # In those amplitude events objects we are going to save a dict with every state as keys
     # in each state, the value will be something that allows us to identify there is a change or not
@@ -55,7 +57,7 @@ def main():
     # CLOSES THE SIDEBAR WHEN THE USER LOADS THE PAGE
     st.write(
         """
-    <iframe src="resources/sidebar-closer.html" height=0 width=0">
+    <iframe src="resources/sidebar-closer.html" height=0 width=0>
     </iframe>""",
         unsafe_allow_html=True,
     )
@@ -81,6 +83,7 @@ def main():
     elif page == "FarolCovid":
         if __name__ == "__main__":
             fc.main(session_state)
+            utils.applyButtonStyles(session_state)
 
     elif page == "Análises":
         if __name__ == "__main__":
