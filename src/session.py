@@ -16,7 +16,6 @@ import collections
 
 
 def rerun():
-    print("Rerruning")
     """Rerun a Streamlit app from the top!"""
     widget_states = _get_widget_states()
     raise RerunException(RerunData(widget_states))

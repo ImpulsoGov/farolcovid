@@ -326,7 +326,6 @@ def gen_slider(session_state):
                 <span class="ambassador-question" style="width:80%;max-width:1000px;"><br><b>O peso determina em qual fase classificamos cada setor econômico.</b> O peso padrão utilizado é de <b>70% para Segurança Sanitária e 30% para Contribuição Econômica</b> - a partir desse valor você pode atribuir mais peso para Segurança (mais detalhes na Metodologia).
                 Este parâmetro pode ser alterado abaixo; entre em contato conosco para mais detalhes.</span><p>
             </div>
-            {radio_horizontalization_html}
         </div>""",
         unsafe_allow_html=True,
     )
@@ -336,6 +335,7 @@ def gen_slider(session_state):
     st.write(
         f"""
         <div class="base-wrapper">
+            {radio_horizontalization_html}
             <div class="saude-slider-value-display"><b>Peso selecionado (Segurança): {session_state.saude_ordem_data["slider_value"]}%</b>&nbsp;&nbsp;|  &nbsp;Peso restante para Economia: {100 - session_state.saude_ordem_data["slider_value"]}%</div>
         </div>""",
         unsafe_allow_html=True,
