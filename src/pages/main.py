@@ -128,15 +128,15 @@ def update_indicators(indicators, data, config, user_input, session_state):
     return indicators
 
 
-def update_user_input_places(data, user_input):
-    
-    user_input["state_id"] = data["state_id"].values[0]
+def update_user_input_ids(data, user_input):
+
+    user_input["state_num_id"] = data["state_num_id"].values[0]
     user_input["health_region_id"] = False
     user_input["city_id"] = False
 
-    if user_input["place_type"] == "state_id":
+    if user_input["place_type"] == "state_num_id":
         return user_input
-    
+
     # health region level
     user_input["health_region_id"] = data["health_region_id"].values[0]
     if user_input["place_type"] == "health_region_id":
@@ -147,57 +147,97 @@ def update_user_input_places(data, user_input):
     return user_input
 
 
-def filter_options(user_input, dfs, config):
+def choose_rt(user_input, dfs, level):
 
-    if user_input["city_name"] == "Todos" and user_input["health_region_name"] == "Todos":
-        data = dfs["states"][dfs["states"]["state_name"] == user_input["state_name"]]
-        user_input["place_type"] = "state_id"
+    places = {1: "city", 2: "health_region", 3: "state"}
 
-    elif user_input["city_name"] == "Todos":
-        data = dfs["health_region"][dfs["health_region"]["health_region_name"] == user_input["health_region_name"]]
-        user_input["place_type"] = "health_region_id"
+    place_name = places[level] + "_name"
+    df = dfs[places[level]][dfs[places[level]][place_name] == user_input[place_name]]
+
+    if level > 3:
+        user_input["rt_values"] = {"best": 2.5, "worst": 3}
+        user_input["rt_level"] = "nan"
+        return user_input
+
+    elif df["rt_10days_ago_low"].values > 0:
+        user_input["rt_values"] = {
+            "best": df["rt_10days_ago_low"].values[0],
+            "worst": df["rt_10days_ago_high"].values[0],
+        }
+
+        user_input["rt_level"] = [
+            places[level] + "_id"
+            if places[level] != "state"
+            else places[level] + "_num_id"
+        ][0]
+
+        return user_input
 
     else:
-        data = dfs["cities"][
-            (dfs["cities"]["state_name"] == user_input["state_name"])
-            & (dfs["cities"]["city_name"] == user_input["city_name"])
+        return choose_rt(user_input, dfs, level + 1)
+
+
+def update_user_input_places(user_input, dfs, config):
+
+    # Nivel Estado
+    if (
+        user_input["city_name"] == "Todos"
+        and user_input["health_region_name"] == "Todos"
+    ):
+        data = dfs["state"][dfs["state"]["state_name"] == user_input["state_name"]]
+        user_input["place_type"] = "state_num_id"
+        # Escolhe Rt para SimulaCovid
+        user_input = choose_rt(user_input, dfs, level=3)
+
+    # Nivel Regional
+    elif user_input["city_name"] == "Todos":
+        data = dfs["health_region"][
+            dfs["health_region"]["health_region_name"]
+            == user_input["health_region_name"]
         ]
+        user_input["place_type"] = "health_region_id"
+        # Escolhe Rt para SimulaCovid
+        user_input = choose_rt(user_input, dfs, level=2)
 
+    # Nivel Cidade
+    else:
+        data = dfs["city"][
+            (dfs["city"]["state_name"] == user_input["state_name"])
+            & (dfs["city"]["city_name"] == user_input["city_name"])
+        ]
         user_input["place_type"] = "city_id"
+        # Escolhe Rt para SimulaCovid
+        user_input = choose_rt(user_input, dfs, level=1)
 
-        # para simulacovid
-        user_input["state_rt"] = {
-            "best": dfs["states"][dfs["states"]["state_name"] == user_input["state_name"]][
-                "rt_10days_ago_low"
-            ].values[0],
-            "worst": dfs["states"][dfs["states"]["state_name"] == user_input["state_name"]][
-                "rt_10days_ago_high"
-            ].values[0],
-        }
-    
-    user_input = update_user_input_places(data, user_input)
-
+    # Seleciona localidade para títulos
     user_input["locality"] = utils.choose_place(
-        city=user_input["city_name"], state=user_input["state_name"], region=user_input["health_region_name"]
+        city=user_input["city_name"],
+        region=user_input["health_region_name"],
+        state=user_input["state_name"],
     )
 
+    # Update dos ids
+    user_input = update_user_input_ids(data, user_input)
     return user_input, data
 
 
 @st.cache(suppress_st_warning=True)
 def get_data(config):
 
-    dfs = {place: loader.read_data(
+    dfs = {
+        place: loader.read_data(
             "br",
             config,
             endpoint=config["br"]["api"]["endpoints"]["farolcovid"][place],
         ).replace({"medio": "médio", "insatisfatorio": "insatisfatório"})
-        for place in ["cities", "health_region", "states"]}
+        for place in ["city", "health_region", "state"]
+    }
 
-    return dfs
+    places_ids = loader.read_data("br", config, "br/places/ids")
+    return dfs, places_ids
 
 
-def main(session_state):
+def main(session_state=None):
 
     # Get user info
     user_analytics = amplitude.gen_user(utils.get_server_session())
@@ -213,41 +253,48 @@ def main(session_state):
 
     # GET DATA
     config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
-    dfs = get_data(config)
+    dfs, places_ids = get_data(config)
 
     # REGION/CITY USER INPUT
     user_input = dict()
 
     user_input["state_name"] = st.selectbox(
-        "Estado", dfs["cities"]["state_name"].sort_values().unique()
+        "Estado", dfs["city"]["state_name"].sort_values().unique()
     )
 
     user_input["health_region_name"] = st.selectbox(
-        "Regional de Saúde", 
+        "Regional de Saúde",
         utils.add_all(
-            dfs["cities"][dfs["cities"]["state_name"] == user_input["state_name"]][
+            dfs["city"][dfs["city"]["state_name"] == user_input["state_name"]][
                 "health_region_name"
-            ].unique()
+            ]
+            .sort_values()
+            .unique()
         ),
     )
 
     user_input["city_name"] = st.selectbox(
         "Município",
         utils.add_all(
-            dfs["cities"][dfs["cities"]["state_name"] == user_input["state_name"]][
+            dfs["city"][dfs["city"]["state_name"] == user_input["state_name"]][
                 "city_name"
-            ].unique()
+            ]
+            .sort_values()
+            .unique()
         ),
     )
+
     changed_city = user_analytics.safe_log_event(
         "picked farol place",
         session_state,
         event_args={"state": user_input["state_name"], "city": user_input["city_name"]},
     )
-    user_input, data = filter_options(user_input, dfs, config)
+    user_input, data = update_user_input_places(user_input, dfs, config)
 
     # SOURCES PARAMS
-    user_input = utils.get_sources(user_input, data, dfs["cities"], ["beds", "ventilators"])
+    user_input = utils.get_sources(
+        user_input, data, dfs["city"], ["beds", "ventilators"]
+    )
 
     # POPULATION PARAMS
     user_input["population_params"] = {
@@ -316,14 +363,13 @@ def main(session_state):
 
     # INDICATORS CARDS
     indicators = IndicatorCards
-
     indicators = update_indicators(indicators, data, config, user_input, session_state)
 
     if "state" in user_input["place_type"]:
 
         # Add disclaimer to cities in state alert levels
-        total_alert_cities = dfs["cities"][
-            dfs["cities"]["state_id"] == data["state_id"].unique()[0]
+        total_alert_cities = dfs["city"][
+            dfs["city"]["state_num_id"] == data["state_num_id"].unique()[0]
         ]["overall_alert"].value_counts()
 
         utils.genKPISection(
@@ -385,16 +431,10 @@ def main(session_state):
             unsafe_allow_html=True,
         )
 
-        if user_input["city_id"]:
-            locality_id = user_input["city_id"]
-        else:
-            df_state_mapping = pd.read_csv("./configs/states_table.csv")
-            locality_id = df_state_mapping.loc[
-                df_state_mapping["state_name"] == data["state_name"].values[0]
-            ].iloc[0]["state_num_id"]
-
         try:
-            fig = plots.gen_social_dist_plots_placeid(locality_id)
+            fig = plots.gen_social_dist_plots_placeid(
+                user_input[user_input["place_type"]]
+            )
             st.plotly_chart(fig, use_container_width=True)
         except:
             st.write(
@@ -413,8 +453,9 @@ def main(session_state):
             """,
             unsafe_allow_html=True,
         )
+
         try:
-            fig2 = plots.plot_rt_wrapper(locality_id)
+            fig2 = plots.plot_rt_wrapper(user_input[user_input["place_type"]])
             st.plotly_chart(fig2, use_container_width=True)
         except:
             st.write(
