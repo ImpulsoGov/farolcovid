@@ -6,7 +6,7 @@
             for (var i = 0; i < iframes.length; i++) {
                 frame = iframes[i]
                 if (frame.parentElement.className == "markdown-text-container stMarkdown" && frame.className == "") {
-                    //frame.parentElement.style["display"] = "none";
+                    frame.parentElement.style["display"] = "none";
                     //Its buggy so lets save it for later
                 }
                 console.log(frame);
