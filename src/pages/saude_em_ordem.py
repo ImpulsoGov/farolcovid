@@ -49,8 +49,6 @@ def get_score_groups(config, session_state):
     )
     CNAE_sectors = dict(zip(CNAE_sectors.cnae, CNAE_sectors.activity))
 
-    # REMOVE LINE BELOW ASAP
-    # economic_data = economic_data[economic_data["cnae"] != 44]
     economic_data["activity_name"] = economic_data.apply(
         lambda row: CNAE_sectors[row["cnae"]], axis=1
     )
@@ -536,6 +534,8 @@ def gen_single_table(session_state, score_groups, data_index, n=5):
     # If the user chose to open the table we extende the amount of rows to the full size of the group
     if session_state.saude_ordem_data["opened_tables"][data_index] is True:
         n = len(score_groups[data_index])
+    else:
+        n = min(n, len(score_groups[data_index]))  # goes to a max of n
     table_id = "saude-table-" + str(data_index)
     working_data = list(reversed(score_groups[data_index][-n:]))
     proportion = (
