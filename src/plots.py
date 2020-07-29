@@ -159,64 +159,39 @@ def get_alert_color(value):
 
 
 # FAROLCOVID INDICATOR: INLOCO
-def plot_inloco(pairs, df, place_type, decoration=False):
+def plot_inloco(place_id, df, decoration=False):
 
     fig = go.Figure()
-    # buttons_list = [
-    #     dict(
-    #         label="Todos",
-    #         method="update",
-    #         args=[
-    #             {"visible": [True for i in range(len(pairs))]},
-    #             {
-    #                 "title": "Distanciamento social para os locais selecionados",
-    #                 "annotations": [],
-    #             },
-    #         ],
-    #     )
-    # ]
-
+    names = utils.name_dictionary.get_place_names_by_id(place_id)
+    state_id = int(str(place_id)[:2])
     # Add traces
-    for a, pair in enumerate(pairs):
+    if place_id > 10000:  # city
+        clean_df = df.query('state_num_id == "%s"' % state_id).query(
+            'city_name == "%s"' % names[0]
+        )
 
-        if place_type == "city":
-            clean_df = df.query('state_name == "%s"' % pair[1]).query(
-                'city_name == "%s"' % pair[0]
-            )
-
-            x_values = translate_dates(clean_df["dt"])
+        x_values = translate_dates(clean_df["dt"])
+        # Redo this in case of isolated not being the index anymore
+        if clean_df.index.name == "isolated":
+            y_values = clean_df.index
+        else:
             y_values = clean_df["isolated"]
-            name = pair[0]  # city_name
+        name = names[0] + f" ({names[2]})"
 
-        if place_type == "state":
+    else:  # state
+        clean_df = df.query('state_num_id == "%s"' % state_id)
+        x_values = translate_dates(clean_df["dt"])
+        y_values = clean_df["isolated"]
+        name = names[0]
 
-            x_values = translate_dates(df.columns)
-            y_values = df.query('state_name == "%s"' % pair).values[0]
-            name = pair  # state_name
+    # Generate fig
+    fig.add_trace(go.Scatter(x=x_values, y=y_values, name=name))
 
-        # Generate fig
-        fig.add_trace(go.Scatter(x=x_values, y=y_values, name=name))
-
-        # Use alert color if only 1 place
-        if len(pairs) == 1:
-            fig.update_traces(line={"color": get_alert_color(y_values[-1])})
-
-        # buttons_list.append(
-        #     dict(
-        #         label=city_name,
-        #         method="update",
-        #         args=[
-        #             {"visible": [i == a for i in range(len(city_states_pairs))]},
-        #             {
-        #                 "title": "Distanciamento social %s" % city_name,
-        #                 "annotations": [],
-        #             },
-        #         ],
-        #     ),
-        # )
+    # Use alert color
+    fig.update_traces(line={"color": get_alert_color(y_values[-1])})
 
     if decoration:
-        fig.update_layout(updatemenus=[dict(active=0)])  # buttons=buttons_list,)])
+        fig.update_layout(updatemenus=[dict(active=0)])
     fig.update_layout(template="plotly_white")
 
     return fig
@@ -237,15 +212,23 @@ def sort_by_x(x, y):
     return zip(*data)
 
 
-def gen_social_dist_plots(in_args, in_height=700, set_height=False):
+def gen_social_dist_plots_state_session_wrapper(
+    session_state, in_height=700, set_height=False
+):
+    if session_state.city_id == None or session_state.city_id == False:
+        return gen_social_dist_plots(session_state.state_num_id)
+    else:
+        return gen_social_dist_plots(session_state.city_id)
+
+
+def gen_social_dist_plots(place_id, in_height=700, set_height=False):
 
     api_inloco = utils.get_inloco_url(config)
 
-    if type(in_args[0]) == type([]):
+    if place_id > 10000:
         is_city = True
     else:
         is_city = False
-
     social_dist_plot = None
 
     if is_city:
@@ -253,9 +236,8 @@ def gen_social_dist_plots(in_args, in_height=700, set_height=False):
             gen_social_dist_plots.cities_df = pd.read_csv(
                 api_inloco["cities"], index_col=0
             )
-
         social_dist_df = gen_social_dist_plots.cities_df
-        social_dist_plot = plot_inloco(in_args, social_dist_df, "city")
+        social_dist_plot = plot_inloco(place_id, social_dist_df)
 
     else:  # IS STATE
         if gen_social_dist_plots.states_df is None:  # Too to only load once
@@ -264,15 +246,7 @@ def gen_social_dist_plots(in_args, in_height=700, set_height=False):
             )
 
         social_dist_df = gen_social_dist_plots.states_df
-
-        my_clean_df = (
-            social_dist_df.reset_index()
-            .pivot(index="state_name", columns="dt", values="isolated")
-            .fillna(0)
-            .dropna(how="all")
-        )
-
-        social_dist_plot = plot_inloco(in_args, my_clean_df, "state")
+        social_dist_plot = plot_inloco(place_id, social_dist_df)
 
     # Moving average dotted
     x_data = social_dist_plot.data[0]["x"]
@@ -318,16 +292,6 @@ def translate_dates(df, simple=True, lang_frame="pt_BR.utf8"):
 
 gen_social_dist_plots.cities_df = None
 gen_social_dist_plots.states_df = None
-
-
-def gen_social_dist_plots_placeid(user_input, height=700):
-
-    place_name = utils.get_place_names_by_id(user_input)
-
-    if type(place_name) == type("sampletext"):  # IS STATE
-        return gen_social_dist_plots([place_name], height)
-    else:  # IS CITY
-        return gen_social_dist_plots([place_name[::-1]], height)
 
 
 # SIMULACOVID

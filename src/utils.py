@@ -32,6 +32,7 @@ import yaml
 import random
 from ua_parser import user_agent_parser
 import time
+import loader
 
 configs_path = os.path.join(os.path.dirname(__file__), "configs")
 cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
@@ -129,40 +130,60 @@ def choose_place(city, region, state):
     return city
 
 
-# def get_place_id_by_names(state_name, city_name_input="Todos"):
-#     """
-#     In: name of the state (returns a numerical id of only the state) or the name of the state and the name of the city
-#     Out: the numerical id of the state of the city
-#     """
+class Dictionary:
+    def __init__(self):
+        self.dictionary = None
 
-#     configs_path = os.path.join(os.path.dirname(__file__), "configs")
-#     cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
-#     states = pd.read_csv(os.path.join(configs_path, "states_table.csv"))
+    def check_initialize(self):
+        if self.dictionary is None:
+            self.dictionary = loader.read_data(
+                "br",
+                loader.config,
+                loader.config["br"]["api"]["endpoints"]["utilities"]["place_ids"],
+            )
 
-#     state_num_id = states.query("state_name == '%s'" % state_name).values[0][-1]
+    def get_place_names_by_id(self, id):
+        self.check_initialize()
+        if id < 100:  # is state
+            return [
+                self.dictionary.loc[self.dictionary["state_num_id"] == id][
+                    "state_name"
+                ].values[0]
+            ]
+        elif id < 10000:  # is health regional
+            row = self.dictionary.loc[self.dictionary["health_region_id"] == id]
+            # healh regional,state
+            return [
+                row["health_region_name"].values[0],
+                row["state_name"].values[0],
+            ]
+        else:  # is city
+            row = self.dictionary.loc[self.dictionary["city_id"] == id]
+            # city,healh regional,state
+            return [
+                row["city_name"].values[0],
+                row["health_region_name"].values[0],
+                row["state_name"].values[0],
+            ]
 
-#     if city_name_input == "Todos":
-#         return state_num_id
-#     city_id = (
-#         cities.query("state_num_id == '%s'" % state_num_id)
-#         .query("city_name == '%s'" % city_name_input)
-#         .values[0][1]
-#     )
-#     return city_id
+    def get_place_id_by_names(
+        self, state_name, city_name="Todos", health_region_name=None
+    ):
+        self.check_initialize()
+        dictionary = self.dictionary.loc[self.dictionary["state_name"] == state_name]
+        if health_region_name != None:
+            return dictionary.loc[
+                dictionary["health_system_region"] == health_region_name
+            ]["health_region_id"].values[0]
+        elif city_name != "Todos":
+            return dictionary.loc[dictionary["city_name"] == city_name][
+                "city_id"
+            ].values[0]
+        else:
+            dictioanry["state_num_id"].values[0]
 
 
-# TODO: por que retornamos uma lista quando é cidade?
-def get_place_names_by_id(user_input):
-
-    get_name = {
-        "state_num_id": user_input["state_name"],
-        "health_region_id": user_input["health_region_name"],
-        "city_id": [user_input["state_name"], user_input["city_name"]],
-    }
-
-    return get_name[user_input["place_type"]]
-
-
+name_dictionary = Dictionary()
 # def get_state_str_id_by_id(place_id):
 
 #     states = pd.read_csv(

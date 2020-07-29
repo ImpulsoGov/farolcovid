@@ -159,7 +159,7 @@ def choose_rt(user_input, dfs, level):
         user_input["rt_level"] = "nan"
         return user_input
 
-    elif df["rt_10days_ago_low"].values > 0:
+    elif len(df["rt_10days_ago_low"].values) > 0:
         user_input["rt_values"] = {
             "best": df["rt_10days_ago_low"].values[0],
             "worst": df["rt_10days_ago_high"].values[0],
@@ -290,7 +290,6 @@ def main(session_state=None):
         event_args={"state": user_input["state_name"], "city": user_input["city_name"]},
     )
     user_input, data = update_user_input_places(user_input, dfs, config)
-
     # SOURCES PARAMS
     user_input = utils.get_sources(
         user_input, data, dfs["city"], ["beds", "ventilators"]
@@ -437,8 +436,7 @@ def main(session_state=None):
         )
 
         try:
-            fig = plots.gen_social_dist_plots_placeid(user_input)
-
+            fig = plots.gen_social_dist_plots_state_session_wrapper(session_state)
             st.plotly_chart(fig, use_container_width=True)
         except:
             st.write(
