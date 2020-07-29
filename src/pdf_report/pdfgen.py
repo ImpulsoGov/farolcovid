@@ -37,7 +37,6 @@ def convert_path(fpath):
     return fpath
 
 
-
 def check_necessary_values(model_path=None):
     if model_path != None:
         html_file = open(model_path, "r")
@@ -328,10 +327,16 @@ def parse_user_input(user_input, indicators, data, config, test=False):
         convert_risk(risco_geral, ["is_high_risk", "is_medium_risk", "is_low_risk"])
     )
 
+    # TODO: CHECK THIS NEW CALL TO IDS!
     # Place plots
-    plots_dict = _gen_place_plots(
-        utils.get_place_id_by_names(user_input["state_name"], user_input["city_name"])
-    )
+    if user_input["city_name"] == "Todos":
+        plots_dict = _gen_place_plots(user_input["state_num_id"])
+    else:
+        plots_dict = _gen_place_plots(user_input["city_id"])
+
+    # plots_dict = _gen_place_plots(
+    #     utils.get_place_id_by_names(user_input["state_name"], user_input["city_name"])
+    # )
 
     print(plots_dict["social_distancing"].keys())
 

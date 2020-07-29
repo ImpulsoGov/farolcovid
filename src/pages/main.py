@@ -314,15 +314,20 @@ def main(session_state=None):
     user_input["last_updated_cases"] = data["last_updated_subnotification"].max()
     # Update session values to standard ones if changed city or opened page or reseted values
     if (
-        session_state.state != user_input["state_name"]
-        or session_state.health_region != user_input["health_region_name"]
-        or session_state.city != user_input["city_name"]
+        session_state.state_name != user_input["state_name"]
+        or session_state.health_region_name != user_input["health_region_name"]
+        or session_state.city_name != user_input["city_name"]
         or session_state.number_beds is None
         or session_state.reset
     ):
-        session_state.state = user_input["state_name"]
-        session_state.state = user_input["health_region_name"]
-        session_state.city = user_input["city_name"]
+        session_state.state_name = user_input["state_name"]
+        session_state.health_region_name = user_input["health_region_name"]
+        session_state.city_name = user_input["city_name"]
+
+        session_state.state_num_id = user_input["state_num_id"]
+        session_state.health_region_id = user_input["health_region_id"]
+        session_state.city_id = user_input["city_id"]
+
         session_state.number_beds = int(
             user_input["number_beds"]
             * config["br"]["simulacovid"]["resources_available_proportion"]
@@ -513,6 +518,7 @@ def main(session_state=None):
     products = ProductCards
     products[1].recommendation = f'Risco {data["overall_alert"].values[0]}'
     utils.genProductsSection(products)
+
     # SELECTION BUTTONS
     if session_state.continuation_selection is None:
         session_state.continuation_selection = [False, False]
@@ -522,24 +528,30 @@ def main(session_state=None):
         session_state.continuation_selection = [True, False]
     if st.button(saude_button_name):
         session_state.continuation_selection = [False, True]
-    # utils.applyButtonStyles(session_state)
-    # simula_selected = st.button("Simulacovid")
-    simulastyle = """border: 1px solid black;"""
+
     utils.stylizeButton(
-        simula_button_name, simulastyle, session_state, others={"ui_binSelect": 1}
+        simula_button_name,
+        """border: 1px solid black;""",
+        session_state,
+        others={"ui_binSelect": 1},
     )
-    # saude_selected = st.button("Saude em Ordem")
+
     utils.stylizeButton(
-        saude_button_name, simulastyle, session_state, others={"ui_binSelect": 2}
+        saude_button_name,
+        """border: 1px solid black;""",
+        session_state,
+        others={"ui_binSelect": 2},
     )
-    # product = st.selectbox(
-    # "", ["Como você gostaria de prosseguir?", "SimulaCovid", "Saúde em Ordem",],
-    # )
+
     if session_state.continuation_selection[0]:
         user_analytics.safe_log_event(
             "picked simulacovid",
             session_state,
-            event_args={"state": session_state.state, "city": session_state.city,},
+            event_args={
+                "state": session_state.state_name,
+                "health_region": session_state.health_region_name,
+                "city": session_state.city_name,
+            },
             alternatives=["picked saude_em_ordem", "picked simulacovid"],
         )
         # Downloading the saved data from memory
@@ -550,11 +562,16 @@ def main(session_state=None):
         sm.main(user_input, indicators, data, config, session_state)
         # TODO: remove comment on this later!
         # utils.gen_pdf_report()
+
     elif session_state.continuation_selection[1]:
         user_analytics.safe_log_event(
             "picked saude_em_ordem",
             session_state,
-            event_args={"state": session_state.state, "city": session_state.city,},
+            event_args={
+                "state": session_state.state_name,
+                "health_region": session_state.health_region_name,
+                "city": session_state.city_name,
+            },
             alternatives=["picked saude_em_ordem", "picked simulacovid"],
         )
         so.main(user_input, indicators, data, config, session_state)

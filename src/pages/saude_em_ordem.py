@@ -23,7 +23,7 @@ DO_IT_BY_RANGE = (
 # INITIAL DATA PROCESSING
 def get_score_groups(config, session_state):
     """ Takes our data and splits it into 4 sectors for use by our diagram generator """
-    uf_num = utils.get_place_id_by_names(session_state.state)
+
     CNAE_sectors = loader.read_data(
         "br", config, config["br"]["api"]["endpoints"]["safereopen"]["cnae_sectors"]
     )
@@ -31,7 +31,7 @@ def get_score_groups(config, session_state):
     economic_data = loader.read_data(
         "br", config, config["br"]["api"]["endpoints"]["safereopen"]["economic_data"]
     )
-    economic_data = economic_data.loc[economic_data["state_num_id"] == uf_num]
+    economic_data = economic_data.loc[economic_data["state_num_id"] == session_state.state_num_id]
     # REMOVE LINE BELOW ASAP
     # economic_data = economic_data[economic_data["cnae"] != 44]
     economic_data["activity_name"] = economic_data.apply(
@@ -109,7 +109,7 @@ def chunks(l, n):
 
 
 # SEÇÃO DE INTRODUÇÃO
-def gen_header():
+def gen_header(): # NOT USED FOR NOW
     st.write(
         """
         <div class="base-wrapper">
@@ -144,7 +144,7 @@ def gen_illustrative_plot(sectors_data, session_state):
     <div class="saude-alert-banner saude-blue-bg mb" style="margin-bottom: 0px;">
         <div class="base-wrapper flex flex-column" style="margin-top: 0px;">
             <div class="flex flex-row flex-space-between flex-align-items-center">
-                <span class="white-span header p1"> Ordem de Retomada dos Setores | {session_state.state + " (Estado)"}</span>
+                <span class="white-span header p1"> Ordem de Retomada dos Setores | {session_state.state_name + " (Estado)"}</span>
             </div>
             <span class="white-span p3">Sugerimos uma retomada <b>em fases</b>, a começar pelos <b>setores mais seguros</b> e com <b>maior contribuição econômica.</b></span>
             <div class="flex flex-row flex-m-column">"""
@@ -177,42 +177,6 @@ def gen_illustrative_plot(sectors_data, session_state):
         </div>
     </div>"""
     st.write(text, unsafe_allow_html=True)
-
-
-# SEÇÃO PLOT SAUDE EM ORDEM
-# def gen_illustrative_plot(sectors_data, session_state):
-#     """ Generates our illustrative sector diagram """
-#     text = f"""
-#     <div class="saude-sector-basic-plot-area">
-#         <div class="saude-veja-title" style="text-align:left;">SAUDE EM ORDEM | {session_state.state.upper() + " (ESTADO)"}</div>
-#         <div class="saude-sector-basic-plot-disc">
-#             Os dois principais indicadores utilizados são a Importância Econômica (medida pela soma dos salários pagos) e o Nível de Segurança Sanitária do setor. A ideia é que devemos iniciar a reabertura pelos setores de mais seguros do ponto de vista da saúde e de maior importância econômica.
-#         </div>
-#         <div class="saude-sector-basic-plot-title">
-#             Top 5 Setores por grupo de custo-benefício
-#         </div>
-#         <div class="saude-segurança-eixo-label">Segurança Sanitária</div>
-#         <div class="saude-plot-axis">"""
-#     names_in_order = ["d", "c", "b", "a"]
-#     for index, sector_dict in enumerate(sectors_data):
-#         text += gen_sector_plot_card(names_in_order[index], sector_dict, size_sectors=5)
-#     text += """
-#             <div class="saude-vertical-arrow-full">
-#                 <div class="saude-arrow-up-pos">
-#                     <i class="saude-arrow up"></i>
-#                 </div>
-#                 <div class="saude-vertical-line"></div>
-#             </div>
-#             <div class="saude-horizontal-arrow-full">
-#                 <div class="saude-horizontal-line"></div>
-#                 <div class="saude-arrow-right-pos">
-#                     <i class="saude-arrow right"></i>
-#                 </div>
-#             </div>
-#             <div class="saude-economia-eixo-label">Contribuição Econômica</div>
-#         </div>
-#     </div>"""
-#     st.write(text, unsafe_allow_html=True)
 
 
 def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
@@ -252,31 +216,6 @@ def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
     return text
 
 
-# def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
-#     """ Generates One specific card from the sector diagram  """
-#     titles = {"a": "Grupo A ✅", "b": "Grupo B 🙌", "c": "Grupo C ‼", "d": "Grupo D ⚠"}
-#     top_n_sectors = sector_data[-size_sectors::]
-#     # The last 5 are the best
-#     item_list = "<br>".join(["- " + i["activity_name"] for i in top_n_sectors])
-#     average_wage = int(
-#         sum([float(i["total_wage_bill"]) for i in top_n_sectors]) / size_sectors
-#     )
-#     num_people = sum([int(i["n_employee"]) for i in top_n_sectors])
-#     text = f"""
-#     <div class="saude-sector-{sector_name}-frame">
-#         <div class="saude-plot-group-title">{titles[sector_name]}</div>
-#         <div class="saude-plot-group-sectors-list">
-#             {item_list}
-#         </div>
-#         <div class="saude-plot-group-massa-salarial-label">Massa Salarial média:</div>
-#         <div class="saude-plot-group-massa-salarial-value">R$ {convert_money(average_wage)}</div>
-#         <div class="saude-plot-group-separator-line"></div>
-#         <div class="saude-plot-group-pessoas-label">Número de trabalhadores: </div>
-#         <div class="saude-plot-group-pessoas-value">{convert_money(num_people)}</div>
-#     </div>"""
-#     return text
-
-
 def convert_money(money):
     """ Can be used later to make money look like whatever we want, but a of
         now just adding the decimal separator should be enough
@@ -285,36 +224,6 @@ def convert_money(money):
 
 
 # SEÇÃO DE SELEÇÃO DE PESOS
-# def gen_slider(session_state):
-#     """ Generates the weight slider we see after the initial sector diagram and saves it to session_state"""
-#     st.write(
-#         """
-#         <div class="base-wrapper">
-#             <div class="saude-slider-wrapper">
-#                 <span class="section-header primary-span">ESCOLHA O PESO PARA A SEGURANÇA SANITÁRIA</span><p>
-#                 <span class="ambassador-question" style="width:80%;max-width:1000px;"><br><b>O peso padrão da simulação atribui 70% para Segurança Sanitária e 30% para Contribuição Econômica,</b> seguindo decisão do RS, principal inspiração para a ferramenta. 
-#                 Este parâmetro pode ser alterado abaixo; entre em contato conosco para mais detalhes.</span><p>
-#             </div>
-#         </div>""",
-#         unsafe_allow_html=True,
-#     )
-#     session_state.saude_ordem_data["slider_value"] = st.slider(
-#         "Selecione o peso para Segurança Sanitária abaixo:", 70, 100, step=10
-#     )
-#     amplitude.gen_user(utils.get_server_session()).safe_log_event(
-#         "chose saude_slider_value",
-#         session_state,
-#         event_args={"slider_value": session_state.saude_ordem_data["slider_value"]},
-#     )
-#     st.write(
-#         f"""
-#         <div class="base-wrapper">
-#             <div class="saude-slider-value-display"><b>Peso selecionado (Segurança): {session_state.saude_ordem_data["slider_value"]}%</b>&nbsp;&nbsp;|  &nbsp;Peso restante para Economia: {100 - session_state.saude_ordem_data["slider_value"]}%</div>
-#         </div>""",
-#         unsafe_allow_html=True,
-#     )
-
-
 def gen_slider(session_state):
     """ Generates the weight slider we see after the initial sector diagram and saves it to session_state"""
     st.write(
@@ -365,7 +274,7 @@ def gen_detailed_vision(economic_data, session_state, config):
         amplitude.gen_user(utils.get_server_session()).safe_log_event(  # Logs the event
             "picked saude_em_ordem_detailed_view",
             session_state,
-            event_args={"state": session_state.state, "city": session_state.city,},
+            event_args={"state": session_state.state_name, "city": session_state.city_name,},
         )
         session_state.saude_ordem_data[
             "opened_detailed_view"
@@ -379,14 +288,14 @@ def gen_detailed_vision(economic_data, session_state, config):
 
 def get_state_clean_data_url(session_state, config):
     """Reads which state are we using and returns the correct file download url for it"""
-    state_num_id = utils.get_place_id_by_names(session_state.state)
+
     index_file_url = f'https://drive.google.com/uc?export=download&id={config["br"]["drive_ids"]["br_states_clean_data_index"]}'
     state_data_index = pd.read_csv(
         io.BytesIO(requests.get(index_file_url).content),
         encoding="utf8",
         # index_col="state_num_id",
     )
-    uf_file_id = state_data_index.loc[state_data_index["state_num_id"] == state_num_id][
+    uf_file_id = state_data_index.loc[state_data_index["state_num_id"] == session_state.state_num_id][
         "file_id"
     ].values[0]
     return f"https://drive.google.com/uc?export=download&id={uf_file_id}"

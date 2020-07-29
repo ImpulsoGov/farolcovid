@@ -30,17 +30,22 @@ import time
 def main():
 
     # SESSION STATE
-    time.sleep(0.05)  # minimal wait time so we give time for the user session to appear in steamlit
+    time.sleep(
+        0.05
+    )  # minimal wait time so we give time for the user session to appear in steamlit
     session_state = session.SessionState.get(
         key=session.get_user_id(),
         update=False,
+        state_name="Acre",
+        state_num_id=None,
+        health_region_name="Todos",
+        health_region_id=None,
+        city_name="Todos",
+        city_id=None,
         number_beds=None,
         number_ventilators=None,
         number_cases=None,
         number_deaths=None,
-        state="Acre",
-        health_region="Todos",
-        city="Todos",
         refresh=False,
         reset=False,
         saude_ordem_data=None,
