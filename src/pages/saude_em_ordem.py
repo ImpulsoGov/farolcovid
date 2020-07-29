@@ -294,7 +294,7 @@ def gen_detailed_vision(economic_data, session_state, config):
             session_state,
             event_args={
                 "state": session_state.state_name,
-                "city": session_state.city_name_name,
+                "city": session_state.city_name,
             },
         )
         session_state.saude_ordem_data[
