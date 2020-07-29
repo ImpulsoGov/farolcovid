@@ -23,7 +23,10 @@ def get_score_groups(config, session_state):
     """ Takes our data and splits it into 4 sectors for use by our diagram generator """
     # uf_num = utils.get_place_id_by_names(session_state.state)
 
-    if session_state.city_name != "Todos" and session_state.health_region_name != "Todos":
+    if (
+        session_state.city_name != "Todos"
+        or session_state.health_region_name != "Todos"
+    ):
         endpoint = "health_region"
         col = "health_region_id"
         value = session_state.health_region_id
@@ -38,8 +41,9 @@ def get_score_groups(config, session_state):
     economic_data = loader.read_data(
         "br",
         config,
-        config["br"]["api"]["endpoints"]["safereopen"]["economic_data"][endpoint]).query(f"{col} == {value}")
-    
+        config["br"]["api"]["endpoints"]["safereopen"]["economic_data"][endpoint],
+    ).query(f"{col} == {value}")
+
     CNAE_sectors = loader.read_data(
         "br", config, config["br"]["api"]["endpoints"]["safereopen"]["cnae_sectors"]
     )
@@ -123,7 +127,7 @@ def chunks(l, n):
 
 
 # SEÇÃO DE INTRODUÇÃO
-def gen_header(): # NOT USED FOR NOW
+def gen_header():  # NOT USED FOR NOW
     st.write(
         """
         <div class="base-wrapper">
@@ -288,7 +292,10 @@ def gen_detailed_vision(economic_data, session_state, config):
         amplitude.gen_user(utils.get_server_session()).safe_log_event(  # Logs the event
             "picked saude_em_ordem_detailed_view",
             session_state,
-            event_args={"state": session_state.state_name, "city": session_state.city_name_name,},
+            event_args={
+                "state": session_state.state_name,
+                "city": session_state.city_name_name,
+            },
         )
         session_state.saude_ordem_data[
             "opened_detailed_view"
