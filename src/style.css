@@ -35,6 +35,10 @@
     background-color: var(--main-primary);
 }
 
+.saude-blue-bg {
+    background-color: #0097A7;
+}
+
 .darkblue-bg {
     background-color: var(--main-dark);
 }
@@ -605,6 +609,9 @@ header>.toolbar { /* Hide toolbar menu */
     animation-duration: 3s;
     margin-top: 1em;
 }
+.disabled{
+    pointer-events: none;
+}
 
 .btn-ambassador:hover {
     color: var(--main-primary);
@@ -846,7 +853,7 @@ header>.toolbar { /* Hide toolbar menu */
 
 .sidebar-collapse-control {
     background-color: var(--main-primary);
-    padding: 1em;
+    padding: 0.7em;
     color: white;
 }
 
@@ -1062,7 +1069,7 @@ header>.toolbar { /* Hide toolbar menu */
 }
 .saude-arrow {
     border: solid black;
-    border-width: 0 3px 3px 0;
+    border-width: 0 2px 2px 0;
     display: inline-block;
     padding: 6px;
 }
@@ -1378,7 +1385,7 @@ header>.toolbar { /* Hide toolbar menu */
     width: 10vw;
     height: 3vw;
     top: 5vw;
-    border-radius: 1.5vw;
+    border-radius: 1.8vw;
     font-size:1.5vw;
     font-family: Oswald;
     font-style: normal;
@@ -1553,6 +1560,164 @@ header>.toolbar { /* Hide toolbar menu */
 .saude-download-clean-data-button-div{
     position:relative;
     float:right;
+    height:50px;
     width: 300px;
 
+}
+.saude-alert-banner {
+    width: 100vw;
+    height: auto;
+}
+.saude-white-banner-pt0{
+    height: 400px;
+    width:100%;
+    background-color: white;
+    position:absolute;
+    bottom: 100px;
+    z-index: 0;
+}
+@media only screen and (max-width: 425px) {
+    .saude-white-banner-pt0{
+        display:none;
+    }
+}
+.saude-white-banner-pt1{
+    height:200px;
+    width:100%;
+    top:-200px;
+    background-color: white;
+    position:relative;
+    z-index: 0;
+    display:none;
+}
+.saude-white-banner-pt2{
+    height:auto;
+    background-color: white;
+    position:relative;
+    top:0px;
+}
+@media only screen and (max-width: 425px) {
+    .saude-white-banner-pt2{
+        display:none;
+    }
+}
+.saude-banner-button{
+    position: absolute;
+    width: 120px;
+    height: 40px;
+    border-radius: 14px;
+    font-size: 24px;
+    font-family: Oswald;
+    font-style: normal;
+    font-weight: normal;
+    color: #FFFFFF;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+    line-height: auto;
+}
+.high-security{
+    background: rgb(2, 188, 23);
+    top: 10%;
+}
+.high-economy{
+    background: rgb(2, 188, 23);
+    top:calc(3% + 70px);
+}
+.low-security{
+    background: rgb(255, 95, 107);
+    left: 1090px;
+    top: 10%;
+}
+.low-economy{
+    background: rgb(255, 95, 107);
+    left: 1090px;
+    top:calc(3% + 70px);
+}
+
+.saude-banner-desc{
+    position: relative;
+    width: 883px;
+    /* height: 72px; */
+    left: 180px;
+    padding: var(--minor-padding);
+    top:-30px;
+    font-family: IBM Plex Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 28px;
+    display: inline-block;
+    align-items: center;
+
+    color: #000000;
+}
+.saude-banner-arrow-body{
+    position: absolute;
+    width: 1165px;
+    height: 0px;
+    left: 50px;
+    top: 0px;
+    border: 1px solid #000000;
+    box-sizing: border-box;
+}
+.saude-banner-arrow-tip{
+    left:1200px;
+    top:-10px;
+    position: absolute;
+}
+.saude-card-header-v2{
+    font-family: Oswald;
+    width:100%;
+    top:20px;
+    position:absolute;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 36px;
+}
+.saude-card-list-v2{
+    width:86%;
+    top:80px;
+    position:absolute;
+    font-family: IBM Plex Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 23px;
+}
+.saude-card-display-region-v2{
+}
+.saude-card-display-text-v2{
+    font-family: IBM Plex Sans;
+    font-style: normal;
+    font-size: 16px;
+    width:50%;
+    height:80px;
+    bottom:20px;
+    position:absolute;
+    text-align: center;
+}
+.sdcardtext-left{
+    border-right: 1px solid grey;
+    left:0px;
+}
+.sdcardtext-right{
+    border-left: 1px solid grey;
+    left:50%;
+}
+.saude-card-redirect{
+    position:absolute;
+    width:80%;
+    bottom:130px;
+    font-size: 14px;
+}
+.saude-indicator-card {
+    margin-top: 30px;
+    padding: var(--main-padding);
+    width: 280px;
+    height: 400px;
+    border-radius: var(--main-border-radius);
+    opacity: 0.98;
+    background-color: white;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
