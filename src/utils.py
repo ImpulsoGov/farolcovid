@@ -129,66 +129,66 @@ def choose_place(city, region, state):
     return city
 
 
-def get_place_id_by_names(state_name, city_name_input="Todos"):
-    """
-    In: name of the state (returns a numerical id of only the state) or the name of the state and the name of the city
-    Out: the numerical id of the state of the city
-    """
+# def get_place_id_by_names(state_name, city_name_input="Todos"):
+#     """
+#     In: name of the state (returns a numerical id of only the state) or the name of the state and the name of the city
+#     Out: the numerical id of the state of the city
+#     """
 
-    configs_path = os.path.join(os.path.dirname(__file__), "configs")
-    cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
-    states = pd.read_csv(os.path.join(configs_path, "states_table.csv"))
+#     configs_path = os.path.join(os.path.dirname(__file__), "configs")
+#     cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
+#     states = pd.read_csv(os.path.join(configs_path, "states_table.csv"))
 
-    state_num_id = states.query("state_name == '%s'" % state_name).values[0][-1]
+#     state_num_id = states.query("state_name == '%s'" % state_name).values[0][-1]
 
-    if city_name_input == "Todos":
-        return state_num_id
-    city_id = (
-        cities.query("state_num_id == '%s'" % state_num_id)
-        .query("city_name == '%s'" % city_name_input)
-        .values[0][1]
-    )
-    return city_id
-
-
-def get_place_names_by_id(place_id):
-    """
-    In: id of a place (id < 100 for states, id > 100 for cities)
-    Out: either a string representing the name of the state or a list contaning [state name,city name]
-    """
-    configs_path = os.path.join(os.path.dirname(__file__), "configs")
-    cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
-    states = pd.read_csv(os.path.join(configs_path, "states_table.csv"))
-
-    state_name_index = [i for i in states.columns].index("state_name")
-
-    if place_id <= 100:
-        state_name_index = [i for i in states.columns].index("state_name")
-        return states.query("state_num_id == '%s'" % place_id).values[0][
-            state_name_index
-        ]
-    else:
-        data = cities.query("city_id == '%s'" % place_id).values[0]
-        city_name_index = [i for i in cities.columns].index("city_name")
-        state_num_id_index = [i for i in cities.columns].index("state_num_id")
-        city_name = data[city_name_index]
-        state_id = data[state_num_id_index]
-        state_name = states.query("state_num_id == '%s'" % state_id).values[0][
-            state_name_index
-        ]
-        return [state_name, city_name]
+#     if city_name_input == "Todos":
+#         return state_num_id
+#     city_id = (
+#         cities.query("state_num_id == '%s'" % state_num_id)
+#         .query("city_name == '%s'" % city_name_input)
+#         .values[0][1]
+#     )
+#     return city_id
 
 
-def get_state_str_id_by_id(place_id):
+# def get_place_names_by_id(place_id):
+#     """
+#     In: id of a place (id < 100 for states, id > 100 for cities)
+#     Out: either a string representing the name of the state or a list contaning [state name,city name]
+#     """
+#     configs_path = os.path.join(os.path.dirname(__file__), "configs")
+#     cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
+#     states = pd.read_csv(os.path.join(configs_path, "states_table.csv"))
 
-    states = pd.read_csv(
-        os.path.join(
-            os.path.join(os.path.dirname(__file__), "configs"), "states_table.csv"
-        )
-    )
+#     state_name_index = [i for i in states.columns].index("state_name")
 
-    index = [i for i in states.columns].index("state_id")
-    return states.query("state_num_id == '%s'" % place_id).values[0][index]
+#     if place_id <= 100:
+#         state_name_index = [i for i in states.columns].index("state_name")
+#         return states.query("state_num_id == '%s'" % place_id).values[0][
+#             state_name_index
+#         ]
+#     else:
+#         data = cities.query("city_id == '%s'" % place_id).values[0]
+#         city_name_index = [i for i in cities.columns].index("city_name")
+#         state_num_id_index = [i for i in cities.columns].index("state_num_id")
+#         city_name = data[city_name_index]
+#         state_id = data[state_num_id_index]
+#         state_name = states.query("state_num_id == '%s'" % state_id).values[0][
+#             state_name_index
+#         ]
+#         return [state_name, city_name]
+
+
+# def get_state_str_id_by_id(place_id):
+
+#     states = pd.read_csv(
+#         os.path.join(
+#             os.path.join(os.path.dirname(__file__), "configs"), "states_table.csv"
+#         )
+#     )
+
+#     index = [i for i in states.columns].index("state_id")
+#     return states.query("state_num_id == '%s'" % place_id).values[0][index]
 
 
 def get_ufs_list():
