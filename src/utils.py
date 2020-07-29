@@ -151,32 +151,16 @@ def choose_place(city, region, state):
 #     return city_id
 
 
-# def get_place_names_by_id(place_id):
-#     """
-#     In: id of a place (id < 100 for states, id > 100 for cities)
-#     Out: either a string representing the name of the state or a list contaning [state name,city name]
-#     """
-#     configs_path = os.path.join(os.path.dirname(__file__), "configs")
-#     cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
-#     states = pd.read_csv(os.path.join(configs_path, "states_table.csv"))
+# TODO: por que retornamos uma lista quando é cidade?
+def get_place_names_by_id(user_input):
 
-#     state_name_index = [i for i in states.columns].index("state_name")
+    get_name = {
+        "state_num_id": user_input["state_name"],
+        "health_region_id": user_input["health_region_name"],
+        "city_id": [user_input["state_name"], user_input["city_name"]],
+    }
 
-#     if place_id <= 100:
-#         state_name_index = [i for i in states.columns].index("state_name")
-#         return states.query("state_num_id == '%s'" % place_id).values[0][
-#             state_name_index
-#         ]
-#     else:
-#         data = cities.query("city_id == '%s'" % place_id).values[0]
-#         city_name_index = [i for i in cities.columns].index("city_name")
-#         state_num_id_index = [i for i in cities.columns].index("state_num_id")
-#         city_name = data[city_name_index]
-#         state_id = data[state_num_id_index]
-#         state_name = states.query("state_num_id == '%s'" % state_id).values[0][
-#             state_name_index
-#         ]
-#         return [state_name, city_name]
+    return get_name[user_input["place_type"]]
 
 
 # def get_state_str_id_by_id(place_id):

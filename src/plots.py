@@ -24,7 +24,9 @@ cf.set_config_file(offline=False, world_readable=True)
 def iplottitle(title, width=40):
     return "<br>".join(textwrap.wrap(title, width))
 
+
 import yaml
+
 config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
 
 
@@ -36,7 +38,7 @@ def plot_heatmap(df, x, y, z, title, colorscale="oranges"):
     )
 
 
-# FAROLCOVID PAGE
+# FAROLCOVID INDICATOR: RT
 def plot_rt(t, title=""):
     # TODO: put dicts in config
     rt_classification = {
@@ -117,29 +119,26 @@ def plot_rt(t, title=""):
     return fig
 
 
-def plot_rt_wrapper(place_id):
+def plot_rt_wrapper(place_id, place_type):
 
-    if place_id <= 100:
-        pre_data = loader.read_data(
-            "br", config, config["br"]["api"]["endpoints"]["rt_states"]
+    endpoints = {
+        "state_num_id": "state",
+        "health_region_id": "health_region",
+        "city_id": "city",
+    }
+
+    data = (
+        loader.read_data(
+            "br", config, config["br"]["api"]["endpoints"]["rt"][endpoints[place_type]]
         )
-        state_str_id = utils.get_state_str_id_by_id(place_id)
-        final_data = pre_data.loc[pre_data["state"] == state_str_id].sort_values(
-            "last_updated"
-        )[:-10]
+        .query(f"{place_type} == {place_id}")
+        .sort_values("last_updated")[:-10]
+    )
 
-    else:
-        pre_data = loader.read_data(
-            "br", config, config["br"]["api"]["endpoints"]["rt_cities"]
-        )
-        final_data = pre_data.loc[pre_data["city_id"] == place_id].sort_values(
-            "last_updated"
-        )[:-10]
-
-    if len(final_data) < 30:
+    if len(data) < 30:
         return None
 
-    fig = plot_rt(final_data)
+    fig = plot_rt(data)
     fig.update_layout(xaxis=dict(tickformat="%d/%m"))
     fig.update_layout(margin=dict(l=50, r=50, b=100, t=20, pad=4))
     fig.update_yaxes(automargin=True)
@@ -159,6 +158,7 @@ def get_alert_color(value):
         return alert_colors[1]
 
 
+# FAROLCOVID INDICATOR: INLOCO
 def plot_inloco(pairs, df, place_type, decoration=False):
 
     fig = go.Figure()
@@ -320,14 +320,14 @@ gen_social_dist_plots.cities_df = None
 gen_social_dist_plots.states_df = None
 
 
-def gen_social_dist_plots_placeid(place_id, height=700):
+def gen_social_dist_plots_placeid(user_input, height=700):
 
-    names = utils.get_place_names_by_id(place_id)
+    place_name = utils.get_place_names_by_id(user_input)
 
-    if type(names) == type("sampletext"):  # IS STATE
-        return gen_social_dist_plots([names], height)
+    if type(place_name) == type("sampletext"):  # IS STATE
+        return gen_social_dist_plots([place_name], height)
     else:  # IS CITY
-        return gen_social_dist_plots([names[::-1]], height)
+        return gen_social_dist_plots([place_name[::-1]], height)
 
 
 # SIMULACOVID

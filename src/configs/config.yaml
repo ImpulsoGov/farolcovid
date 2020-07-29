@@ -6,8 +6,10 @@ br:
         local: http://45.55.43.231:7000/
         endpoints:
             simulacovid: "br/cities/simulacovid/main"
-            rt_cities: "br/cities/rt"
-            rt_states: "br/states/rt"
+            rt:
+                city: "br/cities/rt"
+                health_region: "br/health_region/rt"
+                state: "br/states/rt"
             farolcovid: 
                 city: "br/cities/farolcovid/main"
                 health_region: "br/health_region/farolcovid/main"

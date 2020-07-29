@@ -437,9 +437,8 @@ def main(session_state=None):
         )
 
         try:
-            fig = plots.gen_social_dist_plots_placeid(
-                user_input[user_input["place_type"]]
-            )
+            fig = plots.gen_social_dist_plots_placeid(user_input)
+
             st.plotly_chart(fig, use_container_width=True)
         except:
             st.write(
@@ -451,8 +450,8 @@ def main(session_state=None):
             <div class="base-wrapper">
                     <span class="section-header primary-span">CÁLCULO DO RITMO DE CONTÁGIO EM {user_input["locality"]}</span>
                     <br><br>
-                    O ritmo de contágio, conhecido como número de reprodução efetivo (Rt), traduz a dinâmica de disseminação do Covid a cada dia. 
-                    <br>O valor pode ser lido como o número médio de novas infecções diárias causadas por uma única pessoa infectada. 
+                    O ritmo de contágio, conhecido como número de reprodução efetivo (Rt), traduz a dinâmica de disseminação do Covid a cada dia.
+                    <br>O valor pode ser lido como o número médio de novas infecções diárias causadas por uma única pessoa infectada.
                     Para mais informações, visite a página de Metodologia.
             </div>
             """,
@@ -460,7 +459,9 @@ def main(session_state=None):
         )
 
         try:
-            fig2 = plots.plot_rt_wrapper(user_input[user_input["place_type"]])
+            fig2 = plots.plot_rt_wrapper(
+                user_input[user_input["place_type"]], user_input["place_type"]
+            )
             st.plotly_chart(fig2, use_container_width=True)
         except:
             st.write(
