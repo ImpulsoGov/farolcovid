@@ -28,8 +28,8 @@ br:
         health_infrastructure: https://docs.google.com/spreadsheets/d/1Zz5WqIj6-oO4skuHPkq3-W9VZxe-XMPThtI-vUghkFI
         embaixadores: https://docs.google.com/spreadsheets/d/1CASa-MdJS_o2tffWlIS--FSskSxhJUw3pA1L5AGIe04
         CNAE_sectors: https://docs.google.com/spreadsheets/d/1pP8dY9kRa9EvX3KcVPfMWJ8exDaoT1_bBggSKfD3y0k
-        br_states_reopening_data: https://docs.google.com/spreadsheets/d/1-uU-CbE8k7ctRD-n8veEz0l--_ECcUyaa6ZcjhraO_o
-        br_health_region_reopening_data: https://docs.google.com/spreadsheets/d/17FzeuXoHD5e9cqOHD1lcwyH7AgWTZ0UQ-7gwgA7VMok
+        br_states_reopening_data: https://docs.google.com/spreadsheets/d/1H20RNeTJqON8cqhwiZJdfXqVYbFVKrG5
+        br_health_region_reopening_data: https://docs.google.com/spreadsheets/d/1FB5GfHN0TGcC6YYCvoMLwZPN0chpHRMi
     cases:
         url: https://data.brasil.io/dataset/covid19/caso_full.csv.gz
         rename:
