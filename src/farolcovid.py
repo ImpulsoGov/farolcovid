@@ -46,6 +46,7 @@ def main():
         number_ventilators=None,
         number_cases=None,
         number_deaths=None,
+        population_params=dict(),
         refresh=False,
         reset=False,
         saude_ordem_data=None,
@@ -56,7 +57,6 @@ def main():
         button_styles=dict(),
         continuation_selection=None,
     )
-
     # AMPLITUDE EVENT
     # In those amplitude events objects we are going to save a dict with every state as keys
     # in each state, the value will be something that allows us to identify there is a change or not

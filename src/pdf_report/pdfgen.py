@@ -15,6 +15,7 @@ logging.getLogger("googleapicliet.discovery_cache").setLevel(logging.ERROR)
 import binascii
 import pickle
 import plotly.io as pio
+import math
 
 pio.orca.config.executable = "/usr/bin/orca"
 pio.orca.config.use_xvfb = True
@@ -107,10 +108,12 @@ def _gen_place_plots(place_id):
     """
     Generate plots to the PDF file
     """
-
+    place_type = ["state_num_id", "health_region_id", "city_id"][
+        math.floor(math.log10(min(10 ** 3, place_id))) - 1
+    ]
     plots_dict = {
-        "social_distancing": {"plot": plots.gen_social_dist_plots_placeid(place_id)},
-        "rt": {"plot": plots.plot_rt_wrapper(place_id)},
+        "social_distancing": {"plot": plots.gen_social_dist_plots(place_id)},
+        "rt": {"plot": plots.plot_rt_wrapper(place_id, place_type)},
         "file_objects": list(),
     }
 
@@ -312,7 +315,6 @@ def parse_user_input(user_input, indicators, data, config, test=False):
     """
     Parse all content to a dict for PDF
     """
-
     risco_geral = data["overall_alert"].values[0]
 
     # Start inputs for PDF
@@ -337,8 +339,6 @@ def parse_user_input(user_input, indicators, data, config, test=False):
     # plots_dict = _gen_place_plots(
     #     utils.get_place_id_by_names(user_input["state_name"], user_input["city_name"])
     # )
-
-    print(plots_dict["social_distancing"].keys())
 
     content_dict["isolamento_plot_path"] = plots_dict["social_distancing"]["path"]
     content_dict["contagio_plot_path"] = plots_dict["rt"]["path"]
