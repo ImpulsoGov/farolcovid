@@ -182,10 +182,10 @@ br:
                 "correct_name": "São Valério"
             "Campo Grande":
                 "state_name": "Rio Grande do Norte"
-                "correct_name": "Augusto Severo (Campo Grande)"
+                "correct_name": "Augusto Severo"
             "Boa Saúde":
                 "state_name": "Rio Grande do Norte"
-                "correct_name": "Boa Saúde (Januário Cicco)"
+                "correct_name": "Boa Saúde"
     rt_parameters:
         r_t_range_max: 12
         optimal_sigma: 0.01 # best sigma for Brazil (prior hyperparameters)
