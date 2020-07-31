@@ -8,7 +8,8 @@ import pandas as pd
 from models import IndicatorType, IndicatorCards, ProductCards
 
 from model.simulator import run_simulation, get_dmonth
-import pdf_report.pdfgen as pdfgen
+
+# import pdf_report.pdfgen as pdfgen
 import pages.simulacovid as sm
 import pages.saude_em_ordem as so
 import plots
@@ -461,16 +462,16 @@ def main(session_state):
         "D"
     ]
     # PDF-REPORT GEN BUTTON
-    if st.button("Gerar Relatório PDF"):
-        user_analytics.log_event("generated pdf")
-        st.write(
-            """<div class="base-wrapper">Aguarde um momento por favor...</div>""",
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            pdfgen.gen_pdf_report(user_input, indicators, data, config),
-            unsafe_allow_html=True,
-        )
+    # if st.button("Gerar Relatório PDF"):
+    #     user_analytics.log_event("generated pdf")
+    #     st.write(
+    #         """<div class="base-wrapper">Aguarde um momento por favor...</div>""",
+    #         unsafe_allow_html=True,
+    #     )
+    #     st.markdown(
+    #         pdfgen.gen_pdf_report(user_input, indicators, data, config),
+    #         unsafe_allow_html=True,
+    #     )
     # TOOLS
     products = ProductCards
     products[1].recommendation = f'Risco {data["overall_alert"].values[0]}'
