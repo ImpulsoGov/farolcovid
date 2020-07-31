@@ -143,15 +143,25 @@ def gen_header():  # NOT USED FOR NOW
     )
 
 
-def gen_intro():
-    st.write(
-        """
+def gen_intro(alert):
+    if alert == "baixo":
+        st.write(
+            """
         <div class="base-wrapper">
                 <div class="section-header primary-span">VEJA OS SETORES MAIS SEGUROS PARA REABRIR</div><br>
-                <div class="ambassador-question"><b>Se o seu município ou estado se encontra em ordem e com risco <span style="color:#02B529;">BAIXO</span>, você já pode começar a pensar um plano de reabertura.</b> Nós compilamos aqui dados econômicos do seu estado para retomada segura de atividades econômicas, ordenadas a com critérios objetivos.</div>
+                <div class="ambassador-question"><b>Legal, seu município/regional/estado está em risco <span style="color:#02B529;">BAIXO</span>! Isso significa que já é adequado pensar em retomar as atividades econômicas gradualmente.</b> Nós compilamos aqui dados econômicos do seu estado para retomada segura de atividades econômicas, ordenadas com critérios objetivos.</div>
         </div>""",
-        unsafe_allow_html=True,
-    )
+            unsafe_allow_html=True,
+        )
+    else:
+        st.write(
+            """
+        <div class="base-wrapper">
+                <div class="section-header primary-span">VEJA OS SETORES MAIS SEGUROS PARA REABRIR</div><br>
+                <div class="ambassador-question"><b>Opa, seu município/regional/estado ainda não está verde! Isso significa que <span style="color:#dd2c00;">não é o momento</span> de retomar as atividades econômicas.</b> No entanto, para fins de planejamento a ser implementado quando a doença for controlada, compilamos aqui dados econômicos do seu estado para retomada segura de atividades econômicas, ordenadas com critérios objetivos.</div>
+        </div>""",
+            unsafe_allow_html=True,
+        )
 
 
 def gen_illustrative_plot(sectors_data, session_state, place_name):
@@ -638,7 +648,7 @@ def main(user_input, indicators, data, config, session_state):
         }
     score_groups, economic_data, place_name = get_score_groups(config, session_state)
     # gen_header()
-    gen_intro()
+    gen_intro(alert=data["overall_alert"].values[0])
     gen_illustrative_plot(score_groups, session_state, place_name)
     gen_slider(session_state)
     gen_detailed_vision(economic_data, session_state, config)

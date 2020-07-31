@@ -536,7 +536,6 @@ def main(session_state=None):
         session_state,
         others={"ui_binSelect": 2},
     )
-
     if session_state.continuation_selection[0]:
         user_analytics.safe_log_event(
             "picked simulacovid",
