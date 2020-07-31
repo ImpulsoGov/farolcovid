@@ -549,7 +549,14 @@ def genInputFields(user_input, config, session):
 
     if st.button("Resetar aos valores oficais"):
         session.reset = True
-
+    alteration_button_style = """border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 14px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
+    reset_button_style = """position:absolute;right:3em;top:-68px;border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: rgb(160,170,178);font-weight: bold;text-align: center;text-decoration: none;font-size: 14px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
+    stylizeButton(
+        "Finalizar alteração", alteration_button_style, session,
+    )
+    stylizeButton(
+        "Resetar aos valores oficais", reset_button_style, session,
+    )
     return user_input, session
 
 

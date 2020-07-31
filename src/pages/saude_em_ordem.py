@@ -437,7 +437,7 @@ def gen_isoscore_lines(fig, score_parts, wage_range, weight):
     x_data = np.logspace(
         np.log(wage_range[0] * 0.85), np.log(wage_range[1] * 1.15), 50, base=np.e
     )
-    names = ["Nan", "Grupo D", "Grupo C", "Grupo B", "Grupo A"]
+    names = ["Nan", "Fase 4", "Fase 3", "Fase 2", "Fase 1"]
     area_colors = [
         "#FFFFFF",
         "rgba(252,40,3,0.2)",

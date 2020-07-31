@@ -460,7 +460,12 @@ def main(session_state=None):
             "<div class='base-wrapper'><i>Em breve:</i> gráficos de subnotificação.</div>",
             unsafe_allow_html=True,
         )
-
+    key_indicators_button_style = """border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
+    utils.stylizeButton(
+        "Confira a evolução de indicadores-chave",
+        key_indicators_button_style,
+        session_state,
+    )
     # CHANGE DATA SECTION
     utils.genInputCustomizationSectionHeader(user_input["locality"])
     old_user_input = dict(user_input)
@@ -493,16 +498,16 @@ def main(session_state=None):
         "D"
     ]
     # PDF-REPORT GEN BUTTON
-    if st.button("Gerar Relatório PDF"):
-        user_analytics.log_event("generated pdf")
-        st.write(
-            """<div class="base-wrapper">Aguarde um momento por favor...</div>""",
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            pdfgen.gen_pdf_report(user_input, indicators, data, config),
-            unsafe_allow_html=True,
-        )
+    # if st.button("Gerar Relatório PDF"):
+    # user_analytics.log_event("generated pdf")
+    # st.write(
+    # """<div class="base-wrapper">Aguarde um momento por favor...</div>""",
+    # unsafe_allow_html=True,
+    # )
+    # st.markdown(
+    # pdfgen.gen_pdf_report(user_input, indicators, data, config),
+    # unsafe_allow_html=True,
+    # )
     # TOOLS
     products = ProductCards
     products[1].recommendation = f'Risco {data["overall_alert"].values[0]}'
