@@ -565,12 +565,10 @@ def gen_single_table(session_state, score_groups, data_index, n=5):
             <div class="saude-table-line tl1" style="height: {proportion};"></div>
             <div class="saude-table-line tl2" style="height: {proportion};"></div>
             <div class="saude-table-line tl3" style="height: {proportion};"></div>
-            <div class="saude-table-line tl4" style="height: {proportion};"></div>
             <div class="saude-table-field tt1">Nome do setor</div>
             <div class="saude-table-field tt2">Índice de Segurança Sanitária</div>
             <div class="saude-table-field tt3">N°de Trabalhadores</div>
             <div class="saude-table-field tt4">Massa Salarial</div>
-            <div class="saude-table-field tt5">índice Saúde em Ordem</div>
         </div>"""
     for index, sector_data in enumerate(working_data):
         text += gen_sector_table_row(sector_data, index)
@@ -593,7 +591,6 @@ def gen_sector_table_row(sector_data, row_index):
             <div class="saude-table-field tf2">{"%0.2f"%sector_data["security_index"]}</div>
             <div class="saude-table-field tf3">{convert_money(sector_data["n_employee"])}</div>
             <div class="saude-table-field tf4">R$ {convert_money(sector_data["total_wage_bill"])}</div>
-            <div class="saude-table-field tf5">{"%0.2f"%sector_data["score"]}</div>
         </div>"""
 
 

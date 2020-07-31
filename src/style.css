@@ -1422,13 +1422,13 @@ header>.toolbar { /* Hide toolbar menu */
     border-right: 2px solid #000000;
 }
 .tl1{
-    left: 30%;
+    left: 40%;
 }
 .tl2{
-    left: 47%;
+    left: 60%;
 }
 .tl3{
-    left: 65%;
+    left: 80%;
 }
 .tl4{
     left: 82%;
@@ -1436,8 +1436,8 @@ header>.toolbar { /* Hide toolbar menu */
 .saude-table-field {
     position: absolute;
     font-size:2vw;
-    top:0.5vw;
-    height:4vw;
+    top:0.0vw;
+    height:100%;
     font-family: IBM Plex Sans;
     font-style: normal;
     font-weight: normal;
@@ -1448,22 +1448,22 @@ header>.toolbar { /* Hide toolbar menu */
 /* tt is for title and tf is for field and te for the end(total) row */
 .tt1 {
     left:0%;
-    width:30%;
+    width:40%;
     font-size:2vw;
 }
 .tt2{
-    left:30%;
-    width:17%;
-    font-size:1.2vw;
+    left:40%;
+    width:20%;
+    font-size:1.4vw;
 }
 .tt3{
-    left:47%;
-    width:18%;
-    font-size:1.5vw;
+    left:60%;
+    width:20%;
+    font-size:1.7vw;
 }
 .tt4{
-    left:65%;
-    width:17%;
+    left:80%;
+    width:20%;
     font-size:2vw;
 }
 .tt5{
@@ -1473,26 +1473,29 @@ header>.toolbar { /* Hide toolbar menu */
 }
 .tf1 {
     left:0%;
-    top:1.5vw;
-    width:30%;
-    font-size:1.2vw;
+    width:40%;
+    height:90%;
+    font-size:1.7vw;
+    display:inline-flex;
+    text-align:left;
 }
 .tf2{
-    left:30%;
-    width:17%;
-    font-size:2vw;
+    left:40%;
+    top:0.9vw;
+    width:20%;
+    font-size:2.3vw;
 }
 .tf3{
-    left:47%;
+    left:60%;
     top:1.2vw;
-    width:18%;
-    font-size:1.5vw;
+    width:20%;
+    font-size:2vw;
 }
 .tf4{
-    left:65%;
+    left:80%;
     top:1.2vw;
-    width:17%;
-    font-size:1.5vw;
+    width:20%;
+    font-size:1.7vw;
 }
 .tf5{
     left:82%;
@@ -1501,23 +1504,23 @@ header>.toolbar { /* Hide toolbar menu */
 }
 .te1 {
     left:0%;
-    width:30%;
+    width:40%;
     font-size:2vw;
 }
 .te2{
-    left:30%;
-    width:17%;
+    left:40%;
+    width:20%;
     font-size:1.2vw;
 }
 .te3{
-    left:47%;
-    width:18%;
-    font-size:1.5vw;
+    left:60%;
+    width:20%;
+    font-size:2vw;
 }
 .te4{
-    left:65%;
-    width:17%;
-    font-size:1.5vw;
+    left:80%;
+    width:20%;
+    font-size:1.7vw;
 }
 .te5{
     left:82%;
