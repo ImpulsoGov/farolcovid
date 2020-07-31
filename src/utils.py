@@ -118,8 +118,29 @@ def get_sources(user_input, data, cities_sources, resources):
 # PLACES TOOLS
 
 
-def add_all(x, all_string="Todos"):
-    return [all_string] + list(x)
+def add_all(x, all_string="Todos", first=None):
+    formatted = [all_string] + list(x)
+    if first != None:
+        first_index = formatted.index(first)
+        item = formatted.pop(first_index)
+        formatted.insert(0, item)
+    return formatted
+
+
+def filter_place(
+    dfs, place_type, state_name=None, health_region_name=None, city_name=None
+):
+
+    if place_type == "state":
+        return dfs["city"]["state_name"].sort_values().unique()
+    elif place_type == "city":
+        data = dfs["city"][dfs["city"]["state_name"] == state_name]
+        if health_region_name != None and health_region_name != "Todos":
+            data = data.loc[data["health_region_name"] == health_region_name]
+        return add_all(data["city_name"].sort_values().unique())
+    else:
+        data = dfs["city"][dfs["city"]["state_name"] == state_name]
+        return add_all(data["health_region_name"].sort_values().unique())
 
 
 def choose_place(city, region, state):
@@ -152,7 +173,7 @@ class Dictionary:
             ]
         elif id < 10000:  # is health regional
             row = self.dictionary.loc[self.dictionary["health_region_id"] == id]
-            # healh regional,state
+            # healh regional,stater
             return [
                 row["health_region_name"].values[0],
                 row["state_name"].values[0],
@@ -598,7 +619,7 @@ def genKPISection(
 
     cards = list(map(genIndicatorCard, indicators.values()))
     cards = "".join(cards)
-    msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  🚨%0a%0a{stoplight}😷 *Contágio*: Cada contaminado infecta em média outras *{indicators['rt'].display} pessoas* - _semana passada: {indicators['rt'].left_display}, tendência: {indicators['rt'].right_display}_%0a%0a🏥 *Capacidade*: A capacidade hospitalar será atingida em *{indicators['hospital_capacity'].display.replace("+", "mais")} mês(es)* %0a%0a🔍 *Subnotificação*: A cada 10 pessoas infectadas, *{indicators['subnotification_rate'].display} são diagnosticadas* %0a%0a🏠 *Isolamento*: Na última semana, *{indicators['social_isolation'].display} das pessoas ficou em casa* - _semana passada: {indicators['social_isolation'].left_display}, tendência: {indicators['social_isolation'].right_display}_%0a%0a---%0a%0a👉 Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui: https://coronacidades.org/farol-covid/"""
+    msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  🚨%0a%0a{stoplight}😷 *Contágio*: Cada contaminado infecta em média outras *{indicators['rt'].display} pessoas* - _semana passada: {indicators['rt'].left_display}, tendência: {indicators['rt'].right_display}_%0a%0a🏥 *Capacidade*: A capacidade hospitalar será atingida em *{str(indicators['hospital_capacity'].display).replace("+", "mais")} mês(es)* %0a%0a🔍 *Subnotificação*: A cada 10 pessoas infectadas, *{indicators['subnotification_rate'].display} são diagnosticadas* %0a%0a🏠 *Isolamento*: Na última semana, *{indicators['social_isolation'].display} das pessoas ficou em casa* - _semana passada: {indicators['social_isolation'].left_display}, tendência: {indicators['social_isolation'].right_display}_%0a%0a---%0a%0a👉 Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui: https://coronacidades.org/farol-covid/"""
 
     st.write(
         """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;">

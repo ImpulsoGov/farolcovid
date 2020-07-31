@@ -257,30 +257,20 @@ def main(session_state=None):
 
     # REGION/CITY USER INPUT
     user_input = dict()
-
-    user_input["state_name"] = st.selectbox(
-        "Estado", dfs["city"]["state_name"].sort_values().unique()
-    )
+    user_input["state_name"] = st.selectbox("Estado", utils.filter_place(dfs, "state"))
 
     user_input["health_region_name"] = st.selectbox(
         "Regional de Saúde",
-        utils.add_all(
-            dfs["city"][dfs["city"]["state_name"] == user_input["state_name"]][
-                "health_region_name"
-            ]
-            .sort_values()
-            .unique()
-        ),
+        utils.filter_place(dfs, "health_region", state_name=user_input["state_name"]),
     )
 
     user_input["city_name"] = st.selectbox(
         "Município",
-        utils.add_all(
-            dfs["city"][dfs["city"]["state_name"] == user_input["state_name"]][
-                "city_name"
-            ]
-            .sort_values()
-            .unique()
+        utils.filter_place(
+            dfs,
+            "city",
+            state_name=user_input["state_name"],
+            health_region_name=user_input["health_region_name"],
         ),
     )
 
