@@ -79,6 +79,8 @@ def gen_sorted_sectors(sectors_data, slider_value, by_range=True):
     data_for_objects = data_for_objects.rename(columns={column_name: "score"})
     sectors = data_for_objects.to_dict(orient="records")
     sectors.sort(key=lambda x: x["score"])
+    for i in range(len(sectors)):
+        sectors[i]["index"] = len(sectors) - i
     if by_range:
         sector_groups = chunks_by_range(sectors, "score", 4)
     else:
@@ -589,7 +591,7 @@ def gen_single_table(session_state, score_groups, data_index, n=5):
 def gen_sector_table_row(sector_data, row_index):
     """ Generates a row of a table given the necessary information coming from a sector data row """
     return f"""<div class="saude-table-row {["tlblue","tlwhite"][row_index % 2]}">
-            <div class="saude-table-field tf0">{row_index + 1}</div>
+            <div class="saude-table-field tf0">{sector_data["index"]}</div>
             <div class="saude-table-field tf1">{sector_data["activity_name"]}</div>
             <div class="saude-table-field tf2">{"%0.2f"%sector_data["security_index"]}</div>
             <div class="saude-table-field tf3">{convert_money(sector_data["n_employee"])}</div>
