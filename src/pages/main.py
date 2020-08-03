@@ -218,7 +218,7 @@ def update_user_input_places(user_input, dfs, config):
 
     # Update dos ids
     user_input = update_user_input_ids(data, user_input)
-    return user_input, data
+    return user_input, utils.fix_dates(data)
 
 
 @st.cache(suppress_st_warning=True)
@@ -229,7 +229,9 @@ def get_data(config):
             "br",
             config,
             endpoint=config["br"]["api"]["endpoints"]["farolcovid"][place],
-        ).replace({"medio": "médio", "insatisfatorio": "insatisfatório"})
+        )
+        .replace({"medio": "médio", "insatisfatorio": "insatisfatório"})
+        .pipe(utils.fix_dates)
         for place in ["city", "health_region", "state"]
     }
 
