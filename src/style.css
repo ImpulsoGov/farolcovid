@@ -1421,14 +1421,17 @@ header>.toolbar { /* Hide toolbar menu */
     height:100%;
     border-right: 2px solid #000000;
 }
+.tl0{
+    left: 6%;
+}
 .tl1{
-    left: 40%;
+    left: 46%;
 }
 .tl2{
-    left: 60%;
+    left: 64%;
 }
 .tl3{
-    left: 80%;
+    left: 82%;
 }
 .tl4{
     left: 82%;
@@ -1446,55 +1449,74 @@ header>.toolbar { /* Hide toolbar menu */
     color: #000000;
 }
 /* tt is for title and tf is for field and te for the end(total) row */
-.tt1 {
+.tt0 {
     left:0%;
+    width:6%;
+    font-size:1.3vw;
+    line-height: 3.2;
+}
+
+.tt1 {
+    left:6%;
     width:40%;
     font-size:2vw;
+    line-height: 2.1;
 }
 .tt2{
-    left:40%;
-    width:20%;
+    left:46%;
+    width:18%;
     font-size:1.4vw;
 }
 .tt3{
-    left:60%;
-    width:20%;
+    left:64%;
+    width:18%;
     font-size:1.7vw;
+    line-height: 2.6;
 }
 .tt4{
-    left:80%;
-    width:20%;
+    left:82%;
+    width:18%;
     font-size:2vw;
+    line-height: 2.2;
 }
 .tt5{
     left:82%;
     width:18%;
     font-size:1.2vw;
 }
-.tf1 {
+.tf0 {
     left:0%;
-    width:40%;
+    width:6%;
+    height:90%;
+    font-size:1.7vw;
+    line-height: 3.2;
+}
+.tf1 {
+    left:8%;
+    width:36%;
     height:90%;
     font-size:1.7vw;
     display:inline-flex;
     text-align:left;
 }
 .tf2{
-    left:40%;
+    left:46%;
     top:0.9vw;
-    width:20%;
+    width:18%;
     font-size:2.3vw;
+    line-height: 1.3;
 }
 .tf3{
-    left:60%;
+    left:64%;
     top:1.2vw;
-    width:20%;
+    width:18%;
     font-size:2vw;
+    line-height: 1.2;
 }
 .tf4{
-    left:80%;
+    left:82%;
     top:1.2vw;
-    width:20%;
+    width:18%;
     font-size:1.7vw;
 }
 .tf5{
@@ -1503,23 +1525,23 @@ header>.toolbar { /* Hide toolbar menu */
     font-size:2vw;
 }
 .te1 {
-    left:0%;
+    left:6%;
     width:40%;
     font-size:2vw;
 }
 .te2{
-    left:40%;
-    width:20%;
+    left:46%;
+    width:18%;
     font-size:1.2vw;
 }
 .te3{
-    left:60%;
-    width:20%;
+    left:64%;
+    width:18%;
     font-size:2vw;
 }
 .te4{
-    left:80%;
-    width:20%;
+    left:82%;
+    width:18%;
     font-size:1.7vw;
 }
 .te5{

@@ -562,9 +562,11 @@ def gen_single_table(session_state, score_groups, data_index, n=5):
             <div class="saude-table-title-button tbeconomy" style="background: {safety_display[1][1]};">{safety_display[1][0]}</div>
         </div>
         <div class="saude-table-head-box">
+            <div class="saude-table-line tl0" style="height: {proportion};"></div>
             <div class="saude-table-line tl1" style="height: {proportion};"></div>
             <div class="saude-table-line tl2" style="height: {proportion};"></div>
             <div class="saude-table-line tl3" style="height: {proportion};"></div>
+            <div class="saude-table-field tt0">Ranking</div>
             <div class="saude-table-field tt1">Nome do setor</div>
             <div class="saude-table-field tt2">Índice de Segurança Sanitária</div>
             <div class="saude-table-field tt3">N°de Trabalhadores</div>
@@ -587,6 +589,7 @@ def gen_single_table(session_state, score_groups, data_index, n=5):
 def gen_sector_table_row(sector_data, row_index):
     """ Generates a row of a table given the necessary information coming from a sector data row """
     return f"""<div class="saude-table-row {["tlblue","tlwhite"][row_index % 2]}">
+            <div class="saude-table-field tf0">{row_index + 1}</div>
             <div class="saude-table-field tf1">{sector_data["activity_name"]}</div>
             <div class="saude-table-field tf2">{"%0.2f"%sector_data["security_index"]}</div>
             <div class="saude-table-field tf3">{convert_money(sector_data["n_employee"])}</div>
