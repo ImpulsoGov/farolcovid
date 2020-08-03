@@ -62,12 +62,10 @@ def get_inloco_url(config):
 
 # DATES TOOLS
 
-
 def fix_dates(df):
-
     for col in df.columns:
         if "last_updated" in col:
-            df[col] = pd.to_datetime(df[col]).apply(lambda x: x.strftime("%d/%m/%Y"))
+            df[col] = pd.to_datetime(df[col])#.apply(lambda x: x.strftime("%d/%m/%Y"))
     return df
 
 
