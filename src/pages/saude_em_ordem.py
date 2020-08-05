@@ -11,6 +11,7 @@ import numpy as np
 import math
 import os
 import pandas as pd
+import session
 
 DO_IT_BY_RANGE = (
     True  # DEFINES IF WE SHOULD RUN OUR CODE BY METHOD 1 (TRUE) OR 2 (FALSE)
@@ -266,9 +267,11 @@ def gen_slider(session_state):
         </div>""",
         unsafe_allow_html=True,
     )
+
     session_state.saude_ordem_data["slider_value"] = st.radio(
         radio_label, [70, 80, 90, 100]
     )
+    print("VALOR SELECIONADO:", session_state.saude_ordem_data["slider_value"])
     st.write(
         f"""
         <div class="base-wrapper">
@@ -364,6 +367,15 @@ def plot_cnae(economic_data, slider_value, by_range=True):
     numpy_econ_version = economic_data[
         ["activity_name", column_name, "total_wage_bill"]
     ].to_numpy()
+
+    print(
+        "\nQual o dado?",
+        economic_data[
+            economic_data["activity_name"] == "Extração de Minerais Não-metálicos"
+        ],
+        "\n",
+    )
+
     fig.add_trace(
         go.Scatter(
             x=economic_data["total_wage_bill"],
@@ -492,7 +504,6 @@ def gen_sector_tables(
     Uses session_state to decided if the table is open or closed
     """
     text = ""
-    titles = ["D", "C", "B", "A"]
     if download:
         clean_econ_data = get_clean_data(econ_data)
         download_text = convert_dataframe_to_html(clean_econ_data, name=download_name)
@@ -514,9 +525,10 @@ def gen_sector_tables(
     )
 
     for table_index in reversed(range(4)):
+        number = str(4 - table_index + 1)
         # We create it all under a button but the table will be shown either way
         # The button is merely to alternate the state between open and closed
-        if st.button("Mostrar/Ocultar mais do Grupo " + titles[table_index]):
+        if st.button("Mostrar/Ocultar mais da Fase " + number):
             session_state.saude_ordem_data["opened_tables"][
                 table_index
             ] = not session_state.saude_ordem_data["opened_tables"][table_index]
@@ -525,9 +537,7 @@ def gen_sector_tables(
             gen_single_table(session_state, score_groups, table_index, default_size)
         table_button_style = """border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
         utils.stylizeButton(
-            "Mostrar/Ocultar mais do Grupo " + titles[table_index],
-            table_button_style,
-            session_state,
+            "Mostrar/Ocultar mais da Fase " + number, table_button_style, session_state,
         )
 
 
@@ -549,6 +559,8 @@ def gen_single_table(session_state, score_groups, data_index, n=5):
     else:
         n = min(n, len(score_groups[data_index]))  # goes to a max of n
     table_id = "saude-table-" + str(data_index)
+
+    print("Quantos itens selecionamos?", n)
     working_data = list(reversed(score_groups[data_index][-n:]))
     proportion = (
         str((n + 1) * 5) + "vw"
@@ -648,11 +660,11 @@ def main(user_input, indicators, data, config, session_state):
             "opened_tables": [True, True, True, True],
             "opened_detailed_view": False,
         }
+    gen_intro(alert=data["overall_alert"].values[0])
+    gen_slider(session_state)
     score_groups, economic_data, place_name = get_score_groups(config, session_state)
     # gen_header()
-    gen_intro(alert=data["overall_alert"].values[0])
     gen_illustrative_plot(score_groups, session_state, place_name)
-    gen_slider(session_state)
     gen_detailed_vision(economic_data, session_state, config)
     gen_sector_tables(
         session_state,
