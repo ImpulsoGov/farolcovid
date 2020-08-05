@@ -105,7 +105,7 @@ def main():
             "Níveis de Risco",
             "Estimando Ritmo de Contágio",
             "Modelo Epidemiológico",
-            # "Metodologia do Saúde em Ordem",
+            "Metodologia do Saúde em Ordem",
             "Quem somos?",
         ],
     )
