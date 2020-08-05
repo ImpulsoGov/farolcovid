@@ -189,7 +189,7 @@ ProductCards: List[Product] = [
     ),
     Product(
         recommendation="",
-        name="Saúde em Ordem <br>",
+        name="Saúde em Ordem<br>(em breve)<br>",
         caption="explore que setores não-essenciais da sua economia são menos expostos ao risco de contaminação por Covid-19",
         image=Illustration.CITY.value,
     ),

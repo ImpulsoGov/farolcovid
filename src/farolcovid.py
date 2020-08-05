@@ -26,7 +26,6 @@ from streamlit import caching
 import session
 import time
 
-
 def main():
 
     # SESSION STATE
@@ -106,7 +105,7 @@ def main():
             "Níveis de Risco",
             "Estimando Ritmo de Contágio",
             "Modelo Epidemiológico",
-            "Metodologia do Saúde em Ordem",
+            # "Metodologia do Saúde em Ordem",
             "Quem somos?",
         ],
     )

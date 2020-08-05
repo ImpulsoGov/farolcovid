@@ -8,7 +8,8 @@ import pandas as pd
 from models import IndicatorType, IndicatorCards, ProductCards
 
 from model.simulator import run_simulation, get_dmonth
-import pdf_report.pdfgen as pdfgen
+
+# import pdf_report.pdfgen as pdfgen
 import pages.simulacovid as sm
 import pages.saude_em_ordem as so
 import plots
@@ -17,6 +18,7 @@ import amplitude
 import session
 
 from streamlit.server.Server import Server
+import os
 
 
 def fix_type(x, group):
@@ -239,7 +241,36 @@ def get_data(config):
     return dfs, places_ids
 
 
-def main(session_state=None):
+def main(session_state):
+    # START Google Analytics
+    GOOGLE_ANALYTICS_CODE = os.getenv("GOOGLE_ANALYTICS_CODE")
+    if GOOGLE_ANALYTICS_CODE:
+        import pathlib
+        from bs4 import BeautifulSoup
+
+        GA_JS = (
+            """
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '%s');
+        """
+            % GOOGLE_ANALYTICS_CODE
+        )
+        index_path = pathlib.Path(st.__file__).parent / "static" / "index.html"
+        soup = BeautifulSoup(index_path.read_text(), features="lxml")
+        if not soup.find(id="google-analytics-loader"):
+            script_tag_import = soup.new_tag(
+                "script",
+                src="https://www.googletagmanager.com/gtag/js?id=%s"
+                % GOOGLE_ANALYTICS_CODE,
+            )
+            soup.head.append(script_tag_import)
+            script_tag_loader = soup.new_tag("script", id="google-analytics-loader")
+            script_tag_loader.string = GA_JS
+            soup.head.append(script_tag_loader)
+            index_path.write_text(str(soup))
+    # END Google Analytics
 
     # Get user info
     user_analytics = amplitude.gen_user(utils.get_server_session())
@@ -501,15 +532,15 @@ def main(session_state=None):
     ]
     # PDF-REPORT GEN BUTTON
     # if st.button("Gerar Relatório PDF"):
-    # user_analytics.log_event("generated pdf")
-    # st.write(
-    # """<div class="base-wrapper">Aguarde um momento por favor...</div>""",
-    # unsafe_allow_html=True,
-    # )
-    # st.markdown(
-    # pdfgen.gen_pdf_report(user_input, indicators, data, config),
-    # unsafe_allow_html=True,
-    # )
+    #     user_analytics.log_event("generated pdf")
+    #     st.write(
+    #         """<div class="base-wrapper">Aguarde um momento por favor...</div>""",
+    #         unsafe_allow_html=True,
+    #     )
+    #     st.markdown(
+    #         pdfgen.gen_pdf_report(user_input, indicators, data, config),
+    #         unsafe_allow_html=True,
+    #     )
     # TOOLS
     products = ProductCards
     products[1].recommendation = f'Risco {data["overall_alert"].values[0]}'
@@ -569,7 +600,7 @@ def main(session_state=None):
             },
             alternatives=["picked saude_em_ordem", "picked simulacovid"],
         )
-        so.main(user_input, indicators, data, config, session_state)
+        # so.main(user_input, indicators, data, config, session_state)
         pass
 
     utils.gen_whatsapp_button(config["impulso"]["contact"])
