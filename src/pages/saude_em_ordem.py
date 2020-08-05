@@ -20,7 +20,7 @@ DO_IT_BY_RANGE = (
 # METHOD 2 IS DIVIDING OUR ACTIVITIES IN GROUPS OF ROUGHLY EQUAL SIZE AFTER RANKING THEM
 
 # INITIAL DATA PROCESSING
-def get_score_groups(config, session_state):
+def get_score_groups(config, session_state, slider_value):
     """ Takes our data and splits it into 4 sectors for use by our diagram generator """
     # uf_num = utils.get_place_id_by_names(session_state.state)
 
@@ -53,12 +53,9 @@ def get_score_groups(config, session_state):
     economic_data["activity_name"] = economic_data.apply(
         lambda row: CNAE_sectors[row["cnae"]], axis=1
     )
+    # st.write(f"<h3>{slider_value}</h3>", unsafe_allow_html=True)
     return (
-        gen_sorted_sectors(
-            economic_data,
-            session_state.saude_ordem_data["slider_value"],
-            DO_IT_BY_RANGE,
-        ),
+        gen_sorted_sectors(economic_data, slider_value, DO_IT_BY_RANGE,),
         economic_data,
         place_name,
     )
@@ -204,6 +201,11 @@ def gen_illustrative_plot(sectors_data, session_state, place_name):
         </div>
     </div>"""
     st.write(text, unsafe_allow_html=True)
+    # Invert the order
+    # st.write(
+    # f"""<iframe src="resources/saude-inverter.html?obj1=Caso queira, altere abaixo o peso dado à Segurança Sanitária&obj2=Ordem de Retomada dos Setores |" height="0" width="0"></iframe>""",
+    # unsafe_allow_html=True,
+    # )
 
 
 def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
@@ -271,7 +273,7 @@ def gen_slider(session_state):
     session_state.saude_ordem_data["slider_value"] = st.radio(
         radio_label, [70, 80, 90, 100]
     )
-    print("VALOR SELECIONADO:", session_state.saude_ordem_data["slider_value"])
+    # print("VALOR SELECIONADO:", session_state.saude_ordem_data["slider_value"])
     st.write(
         f"""
         <div class="base-wrapper">
@@ -367,14 +369,6 @@ def plot_cnae(economic_data, slider_value, by_range=True):
     numpy_econ_version = economic_data[
         ["activity_name", column_name, "total_wage_bill"]
     ].to_numpy()
-
-    print(
-        "\nQual o dado?",
-        economic_data[
-            economic_data["activity_name"] == "Extração de Minerais Não-metálicos"
-        ],
-        "\n",
-    )
 
     fig.add_trace(
         go.Scatter(
@@ -525,7 +519,7 @@ def gen_sector_tables(
     )
 
     for table_index in reversed(range(4)):
-        number = str(4 - table_index + 1)
+        number = str(4 - table_index)
         # We create it all under a button but the table will be shown either way
         # The button is merely to alternate the state between open and closed
         if st.button("Mostrar/Ocultar mais da Fase " + number):
@@ -560,7 +554,7 @@ def gen_single_table(session_state, score_groups, data_index, n=5):
         n = min(n, len(score_groups[data_index]))  # goes to a max of n
     table_id = "saude-table-" + str(data_index)
 
-    print("Quantos itens selecionamos?", n)
+    # print("Quantos itens selecionamos?", n)
     working_data = list(reversed(score_groups[data_index][-n:]))
     proportion = (
         str((n + 1) * 5) + "vw"
@@ -662,7 +656,9 @@ def main(user_input, indicators, data, config, session_state):
         }
     gen_intro(alert=data["overall_alert"].values[0])
     gen_slider(session_state)
-    score_groups, economic_data, place_name = get_score_groups(config, session_state)
+    score_groups, economic_data, place_name = get_score_groups(
+        config, session_state, session_state.saude_ordem_data["slider_value"]
+    )
     # gen_header()
     gen_illustrative_plot(score_groups, session_state, place_name)
     gen_detailed_vision(economic_data, session_state, config)

@@ -1,0 +1,38 @@
+<head>
+    <meta charset="UTF-8">
+    <script>
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        function findAndSwap() {
+            var obj1;
+            var obj2;
+            obj1SearchString = urlParams.get("obj1");
+            obj2SearchString = urlParams.get("obj2");
+            console.log(obj1SearchString);
+            console.log(obj2SearchString);
+            containers = window.parent.document.getElementsByClassName("element-container");
+            for (i = 0; i < containers.length; i++) {
+                if (containers[i].innerHTML.includes(obj1SearchString)) {
+                    obj1 = containers[i];
+                    console.log(containers[i].innerHTML);
+                    console.log("FOUND-----");
+                }
+                if (containers[i].innerHTML.includes(obj2SearchString)) {
+                    obj2 = containers[i];
+                    console.log(containers[i].innerHTML);
+                    console.log("FOUND-----");
+                }
+            }
+            //swapElements(obj1, obj2);
+        }
+        function swapElements(obj1, obj2) {
+            obj2.nextSibling === obj1
+                ? obj1.parentNode.insertBefore(obj2, obj1.nextSibling)
+                : obj1.parentNode.insertBefore(obj2, obj1);
+        }
+    </script>
+</head>
+
+<body onload="findAndSwap();">
+
+</body>
