@@ -16,7 +16,6 @@ def read_data(country, config, endpoint):
 
     url = api_url + endpoint
     print(url)
-
     df = pd.read_csv(url)
 
     if "last_updated" in df.columns:

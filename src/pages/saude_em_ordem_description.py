@@ -12,11 +12,12 @@ def main(session_state):
     st.subheader("""1. Introdução""")
     st.write(
         """
-    Idealmente, gostaríamos que todo processo de retomada gradual econômica começasse pela reabertura daqueles setores que proporcionam menores riscos à saúde pública por um lado, e maior importância econômica por outro. Assim, se em um primeiro momento o trade-off entre saúde e economia não existe pois são os indicadores de saúde que devem indicar se é, ou não, o momento certo para iniciar um processo de retomada, uma vez iniciado este processo, a tensão entre saúde e economia passa a existir.
+    Essa ferramenta propõe que a ordem de retomada econômica nas cidades e estados brasileiros seja guiada por critérios objetivos. Poderiam ser observadas uma série de dimensões sócio-econômicas, como a quantidade de pessoas impactadas e critérios de desigualdade de renda e de gênero, conforme sugerido pela Vital Strategies.  No Saúde em Ordem, seguindo modelo do Grupo Técnico de Atividade Econômica do Comitê de Dados da Secretaria de Planejamento, Orçamento e Gestão do Estado do Rio Grande do Sul, consideramos dois desses critérios -- setores que proporcionam menores riscos à saúde pública e maior importância econômica por outro. 
     
-    Cabe aqui esclarecer que quem define se é o momento de retomada da economia são os indicadores de saúde (ver Farol Covid para saber se é o caso do seu município). De todo modo, é fundamental planejar este processo para que quando chegue o momento não haja confusão e dúvidas. A ideia aqui é apresentar uma metodologia desenvolvida no âmbito do Grupo Técnico de Atividade Econômica do Comitê de Dados da Secretaria de Planejamento, Orçamento e Gestão do Estado do Rio Grande do Sul para ordenar os setores econômicos do estado em fases de abertura de acordo com seu risco de contágio e sua importância econômica.
+    Cabe esclarecer que o momento de iniciar a retomada da economia é definido pelo Nível de Risco (ver Farol Covid para saber se é o caso do seu município). Sugerimos que a retomada comece apenas quando ele esteja baixo e que os indicadores sejam revisados a cada 14 dias. De todo modo, é fundamental planejar este processo para que quando chegue o momento não haja confusão e dúvidas.
     
     O modelo aqui apresentado traz algumas variações em relação ao modelo utilizado no Rio Grande do Sul por estar desenhado pensando em sua utilização para todos os estados da federação e levar em consideração também informações sobre o mercado de trabalho informal.
+    
     """
     )
     st.subheader("2. Dados")

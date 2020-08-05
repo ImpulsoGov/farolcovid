@@ -1,0 +1,41 @@
+<head>
+    <script>
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        function horizontalize(urlParams) {
+            var name = urlParams.get("radioText")
+            var radio_div = getRadioDiv(name);
+            resizeLabel(radio_div);
+            repositionButtons(radio_div);
+        }
+        function getRadioDiv(name) {
+            radioDivs = window.parent.document.getElementsByClassName("Widget row-widget stRadio");
+            for (var i = 0; i < radioDivs.length; i++) {
+                if (radioDivs[i].childNodes[0].textContent == name) {
+                    return radioDivs[i];
+                }
+            }
+        }
+        function resizeLabel(radio_div) {
+            radio_div.childNodes[0].style["font-size"] = "30px";
+            radio_div.childNodes[0].style["font-family"] = "IBM Plex Sans;";
+        }
+        function repositionButtons(radio_div) {
+            radio_div.childNodes[1].style["height"] = "40px";
+            radio_div.childNodes[1].style["align-items"] = "center";
+            radio_div.childNodes[1].style["padding-left"] = "calc(50% - 161px)";
+            radio_div.childNodes[1].style["padding-right"] = "calc(50% - 161px)";
+            radio_div.childNodes[1].style["display"] = "flex";
+            buttons = radio_div.childNodes[1].childNodes;
+            for (var i = 0; i < buttons.length; i++) {
+                button = buttons[i];
+                button.style.position = "relative";
+                button.childNodes[2].style["font-size"] = "24px";
+            }
+        }
+    </script>
+</head>
+
+<body onload="horizontalize(urlParams)">
+
+</body>
