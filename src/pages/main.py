@@ -262,7 +262,7 @@ def main(session_state=None):
     user_input["state_name"] = st.selectbox("Estado", utils.filter_place(dfs, "state"))
 
     user_input["health_region_name"] = st.selectbox(
-        "Regional de Saúde",
+        "Região de Saúde",
         utils.filter_place(dfs, "health_region", state_name=user_input["state_name"]),
     )
 
@@ -334,7 +334,7 @@ def main(session_state=None):
     if data["confirmed_cases"].sum() == 0:
         st.write(
             f"""<div class="base-wrapper">
-                    Seu município ou regional de saúde ainda não possui casos reportados oficialmente. Portanto, simulamos como se o primeiro caso ocorresse hoje.
+                    Seu município ou Região de Saúde ainda não possui casos reportados oficialmente. Portanto, simulamos como se o primeiro caso ocorresse hoje.
                     <br><br>Caso queria, você pode mudar esse número abaixo:
                 </div>""",
             unsafe_allow_html=True,

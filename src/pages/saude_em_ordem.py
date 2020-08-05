@@ -30,7 +30,7 @@ def get_score_groups(config, session_state):
         endpoint = "health_region"
         col = "health_region_id"
         value = session_state.health_region_id
-        place_name = session_state.health_region_name + " (Região de Sáude)"
+        place_name = session_state.health_region_name + " (Região de Saúde)"
 
     else:
         endpoint = "state"
