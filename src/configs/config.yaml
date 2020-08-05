@@ -27,7 +27,7 @@ br:
     drive_paths:
         br_id_state_region_city: https://docs.google.com/spreadsheets/d/1pHkH9FZj-c_bCEdvCH9k54uog5QDEd_x5xi4YmDsqyY
         cities_population: https://docs.google.com/spreadsheets/d/1k8mXuUggBuBEghHhhLrLtA-5wa4JsAc-D35S5bNlf24
-        health_infrastructure: https://docs.google.com/spreadsheets/d/1Zz5WqIj6-oO4skuHPkq3-W9VZxe-XMPThtI-vUghkFI
+        health_infrastructure: https://docs.google.com/spreadsheets/d/1MqkUvMuC8C2rc_-U46ZOMgvG3MZ8KXg5NMoj68UBivQ
         embaixadores: https://docs.google.com/spreadsheets/d/1CASa-MdJS_o2tffWlIS--FSskSxhJUw3pA1L5AGIe04
         CNAE_sectors: https://docs.google.com/spreadsheets/d/1pP8dY9kRa9EvX3KcVPfMWJ8exDaoT1_bBggSKfD3y0k
         br_states_reopening_data: https://docs.google.com/spreadsheets/d/1H20RNeTJqON8cqhwiZJdfXqVYbFVKrG5
