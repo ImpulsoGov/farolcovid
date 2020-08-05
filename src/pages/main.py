@@ -128,60 +128,118 @@ def update_indicators(indicators, data, config, user_input, session_state):
     return indicators
 
 
-def filter_options(user_input, df_cities, df_states, config):
+def update_user_input_ids(data, user_input):
 
-    if user_input["city_name"] == "Todos":
+    user_input["state_num_id"] = data["state_num_id"].values[0]
+    user_input["health_region_id"] = False
+    user_input["city_id"] = False
 
-        data = df_states[df_states["state_name"] == user_input["state_name"]]
+    if user_input["place_type"] == "state_num_id":
+        return user_input
 
-        user_input["state_id"] = data["state_id"].values[0]
-        user_input["city_id"] = False
-        user_input["place_type"] = "state_id"
+    # health region level
+    user_input["health_region_id"] = data["health_region_id"].values[0]
+    if user_input["place_type"] == "health_region_id":
+        return user_input
 
-    else:
-        data = df_cities[
-            (df_cities["state_name"] == user_input["state_name"])
-            & (df_cities["city_name"] == user_input["city_name"])
-        ]
+    # city level
+    user_input["city_id"] = data["city_id"].values[0]
+    return user_input
 
-        user_input["state_id"] = data["state_id"].values[0]
-        user_input["city_id"] = data["city_id"].values[0]
-        user_input["place_type"] = "city_id"
 
-        # para simulacovid
-        user_input["state_rt"] = {
-            "best": df_states[df_states["state_name"] == user_input["state_name"]][
-                "rt_10days_ago_low"
-            ].values[0],
-            "worst": df_states[df_states["state_name"] == user_input["state_name"]][
-                "rt_10days_ago_high"
-            ].values[0],
+def choose_rt(user_input, dfs, level):
+
+    places = {1: "city", 2: "health_region", 3: "state"}
+
+    place_name = places[level] + "_name"
+    df = dfs[places[level]][dfs[places[level]][place_name] == user_input[place_name]]
+
+    if level > 3:
+        user_input["rt_values"] = {"best": 2.5, "worst": 3}
+        user_input["rt_level"] = "nan"
+        return user_input
+
+    elif len(df["rt_10days_ago_low"].values) > 0:
+        user_input["rt_values"] = {
+            "best": df["rt_10days_ago_low"].values[0],
+            "worst": df["rt_10days_ago_high"].values[0],
         }
 
+        user_input["rt_level"] = [
+            places[level] + "_id"
+            if places[level] != "state"
+            else places[level] + "_num_id"
+        ][0]
+
+        return user_input
+
+    else:
+        return choose_rt(user_input, dfs, level + 1)
+
+
+def update_user_input_places(user_input, dfs, config):
+
+    # Nivel Estado
+    if (
+        user_input["city_name"] == "Todos"
+        and user_input["health_region_name"] == "Todos"
+    ):
+        data = dfs["state"][dfs["state"]["state_name"] == user_input["state_name"]]
+        user_input["place_type"] = "state_num_id"
+        # Escolhe Rt para SimulaCovid
+        user_input = choose_rt(user_input, dfs, level=3)
+
+    # Nivel Regional
+    elif user_input["city_name"] == "Todos":
+        data = dfs["health_region"][
+            dfs["health_region"]["health_region_name"]
+            == user_input["health_region_name"]
+        ]
+        user_input["place_type"] = "health_region_id"
+        # Escolhe Rt para SimulaCovid
+        user_input = choose_rt(user_input, dfs, level=2)
+
+    # Nivel Cidade
+    else:
+        data = dfs["city"][
+            (dfs["city"]["state_name"] == user_input["state_name"])
+            & (dfs["city"]["city_name"] == user_input["city_name"])
+        ]
+        user_input["place_type"] = "city_id"
+        # Escolhe Rt para SimulaCovid
+        user_input = choose_rt(user_input, dfs, level=1)
+
+    # Seleciona localidade para títulos
     user_input["locality"] = utils.choose_place(
-        city=user_input["city_name"], state=user_input["state_name"], region="Todos"
+        city=user_input["city_name"],
+        region=user_input["health_region_name"],
+        state=user_input["state_name"],
     )
 
-    return user_input, data
+    # Update dos ids
+    user_input = update_user_input_ids(data, user_input)
+    return user_input, utils.fix_dates(data)
 
 
 @st.cache(suppress_st_warning=True)
 def get_data(config):
-    return (
-        loader.read_data(
+
+    dfs = {
+        place: loader.read_data(
             "br",
             config,
-            endpoint=config["br"]["api"]["endpoints"]["farolcovid"]["cities"],
-        ).replace({"medio": "médio", "insatisfatorio": "insatisfatório"}),
-        loader.read_data(
-            "br",
-            config,
-            endpoint=config["br"]["api"]["endpoints"]["farolcovid"]["states"],
-        ).replace({"medio": "médio", "insatisfatorio": "insatisfatório"}),
-    )
+            endpoint=config["br"]["api"]["endpoints"]["farolcovid"][place],
+        )
+        .replace({"medio": "médio", "insatisfatorio": "insatisfatório"})
+        .pipe(utils.fix_dates)
+        for place in ["city", "health_region", "state"]
+    }
+
+    places_ids = loader.read_data("br", config, "br/places/ids")
+    return dfs, places_ids
 
 
-def main(session_state):
+def main(session_state=None):
 
     # Get user info
     user_analytics = amplitude.gen_user(utils.get_server_session())
@@ -197,32 +255,37 @@ def main(session_state):
 
     # GET DATA
     config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
-    df_cities, df_states = get_data(config)
+    dfs, places_ids = get_data(config)
 
     # REGION/CITY USER INPUT
     user_input = dict()
+    user_input["state_name"] = st.selectbox("Estado", utils.filter_place(dfs, "state"))
 
-    user_input["state_name"] = st.selectbox(
-        "Estado", df_cities["state_name"].sort_values().unique()
+    user_input["health_region_name"] = st.selectbox(
+        "Região de Saúde",
+        utils.filter_place(dfs, "health_region", state_name=user_input["state_name"]),
     )
 
     user_input["city_name"] = st.selectbox(
         "Município",
-        utils.add_all(
-            df_cities[df_cities["state_name"] == user_input["state_name"]][
-                "city_name"
-            ].unique()
+        utils.filter_place(
+            dfs,
+            "city",
+            state_name=user_input["state_name"],
+            health_region_name=user_input["health_region_name"],
         ),
     )
+
     changed_city = user_analytics.safe_log_event(
         "picked farol place",
         session_state,
         event_args={"state": user_input["state_name"], "city": user_input["city_name"]},
     )
-    user_input, data = filter_options(user_input, df_cities, df_states, config)
-
+    user_input, data = update_user_input_places(user_input, dfs, config)
     # SOURCES PARAMS
-    user_input = utils.get_sources(user_input, data, df_cities, ["beds", "ventilators"])
+    user_input = utils.get_sources(
+        user_input, data, dfs["city"], ["beds", "ventilators"]
+    )
 
     # POPULATION PARAMS
     user_input["population_params"] = {
@@ -242,13 +305,20 @@ def main(session_state):
     user_input["last_updated_cases"] = data["last_updated_subnotification"].max()
     # Update session values to standard ones if changed city or opened page or reseted values
     if (
-        session_state.state != user_input["state_name"]
-        or session_state.city != user_input["city_name"]
+        session_state.state_name != user_input["state_name"]
+        or session_state.health_region_name != user_input["health_region_name"]
+        or session_state.city_name != user_input["city_name"]
         or session_state.number_beds is None
         or session_state.reset
     ):
-        session_state.state = user_input["state_name"]
-        session_state.city = user_input["city_name"]
+        session_state.state_name = user_input["state_name"]
+        session_state.health_region_name = user_input["health_region_name"]
+        session_state.city_name = user_input["city_name"]
+
+        session_state.state_num_id = user_input["state_num_id"]
+        session_state.health_region_id = user_input["health_region_id"]
+        session_state.city_id = user_input["city_id"]
+
         session_state.number_beds = int(
             user_input["number_beds"]
             * config["br"]["simulacovid"]["resources_available_proportion"]
@@ -264,7 +334,7 @@ def main(session_state):
     if data["confirmed_cases"].sum() == 0:
         st.write(
             f"""<div class="base-wrapper">
-                    Seu município ou regional de saúde ainda não possui casos reportados oficialmente. Portanto, simulamos como se o primeiro caso ocorresse hoje.
+                    Seu município ou Região de Saúde ainda não possui casos reportados oficialmente. Portanto, simulamos como se o primeiro caso ocorresse hoje.
                     <br><br>Caso queria, você pode mudar esse número abaixo:
                 </div>""",
             unsafe_allow_html=True,
@@ -289,14 +359,13 @@ def main(session_state):
 
     # INDICATORS CARDS
     indicators = IndicatorCards
-
     indicators = update_indicators(indicators, data, config, user_input, session_state)
 
     if "state" in user_input["place_type"]:
 
         # Add disclaimer to cities in state alert levels
-        total_alert_cities = df_cities[
-            df_cities["state_id"] == data["state_id"].unique()[0]
+        total_alert_cities = dfs["city"][
+            dfs["city"]["state_num_id"] == data["state_num_id"].unique()[0]
         ]["overall_alert"].value_counts()
 
         utils.genKPISection(
@@ -358,16 +427,8 @@ def main(session_state):
             unsafe_allow_html=True,
         )
 
-        if user_input["city_id"]:
-            locality_id = user_input["city_id"]
-        else:
-            df_state_mapping = pd.read_csv("./configs/states_table.csv")
-            locality_id = df_state_mapping.loc[
-                df_state_mapping["state_name"] == data["state_name"].values[0]
-            ].iloc[0]["state_num_id"]
-
         try:
-            fig = plots.gen_social_dist_plots_placeid(locality_id)
+            fig = plots.gen_social_dist_plots_state_session_wrapper(session_state)
             st.plotly_chart(fig, use_container_width=True)
         except:
             st.write(
@@ -379,26 +440,34 @@ def main(session_state):
             <div class="base-wrapper">
                     <span class="section-header primary-span">CÁLCULO DO RITMO DE CONTÁGIO EM {user_input["locality"]}</span>
                     <br><br>
-                    O ritmo de contágio, conhecido como número de reprodução efetivo (Rt), traduz a dinâmica de disseminação do Covid a cada dia. 
-                    <br>O valor pode ser lido como o número médio de novas infecções diárias causadas por uma única pessoa infectada. 
+                    O ritmo de contágio, conhecido como número de reprodução efetivo (Rt), traduz a dinâmica de disseminação do Covid a cada dia.
+                    <br>O valor pode ser lido como o número médio de novas infecções diárias causadas por uma única pessoa infectada.
                     Para mais informações, visite a página de Metodologia.
             </div>
             """,
             unsafe_allow_html=True,
         )
+
         try:
-            fig2 = plots.plot_rt_wrapper(locality_id)
+            fig2 = plots.plot_rt_wrapper(
+                user_input[user_input["place_type"]], user_input["place_type"]
+            )
             st.plotly_chart(fig2, use_container_width=True)
         except:
             st.write(
-                """<div class="base-wrapper"><b>Seu município ou estado não possui mais de 30 dias de dados de casos confirmados.</b>""",
+                """<div class="base-wrapper"><b>Seu município, regional ou estado não possui mais de 30 dias de dados de casos confirmados.</b>""",
                 unsafe_allow_html=True,
             )
         st.write(
             "<div class='base-wrapper'><i>Em breve:</i> gráficos de subnotificação.</div>",
             unsafe_allow_html=True,
         )
-
+    key_indicators_button_style = """border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
+    utils.stylizeButton(
+        "Confira a evolução de indicadores-chave",
+        key_indicators_button_style,
+        session_state,
+    )
     # CHANGE DATA SECTION
     utils.genInputCustomizationSectionHeader(user_input["locality"])
     old_user_input = dict(user_input)
@@ -431,20 +500,21 @@ def main(session_state):
         "D"
     ]
     # PDF-REPORT GEN BUTTON
-    if st.button("Gerar Relatório PDF"):
-        user_analytics.log_event("generated pdf")
-        st.write(
-            """<div class="base-wrapper">Aguarde um momento por favor...</div>""",
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            pdfgen.gen_pdf_report(user_input, indicators, data, config),
-            unsafe_allow_html=True,
-        )
+    # if st.button("Gerar Relatório PDF"):
+    # user_analytics.log_event("generated pdf")
+    # st.write(
+    # """<div class="base-wrapper">Aguarde um momento por favor...</div>""",
+    # unsafe_allow_html=True,
+    # )
+    # st.markdown(
+    # pdfgen.gen_pdf_report(user_input, indicators, data, config),
+    # unsafe_allow_html=True,
+    # )
     # TOOLS
     products = ProductCards
     products[1].recommendation = f'Risco {data["overall_alert"].values[0]}'
     utils.genProductsSection(products)
+
     # SELECTION BUTTONS
     if session_state.continuation_selection is None:
         session_state.continuation_selection = [False, False]
@@ -454,24 +524,29 @@ def main(session_state):
         session_state.continuation_selection = [True, False]
     if st.button(saude_button_name):
         session_state.continuation_selection = [False, True]
-    # utils.applyButtonStyles(session_state)
-    # simula_selected = st.button("Simulacovid")
-    simulastyle = """border: 1px solid black;"""
+
     utils.stylizeButton(
-        simula_button_name, simulastyle, session_state, others={"ui_binSelect": 1}
+        simula_button_name,
+        """border: 1px solid black;""",
+        session_state,
+        others={"ui_binSelect": 1},
     )
-    # saude_selected = st.button("Saude em Ordem")
+
     utils.stylizeButton(
-        saude_button_name, simulastyle, session_state, others={"ui_binSelect": 2}
+        saude_button_name,
+        """border: 1px solid black;""",
+        session_state,
+        others={"ui_binSelect": 2},
     )
-    # product = st.selectbox(
-    # "", ["Como você gostaria de prosseguir?", "SimulaCovid", "Saúde em Ordem",],
-    # )
     if session_state.continuation_selection[0]:
         user_analytics.safe_log_event(
             "picked simulacovid",
             session_state,
-            event_args={"state": session_state.state, "city": session_state.city,},
+            event_args={
+                "state": session_state.state_name,
+                "health_region": session_state.health_region_name,
+                "city": session_state.city_name,
+            },
             alternatives=["picked saude_em_ordem", "picked simulacovid"],
         )
         # Downloading the saved data from memory
@@ -482,11 +557,16 @@ def main(session_state):
         sm.main(user_input, indicators, data, config, session_state)
         # TODO: remove comment on this later!
         # utils.gen_pdf_report()
+
     elif session_state.continuation_selection[1]:
         user_analytics.safe_log_event(
             "picked saude_em_ordem",
             session_state,
-            event_args={"state": session_state.state, "city": session_state.city,},
+            event_args={
+                "state": session_state.state_name,
+                "health_region": session_state.health_region_name,
+                "city": session_state.city_name,
+            },
             alternatives=["picked saude_em_ordem", "picked simulacovid"],
         )
         so.main(user_input, indicators, data, config, session_state)

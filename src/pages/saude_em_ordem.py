@@ -11,8 +11,6 @@ import numpy as np
 import math
 import os
 import pandas as pd
-import io
-import requests
 
 DO_IT_BY_RANGE = (
     True  # DEFINES IF WE SHOULD RUN OUR CODE BY METHOD 1 (TRUE) OR 2 (FALSE)
@@ -23,17 +21,34 @@ DO_IT_BY_RANGE = (
 # INITIAL DATA PROCESSING
 def get_score_groups(config, session_state):
     """ Takes our data and splits it into 4 sectors for use by our diagram generator """
-    uf_num = utils.get_place_id_by_names(session_state.state)
+    # uf_num = utils.get_place_id_by_names(session_state.state)
+
+    if (
+        session_state.city_name != "Todos"
+        or session_state.health_region_name != "Todos"
+    ):
+        endpoint = "health_region"
+        col = "health_region_id"
+        value = session_state.health_region_id
+        place_name = session_state.health_region_name + " (Região de Saúde)"
+
+    else:
+        endpoint = "state"
+        col = "state_num_id"
+        value = session_state.state_num_id
+        place_name = session_state.state_name + " (Estado)"
+
+    economic_data = loader.read_data(
+        "br",
+        config,
+        config["br"]["api"]["endpoints"]["safereopen"]["economic_data"][endpoint],
+    ).query(f"{col} == {value}")
+
     CNAE_sectors = loader.read_data(
         "br", config, config["br"]["api"]["endpoints"]["safereopen"]["cnae_sectors"]
     )
     CNAE_sectors = dict(zip(CNAE_sectors.cnae, CNAE_sectors.activity))
-    economic_data = loader.read_data(
-        "br", config, config["br"]["api"]["endpoints"]["safereopen"]["economic_data"]
-    )
-    economic_data = economic_data.loc[economic_data["state_num_id"] == uf_num]
-    # REMOVE LINE BELOW ASAP
-    # economic_data = economic_data[economic_data["cnae"] != 44]
+
     economic_data["activity_name"] = economic_data.apply(
         lambda row: CNAE_sectors[row["cnae"]], axis=1
     )
@@ -44,6 +59,7 @@ def get_score_groups(config, session_state):
             DO_IT_BY_RANGE,
         ),
         economic_data,
+        place_name,
     )
 
 
@@ -63,6 +79,8 @@ def gen_sorted_sectors(sectors_data, slider_value, by_range=True):
     data_for_objects = data_for_objects.rename(columns={column_name: "score"})
     sectors = data_for_objects.to_dict(orient="records")
     sectors.sort(key=lambda x: x["score"])
+    for i in range(len(sectors)):
+        sectors[i]["index"] = len(sectors) - i
     if by_range:
         sector_groups = chunks_by_range(sectors, "score", 4)
     else:
@@ -109,7 +127,7 @@ def chunks(l, n):
 
 
 # SEÇÃO DE INTRODUÇÃO
-def gen_header():
+def gen_header():  # NOT USED FOR NOW
     st.write(
         """
         <div class="base-wrapper">
@@ -127,32 +145,40 @@ def gen_header():
     )
 
 
-def gen_intro():
-    st.write(
-        """
+def gen_intro(alert):
+    if alert == "baixo":
+        st.write(
+            """
         <div class="base-wrapper">
                 <div class="section-header primary-span">VEJA OS SETORES MAIS SEGUROS PARA REABRIR</div><br>
-                <div class="ambassador-question"><b>Se o seu município ou estado se encontra em ordem e com risco <span style="color:#02B529;">BAIXO</span>, você já pode começar a pensar um plano de reabertura.</b> Nós compilamos aqui dados econômicos do seu estado para retomada segura de atividades econômicas, ordenadas a com critérios objetivos.</div>
+                <div class="ambassador-question"><b>Legal, seu município/regional/estado está em risco <span style="color:#02B529;">BAIXO</span>! Isso significa que já é adequado pensar em retomar as atividades econômicas gradualmente.</b> Nós compilamos aqui dados econômicos do seu estado para retomada segura de atividades econômicas, ordenadas com critérios objetivos.</div>
         </div>""",
-        unsafe_allow_html=True,
-    )
+            unsafe_allow_html=True,
+        )
+    else:
+        st.write(
+            """
+        <div class="base-wrapper">
+                <div class="section-header primary-span">VEJA OS SETORES MAIS SEGUROS PARA REABRIR</div><br>
+                <div class="ambassador-question"><b>Opa, seu município/regional/estado ainda não está verde! Isso significa que <span style="color:#dd2c00;">não é o momento</span> de retomar as atividades econômicas.</b> No entanto, para fins de planejamento a ser implementado quando a doença for controlada, compilamos aqui dados econômicos do seu estado para retomada segura de atividades econômicas, ordenadas com critérios objetivos.</div>
+        </div>""",
+            unsafe_allow_html=True,
+        )
 
 
-def gen_illustrative_plot(sectors_data, session_state):
+def gen_illustrative_plot(sectors_data, session_state, place_name):
     """ Generates our illustrative sector diagram Version saude v2 """
     text = f""" 
     <div class="saude-alert-banner saude-blue-bg mb" style="margin-bottom: 0px;">
         <div class="base-wrapper flex flex-column" style="margin-top: 0px;">
             <div class="flex flex-row flex-space-between flex-align-items-center">
-                <span class="white-span header p1"> Ordem de Retomada dos Setores | {session_state.state + " (Estado)"}</span>
+                <span class="white-span header p1"> Ordem de Retomada dos Setores | {place_name}</span>
             </div>
             <span class="white-span p3">Sugerimos uma retomada <b>em fases</b>, a começar pelos <b>setores mais seguros</b> e com <b>maior contribuição econômica.</b></span>
             <div class="flex flex-row flex-m-column">"""
     names_in_order = list(reversed(["d", "c", "b", "a"]))
     for index, sector_dict in enumerate(reversed(sectors_data)):
-        text += gen_sector_plot_card(
-            names_in_order[index], sector_dict, size_sectors=3
-        )
+        text += gen_sector_plot_card(names_in_order[index], sector_dict, size_sectors=3)
     text += """
             </div>
         </div>
@@ -177,42 +203,6 @@ def gen_illustrative_plot(sectors_data, session_state):
         </div>
     </div>"""
     st.write(text, unsafe_allow_html=True)
-
-
-# SEÇÃO PLOT SAUDE EM ORDEM
-# def gen_illustrative_plot(sectors_data, session_state):
-#     """ Generates our illustrative sector diagram """
-#     text = f"""
-#     <div class="saude-sector-basic-plot-area">
-#         <div class="saude-veja-title" style="text-align:left;">SAUDE EM ORDEM | {session_state.state.upper() + " (ESTADO)"}</div>
-#         <div class="saude-sector-basic-plot-disc">
-#             Os dois principais indicadores utilizados são a Importância Econômica (medida pela soma dos salários pagos) e o Nível de Segurança Sanitária do setor. A ideia é que devemos iniciar a reabertura pelos setores de mais seguros do ponto de vista da saúde e de maior importância econômica.
-#         </div>
-#         <div class="saude-sector-basic-plot-title">
-#             Top 5 Setores por grupo de custo-benefício
-#         </div>
-#         <div class="saude-segurança-eixo-label">Segurança Sanitária</div>
-#         <div class="saude-plot-axis">"""
-#     names_in_order = ["d", "c", "b", "a"]
-#     for index, sector_dict in enumerate(sectors_data):
-#         text += gen_sector_plot_card(names_in_order[index], sector_dict, size_sectors=5)
-#     text += """
-#             <div class="saude-vertical-arrow-full">
-#                 <div class="saude-arrow-up-pos">
-#                     <i class="saude-arrow up"></i>
-#                 </div>
-#                 <div class="saude-vertical-line"></div>
-#             </div>
-#             <div class="saude-horizontal-arrow-full">
-#                 <div class="saude-horizontal-line"></div>
-#                 <div class="saude-arrow-right-pos">
-#                     <i class="saude-arrow right"></i>
-#                 </div>
-#             </div>
-#             <div class="saude-economia-eixo-label">Contribuição Econômica</div>
-#         </div>
-#     </div>"""
-#     st.write(text, unsafe_allow_html=True)
 
 
 def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
@@ -252,31 +242,6 @@ def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
     return text
 
 
-# def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
-#     """ Generates One specific card from the sector diagram  """
-#     titles = {"a": "Grupo A ✅", "b": "Grupo B 🙌", "c": "Grupo C ‼", "d": "Grupo D ⚠"}
-#     top_n_sectors = sector_data[-size_sectors::]
-#     # The last 5 are the best
-#     item_list = "<br>".join(["- " + i["activity_name"] for i in top_n_sectors])
-#     average_wage = int(
-#         sum([float(i["total_wage_bill"]) for i in top_n_sectors]) / size_sectors
-#     )
-#     num_people = sum([int(i["n_employee"]) for i in top_n_sectors])
-#     text = f"""
-#     <div class="saude-sector-{sector_name}-frame">
-#         <div class="saude-plot-group-title">{titles[sector_name]}</div>
-#         <div class="saude-plot-group-sectors-list">
-#             {item_list}
-#         </div>
-#         <div class="saude-plot-group-massa-salarial-label">Massa Salarial média:</div>
-#         <div class="saude-plot-group-massa-salarial-value">R$ {convert_money(average_wage)}</div>
-#         <div class="saude-plot-group-separator-line"></div>
-#         <div class="saude-plot-group-pessoas-label">Número de trabalhadores: </div>
-#         <div class="saude-plot-group-pessoas-value">{convert_money(num_people)}</div>
-#     </div>"""
-#     return text
-
-
 def convert_money(money):
     """ Can be used later to make money look like whatever we want, but a of
         now just adding the decimal separator should be enough
@@ -285,40 +250,13 @@ def convert_money(money):
 
 
 # SEÇÃO DE SELEÇÃO DE PESOS
-# def gen_slider(session_state):
-#     """ Generates the weight slider we see after the initial sector diagram and saves it to session_state"""
-#     st.write(
-#         """
-#         <div class="base-wrapper">
-#             <div class="saude-slider-wrapper">
-#                 <span class="section-header primary-span">ESCOLHA O PESO PARA A SEGURANÇA SANITÁRIA</span><p>
-#                 <span class="ambassador-question" style="width:80%;max-width:1000px;"><br><b>O peso padrão da simulação atribui 70% para Segurança Sanitária e 30% para Contribuição Econômica,</b> seguindo decisão do RS, principal inspiração para a ferramenta. 
-#                 Este parâmetro pode ser alterado abaixo; entre em contato conosco para mais detalhes.</span><p>
-#             </div>
-#         </div>""",
-#         unsafe_allow_html=True,
-#     )
-#     session_state.saude_ordem_data["slider_value"] = st.slider(
-#         "Selecione o peso para Segurança Sanitária abaixo:", 70, 100, step=10
-#     )
-#     amplitude.gen_user(utils.get_server_session()).safe_log_event(
-#         "chose saude_slider_value",
-#         session_state,
-#         event_args={"slider_value": session_state.saude_ordem_data["slider_value"]},
-#     )
-#     st.write(
-#         f"""
-#         <div class="base-wrapper">
-#             <div class="saude-slider-value-display"><b>Peso selecionado (Segurança): {session_state.saude_ordem_data["slider_value"]}%</b>&nbsp;&nbsp;|  &nbsp;Peso restante para Economia: {100 - session_state.saude_ordem_data["slider_value"]}%</div>
-#         </div>""",
-#         unsafe_allow_html=True,
-#     )
-
-
 def gen_slider(session_state):
     """ Generates the weight slider we see after the initial sector diagram and saves it to session_state"""
+    radio_label = "Caso queira, altere abaixo o peso dado à Segurança Sanitária:"
+    # Code in order to horizontalize the radio buttons
+    radio_horizontalization_html = utils.get_radio_horizontalization_html(radio_label)
     st.write(
-        """
+        f"""
         <div class="base-wrapper">
             <div class="saude-slider-wrapper">
                 <span class="section-header primary-span">ESCOLHA O PESO PARA A SEGURANÇA SANITÁRIA</span><p>
@@ -328,24 +266,23 @@ def gen_slider(session_state):
         </div>""",
         unsafe_allow_html=True,
     )
-    radio_label = "Caso queira, altere abaixo o peso dado à Segurança Sanitária:"
-    # Code in order to horizontalize the radio buttons
-    radio_horizontalization_html = utils.get_radio_horizontalization_html(radio_label)
     session_state.saude_ordem_data["slider_value"] = st.radio(
         radio_label, [70, 80, 90, 100]
+    )
+    st.write(
+        f"""
+        <div class="base-wrapper">
+            {radio_horizontalization_html}
+            <div class="saude-slider-value-display"><b>Peso selecionado (Segurança): {session_state.saude_ordem_data["slider_value"]}%</b>&nbsp;&nbsp;|  &nbsp;Peso restante para Economia: {100 - session_state.saude_ordem_data["slider_value"]}%</div>
+        </div>""",
+        unsafe_allow_html=True,
     )
     amplitude.gen_user(utils.get_server_session()).safe_log_event(
         "chose saude_slider_value",
         session_state,
         event_args={"slider_value": session_state.saude_ordem_data["slider_value"]},
     )
-    st.write(
-        f"""
-        <div class="base-wrapper">
-            {radio_horizontalization_html}
-        </div>""",
-        unsafe_allow_html=True,
-    )
+    # st.write(radio_horizontalization_html,unsafe_allow_html=True)
 
 
 # SEÇÃO DE DETALHES (INCLUDES THE DETAILED PLOT AND THE FULL DATA DOWNLOAD BUTTON)
@@ -355,7 +292,7 @@ def gen_detailed_vision(economic_data, session_state, config):
         f"""
         <div class="base-wrapper">
             <span style="width: 80%; max-width: 1000px; margin-top: -50px;">
-            <i>Clique em "Visão Detalhada" para ver o gráfico completo com todas as informações.</i>
+            <i><b>Clique em "Visão Detalhada" para ver o gráfico completo com todas as informações.</b></i>
             </span><br>""",
         unsafe_allow_html=True,
     )
@@ -365,7 +302,10 @@ def gen_detailed_vision(economic_data, session_state, config):
         amplitude.gen_user(utils.get_server_session()).safe_log_event(  # Logs the event
             "picked saude_em_ordem_detailed_view",
             session_state,
-            event_args={"state": session_state.state, "city": session_state.city,},
+            event_args={
+                "state": session_state.state_name,
+                "city": session_state.city_name,
+            },
         )
         session_state.saude_ordem_data[
             "opened_detailed_view"
@@ -375,21 +315,28 @@ def gen_detailed_vision(economic_data, session_state, config):
     else:  # If the button is not clicked plot it as well but do not alter the flag
         if session_state.saude_ordem_data["opened_detailed_view"] is True:
             display_detailed_plot(economic_data, session_state)
+    detailed_button_style = """border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
+    utils.stylizeButton("Visão Detalhada", detailed_button_style, session_state)
 
 
-def get_state_clean_data_url(session_state, config):
-    """Reads which state are we using and returns the correct file download url for it"""
-    state_num_id = utils.get_place_id_by_names(session_state.state)
-    index_file_url = f'https://drive.google.com/uc?export=download&id={config["br"]["drive_ids"]["br_states_clean_data_index"]}'
-    state_data_index = pd.read_csv(
-        io.BytesIO(requests.get(index_file_url).content),
-        encoding="utf8",
-        # index_col="state_num_id",
-    )
-    uf_file_id = state_data_index.loc[state_data_index["state_num_id"] == state_num_id][
-        "file_id"
-    ].values[0]
-    return f"https://drive.google.com/uc?export=download&id={uf_file_id}"
+def get_clean_data(in_econ_data):
+    cols = in_econ_data.columns.tolist()
+    cols.insert(2, "activity_name")
+    cols = cols[:-1]
+    economic_data = in_econ_data[cols]
+    to_drop_columns = [
+        i
+        for i in list(economic_data.columns)
+        if ("cd_id" in i and (i.split("_")[-1] not in ["07", "08", "09", "10"]))
+    ]
+    economic_data = economic_data.drop(to_drop_columns, axis=1)
+    return economic_data
+
+
+def convert_dataframe_to_html(df, name="dados"):
+    uri = df.to_csv(index=False).replace(",", "%2C").replace("\n", "%0A")
+    file_name = "saude_em_ordem_" + name.replace(" ", "_") + ".csv"
+    return f'<a href="data:application/octet-stream,{uri}" download="{file_name}" class="btn-ambassador">Baixar Dados Completos</a>'
 
 
 def display_detailed_plot(economic_data, session_state):
@@ -502,7 +449,7 @@ def gen_isoscore_lines(fig, score_parts, wage_range, weight):
     x_data = np.logspace(
         np.log(wage_range[0] * 0.85), np.log(wage_range[1] * 1.15), 50, base=np.e
     )
-    names = ["Nan", "Grupo D", "Grupo C", "Grupo B", "Grupo A"]
+    names = ["Nan", "Fase 4", "Fase 3", "Fase 2", "Fase 1"]
     area_colors = [
         "#FFFFFF",
         "rgba(252,40,3,0.2)",
@@ -532,7 +479,13 @@ def gen_isoscore_lines(fig, score_parts, wage_range, weight):
 
 # SEÇÃO DE TABELAS DE SETORES
 def gen_sector_tables(
-    session_state, score_groups, config, default_size=5, download=False
+    session_state,
+    score_groups,
+    config,
+    default_size=5,
+    download=False,
+    econ_data=None,
+    download_name="dados",
 ):
     """
     Major function that will generate all the tables from all the sectors.
@@ -541,15 +494,14 @@ def gen_sector_tables(
     text = ""
     titles = ["D", "C", "B", "A"]
     if download:
-        download_text = f"""
-                <a href="{get_state_clean_data_url(session_state,config)}" download="dados_estado.csv" class="btn-ambassador">
-                    Baixar dados completos do estado
-                </a>"""
+        clean_econ_data = get_clean_data(econ_data)
+        download_text = convert_dataframe_to_html(clean_econ_data, name=download_name)
     else:
-        download_text = f"""
-                <a href="" download="dados_estado.csv" class="btn-ambassador disabled">
-                    Baixar dados (Desativado)
-                </a>"""
+        # download_text = f"""
+        # <a href="" download="dados_estado.csv" class="btn-ambassador disabled">
+        # Baixar dados (Desativado)
+        # </a>"""
+        download_text = " "
     st.write(
         f"""
         <div class="base-wrapper">
@@ -571,6 +523,12 @@ def gen_sector_tables(
             gen_single_table(session_state, score_groups, table_index, default_size)
         else:
             gen_single_table(session_state, score_groups, table_index, default_size)
+        table_button_style = """border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
+        utils.stylizeButton(
+            "Mostrar/Ocultar mais do Grupo " + titles[table_index],
+            table_button_style,
+            session_state,
+        )
 
 
 def gen_single_table(session_state, score_groups, data_index, n=5):
@@ -588,6 +546,8 @@ def gen_single_table(session_state, score_groups, data_index, n=5):
     # If the user chose to open the table we extende the amount of rows to the full size of the group
     if session_state.saude_ordem_data["opened_tables"][data_index] is True:
         n = len(score_groups[data_index])
+    else:
+        n = min(n, len(score_groups[data_index]))  # goes to a max of n
     table_id = "saude-table-" + str(data_index)
     working_data = list(reversed(score_groups[data_index][-n:]))
     proportion = (
@@ -604,15 +564,15 @@ def gen_single_table(session_state, score_groups, data_index, n=5):
             <div class="saude-table-title-button tbeconomy" style="background: {safety_display[1][1]};">{safety_display[1][0]}</div>
         </div>
         <div class="saude-table-head-box">
+            <div class="saude-table-line tl0" style="height: {proportion};"></div>
             <div class="saude-table-line tl1" style="height: {proportion};"></div>
             <div class="saude-table-line tl2" style="height: {proportion};"></div>
             <div class="saude-table-line tl3" style="height: {proportion};"></div>
-            <div class="saude-table-line tl4" style="height: {proportion};"></div>
+            <div class="saude-table-field tt0">Ranking</div>
             <div class="saude-table-field tt1">Nome do setor</div>
             <div class="saude-table-field tt2">Índice de Segurança Sanitária</div>
             <div class="saude-table-field tt3">N°de Trabalhadores</div>
             <div class="saude-table-field tt4">Massa Salarial</div>
-            <div class="saude-table-field tt5">índice Saúde em Ordem</div>
         </div>"""
     for index, sector_data in enumerate(working_data):
         text += gen_sector_table_row(sector_data, index)
@@ -631,11 +591,11 @@ def gen_single_table(session_state, score_groups, data_index, n=5):
 def gen_sector_table_row(sector_data, row_index):
     """ Generates a row of a table given the necessary information coming from a sector data row """
     return f"""<div class="saude-table-row {["tlblue","tlwhite"][row_index % 2]}">
+            <div class="saude-table-field tf0">{sector_data["index"]}</div>
             <div class="saude-table-field tf1">{sector_data["activity_name"]}</div>
             <div class="saude-table-field tf2">{"%0.2f"%sector_data["security_index"]}</div>
             <div class="saude-table-field tf3">{convert_money(sector_data["n_employee"])}</div>
             <div class="saude-table-field tf4">R$ {convert_money(sector_data["total_wage_bill"])}</div>
-            <div class="saude-table-field tf5">{"%0.2f"%sector_data["score"]}</div>
         </div>"""
 
 
@@ -688,11 +648,19 @@ def main(user_input, indicators, data, config, session_state):
             "opened_tables": [True, True, True, True],
             "opened_detailed_view": False,
         }
-    score_groups, economic_data = get_score_groups(config, session_state)
+    score_groups, economic_data, place_name = get_score_groups(config, session_state)
     # gen_header()
-    gen_intro()
-    gen_illustrative_plot(score_groups, session_state)
+    gen_intro(alert=data["overall_alert"].values[0])
+    gen_illustrative_plot(score_groups, session_state, place_name)
     gen_slider(session_state)
     gen_detailed_vision(economic_data, session_state, config)
-    gen_sector_tables(session_state, score_groups, config, default_size=5)
+    gen_sector_tables(
+        session_state,
+        score_groups,
+        config,
+        default_size=5,
+        download=True,
+        econ_data=economic_data,
+        download_name=place_name,
+    )
     gen_protocols_section()

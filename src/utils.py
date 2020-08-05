@@ -32,6 +32,7 @@ import yaml
 import random
 from ua_parser import user_agent_parser
 import time
+import loader
 
 configs_path = os.path.join(os.path.dirname(__file__), "configs")
 cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
@@ -61,12 +62,10 @@ def get_inloco_url(config):
 
 # DATES TOOLS
 
-
 def fix_dates(df):
-
     for col in df.columns:
         if "last_updated" in col:
-            df[col] = pd.to_datetime(df[col]).apply(lambda x: x.strftime("%d/%m/%Y"))
+            df[col] = pd.to_datetime(df[col])#.apply(lambda x: x.strftime("%d/%m/%Y"))
     return df
 
 
@@ -90,17 +89,18 @@ def get_sources(user_input, data, cities_sources, resources):
 
             col = "_".join([item, x])
 
-            if user_input["place_type"] == "state_id":
+            if (
+                user_input["place_type"] == "state_num_id"
+                or user_input["place_type"] == "health_region_id"
+            ):
 
                 user_input[col] = cities_sources[
-                    cities_sources["state_id"] == data["state_id"].iloc[0]
+                    cities_sources[user_input["place_type"]]
+                    == data[user_input["place_type"]].iloc[0]
                 ][col].agg(cols_agg[item])
 
             if user_input["place_type"] == "city_id":
                 user_input[col] = data[col].fillna(0).values[0]
-
-                # if "last_updated" in col:
-                #     user_input[col] = pd.to_datetime(user_input[col]).strftime("%d/%m")
 
     user_input["last_updated_number_beds"] = pd.to_datetime(
         user_input["last_updated_number_beds"]
@@ -109,14 +109,6 @@ def get_sources(user_input, data, cities_sources, resources):
     user_input["last_updated_number_ventilators"] = pd.to_datetime(
         user_input["last_updated_number_ventilators"]
     ).strftime("%d/%m")
-    # user_input["n_beds"] = sources["number_beds"][0]
-    # user_input["n_ventilators"] = sources["number_ventilators"][0]
-
-    # user_input["authors_beds"] = ", ".join(sources["author_number_beds"])
-    # user_input["authors_ventilators"] = ", ".join(sources["author_number_ventilators"])
-
-    # user_input["last_updated_beds"] = sources["last_updated_number_beds"].max()
-    # user_input["last_updated_ventilators"] = sources["last_updated_number_ventilators"].max()
 
     return user_input
 
@@ -124,80 +116,103 @@ def get_sources(user_input, data, cities_sources, resources):
 # PLACES TOOLS
 
 
-def add_all(x, all_string="Todos"):
-    return [all_string] + list(x)
+def add_all(x, all_string="Todos", first=None):
+    formatted = [all_string] + list(x)
+    if first != None:
+        first_index = formatted.index(first)
+        item = formatted.pop(first_index)
+        formatted.insert(0, item)
+    return formatted
+
+
+def filter_place(
+    dfs, place_type, state_name=None, health_region_name=None, city_name=None
+):
+
+    if place_type == "state":
+        return dfs["city"]["state_name"].sort_values().unique()
+    elif place_type == "city":
+        data = dfs["city"][dfs["city"]["state_name"] == state_name]
+        if health_region_name != None and health_region_name != "Todos":
+            data = data.loc[data["health_region_name"] == health_region_name]
+        return add_all(data["city_name"].sort_values().unique())
+    else:
+        data = dfs["city"][dfs["city"]["state_name"] == state_name]
+        return add_all(data["health_region_name"].sort_values().unique())
 
 
 def choose_place(city, region, state):
-    if city == "Todos" and region == "Todos" and state == "Todos":
-        return "Brasil"
     if city == "Todos" and region == "Todos":
-        return state + " (Estado)" if state != "Todos" else "Brasil"
+        return state + " (Estado)"
     if city == "Todos":
-        return region + " (Região SUS)" if region != "Todos" else "Todas as regiões SUS"
+        return region + " (Região de Saúde)"
     return city
 
 
-def get_place_id_by_names(state_name, city_name_input="Todos"):
-    """
-    In: name of the state (returns a numerical id of only the state) or the name of the state and the name of the city
-    Out: the numerical id of the state of the city
-    """
+class Dictionary:
+    def __init__(self):
+        self.dictionary = None
 
-    configs_path = os.path.join(os.path.dirname(__file__), "configs")
-    cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
-    states = pd.read_csv(os.path.join(configs_path, "states_table.csv"))
+    def check_initialize(self):
+        if self.dictionary is None:
+            self.dictionary = loader.read_data(
+                "br",
+                loader.config,
+                loader.config["br"]["api"]["endpoints"]["utilities"]["place_ids"],
+            )
 
-    state_num_id = states.query("state_name == '%s'" % state_name).values[0][-1]
+    def get_place_names_by_id(self, id):
+        self.check_initialize()
+        if id < 100:  # is state
+            return [
+                self.dictionary.loc[self.dictionary["state_num_id"] == id][
+                    "state_name"
+                ].values[0]
+            ]
+        elif id < 10000:  # is health regional
+            row = self.dictionary.loc[self.dictionary["health_region_id"] == id]
+            # healh regional,stater
+            return [
+                row["health_region_name"].values[0],
+                row["state_name"].values[0],
+            ]
+        else:  # is city
+            row = self.dictionary.loc[self.dictionary["city_id"] == id]
+            # city,healh regional,state
+            return [
+                row["city_name"].values[0],
+                row["health_region_name"].values[0],
+                row["state_name"].values[0],
+            ]
 
-    if city_name_input == "Todos":
-        return state_num_id
-    city_id = (
-        cities.query("state_num_id == '%s'" % state_num_id)
-        .query("city_name == '%s'" % city_name_input)
-        .values[0][1]
-    )
-    return city_id
+    def get_place_id_by_names(
+        self, state_name, city_name="Todos", health_region_name=None
+    ):
+        self.check_initialize()
+        dictionary = self.dictionary.loc[self.dictionary["state_name"] == state_name]
+        if health_region_name != None:
+            return dictionary.loc[
+                dictionary["health_system_region"] == health_region_name
+            ]["health_region_id"].values[0]
+        elif city_name != "Todos":
+            return dictionary.loc[dictionary["city_name"] == city_name][
+                "city_id"
+            ].values[0]
+        else:
+            dictioanry["state_num_id"].values[0]
 
 
-def get_place_names_by_id(place_id):
-    """
-    In: id of a place (id < 100 for states, id > 100 for cities)
-    Out: either a string representing the name of the state or a list contaning [state name,city name]
-    """
-    configs_path = os.path.join(os.path.dirname(__file__), "configs")
-    cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
-    states = pd.read_csv(os.path.join(configs_path, "states_table.csv"))
+name_dictionary = Dictionary()
+# def get_state_str_id_by_id(place_id):
 
-    state_name_index = [i for i in states.columns].index("state_name")
+#     states = pd.read_csv(
+#         os.path.join(
+#             os.path.join(os.path.dirname(__file__), "configs"), "states_table.csv"
+#         )
+#     )
 
-    if place_id <= 100:
-        state_name_index = [i for i in states.columns].index("state_name")
-        return states.query("state_num_id == '%s'" % place_id).values[0][
-            state_name_index
-        ]
-    else:
-        data = cities.query("city_id == '%s'" % place_id).values[0]
-        city_name_index = [i for i in cities.columns].index("city_name")
-        state_num_id_index = [i for i in cities.columns].index("state_num_id")
-        city_name = data[city_name_index]
-        state_id = data[state_num_id_index]
-        state_name = states.query("state_num_id == '%s'" % state_id).values[0][
-            state_name_index
-        ]
-        return [state_name, city_name]
-
-
-def get_state_str_id_by_id(place_id):
-
-    states = pd.read_csv(
-        os.path.join(
-            os.path.join(os.path.dirname(__file__), "configs"), "states_table.csv"
-        )
-    )
-
-    index = [i for i in states.columns].index("state_id")
-    return states.query("state_num_id == '%s'" % place_id).values[0][index]
+#     index = [i for i in states.columns].index("state_id")
+#     return states.query("state_num_id == '%s'" % place_id).values[0][index]
 
 
 def get_ufs_list():
@@ -371,15 +386,22 @@ def applyButtonStyles(session_state):
             [str(key) + "=" + str(value) for key, value in style[1].items()]
         )
         html += f"""
-        <iframe src="resources/redo-button.html?name={name}&{parts}&{other_args}" height = 0 width = 0>
+        <iframe src="resources/redo-button.html?name={name}&{parts}&{other_args}" style="height:0px;width:0px;">
         </iframe>"""
     st.write(html, unsafe_allow_html=True)
 
 
 def get_radio_horizontalization_html(radio_label):
     """ Takes a normal radio and restilizes it to make it horizontal and bigger"""
-    html = f"""<iframe src="resources/horizontalize-radio.html?radioText={radio_label}" height = 0 width = 0></iframe>"""
+    html = f"""<iframe src="resources/horizontalize-radio.html?radioText={radio_label}" style="height:0px;width:0px;"></iframe>"""
     return html
+
+
+def hide_iframes():
+    st.write(
+        f"""<iframe src="resources/hide-iframes.html" height = 0 width = 0></iframe>""",
+        unsafe_allow_html=True,
+    )
 
 
 # END OF JAVASCRIPT HACK METHODS
@@ -525,7 +547,14 @@ def genInputFields(user_input, config, session):
 
     if st.button("Resetar aos valores oficais"):
         session.reset = True
-
+    alteration_button_style = """border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 14px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
+    reset_button_style = """position:absolute;right:3em;top:-68px;border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: rgb(160,170,178);font-weight: bold;text-align: center;text-decoration: none;font-size: 14px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
+    stylizeButton(
+        "Finalizar alteração", alteration_button_style, session,
+    )
+    stylizeButton(
+        "Resetar aos valores oficais", reset_button_style, session,
+    )
     return user_input, session
 
 
@@ -595,7 +624,7 @@ def genKPISection(
 
     cards = list(map(genIndicatorCard, indicators.values()))
     cards = "".join(cards)
-    msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  🚨%0a%0a{stoplight}😷 *Contágio*: Cada contaminado infecta em média outras *{indicators['rt'].display} pessoas* - _semana passada: {indicators['rt'].left_display}, tendência: {indicators['rt'].right_display}_%0a%0a🏥 *Capacidade*: A capacidade hospitalar será atingida em *{indicators['hospital_capacity'].display.replace("+", "mais")} mês(es)* %0a%0a🔍 *Subnotificação*: A cada 10 pessoas infectadas, *{indicators['subnotification_rate'].display} são diagnosticadas* %0a%0a🏠 *Isolamento*: Na última semana, *{indicators['social_isolation'].display} das pessoas ficou em casa* - _semana passada: {indicators['social_isolation'].left_display}, tendência: {indicators['social_isolation'].right_display}_%0a%0a---%0a%0a👉 Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui: https://coronacidades.org/farol-covid/"""
+    msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  🚨%0a%0a{stoplight}😷 *Contágio*: Cada contaminado infecta em média outras *{indicators['rt'].display} pessoas* - _semana passada: {indicators['rt'].left_display}, tendência: {indicators['rt'].right_display}_%0a%0a🏥 *Capacidade*: A capacidade hospitalar será atingida em *{str(indicators['hospital_capacity'].display).replace("+", "mais")} mês(es)* %0a%0a🔍 *Subnotificação*: A cada 10 pessoas infectadas, *{indicators['subnotification_rate'].display} são diagnosticadas* %0a%0a🏠 *Isolamento*: Na última semana, *{indicators['social_isolation'].display} das pessoas ficou em casa* - _semana passada: {indicators['social_isolation'].left_display}, tendência: {indicators['social_isolation'].right_display}_%0a%0a---%0a%0a👉 Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui: https://coronacidades.org/farol-covid/"""
 
     st.write(
         """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;">

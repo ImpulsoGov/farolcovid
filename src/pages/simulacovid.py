@@ -53,7 +53,9 @@ def calculate_recovered(user_input, data):
 def main(user_input, indicators, data, config, session_state):
     user_analytics = amplitude.gen_user(utils.get_server_session())
 
-    if indicators["rt"].display != "- ":
+    if (
+        user_input["place_type"] == user_input["rt_level"]
+    ):  # indicators["rt"].display != "- ":
         st.write(
             f"""
             <div class="base-wrapper">
@@ -68,6 +70,7 @@ def main(user_input, indicators, data, config, session_state):
         )
 
     else:
+        places = {"health_region_id": "Regional", "state_num_id": "Estado"}
         st.write(
             f"""
             <div class="base-wrapper">
@@ -75,8 +78,8 @@ def main(user_input, indicators, data, config, session_state):
                     <br><br>
                     <span>Agora é a hora de se preparar para evitar a sobrecarga hospitalar. 
                     No momento, em {user_input["locality"]}, não temos dados suficientes para estimativa do ritmo de contágio. 
-                    Por isso, <b>iremos simular com o ritmo de contágio do seu estado, que está entre {str(user_input["state_rt"]["best"])}-{str(user_input["state_rt"]["worst"])}</b>, 
-                    ou seja, cada pessoa doente infectará em média entre outras {str(user_input["state_rt"]["best"])}-{str(user_input["state_rt"]["worst"])} pessoas.
+                    Por isso, <b>iremos simular com o ritmo de contágio do seu {places[user_input["rt_level"]]}, que está entre {str(user_input["rt_values"]["best"])}-{str(user_input["rt_values"]["worst"])}</b>, 
+                    ou seja, cada pessoa doente infectará em média entre outras {str(user_input["rt_values"]["best"])}-{str(user_input["rt_values"]["worst"])} pessoas.
                     </span>
             </div>""",
             unsafe_allow_html=True,

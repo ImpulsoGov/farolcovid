@@ -27,7 +27,7 @@ def iterate_simulation(current_state, seir_parameters, phase, initial):
     return res, current_state
 
 
-def get_rt(place_type, user_input, config, bound):
+def get_rt(user_input, bound):
     """
     Get reproduction rate from scenario choice.
     """
@@ -38,13 +38,7 @@ def get_rt(place_type, user_input, config, bound):
         "negativo": lambda x: x * 2,  # cenario negativo
     }
 
-    # Caso tenha Rt
-    if user_input["Rt"]["is_valid"] != "nan":
-        return rules[user_input["strategy"]](user_input["Rt"][bound])
-
-    # Caso não tenha Rt, usa o Rt do estado
-    else:
-        return rules[user_input["strategy"]](user_input["state_rt"][bound])
+    return rules[user_input["strategy"]](user_input["rt_values"][bound])
 
 
 def run_simulation(user_input, config):
@@ -80,10 +74,7 @@ def run_simulation(user_input, config):
         phase = {"scenario": "projection_current_rt", "n_days": 90}
 
         # Get Rts
-        if not user_input["state_id"] and not user_input["city_id"]:
-            phase["R0"] = 3
-        else:
-            phase["R0"] = get_rt(user_input["place_type"], user_input, config, bound)
+        phase["R0"] = get_rt(user_input, bound)
 
         res = entrypoint(
             user_input["population_params"],
