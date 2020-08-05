@@ -600,7 +600,7 @@ def main(session_state):
             },
             alternatives=["picked saude_em_ordem", "picked simulacovid"],
         )
-        # so.main(user_input, indicators, data, config, session_state)
+        so.main(user_input, indicators, data, config, session_state)
         pass
 
     utils.gen_whatsapp_button(config["impulso"]["contact"])
