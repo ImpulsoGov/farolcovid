@@ -639,6 +639,21 @@ def gen_protocols_section():
     )
 
 
+def gen_partners_section():
+    st.write(
+        """
+    <div class="base-wrapper">
+        <span class="section-header primary-span">
+            APOIO TÉCNICO
+        </span><br><br>
+        <figure>
+            <img class="saude-reopening-protocol-img-1" alt="Vital Strategies - Resolve to Save Lives" src="https://i.imgur.com/iY7X2Qb.jpg"><br>
+        </figure>
+    </div>""",
+        unsafe_allow_html=True,
+    )
+
+
 # MAIN
 def main(user_input, indicators, data, config, session_state):
     st.write(
@@ -671,3 +686,4 @@ def main(user_input, indicators, data, config, session_state):
         download_name=place_name,
     )
     gen_protocols_section()
+    gen_partners_section()
