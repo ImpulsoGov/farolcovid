@@ -12,6 +12,7 @@ import math
 import os
 import pandas as pd
 import session
+import urllib.parse
 
 DO_IT_BY_RANGE = (
     True  # DEFINES IF WE SHOULD RUN OUR CODE BY METHOD 1 (TRUE) OR 2 (FALSE)
@@ -337,7 +338,7 @@ def get_clean_data(in_econ_data):
 
 
 def convert_dataframe_to_html(df, name="dados"):
-    uri = df.to_csv(index=False).replace(",", "%2C").replace("\n", "%0A")
+    uri = urllib.parse.quote(df.to_csv(index=False))
     file_name = "saude_em_ordem_" + name.replace(" ", "_") + ".csv"
     return f'<a href="data:application/octet-stream,{uri}" download="{file_name}" class="btn-ambassador">Baixar Dados Completos</a>'
 
