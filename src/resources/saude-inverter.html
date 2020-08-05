@@ -8,22 +8,29 @@
             var obj2;
             obj1SearchString = urlParams.get("obj1");
             obj2SearchString = urlParams.get("obj2");
+            var index1;
+            var index2;
             console.log(obj1SearchString);
             console.log(obj2SearchString);
             containers = window.parent.document.getElementsByClassName("element-container");
             for (i = 0; i < containers.length; i++) {
-                if (containers[i].innerHTML.includes(obj1SearchString)) {
+                if (containers[i].innerHTML.includes(obj1SearchString) && !containers[i].innerHTML.includes(obj2SearchString) && !containers[i].innerHTML.includes("iframe")) {
                     obj1 = containers[i];
-                    console.log(containers[i].innerHTML);
-                    console.log("FOUND-----");
+                    index1 = i;
+                    console.log(containers[i]);
+                    console.log("FOUND 1 -----");
                 }
-                if (containers[i].innerHTML.includes(obj2SearchString)) {
+                if (containers[i].innerHTML.includes(obj2SearchString) && !containers[i].innerHTML.includes(obj1SearchString) && !containers[i].innerHTML.includes("iframe")) {
                     obj2 = containers[i];
-                    console.log(containers[i].innerHTML);
-                    console.log("FOUND-----");
+                    index2 = i;
+                    console.log(containers[i]);
+                    console.log("FOUND 2 -----");
                 }
             }
-            //swapElements(obj1, obj2);
+            if (index1 < index2) {
+                swapElements(obj1, obj2);
+            }
+
         }
         function swapElements(obj1, obj2) {
             obj2.nextSibling === obj1

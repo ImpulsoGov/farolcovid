@@ -53,7 +53,8 @@ def get_score_groups(config, session_state, slider_value):
     economic_data["activity_name"] = economic_data.apply(
         lambda row: CNAE_sectors[row["cnae"]], axis=1
     )
-    # st.write(f"<h3>{slider_value}</h3>", unsafe_allow_html=True)
+    # NECESSARY FOR THE INTEGRITY OF THE WHOLE THING DO NOT DELETE
+    st.write(f"<h3></h3>", unsafe_allow_html=True)
     return (
         gen_sorted_sectors(economic_data, slider_value, DO_IT_BY_RANGE,),
         economic_data,
@@ -202,10 +203,10 @@ def gen_illustrative_plot(sectors_data, session_state, place_name):
     </div>"""
     st.write(text, unsafe_allow_html=True)
     # Invert the order
-    # st.write(
-    # f"""<iframe src="resources/saude-inverter.html?obj1=Caso queira, altere abaixo o peso dado à Segurança Sanitária&obj2=Ordem de Retomada dos Setores |" height="0" width="0"></iframe>""",
-    # unsafe_allow_html=True,
-    # )
+    st.write(
+        f"""<iframe src="resources/saude-inverter.html?obj1=Caso queira, altere abaixo o peso dado à Segurança Sanitária&obj2=Ordem de Retomada dos Setores |" height="0" width="0"></iframe>""",
+        unsafe_allow_html=True,
+    )
 
 
 def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
@@ -258,18 +259,6 @@ def gen_slider(session_state):
     radio_label = "Caso queira, altere abaixo o peso dado à Segurança Sanitária:"
     # Code in order to horizontalize the radio buttons
     radio_horizontalization_html = utils.get_radio_horizontalization_html(radio_label)
-    st.write(
-        f"""
-        <div class="base-wrapper">
-            <div class="saude-slider-wrapper">
-                <span class="section-header primary-span">ESCOLHA O PESO PARA A SEGURANÇA SANITÁRIA</span><p>
-                <span class="ambassador-question" style="width:80%;max-width:1000px;"><br><b>O peso determina em qual fase classificamos cada setor econômico.</b> O peso padrão utilizado é de <b>70% para Segurança Sanitária e 30% para Contribuição Econômica</b> - a partir desse valor você pode atribuir mais peso para Segurança (mais detalhes na Metodologia).
-                Este parâmetro pode ser alterado abaixo; entre em contato conosco para mais detalhes.</span><p>
-            </div>
-        </div>""",
-        unsafe_allow_html=True,
-    )
-
     session_state.saude_ordem_data["slider_value"] = st.radio(
         radio_label, [70, 80, 90, 100]
     )
@@ -288,6 +277,20 @@ def gen_slider(session_state):
         event_args={"slider_value": session_state.saude_ordem_data["slider_value"]},
     )
     # st.write(radio_horizontalization_html,unsafe_allow_html=True)
+
+
+def gen_slider_header():
+    st.write(
+        f"""
+        <div class="base-wrapper">
+            <div class="saude-slider-wrapper">
+                <span class="section-header primary-span">ESCOLHA O PESO PARA A SEGURANÇA SANITÁRIA</span><p>
+                <span class="ambassador-question" style="width:80%;max-width:1000px;"><br><b>O peso determina em qual fase classificamos cada setor econômico.</b> O peso padrão utilizado é de <b>70% para Segurança Sanitária e 30% para Contribuição Econômica</b> - a partir desse valor você pode atribuir mais peso para Segurança (mais detalhes na Metodologia).
+                Este parâmetro pode ser alterado abaixo; entre em contato conosco para mais detalhes.</span><p>
+            </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
 
 
 # SEÇÃO DE DETALHES (INCLUDES THE DETAILED PLOT AND THE FULL DATA DOWNLOAD BUTTON)
@@ -660,6 +663,7 @@ def main(user_input, indicators, data, config, session_state):
         config, session_state, session_state.saude_ordem_data["slider_value"]
     )
     # gen_header()
+    gen_slider_header()
     gen_illustrative_plot(score_groups, session_state, place_name)
     gen_detailed_vision(economic_data, session_state, config)
     gen_sector_tables(
