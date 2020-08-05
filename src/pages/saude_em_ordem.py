@@ -12,6 +12,7 @@ import math
 import os
 import pandas as pd
 import session
+import urllib.parse
 
 DO_IT_BY_RANGE = (
     True  # DEFINES IF WE SHOULD RUN OUR CODE BY METHOD 1 (TRUE) OR 2 (FALSE)
@@ -53,8 +54,6 @@ def get_score_groups(config, session_state, slider_value):
     economic_data["activity_name"] = economic_data.apply(
         lambda row: CNAE_sectors[row["cnae"]], axis=1
     )
-    # NECESSARY FOR THE INTEGRITY OF THE WHOLE THING DO NOT DELETE
-    st.write(f"<h3></h3>", unsafe_allow_html=True)
     return (
         gen_sorted_sectors(economic_data, slider_value, DO_IT_BY_RANGE,),
         economic_data,
@@ -201,6 +200,7 @@ def gen_illustrative_plot(sectors_data, session_state, place_name):
             <div class="saude-banner-button low-economy">Fraca</div>
         </div>
     </div>"""
+    text += gen_slider_header()
     st.write(text, unsafe_allow_html=True)
     # Invert the order
     st.write(
@@ -280,17 +280,13 @@ def gen_slider(session_state):
 
 
 def gen_slider_header():
-    st.write(
-        f"""
-        <div class="base-wrapper">
+    return f"""<div class="base-wrapper">
             <div class="saude-slider-wrapper">
                 <span class="section-header primary-span">ESCOLHA O PESO PARA A SEGURANÇA SANITÁRIA</span><p>
                 <span class="ambassador-question" style="width:80%;max-width:1000px;"><br><b>O peso determina em qual fase classificamos cada setor econômico.</b> O peso padrão utilizado é de <b>70% para Segurança Sanitária e 30% para Contribuição Econômica</b> - a partir desse valor você pode atribuir mais peso para Segurança (mais detalhes na Metodologia).
                 Este parâmetro pode ser alterado abaixo; entre em contato conosco para mais detalhes.</span><p>
             </div>
-        </div>""",
-        unsafe_allow_html=True,
-    )
+        </div>"""
 
 
 # SEÇÃO DE DETALHES (INCLUDES THE DETAILED PLOT AND THE FULL DATA DOWNLOAD BUTTON)
@@ -342,7 +338,7 @@ def get_clean_data(in_econ_data):
 
 
 def convert_dataframe_to_html(df, name="dados"):
-    uri = df.to_csv(index=False).replace(",", "%2C").replace("\n", "%0A")
+    uri = urllib.parse.quote(df.to_csv(index=False))
     file_name = "saude_em_ordem_" + name.replace(" ", "_") + ".csv"
     return f'<a href="data:application/octet-stream,{uri}" download="{file_name}" class="btn-ambassador">Baixar Dados Completos</a>'
 
@@ -663,7 +659,6 @@ def main(user_input, indicators, data, config, session_state):
         config, session_state, session_state.saude_ordem_data["slider_value"]
     )
     # gen_header()
-    gen_slider_header()
     gen_illustrative_plot(score_groups, session_state, place_name)
     gen_detailed_vision(economic_data, session_state, config)
     gen_sector_tables(
