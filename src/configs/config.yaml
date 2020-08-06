@@ -36,13 +36,14 @@ br:
         url: https://data.brasil.io/dataset/covid19/caso_full.csv.gz
         rename:
             city_ibge_code: 'city_id'
+            city: 'city_name'
+            state: 'state_id'
             date: 'last_updated'
             last_available_deaths: 'deaths'
             last_available_confirmed: 'confirmed_cases'
             new_confirmed: 'daily_cases'
             daily_cases_sum: 'infectious_period_cases'
         drop: [
-            'city',
             'estimated_population_2019',
             'is_last',
             'is_repeated',
@@ -222,6 +223,7 @@ br:
             cnes: [
             "country_iso",
             "country_name",
+            "state_num_id",
             "state_id",
             "state_name",
             "health_region_id",
