@@ -283,7 +283,17 @@ def main(session_state):
     utils.genHeroSection(
         "Farol", "Entenda e controle a Covid-19 em sua cidade e estado."
     )
-
+    # TEMPORARY BANNER
+    st.write(
+        """
+    <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
+        <div class="white-span header p1" style="font-size:30px;">NOVO! Não deixe de conferir a nossa nova ferramenta (Saúde em Ordem) no final da página. Confira também a situação da saúde no seu local com o Simulacovid.</div>
+    </div>
+    <div class="base-wrapper">
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
     # GET DATA
     config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
     dfs, places_ids = get_data(config)
@@ -461,7 +471,7 @@ def main(session_state):
         try:
             fig = plots.gen_social_dist_plots_state_session_wrapper(session_state)
             st.plotly_chart(fig, use_container_width=True)
-        except:
+        except Exception as e:
             st.write(
                 """<div class="base-wrapper"><b>Seu município ou estado não possui mais de 30 dias de dados, ou não possui o índice calculado pela inloco.</b>""",
                 unsafe_allow_html=True,
