@@ -72,7 +72,7 @@ def main(session_state):
         """
         O SimulaCovid calcula em quantos dias a demanda de pacientes com
         Covid-19 por leitos hospitalares ($$l$$) e ventiladores ($$v$$) atingirá
-        a capacidade alocada para recebê-los em cada cidade ou regional de saúde
+        a capacidade alocada para recebê-los em cada cidade ou Região de Saúde
         no país. Portanto, estimamos tanto a oferta quanto a demanda para cada
         um dos equipamentos, $$e$$. 
 
@@ -118,7 +118,7 @@ def main(session_state):
         abordagem (Wang et. al, 2020)[1]. Assim, ao permitir simular a adoção dessas
         estratégias em diferentes dias - em um espaço de até 3 meses - podemos
         projetar diferentes curvas de demanda de equipamentos hospitalares no
-        município ou regional de saúde.
+        município ou Região de Saúde.
 
         As próximas duas seções, Capacidade Hospitalar e Modelo Epidemiológico,
         apresentam os modelos para a oferta e demanda de equipamentos

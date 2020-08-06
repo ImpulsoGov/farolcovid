@@ -11,6 +11,8 @@ import numpy as np
 import math
 import os
 import pandas as pd
+import session
+import urllib.parse
 
 DO_IT_BY_RANGE = (
     True  # DEFINES IF WE SHOULD RUN OUR CODE BY METHOD 1 (TRUE) OR 2 (FALSE)
@@ -19,7 +21,7 @@ DO_IT_BY_RANGE = (
 # METHOD 2 IS DIVIDING OUR ACTIVITIES IN GROUPS OF ROUGHLY EQUAL SIZE AFTER RANKING THEM
 
 # INITIAL DATA PROCESSING
-def get_score_groups(config, session_state):
+def get_score_groups(config, session_state, slider_value):
     """ Takes our data and splits it into 4 sectors for use by our diagram generator """
     # uf_num = utils.get_place_id_by_names(session_state.state)
 
@@ -30,7 +32,7 @@ def get_score_groups(config, session_state):
         endpoint = "health_region"
         col = "health_region_id"
         value = session_state.health_region_id
-        place_name = session_state.health_region_name + " (Região de Sáude)"
+        place_name = session_state.health_region_name + " (Região de Saúde)"
 
     else:
         endpoint = "state"
@@ -53,11 +55,7 @@ def get_score_groups(config, session_state):
         lambda row: CNAE_sectors[row["cnae"]], axis=1
     )
     return (
-        gen_sorted_sectors(
-            economic_data,
-            session_state.saude_ordem_data["slider_value"],
-            DO_IT_BY_RANGE,
-        ),
+        gen_sorted_sectors(economic_data, slider_value, DO_IT_BY_RANGE,),
         economic_data,
         place_name,
     )
@@ -202,7 +200,13 @@ def gen_illustrative_plot(sectors_data, session_state, place_name):
             <div class="saude-banner-button low-economy">Fraca</div>
         </div>
     </div>"""
+    text += gen_slider_header()
     st.write(text, unsafe_allow_html=True)
+    # Invert the order
+    st.write(
+        f"""<iframe src="resources/saude-inverter.html?obj1=Caso queira, altere abaixo o peso dado à Segurança Sanitária&obj2=Ordem de Retomada dos Setores |" height="0" width="0"></iframe>""",
+        unsafe_allow_html=True,
+    )
 
 
 def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
@@ -255,20 +259,10 @@ def gen_slider(session_state):
     radio_label = "Caso queira, altere abaixo o peso dado à Segurança Sanitária:"
     # Code in order to horizontalize the radio buttons
     radio_horizontalization_html = utils.get_radio_horizontalization_html(radio_label)
-    st.write(
-        f"""
-        <div class="base-wrapper">
-            <div class="saude-slider-wrapper">
-                <span class="section-header primary-span">ESCOLHA O PESO PARA A SEGURANÇA SANITÁRIA</span><p>
-                <span class="ambassador-question" style="width:80%;max-width:1000px;"><br><b>O peso determina em qual fase classificamos cada setor econômico.</b> O peso padrão utilizado é de <b>70% para Segurança Sanitária e 30% para Contribuição Econômica</b> - a partir desse valor você pode atribuir mais peso para Segurança (mais detalhes na Metodologia).
-                Este parâmetro pode ser alterado abaixo; entre em contato conosco para mais detalhes.</span><p>
-            </div>
-        </div>""",
-        unsafe_allow_html=True,
-    )
     session_state.saude_ordem_data["slider_value"] = st.radio(
         radio_label, [70, 80, 90, 100]
     )
+    # print("VALOR SELECIONADO:", session_state.saude_ordem_data["slider_value"])
     st.write(
         f"""
         <div class="base-wrapper">
@@ -283,6 +277,16 @@ def gen_slider(session_state):
         event_args={"slider_value": session_state.saude_ordem_data["slider_value"]},
     )
     # st.write(radio_horizontalization_html,unsafe_allow_html=True)
+
+
+def gen_slider_header():
+    return f"""<div class="base-wrapper">
+            <div class="saude-slider-wrapper">
+                <span class="section-header primary-span">ESCOLHA O PESO PARA A SEGURANÇA SANITÁRIA</span><p>
+                <span class="ambassador-question" style="width:80%;max-width:1000px;"><br><b>O peso determina em qual fase classificamos cada setor econômico.</b> O peso padrão utilizado é de <b>70% para Segurança Sanitária e 30% para Contribuição Econômica</b> - a partir desse valor você pode atribuir mais peso para Segurança (mais detalhes na Metodologia).
+                Este parâmetro pode ser alterado abaixo; entre em contato conosco para mais detalhes.</span><p>
+            </div>
+        </div>"""
 
 
 # SEÇÃO DE DETALHES (INCLUDES THE DETAILED PLOT AND THE FULL DATA DOWNLOAD BUTTON)
@@ -334,7 +338,7 @@ def get_clean_data(in_econ_data):
 
 
 def convert_dataframe_to_html(df, name="dados"):
-    uri = df.to_csv(index=False).replace(",", "%2C").replace("\n", "%0A")
+    uri = urllib.parse.quote(df.to_csv(index=False))
     file_name = "saude_em_ordem_" + name.replace(" ", "_") + ".csv"
     return f'<a href="data:application/octet-stream,{uri}" download="{file_name}" class="btn-ambassador">Baixar Dados Completos</a>'
 
@@ -364,6 +368,7 @@ def plot_cnae(economic_data, slider_value, by_range=True):
     numpy_econ_version = economic_data[
         ["activity_name", column_name, "total_wage_bill"]
     ].to_numpy()
+
     fig.add_trace(
         go.Scatter(
             x=economic_data["total_wage_bill"],
@@ -492,7 +497,6 @@ def gen_sector_tables(
     Uses session_state to decided if the table is open or closed
     """
     text = ""
-    titles = ["D", "C", "B", "A"]
     if download:
         clean_econ_data = get_clean_data(econ_data)
         download_text = convert_dataframe_to_html(clean_econ_data, name=download_name)
@@ -514,9 +518,10 @@ def gen_sector_tables(
     )
 
     for table_index in reversed(range(4)):
+        number = str(4 - table_index)
         # We create it all under a button but the table will be shown either way
         # The button is merely to alternate the state between open and closed
-        if st.button("Mostrar/Ocultar mais do Grupo " + titles[table_index]):
+        if st.button("Mostrar/Ocultar mais da Fase " + number):
             session_state.saude_ordem_data["opened_tables"][
                 table_index
             ] = not session_state.saude_ordem_data["opened_tables"][table_index]
@@ -525,9 +530,7 @@ def gen_sector_tables(
             gen_single_table(session_state, score_groups, table_index, default_size)
         table_button_style = """border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
         utils.stylizeButton(
-            "Mostrar/Ocultar mais do Grupo " + titles[table_index],
-            table_button_style,
-            session_state,
+            "Mostrar/Ocultar mais da Fase " + number, table_button_style, session_state,
         )
 
 
@@ -549,6 +552,8 @@ def gen_single_table(session_state, score_groups, data_index, n=5):
     else:
         n = min(n, len(score_groups[data_index]))  # goes to a max of n
     table_id = "saude-table-" + str(data_index)
+
+    # print("Quantos itens selecionamos?", n)
     working_data = list(reversed(score_groups[data_index][-n:]))
     proportion = (
         str((n + 1) * 5) + "vw"
@@ -634,6 +639,21 @@ def gen_protocols_section():
     )
 
 
+def gen_partners_section():
+    st.write(
+        """
+    <div class="base-wrapper">
+        <span class="section-header primary-span">
+            APOIO TÉCNICO
+        </span><br><br>
+        <figure>
+            <img class="saude-reopening-protocol-img-1" alt="Vital Strategies - Resolve to Save Lives" src="https://i.imgur.com/iY7X2Qb.jpg"><br>
+        </figure>
+    </div>""",
+        unsafe_allow_html=True,
+    )
+
+
 # MAIN
 def main(user_input, indicators, data, config, session_state):
     st.write(
@@ -648,11 +668,13 @@ def main(user_input, indicators, data, config, session_state):
             "opened_tables": [True, True, True, True],
             "opened_detailed_view": False,
         }
-    score_groups, economic_data, place_name = get_score_groups(config, session_state)
-    # gen_header()
     gen_intro(alert=data["overall_alert"].values[0])
-    gen_illustrative_plot(score_groups, session_state, place_name)
     gen_slider(session_state)
+    score_groups, economic_data, place_name = get_score_groups(
+        config, session_state, session_state.saude_ordem_data["slider_value"]
+    )
+    # gen_header()
+    gen_illustrative_plot(score_groups, session_state, place_name)
     gen_detailed_vision(economic_data, session_state, config)
     gen_sector_tables(
         session_state,
@@ -664,3 +686,4 @@ def main(user_input, indicators, data, config, session_state):
         download_name=place_name,
     )
     gen_protocols_section()
+    gen_partners_section()

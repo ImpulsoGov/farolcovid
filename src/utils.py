@@ -145,7 +145,7 @@ def choose_place(city, region, state):
     if city == "Todos" and region == "Todos":
         return state + " (Estado)"
     if city == "Todos":
-        return region + " (Região SUS)"
+        return region + " (Região de Saúde)"
     return city
 
 

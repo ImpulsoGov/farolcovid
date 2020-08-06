@@ -24,8 +24,14 @@ docker-run:
 		$(IMAGE_TAG)
 
 # Run development server with file binding from './src'
+start-redis:
+	docker run --rm -d --name redis -p 6379:6379 redis:5
+destroy-redis:
+	docker rm -f redis
+
 docker-dev:
 	touch $(PWD)/.env
+	
 	docker run --rm -it \
 		--name farolcovid-dev \
 		-p 8501:8501 \

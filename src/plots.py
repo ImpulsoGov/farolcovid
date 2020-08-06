@@ -164,10 +164,13 @@ def plot_inloco(place_id, df, decoration=False):
     fig = go.Figure()
     names = utils.name_dictionary.get_place_names_by_id(place_id)
     state_id = int(str(place_id)[:2])
+
     # Add traces
     if place_id > 10000:  # city
-        clean_df = df.query('state_num_id == "%s"' % state_id).query(
-            'city_name == "%s"' % names[0]
+        clean_df = (
+            df.query('state_num_id == "%s"' % state_id)
+            .query('city_name == "%s"' % names[0])
+            .reset_index()
         )
 
         x_values = translate_dates(clean_df["dt"])
@@ -179,7 +182,7 @@ def plot_inloco(place_id, df, decoration=False):
         name = names[0] + f" ({names[2]})"
 
     else:  # state
-        clean_df = df.query('state_num_id == "%s"' % state_id)
+        clean_df = df.query('state_num_id == "%s"' % state_id).reset_index()
         x_values = translate_dates(clean_df["dt"])
         y_values = clean_df["isolated"]
         name = names[0]
@@ -188,7 +191,7 @@ def plot_inloco(place_id, df, decoration=False):
     fig.add_trace(go.Scatter(x=x_values, y=y_values, name=name))
 
     # Use alert color
-    fig.update_traces(line={"color": get_alert_color(y_values[-1])})
+    fig.update_traces(line={"color": get_alert_color(y_values.iloc[-1])})
 
     if decoration:
         fig.update_layout(updatemenus=[dict(active=0)])

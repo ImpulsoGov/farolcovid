@@ -26,7 +26,6 @@ from streamlit import caching
 import session
 import time
 
-
 def main():
 
     # SESSION STATE
