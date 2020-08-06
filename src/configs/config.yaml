@@ -243,7 +243,6 @@ br:
             "number_icu_beds",
             "last_updated_number_icu_beds",
             "author_number_icu_beds",
-            "number_icu_beds"
         ]
 
 impulso:
