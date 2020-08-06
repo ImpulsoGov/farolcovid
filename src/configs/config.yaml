@@ -3,7 +3,7 @@ refresh_rate: 999999 # minutes
 br:
     api:
         external: http://datasource.coronacidades.org/
-        local: http://localhost:7000/
+        local: http://45.55.43.231:7000/
         endpoints:
             simulacovid: "br/cities/simulacovid/main"
             rt:
@@ -77,7 +77,10 @@ br:
                 "active_cases",
                 "deaths",
                 "notification_rate",
-                "state_notification_rate"
+                "state_notification_rate",
+                "last_updated_number_icu_beds",
+                "author_number_icu_beds",
+                "number_icu_beds"
             ]   
             state_agg: {
                 "population": sum,
@@ -168,7 +171,8 @@ br:
             display: "notification_rate"
         hospital_capacity:
             risk: "dday_classification"
-            right_display: "number_ventilators"
+            #right_display: "number_ventilators"
+            right_display: "number_icu_beds"
             left_display: "number_beds"
             display: "dday_beds_best_months"
         social_isolation:
@@ -235,8 +239,11 @@ br:
             "last_updated_number_ventilators",
             "author_number_ventilators",
             'number_ventilators',
-            'number_beds',
-            'number_icu_beds'
+            "number_beds",
+            "last_updated_number_icu_beds",
+            "author_number_icu_beds",
+            "number_icu_beds"
+            
         ]
 
 impulso:
