@@ -35,7 +35,7 @@ def _generate_hovertext(df_to_plotly):
 
 def plot_heatmap(df, place_type, legend, title=None, group=None):
 
-    if place_type == "state" or place_type == "city":
+    if place_type == "state_id" or place_type == "city_name":
         col_date = "last_updated"
         col_deaths = "deaths"
 
@@ -139,10 +139,10 @@ def prepare_heatmap(df, place_type, group=None, mavg_days=5):
 
     refresh = df["data_last_refreshed"][0]
 
-    if place_type == "city":
-        df = df[df["state"] == group]
+    if place_type == "city_name":
+        df = df[df["state_id"] == group]
 
-    if place_type == "city" or place_type == "state":
+    if place_type == "city_name" or place_type == "state_id":
         df = _generate_mvg_deaths(df, place_type, mavg_days)
         col_date = "last_updated"
         col_deaths = "deaths"
@@ -155,7 +155,7 @@ def prepare_heatmap(df, place_type, group=None, mavg_days=5):
         df.groupby(place_type)[[col_deaths]].max().reset_index().sort_values(col_deaths)
     )
 
-    if place_type == "city":
+    if place_type == "city_name":
 
         legend = """
         <div class="base-wrapper">
@@ -176,7 +176,7 @@ def prepare_heatmap(df, place_type, group=None, mavg_days=5):
         </div>
         """
 
-    if place_type == "state":
+    if place_type == "state_id":
 
         legend = """
         <div class="base-wrapper">
@@ -240,7 +240,7 @@ def prepare_heatmap(df, place_type, group=None, mavg_days=5):
     )
 
 
-def main(session_state):
+def main(session_state=None):
     user_analytics = amplitude.gen_user(utils.get_server_session())
     opening_response = user_analytics.safe_log_event(
         "opened analysis", session_state, is_new_page=True
@@ -265,11 +265,11 @@ def main(session_state):
     user_uf = st.selectbox("Selecione um estado para análise:", utils.get_ufs_list())
 
     prepare_heatmap(
-        br_cases, place_type="city", group=user_uf,
+        br_cases, place_type="city_name", group=user_uf,
     )
 
     prepare_heatmap(
-        br_cases, place_type="state",
+        br_cases, place_type="state_id",
     )
 
     prepare_heatmap(
@@ -279,8 +279,6 @@ def main(session_state):
         place_type="country_pt",
     )
 
-
-# st.write('Dados atualizados para 10 de maio. Os dados dos dias mais recentes são provisórios e podem ser revisados para cima à medida que testes adicionais são processados.')
 
 if __name__ == "__main__":
     main()
