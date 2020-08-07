@@ -78,7 +78,10 @@ br:
                 "active_cases",
                 "deaths",
                 "notification_rate",
-                "state_notification_rate"
+                "state_notification_rate",
+                "last_updated_number_icu_beds",
+                "author_number_icu_beds",
+                "number_icu_beds"
             ]   
             state_agg: {
                 "population": sum,
@@ -87,7 +90,8 @@ br:
                 "deaths": sum,
                 "state_notification_rate": max,
                 "number_beds": sum,
-                "number_ventilators": sum
+                "number_ventilators": sum,
+                "number_icu_beds": sum
             }   
             health_region_agg: {
                 "population": sum,
@@ -96,7 +100,8 @@ br:
                 "deaths": sum,
                 "notification_rate": median,
                 "number_beds": sum,
-                "number_ventilators": sum
+                "number_ventilators": sum,
+                "number_icu_beds": sum
             }  
         rules:
             rt_classification:
@@ -169,7 +174,7 @@ br:
             display: "notification_rate"
         hospital_capacity:
             risk: "dday_classification"
-            right_display: "number_ventilators"
+            right_display: "number_icu_beds"
             left_display: "number_beds"
             display: "dday_beds_best_months"
         social_isolation:
@@ -235,9 +240,11 @@ br:
             "author_number_beds",
             "last_updated_number_ventilators",
             "author_number_ventilators",
-            'number_ventilators',
-            'number_beds',
-            'number_icu_beds'
+            "number_ventilators",
+            "number_beds",
+            "number_icu_beds",
+            "last_updated_number_icu_beds",
+            "author_number_icu_beds",
         ]
 
 impulso:

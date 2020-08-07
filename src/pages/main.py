@@ -99,7 +99,7 @@ def update_indicators(indicators, data, config, user_input, session_state):
     indicators["subnotification_rate"].left_display = session_state.number_cases
     indicators["hospital_capacity"].left_display = int(session_state.number_beds)
     indicators["hospital_capacity"].right_display = int(
-        session_state.number_ventilators
+        session_state.number_icu_beds
     )
 
     # Caso o usuário altere os casos confirmados, usamos esse novo valor para a estimação
@@ -322,10 +322,12 @@ def main(session_state):
         session_state,
         event_args={"state": user_input["state_name"], "city": user_input["city_name"]},
     )
+
     user_input, data = update_user_input_places(user_input, dfs, config)
+
     # SOURCES PARAMS
     user_input = utils.get_sources(
-        user_input, data, dfs["city"], ["beds", "ventilators"]
+        user_input, data, dfs["city"], ["beds", "ventilators", "icu_beds"]
     )
 
     # POPULATION PARAMS
@@ -366,6 +368,10 @@ def main(session_state):
         )
         session_state.number_ventilators = int(
             user_input["number_ventilators"]
+            * config["br"]["simulacovid"]["resources_available_proportion"]
+        )
+        session_state.number_icu_beds = int(
+            user_input["number_icu_beds"]
             * config["br"]["simulacovid"]["resources_available_proportion"]
         )
         session_state.number_cases = user_input["population_params"]["I_confirmed"]
@@ -521,8 +527,8 @@ def main(session_state):
             {
                 "beds_change": session_state.number_beds
                 - int(old_user_input["number_beds"]),
-                "vent_change": session_state.number_ventilators
-                - int(old_user_input["number_ventilators"]),
+                "icu_beds_change": session_state.number_icu_beds
+                - int(old_user_input["number_icu_beds"]),
                 "cases_change": session_state.number_cases
                 - int(old_user_input["population_params"]["I_confirmed"]),
                 "deaths_change": session_state.number_deaths
@@ -536,7 +542,7 @@ def main(session_state):
     utils.gen_ambassador_section()
 
     indicators["hospital_capacity"].left_display = user_input["number_beds"]
-    indicators["hospital_capacity"].right_display = user_input["number_ventilators"]
+    indicators["hospital_capacity"].right_display = user_input["number_icu_beds"]
     indicators["subnotification_rate"].left_display = user_input["population_params"][
         "D"
     ]
@@ -592,7 +598,7 @@ def main(session_state):
         )
         # Downloading the saved data from memory
         user_input["number_beds"] = session_state.number_beds
-        user_input["number_ventilators"] = session_state.number_ventilators
+        user_input["number_icu_beds"] = session_state.number_icu_beds
         user_input["number_deaths"] = session_state.number_deaths
         user_input["number_cases"] = session_state.number_cases
         sm.main(user_input, indicators, data, config, session_state)

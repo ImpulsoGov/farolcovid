@@ -63,9 +63,9 @@ def check_necessary_values(model_path=None):
 def gen_simulacovid_results(user_input, config):
     scenarios = ["isolation", "lockdown", "nothing"]
     out_names = [
-        ["tempo_colapso_estavel_leitos", "tempo_colapso_estavel_ventiladores"],
-        ["tempo_colapso_positivo_leitos", "tempo_colapso_positivo_ventiladores"],
-        ["tempo_colapso_negativo_leitos", "tempo_colapso_negativo_ventiladores"],
+        ["tempo_colapso_estavel_leitos", "tempo_colapso_estavel_leitos_uti"],
+        ["tempo_colapso_positivo_leitos", "tempo_colapso_positivo_leitos_uti"],
+        ["tempo_colapso_negativo_leitos", "tempo_colapso_negativo_leitos_uti"],
     ]
     scenarios_results = dict()
     for i, scenario in enumerate(scenarios):
@@ -73,12 +73,12 @@ def gen_simulacovid_results(user_input, config):
         adapt_user_input["strategy"] = scenario
         dfs = simulator.run_simulation(user_input, config)
         dday_beds = simulator.get_dmonth(dfs, "I2", int(user_input["number_beds"]))
-        dday_ventilators = simulator.get_dmonth(
-            dfs, "I3", int(user_input["number_ventilators"])
+        dday_icu_beds = simulator.get_dmonth(
+            dfs, "I3", int(user_input["number_icu_beds"])
         )
         scenarios_results[out_names[i][0]] = process_simula_result(dday_beds["best"])
         scenarios_results[out_names[i][1]] = process_simula_result(
-            dday_ventilators["best"]
+            dday_icu_beds["best"]
         )
         if scenario == "isolation":
             simula_plot_file = gen_simulacovid_plot(dfs, user_input)[0]
@@ -304,7 +304,7 @@ def gen_basic_data(user_input):
         "data": datetime.today().strftime("%d/%m/%Y"),
         "nome_lugar": user_input["locality"],
         "leitos": user_input["number_beds"],
-        "ventiladores": user_input["number_ventilators"],
+        "leitos_uti": user_input["number_icu_beds"],
         "casos_ativos": user_input["population_params"]["I"],
         "mortes": user_input["population_params"]["D"],
         "casos_confirmados": user_input["population_params"]["I_confirmed"],

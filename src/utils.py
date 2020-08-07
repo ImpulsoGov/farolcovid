@@ -110,6 +110,10 @@ def get_sources(user_input, data, cities_sources, resources):
         user_input["last_updated_number_ventilators"]
     ).strftime("%d/%m")
 
+    user_input["last_updated_number_icu_beds"] = pd.to_datetime(
+        user_input["last_updated_number_icu_beds"]
+    ).strftime("%d/%m")
+
     return user_input
 
 
@@ -478,6 +482,10 @@ def genInputFields(user_input, config, session):
 
     authors_ventilators = user_input["author_number_ventilators"]
     ventilators_update = user_input["last_updated_number_ventilators"]
+
+    authors_icu_beds = user_input["author_number_icu_beds"]
+    icu_beds_update = user_input["last_updated_number_icu_beds"]
+
     if session.reset or session.number_beds == None:
         number_beds = int(
             user_input["number_beds"]
@@ -488,12 +496,18 @@ def genInputFields(user_input, config, session):
             user_input["number_ventilators"]
             * config["br"]["simulacovid"]["resources_available_proportion"]
         )
+
+        number_icu_beds = int(
+            user_input["number_icu_beds"]
+            * config["br"]["simulacovid"]["resources_available_proportion"]
+        )
         number_cases = int(user_input["population_params"]["I_confirmed"])
         number_deaths = int(user_input["population_params"]["D"])
         session.reset = False
     else:
         number_beds = int(session.number_beds)
-        number_ventilators = int(session.number_ventilators)
+        #number_ventilators = int(session.number_ventilators)
+        number_icu_beds = int(session.number_icu_beds)
         number_cases = int(session.number_cases)
         number_deaths = int(session.number_deaths)
 
@@ -504,6 +518,7 @@ def genInputFields(user_input, config, session):
     if locality == "Brasil":
         authors_beds = "SUS e Embaixadores"
         authors_ventilators = "SUS e Embaixadores"
+        authors_icu_beds = "SUS e Embaixadores"
 
     user_input["number_beds"] = st.number_input(
         f"Número de leitos destinados aos pacientes com Covid-19 (50% do reportado em {authors_beds}; atualizado: {beds_update})",
@@ -512,11 +527,11 @@ def genInputFields(user_input, config, session):
         number_beds,
     )
 
-    user_input["number_ventilators"] = st.number_input(
-        f"Número de ventiladores destinados aos pacientes com Covid-19 (50% do reportado em {authors_ventilators}; atualizado: {ventilators_update}):",
+    user_input["number_icu_beds"] = st.number_input(
+        f"Número de leitos UTI destinados aos pacientes com Covid-19 (50% do reportado em {authors_icu_beds}; atualizado: {icu_beds_update}):",
         0,
         None,
-        number_ventilators,
+        number_icu_beds,
     )
 
     user_input["population_params"]["I_confirmed"] = st.number_input(
@@ -538,6 +553,7 @@ def genInputFields(user_input, config, session):
 
         session.number_beds = int(user_input["number_beds"])
         session.number_ventilators = int(user_input["number_ventilators"])
+        session.number_icu_beds = int(user_input["number_icu_beds"])
         session.number_cases = int(user_input["population_params"]["I_confirmed"])
         session.number_deaths = int(user_input["population_params"]["D"])
 
@@ -752,10 +768,10 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
     else:
         bed_projection = "mais de 2 meses"
 
-    if output.min_range_ventilators < 3 and output.max_range_ventilators < 3:
-        ventilator_projection = f"em até {output.max_range_ventilators} mês(es)"
+    if output.min_range_icu_beds < 3 and output.max_range_icu_beds < 3:
+        icu_bed_projection = f"em até {output.max_range_icu_beds} mês(es)"
     else:
-        ventilator_projection = "mais de 2 meses"
+        icu_bed_projection = "mais de 2 meses"
 
     output = """
         <div>
@@ -781,7 +797,7 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
                                         </span>  
                                 </div> 
                                 <span class="simulator-output-row-prediction-label">
-                                        meses será atingida a capacidade máxima de <b>ventiladores</b>
+                                        meses será atingida a capacidade máxima de <b>leitos UTI</b>
                                 </span>
                         </div>
                         <img src="%s" class="simulator-output-image"/>
@@ -791,7 +807,7 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
         bed_projection,
         bed_img,
         output.color.value,
-        ventilator_projection,
+        icu_bed_projection,
         ventilator_icon,
     )
 
