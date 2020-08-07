@@ -312,9 +312,8 @@ def main(session_state):
         session_state,
         event_args={"state": user_input["state_name"], "city": user_input["city_name"]},
     )
-    print([df.columns for df in dfs.values()])
+
     user_input, data = update_user_input_places(user_input, dfs, config)
-    print(data.columns)
 
     # SOURCES PARAMS
     user_input = utils.get_sources(
@@ -345,7 +344,6 @@ def main(session_state):
         or session_state.number_beds is None
         or session_state.reset
     ):
-        print(user_input)
         session_state.state_name = user_input["state_name"]
         session_state.health_region_name = user_input["health_region_name"]
         session_state.city_name = user_input["city_name"]

@@ -127,6 +127,9 @@ def main(user_input, indicators, data, config, session_state):
         dday_ventilators = simulator.get_dmonth(
             dfs, "I3", int(user_input["number_ventilators"])
         )
+        dday_icu_beds = simulator.get_dmonth(
+            dfs, "I3", int(user_input["number_icu_beds"])
+        )
 
         utils.genChartSimulationSection(
             SimulatorOutput(
@@ -135,6 +138,8 @@ def main(user_input, indicators, data, config, session_state):
                 max_range_beds=dday_beds["best"],
                 min_range_ventilators=dday_ventilators["worst"],
                 max_range_ventilators=dday_ventilators["best"],
+                min_range_icu_beds=dday_icu_beds["worst"],
+                max_range_icu_beds=dday_icu_beds["best"]
             ),
             plot_simulation(dfs, user_input),
         )

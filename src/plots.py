@@ -308,10 +308,10 @@ def plot_simulation(dfs, user_input):
             "capacity": user_input["number_beds"],
         },
         "I3": {
-            "name": "Demanda por ventiladores",
+            "name": "Demanda por leitos UTI",
             "color": "#0097A7",
-            "resource_name": "Capacidade de ventiladores",
-            "capacity": user_input["number_ventilators"],
+            "resource_name": "Capacidade de leitos UTI",
+            "capacity": user_input["number_icu_beds"],
         },
     }
 

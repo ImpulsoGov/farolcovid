@@ -548,7 +548,6 @@ def genInputFields(user_input, config, session):
         number_deaths,
     )
 
-    print("utils", user_input["number_icu_beds"])
     # Faz o update quando clica o botão
     if st.button("Finalizar alteração"):
 
@@ -769,10 +768,10 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
     else:
         bed_projection = "mais de 2 meses"
 
-    if output.min_range_ventilators < 3 and output.max_range_ventilators < 3:
-        ventilator_projection = f"em até {output.max_range_ventilators} mês(es)"
+    if output.min_range_icu_beds < 3 and output.max_range_icu_beds < 3:
+        icu_bed_projection = f"em até {output.max_range_icu_beds} mês(es)"
     else:
-        ventilator_projection = "mais de 2 meses"
+        icu_bed_projection = "mais de 2 meses"
 
     output = """
         <div>
@@ -798,7 +797,7 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
                                         </span>  
                                 </div> 
                                 <span class="simulator-output-row-prediction-label">
-                                        meses será atingida a capacidade máxima de <b>ventiladores</b>
+                                        meses será atingida a capacidade máxima de <b>leitos UTI</b>
                                 </span>
                         </div>
                         <img src="%s" class="simulator-output-image"/>
@@ -808,7 +807,7 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
         bed_projection,
         bed_img,
         output.color.value,
-        ventilator_projection,
+        icu_bed_projection,
         ventilator_icon,
     )
 

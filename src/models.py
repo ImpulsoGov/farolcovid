@@ -111,6 +111,8 @@ class SimulatorOutput(NamedTuple):
     max_range_beds: int
     min_range_ventilators: int
     max_range_ventilators: int
+    min_range_icu_beds: int
+    max_range_icu_beds: int
 
 
 Strategies: List[ContainmentStrategy] = [
@@ -156,11 +158,11 @@ IndicatorCards: Dict[str, Indicator] = {
         right_label="Ranking da UF:",
     ),
     IndicatorType.HOSPITAL_CAPACITY.value: Indicator(
-        header="Capacidade Hospitalar*",
+        header="Capacidade Hospitalar",
         caption="Os seus leitos estarão todos ocupados em",
         unit="mês(es)",
-        left_label="Leitos:",
-        right_label="Ventiladores:",
+        left_label="Leitos*:",
+        right_label="Leitos UTI:",
     ),
     IndicatorType.SOCIAL_ISOLATION.value: Indicator(
         header="Isolamento Social",
