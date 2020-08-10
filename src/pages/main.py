@@ -98,9 +98,7 @@ def update_indicators(indicators, data, config, user_input, session_state):
 
     indicators["subnotification_rate"].left_display = session_state.number_cases
     indicators["hospital_capacity"].left_display = int(session_state.number_beds)
-    indicators["hospital_capacity"].right_display = int(
-        session_state.number_icu_beds
-    )
+    indicators["hospital_capacity"].right_display = int(session_state.number_icu_beds)
 
     # Caso o usuário altere os casos confirmados, usamos esse novo valor para a estimação
     # TODO: vamos acabar com o user_iput e manter só session_state?
@@ -324,7 +322,31 @@ def main(session_state):
     )
 
     user_input, data = update_user_input_places(user_input, dfs, config)
-
+    # MAP
+    map_place_id = utils.Dictionary().get_state_alphabetical_id_by_name(
+        user_input["state_name"]
+    )
+    st.write(
+        f"""
+    <iframe id="map" src="resources/iframe-gen.html?url=http://192.168.0.5:5000/map-iframe?place_id=BR" class="map-br" scroll="no">
+    </iframe>
+    """,
+        unsafe_allow_html=True,
+    )
+    st.write(
+        f"""
+    <iframe id="map-state" src="resources/iframe-gen.html?url=http://192.168.0.5:5000/map-iframe?place_id={map_place_id }" class="map-state" scroll="no">
+    </iframe>
+    """,
+        unsafe_allow_html=True,
+    )
+    st.write(
+        """
+    <iframe id="mapReader" src="resources/map-reader.html" style="width:100%;">
+    </iframe>
+    """,
+        unsafe_allow_html=True,
+    )
     # SOURCES PARAMS
     user_input = utils.get_sources(
         user_input, data, dfs["city"], ["beds", "ventilators", "icu_beds"]

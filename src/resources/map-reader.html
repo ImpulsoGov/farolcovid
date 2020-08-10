@@ -1,0 +1,79 @@
+<head>
+    <meta charset="UTF-8">
+    <script>
+        function init_listener() {
+            console.log(window.parent.document.getElementById("map").contentWindow.document.getElementsByClassName("dw-chart-body")[0]);
+            window.parent.document.getElementById("map").contentWindow.document.getElementsByClassName("dw-chart-body")[0].addEventListener("click", function () {
+                window.parent.document.getElementsByClassName("st-bu st-bv st-ae st-b8 st-ak st-dc st-dd")[0].click();
+                map_iframe = window.parent.document.getElementById("map");
+                br_map_choice = map_iframe.contentWindow.document.getElementsByClassName("dw-tooltip")[0].getElementsByTagName("h2")[0];
+                result = br_map_choice.textContent;
+                map_iframe.contentWindow.document.getElementsByClassName("dw-tooltip")[0].style["display"] = 'none';
+                document.getElementById("result").textContent = result;
+                options = window.parent.document.getElementsByClassName("st-ai st-bo");
+                for (i = 0; i < options.length; i++) {
+                    console.log("Country")
+                    console.log(options[i].textContent);
+                    console.log(result);
+                    if (options[i].textContent == result) {
+                        options[i].click();
+                        map_iframe.focus();
+                        break;
+                    }
+                }
+            });
+            window.parent.document.getElementById("map-state").contentWindow.document.getElementsByClassName("dw-chart-body")[0].addEventListener("click", function () {
+                window.parent.document.getElementsByClassName("st-bu st-bv st-ae st-b8 st-ak st-dc st-dd")[2].click();
+                map_state_iframe = window.parent.document.getElementById("map-state");
+                state_map_choice = map_state_iframe.contentWindow.document.getElementsByClassName("dw-tooltip")[0].getElementsByTagName("h2")[0];
+                result = state_map_choice.textContent;
+                map_state_iframe.contentWindow.document.getElementsByClassName("dw-tooltip")[0].style["display"] = 'none';
+                document.getElementById("result").textContent = result;
+                options = window.parent.document.getElementsByClassName("st-ai st-bo");
+                for (i = 0; i < options.length; i++) {
+                    console.log("State")
+                    console.log(options[i].textContent);
+                    console.log(result);
+                    if (options[i].textContent == result) {
+                        options[i].click();
+                        map_state_iframe.focus();
+                        break;
+                    }
+                }
+            });
+        }
+
+        function check() {
+            map_iframe = window.parent.document.getElementById("map");
+            map_state_iframe = window.parent.document.getElementById("map-state");
+            acessible_iframe = map_iframe.contentWindow;
+            //map_iframe.contentWindow.document.getElementsByClassName("dw-chart-body content-below-chart")[0].addEventListener("click", window.parent.alert('hello'));
+            br_map_choice = map_iframe.contentWindow.document.getElementsByClassName("dw-tooltip")[0].getElementsByTagName("h2")[0];
+            state_map_choice = map_state_iframe.contentWindow.document.getElementsByClassName("dw-tooltip")[0].getElementsByTagName("h2")[0];
+            console.log(br_map_choice);
+            console.log(state_map_choice);
+            if (br_map_choice) {
+                result = br_map_choice.textContent;
+                //clicks the first bar
+                window.parent.document.getElementsByClassName("st-bu st-bv st-ae st-b8 st-ak st-dc st-dd")[0].click();
+            } else {
+                result = state_map_choice.textContent;
+                //clicks the third bar
+                window.parent.document.getElementsByClassName("st-bu st-bv st-ae st-b8 st-ak st-dc st-dd")[2].click();
+            }
+            document.getElementById("result").textContent = result;
+            options = window.parent.document.getElementsByClassName("st-ai st-bo");
+            for (i = 0; i < options.length; i++) {
+                if (options[i].textContent == result) {
+                    options[i].click();
+                }
+            }
+        }
+    </script>
+</head>
+
+<body onload="init_listener();">
+    <button onclick="init_listener();check();">Clique aqui para confirmar a seleção no mapa</button>
+    <h2 style="display:none;">Cidade Selecionada: </h2>
+    <h2 id="result" style="display:none;">Nenhuma</h2>
+</body>

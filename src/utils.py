@@ -62,10 +62,13 @@ def get_inloco_url(config):
 
 # DATES TOOLS
 
+
 def fix_dates(df):
     for col in df.columns:
         if "last_updated" in col:
-            df[col] = pd.to_datetime(df[col])#.apply(lambda x: x.strftime("%d/%m/%Y"))
+            df[col] = pd.to_datetime(
+                df[col]
+            )  # .apply(lambda x: x.strftime("%d/%m/%Y"))
     return df
 
 
@@ -204,6 +207,14 @@ class Dictionary:
             ].values[0]
         else:
             dictioanry["state_num_id"].values[0]
+
+    def get_state_alphabetical_id_by_name(self, state_name):
+        self.check_initialize()
+        if state_name == "Todos":
+            return "BR"
+        return self.dictionary.loc[self.dictionary["state_name"] == state_name][
+            "state_id"
+        ].values[0]
 
 
 name_dictionary = Dictionary()
@@ -506,7 +517,7 @@ def genInputFields(user_input, config, session):
         session.reset = False
     else:
         number_beds = int(session.number_beds)
-        #number_ventilators = int(session.number_ventilators)
+        # number_ventilators = int(session.number_ventilators)
         number_icu_beds = int(session.number_icu_beds)
         number_cases = int(session.number_cases)
         number_deaths = int(session.number_deaths)
