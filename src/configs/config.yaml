@@ -103,64 +103,36 @@ br:
                 "number_ventilators": sum,
                 "number_icu_beds": sum
             }  
+        categories:
+            {0: "novo normal", 1: "moderado", 2: "alto", 3: "altíssimo"}
         rules:
-            rt_classification:
-                column_name: 'rt_10days_ago_most_likely'
-                cuts: [0, 1, 1.2, 10]
-                categories: ['bom', 'insatisfatório', 'ruim'] # [1, 0, -1]
+            # TODO: change new_cases column
+            situation_classification:
+                column_name: 'active_cases'
+                cuts: [0, 10, 20, 40, 100000]
+                categories: [0, 1, 2, 3]
 
-            rt_growth:
-                column_name: "rt_ratio_week_avg"
+            control_classification:
+                column_name: "rt_10days_ago_most_likely"
+                cuts: [0, 0.5, 1, 1.2, 10]
+                categories: [0, 1, 2, 3]
+
+            # TODO: create growth column
+            control_growth: 
+                column_name: "rt_10days_ago_growth"
                 cuts: [0, 0.9, 1.1, 1000]
-                categories: ['melhorando', 'estabilizando', 'piorando'] # [1, 0, -1]
+                categories: ['melhorando', 'estabilizando', 'piorando']
 
-            dday_classification:
-                column_name: 'dday_beds_best'
-                cuts: [0, 30, 60, 91.001]
-                categories: ['ruim', 'insatisfatório', 'bom'] # [-1, 0, 1]
+            capacity_classification:
+                column_name: 'dday_icu_beds_best'
+                cuts: [0, 15, 30, 60, 91.001]
+                categories: [0, 1, 2, 3]
+            
+            trust_classification:
+                column_name: 'notification_rate'
+                cuts: [0, 0.4, 0.6, 0.8, 1.001]
+                categories: [0, 1, 2, 3]
 
-            subnotification_classification:
-                column_name: 'subnotification_rate'
-                cuts: [0, 0.5, 0.7, 1.001]
-                categories: ['bom', 'insatisfatório', 'ruim']  # [1, 0, -1]
-
-            inloco_growth:
-                column_name: 'inloco_ratio_week_avgs'
-                cuts: [0, 0.9, 1.1, 1000]
-                categories: ['piorando', 'estabilizando', 'melhorando'] # [-1, 0, 1]       
-        alerts:
-            alto: 
-                conditions: {
-                    rt_classification: "ruim",
-                    rt_growth: "piorando",
-                    dday_classification: "ruim",
-                    subnotification_classification: "ruim"
-                }
-                how: "any"
-            medio: 
-                conditions: {
-                    rt_classification: "insatisfatório",
-                    rt_growth: "melhorando|estabilizando",
-                    dday_classification: "bom|insatisfatório",
-                    subnotification_classification: "bom|insatisfatório"  
-                }
-                how: "all"
-            medio2: 
-                conditions: {
-                    rt_classification: "bom|insatisfatório",
-                    rt_growth: "melhorando|estabilizando",
-                    dday_classification: "bom|insatisfatório",
-                    subnotification_classification: "insatisfatório"  
-                }
-                how: "all"
-            baixo:
-                conditions: {
-                    rt_classification: "bom",
-                    rt_growth: "melhorando|estabilizando",
-                    dday_classification: "bom|insatisfatório",
-                    subnotification_classification: "bom"            
-                }
-                how: "all"
     indicators:
         rt:
             risk: "rt_classification"
