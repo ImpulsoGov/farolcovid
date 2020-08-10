@@ -79,6 +79,9 @@ br:
                 "deaths",
                 "notification_rate",
                 "state_notification_rate"
+                "last_updated_number_icu_beds",
+                "author_number_icu_beds",
+                "number_icu_beds"
             ]   
             state_agg: {
                 "population": sum,
@@ -87,7 +90,8 @@ br:
                 "deaths": sum,
                 "state_notification_rate": max,
                 "number_beds": sum,
-                "number_ventilators": sum
+                "number_ventilators": sum,
+                "number_icu_beds": sum
             }   
             health_region_agg: {
                 "population": sum,
@@ -96,7 +100,8 @@ br:
                 "deaths": sum,
                 "notification_rate": median,
                 "number_beds": sum,
-                "number_ventilators": sum
+                "number_ventilators": sum,
+                "number_icu_beds": sum
             }  
         rules:
             rt_classification:
@@ -237,7 +242,9 @@ br:
             "author_number_ventilators",
             'number_ventilators',
             'number_beds',
-            'number_icu_beds'
+            "number_icu_beds",
+            "last_updated_number_icu_beds",
+            "author_number_icu_beds",
         ]
 
 impulso:
