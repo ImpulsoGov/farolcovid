@@ -296,6 +296,12 @@ def main(session_state):
     config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
     dfs, places_ids = get_data(config)
 
+    # INitial header div
+    # st.write(
+    # "<div class='base-wrapper'><div class='map-selection' id='map-selection'></div></div>",
+    # unsafe_allow_html=True,
+    # )
+
     # REGION/CITY USER INPUT
     user_input = dict()
     user_input["state_name"] = st.selectbox("Estado", utils.filter_place(dfs, "state"))
@@ -328,25 +334,31 @@ def main(session_state):
     )
     st.write(
         f"""
-    <iframe id="map" src="resources/iframe-gen.html?url=http://192.168.0.5:5000/map-iframe?place_id=BR" class="map-br" scroll="no">
+    <iframe id="map" src="resources/iframe-gen.html?url=http://192.168.0.5:5000/map-iframe?place_id=BR" class="map-br" scrolling="no">
     </iframe>
     """,
         unsafe_allow_html=True,
     )
     st.write(
         f"""
-    <iframe id="map-state" src="resources/iframe-gen.html?url=http://192.168.0.5:5000/map-iframe?place_id={map_place_id }" class="map-state" scroll="no">
+    <iframe id="map-state" src="resources/iframe-gen.html?url=http://192.168.0.5:5000/map-iframe?place_id={map_place_id }" class="map-state" scrolling="no">
     </iframe>
     """,
         unsafe_allow_html=True,
     )
-    st.write(
-        """
-    <iframe id="mapReader" src="resources/map-reader.html" style="width:100%;">
-    </iframe>
-    """,
-        unsafe_allow_html=True,
-    )
+    # st.write(
+    # f"""
+    # <iframe src="resources/map-div-organizer.html">
+    # </iframe>""",
+    # unsafe_allow_html=True,
+    # )
+    # st.write(
+    # """
+    # <iframe id="mapReader" src="resources/map-reader.html" style="width:100%;">
+    # </iframe>
+    # """,
+    # unsafe_allow_html=True,
+    # )
     # SOURCES PARAMS
     user_input = utils.get_sources(
         user_input, data, dfs["city"], ["beds", "ventilators", "icu_beds"]

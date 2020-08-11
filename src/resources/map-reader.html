@@ -1,9 +1,10 @@
 <head>
     <meta charset="UTF-8">
     <script>
+        //Please remove this whole file later. It was made obsolete by the js version
         function init_listener() {
-            console.log(window.parent.document.getElementById("map").contentWindow.document.getElementsByClassName("dw-chart-body")[0]);
-            window.parent.document.getElementById("map").contentWindow.document.getElementsByClassName("dw-chart-body")[0].addEventListener("click", function () {
+            console.log(window.parent.document.getElementById("map").contentWindow.document.getElementsByTagName("svg")[0]);
+            window.parent.document.getElementById("map").contentWindow.document.getElementsByTagName("svg")[0].addEventListener("click", function () {
                 window.parent.document.getElementsByClassName("st-bu st-bv st-ae st-b8 st-ak st-dc st-dd")[0].click();
                 map_iframe = window.parent.document.getElementById("map");
                 br_map_choice = map_iframe.contentWindow.document.getElementsByClassName("dw-tooltip")[0].getElementsByTagName("h2")[0];
@@ -22,8 +23,9 @@
                     }
                 }
             });
-            window.parent.document.getElementById("map-state").contentWindow.document.getElementsByClassName("dw-chart-body")[0].addEventListener("click", function () {
+            window.parent.document.getElementById("map-state").contentWindow.document.getElementsByTagName("svg")[0].addEventListener("click", function () {
                 window.parent.document.getElementsByClassName("st-bu st-bv st-ae st-b8 st-ak st-dc st-dd")[2].click();
+                window.parent.alert("lol-state")
                 map_state_iframe = window.parent.document.getElementById("map-state");
                 state_map_choice = map_state_iframe.contentWindow.document.getElementsByClassName("dw-tooltip")[0].getElementsByTagName("h2")[0];
                 result = state_map_choice.textContent;

@@ -9,8 +9,23 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 app.config["CORS_HEADERS"] = "Content-Type"
-cache_place_df = pd.read_csv("http://192.168.0.5:7000/br/maps")
-cache_place_df["cache"] = [None for i in range(cache_place_df.shape[0])]
+try:
+    cache_place_df = pd.read_csv("http://192.168.0.5:7000/br/maps")
+    cache_place_df["cache"] = [None for i in range(cache_place_df.shape[0])]
+except:
+    print("Map Datasource unreachable")
+    cache_place_df = None
+
+
+def check_for_cache_download():
+    global cache_place_df
+    if cache_place_df is None:
+        try:
+            cache_place_df = pd.read_csv("http://192.168.0.5:7000/br/maps")
+            cache_place_df["cache"] = [None for i in range(cache_place_df.shape[0])]
+        except:
+            print("Map Datasource unreachable")
+            cache_place_df = None
 
 
 def main_clone(url):
@@ -61,6 +76,21 @@ def clone_map(url):
     for script in soup.find_all("script"):
         if script.get("src") != None and script["src"][0] != "h":
             script["src"] = url + script["src"]
+    for link in soup.find_all("link"):
+        if link.get("href") != None and link["href"][0] != "h":
+            link["href"] = url + link["href"]
+    # create a new tag
+    body = soup.find("body")
+    tag = soup.new_tag("script")
+    tag[
+        "src"
+    ] = "https://datawrapper.dwcdn.net/lib/blocks/subscriptions.chart-blocks.255d0b80.js"
+    clicker = soup.new_tag("script")
+    clicker["src"] = "/resources/map-reader-internal.js"
+    body.insert_after(clicker)
+    body["onload"] = "init_listener();"
+    # insert new tag after head tag
+    # body.insert_after(tag)
     return soup.prettify()
 
 
@@ -85,7 +115,11 @@ def hello_world():
     origin="*", headers=["Content-Type", "Authorization", "access-control-allow-origin"]
 )
 def iframe_map():
-    place_df = pd.read_csv("http://192.168.0.5:7000/br/maps")
+    check_for_cache_download()
+    try:
+        place_df = pd.read_csv("http://192.168.0.5:7000/br/maps")
+    except:
+        return "Map datasource unreachable"
     try:
         place_id = request.args.get("place_id")
         new_data = place_df.loc[place_df["place_id"] == place_id]
