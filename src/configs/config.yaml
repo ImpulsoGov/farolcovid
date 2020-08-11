@@ -126,7 +126,7 @@ br:
             capacity_classification:
                 column_name: 'dday_icu_beds_best'
                 cuts: [0, 15, 30, 60, 91.001]
-                categories: [0, 1, 2, 3]
+                categories: [3, 2, 1, 0]
             
             trust_classification:
                 column_name: 'notification_rate'
