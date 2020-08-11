@@ -675,19 +675,23 @@ def genProductCard(product: Product):
     if product.recommendation == "Sugerido":
         badge_style = "primary-bg"
     elif product.recommendation == "Risco alto":
+        product.recommendation = "Espere"
         badge_style = f"red-alert-bg"
+    elif product.recommendation == "Risco baixo":
+        product.recommendation = "Explore"
+        badge_style = "primary-bg"
     else:
-        badge_style = "hide-bg"
+        badge_style = "primary-bg"
 
     return f"""<div class="flex flex-column elevated pr pl product-card mt  ">
+                <img src="{product.image}" style="height:100px;" class="card-image mt"/>
                 <div class="flex flex-row">
                         <span class="p3 header bold uppercase">{product.name}</span>
-                         <span class="{badge_style} ml secondary-badge">{product.recommendation}</span>
                 </div>
-                <span>{product.caption}</span>
-                <img src="{product.image}" style="width: 200px" class="mt"/>
-        </div>
-        """
+                <span class="selection-card-caption">{product.caption}</span>
+                <span class="{badge_style} ml secondary-badge">{product.recommendation}</span>
+                </div>
+                """
 
 
 def genProductsSection(products: List[Product]):

@@ -12,6 +12,8 @@ from model.simulator import run_simulation, get_dmonth
 # import pdf_report.pdfgen as pdfgen
 import pages.simulacovid as sm
 import pages.saude_em_ordem as so
+import pages.distanciamento as ds
+import pages.onda_covid as oc
 import plots
 import utils
 import amplitude
@@ -593,18 +595,26 @@ def main(session_state):
     #     )
     # TOOLS
     products = ProductCards
-    products[1].recommendation = f'Risco {data["overall_alert"].values[0]}'
+    products[2].recommendation = f'Risco {data["overall_alert"].values[0]}'
+    # ADD NEW CARDS
+
     utils.genProductsSection(products)
 
     # SELECTION BUTTONS
     if session_state.continuation_selection is None:
-        session_state.continuation_selection = [False, False]
+        session_state.continuation_selection = [False, False, False, False]
     simula_button_name = "Clique Aqui"  # Simula covid 0space
     saude_button_name = "Clique Aqui "  # Saude em ordem 1space
-    if st.button(simula_button_name):
-        session_state.continuation_selection = [True, False]
-    if st.button(saude_button_name):
-        session_state.continuation_selection = [False, True]
+    distancia_button_name = "Clique_Aqui"  # Distanciamento social
+    onda_button_name = "Clique_Aqui "  # onda covid
+    if st.button(simula_button_name):  # SIMULA
+        session_state.continuation_selection = [True, False, False, False]
+    if st.button(distancia_button_name):  # DISTANCIAMENTO
+        session_state.continuation_selection = [False, True, False, False]
+    if st.button(saude_button_name):  # SAUDE
+        session_state.continuation_selection = [False, False, True, False]
+    if st.button(onda_button_name):  # ONDA
+        session_state.continuation_selection = [False, False, False, True]
 
     utils.stylizeButton(
         simula_button_name,
@@ -614,10 +624,22 @@ def main(session_state):
     )
 
     utils.stylizeButton(
-        saude_button_name,
+        distancia_button_name,
         """border: 1px solid black;""",
         session_state,
         others={"ui_binSelect": 2},
+    )
+    utils.stylizeButton(
+        saude_button_name,
+        """border: 1px solid black;""",
+        session_state,
+        others={"ui_binSelect": 3},
+    )
+    utils.stylizeButton(
+        onda_button_name,
+        """border: 1px solid black;""",
+        session_state,
+        others={"ui_binSelect": 4},
     )
     if session_state.continuation_selection[0]:
         user_analytics.safe_log_event(
@@ -628,7 +650,12 @@ def main(session_state):
                 "health_region": session_state.health_region_name,
                 "city": session_state.city_name,
             },
-            alternatives=["picked saude_em_ordem", "picked simulacovid"],
+            alternatives=[
+                "picked saude_em_ordem",
+                "picked simulacovid",
+                "picked onda",
+                "picked distanciamento",
+            ],
         )
         # Downloading the saved data from memory
         user_input["number_beds"] = session_state.number_beds
@@ -638,8 +665,24 @@ def main(session_state):
         sm.main(user_input, indicators, data, config, session_state)
         # TODO: remove comment on this later!
         # utils.gen_pdf_report()
-
     elif session_state.continuation_selection[1]:
+        user_analytics.safe_log_event(
+            "picked distanciamento",
+            session_state,
+            event_args={
+                "state": session_state.state_name,
+                "health_region": session_state.health_region_name,
+                "city": session_state.city_name,
+            },
+            alternatives=[
+                "picked saude_em_ordem",
+                "picked simulacovid",
+                "picked onda",
+                "picked distanciamento",
+            ],
+        )
+        ds.main(user_input, indicators, data, config, session_state)
+    elif session_state.continuation_selection[2]:
         user_analytics.safe_log_event(
             "picked saude_em_ordem",
             session_state,
@@ -648,10 +691,31 @@ def main(session_state):
                 "health_region": session_state.health_region_name,
                 "city": session_state.city_name,
             },
-            alternatives=["picked saude_em_ordem", "picked simulacovid"],
+            alternatives=[
+                "picked saude_em_ordem",
+                "picked simulacovid",
+                "picked onda",
+                "picked distanciamento",
+            ],
         )
         so.main(user_input, indicators, data, config, session_state)
-        pass
+    elif session_state.continuation_selection[3]:
+        user_analytics.safe_log_event(
+            "picked onda",
+            session_state,
+            event_args={
+                "state": session_state.state_name,
+                "health_region": session_state.health_region_name,
+                "city": session_state.city_name,
+            },
+            alternatives=[
+                "picked saude_em_ordem",
+                "picked simulacovid",
+                "picked onda",
+                "picked distanciamento",
+            ],
+        )
+        oc.main(user_input, indicators, data, config, session_state)
 
     utils.gen_whatsapp_button(config["impulso"]["contact"])
     utils.gen_footer()

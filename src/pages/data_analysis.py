@@ -135,6 +135,7 @@ def _generate_mvg_deaths(df, place_type, mavg_days):
     return df
 
 
+@st.cache(suppress_st_warning=True)
 def prepare_heatmap(df, place_type, group=None, mavg_days=5):
 
     refresh = df["data_last_refreshed"][0]
@@ -180,21 +181,23 @@ def prepare_heatmap(df, place_type, group=None, mavg_days=5):
 
         legend = """
         <div class="base-wrapper">
-            <span class="section-header primary-span">MORTES DIÁRIAS POR ESTADO</span>
+            <span class="section-header primary-span">ONDA DE MORTES DIÁRIAS POR ESTADO</span>
             <br><br>
-            O gráfico abaixo mostra a média do número de mortes
-            diárias dos últimos cinco dias em cada UF, desde a data da
-            primeira morte reportada. Para comparação, os números foram
-            normalizados pelo maior valor encontrado em cada UF:
-            <b>quanto mais vermelho, mais próximo está o valor do
-            maior número de mortes por dia observado na UF até hoje</b>.
-            <br><br>
-            As UFs estão ordenadas pelo dia que atingiu o máximo de mortes, 
-            ou seja, UFs no pico de mortes aparecerão no topo. {}
-            é o estado com o maior número de mortos, com: <i>{}</i>
-            e o Brasil totaliza: <i>{}</i>.
-            <br><br>
-            <i>Última atualização: {}</i>
+            <div class="onda-headercaption">
+                O gráfico abaixo mostra a média do número de mortes
+                diárias dos últimos cinco dias em cada UF, desde a data da
+                primeira morte reportada. Para comparação, os números foram
+                normalizados pelo maior valor encontrado em cada UF:
+                <b>quanto mais vermelho, mais próximo está o valor do
+                maior número de mortes por dia observado na UF até hoje</b>.
+                <br><br>
+                As UFs estão ordenadas pelo dia que atingiu o máximo de mortes, 
+                ou seja, UFs no pico de mortes aparecerão no topo. {}
+                é o estado com o maior número de mortos, com: <i>{}</i>
+                e o Brasil totaliza: <i>{}</i>.
+                <br><br>
+                <i>Última atualização: {}</i>
+            </div>
         </div>
         """
 
