@@ -78,7 +78,7 @@ br:
                 "active_cases",
                 "deaths",
                 "notification_rate",
-                "state_notification_rate",
+                # "state_notification_rate",
                 "last_updated_number_icu_beds",
                 "author_number_icu_beds",
                 "number_icu_beds"
@@ -91,7 +91,8 @@ br:
                 "state_notification_rate": max,
                 "number_beds": sum,
                 "number_ventilators": sum,
-                "number_icu_beds": sum
+                "number_icu_beds": sum,
+                "notification_rate": mean, # TODO: remove after new dfs
             }   
             health_region_agg: {
                 "population": sum,
@@ -101,7 +102,8 @@ br:
                 "notification_rate": median,
                 "number_beds": sum,
                 "number_ventilators": sum,
-                "number_icu_beds": sum
+                "number_icu_beds": sum,
+                "notification_rate": mean, # TODO: remove after new dfs
             }  
         categories:
             {0: "novo normal", 1: "moderado", 2: "alto", 3: "altíssimo"}
