@@ -23,6 +23,25 @@ def get_data(config):
     return dfs, places_ids
 
 
+def gen_banners():
+    st.write(
+        """
+    <div class="base-wrapper flex flex-column" style="background-color:#F02C2E">
+        <div class="white-span header p1" style="font-size:30px;">
+        Acre está a 5 dias em crescimento da média móvel de mortes.<br>
+        O pico de mortes até agora foi de 432 mortes  em 03/08/2020.
+        </div>
+    </div>
+    <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
+        <div class="white-span header p1" style="font-size:30px;">
+        Seu município está a 10 dias em queda da média móvel de mortes.<br>
+        Seu pico de mortes foi de 53 mortes em 25/06/2020.
+        </div>
+    </div>""",
+        unsafe_allow_html=True,
+    )
+
+
 def main(user_input, indicators, data, config, session_state):
 
     st.write(
@@ -43,11 +62,13 @@ def main(user_input, indicators, data, config, session_state):
     )
 
     try:
-        # br_cases = loader.read_data(
-        # "br",
-        # loader.config,
-        # endpoint=config["br"]["api"]["endpoints"]["analysis"]["cases"],
-        # )
+        # load data
+        br_cases = loader.read_data(
+            "br",
+            loader.config,
+            endpoint=config["br"]["api"]["endpoints"]["analysis"]["cases"],
+        )
+        my_dict = utils.Dictionary()
         # da.prepare_heatmap(
         # br_cases, place_type="state_id",
         # )
@@ -68,10 +89,7 @@ def main(user_input, indicators, data, config, session_state):
     city_name = st.selectbox(
         "Município ",
         utils.filter_place(
-            dfs,
-            "city",
-            state_name=user_input["state_name"],
-            health_region_name=user_input["health_region_name"],
+            dfs, "city", state_name=state_name, health_region_name="Todos"
         ),
     )
     st.write(
@@ -84,6 +102,14 @@ def main(user_input, indicators, data, config, session_state):
     deaths_or_cases = st.selectbox(
         "Mortes ou Mortes por Casos?", ["Mortes", "Mortes por casos"]
     )
+    print("Checking")
+    if city_name != "Todos":  # the user selected something
+        gen_banners()
+        uf = my_dict.get_state_alphabetical_id_by_name(state_name)
+        print(uf)
+        da.prepare_heatmap(
+            br_cases, place_type="city_name", group=uf, your_city=city_name
+        )
     # COUNTRY HEATMAP
     # prepare_heatmap(
     # loader.read_data(

@@ -33,7 +33,7 @@ def _generate_hovertext(df_to_plotly):
     return hovertext
 
 
-def plot_heatmap(df, place_type, legend, title=None, group=None):
+def plot_heatmap(df, place_type, legend, title=None, group=None, city_name=None):
 
     if place_type == "state_id" or place_type == "city_name":
         col_date = "last_updated"
@@ -62,9 +62,15 @@ def plot_heatmap(df, place_type, legend, title=None, group=None):
         df.groupby(place_type)[col_deaths]
         .max()
         .loc[pivot.index]
-        .sort_values(ascending=False)[:30]
-        .sort_values()
+        .sort_values(ascending=False)
     )
+    print(states_total_deaths)
+    if city_name != None:
+        my_city = states_total_deaths.loc[states_total_deaths.index == city_name]
+    states_total_deaths = states_total_deaths[:30]
+    if city_name != None:
+        states_total_deaths = states_total_deaths.append(my_city)
+    states_total_deaths = states_total_deaths.sort_values()
 
     # Ordena por: 1. Dia do máximo, 2. Quantidade de Mortes
     sorted_index = (
@@ -77,7 +83,9 @@ def plot_heatmap(df, place_type, legend, title=None, group=None):
     )
 
     states_total_deaths = states_total_deaths.reindex(sorted_index)
-
+    print("orderd")
+    print(states_total_deaths)
+    states_total_deaths = states_total_deaths.apply(lambda row: row.index.name = row.index.name + )
     data = _df_to_plotly(pivot.loc[states_total_deaths.index])
     trace1 = go.Heatmap(
         data,
@@ -136,7 +144,7 @@ def _generate_mvg_deaths(df, place_type, mavg_days):
 
 
 @st.cache(suppress_st_warning=True)
-def prepare_heatmap(df, place_type, group=None, mavg_days=5):
+def prepare_heatmap(df, place_type, group=None, mavg_days=5, your_city=None):
 
     refresh = df["data_last_refreshed"][0]
 
@@ -161,7 +169,7 @@ def prepare_heatmap(df, place_type, group=None, mavg_days=5):
         legend = """
         <div class="base-wrapper">
             O gráfico abaixo mostra a média do número de mortes
-            diárias dos últimos cinco dias para os 30 municípios com mais mortes, desde a data da primeira morte reportada.
+            diárias dos últimos cinco dias para os 30 municípios com mais mortes, desde a data da primeira morte reportada e também o que você selecionou caso este não esteja entre os 30 primeiros.
             Para comparação, os números foram normalizados pelo 
             maior valor encontrado em cada município:
             <b>quanto mais vermelho, mais próximo está o valor do
@@ -240,6 +248,7 @@ def prepare_heatmap(df, place_type, group=None, mavg_days=5):
         # min_deaths=min_deaths,
         legend=legend,
         # title ="Distribuição de novas mortes nas UFs (mavg = 5 days)",
+        city_name=your_city,
     )
 
 

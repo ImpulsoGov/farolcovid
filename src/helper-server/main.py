@@ -12,8 +12,8 @@ app.config["CORS_HEADERS"] = "Content-Type"
 try:
     cache_place_df = pd.read_csv("http://192.168.0.5:7000/br/maps")
     cache_place_df["cache"] = [None for i in range(cache_place_df.shape[0])]
-except:
-    print("Map Datasource unreachable")
+except Exception as e:
+    print("Map Datasource unreachable " + str(e))
     cache_place_df = None
 
 
@@ -23,8 +23,8 @@ def check_for_cache_download():
         try:
             cache_place_df = pd.read_csv("http://192.168.0.5:7000/br/maps")
             cache_place_df["cache"] = [None for i in range(cache_place_df.shape[0])]
-        except:
-            print("Map Datasource unreachable")
+        except Exception as e:
+            print("Map Datasource unreachable" + str(e))
             cache_place_df = None
 
 
@@ -118,8 +118,8 @@ def iframe_map():
     check_for_cache_download()
     try:
         place_df = pd.read_csv("http://192.168.0.5:7000/br/maps")
-    except:
-        return "Map datasource unreachable"
+    except Exception as e:
+        return "Map datasource unreachable" + str(e)
     try:
         place_id = request.args.get("place_id")
         new_data = place_df.loc[place_df["place_id"] == place_id]
