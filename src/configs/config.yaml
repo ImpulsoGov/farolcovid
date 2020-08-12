@@ -88,22 +88,20 @@ br:
                 "confirmed_cases": sum,
                 "active_cases": sum,
                 "deaths": sum,
-                "state_notification_rate": max,
+                "notification_rate": median, # TODO: remove after new dfs
                 "number_beds": sum,
                 "number_ventilators": sum,
                 "number_icu_beds": sum,
-                "notification_rate": mean, # TODO: remove after new dfs
             }   
             health_region_agg: {
                 "population": sum,
                 "confirmed_cases": sum,
                 "active_cases": sum,
                 "deaths": sum,
-                "notification_rate": median,
+                "notification_rate": median, # TODO: remove after new dfs
                 "number_beds": sum,
                 "number_ventilators": sum,
                 "number_icu_beds": sum,
-                "notification_rate": mean, # TODO: remove after new dfs
             }  
         categories:
             {0: "novo normal", 1: "moderado", 2: "alto", 3: "altíssimo"}
