@@ -113,13 +113,13 @@ br:
                 categories: [0, 1, 2, 3]
 
             control_classification:
-                column_name: "rt_10days_ago_most_likely"
+                column_name: "rt_most_likely"
                 cuts: [0, 0.5, 1, 1.2, 10]
                 categories: [0, 1, 2, 3]
 
             # TODO: create growth column
             control_growth: 
-                column_name: "rt_10days_ago_growth"
+                column_name: "rt_growth"
                 cuts: [0, 0.9, 1.1, 1000]
                 categories: ['melhorando', 'estabilizando', 'piorando']
 
