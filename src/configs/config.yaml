@@ -108,7 +108,7 @@ br:
         rules:
             # TODO: change new_cases column
             situation_classification:
-                column_name: 'new_cases_1m_mavg'
+                column_name: 'daily_cases_mavg_1mi'
                 cuts: [0, 10, 20, 40, 100000]
                 categories: [0, 1, 2, 3]
 
