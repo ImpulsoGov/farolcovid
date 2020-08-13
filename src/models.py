@@ -42,24 +42,26 @@ class Illustration(enum.Enum):
 
 
 class IndicatorType(enum.Enum):
-    RT = "rt"
-    SUBNOTIFICATION_RATE = "subnotification_rate"
-    HOSPITAL_CAPACITY = "hospital_capacity"
-    SOCIAL_ISOLATION = "social_isolation"
+    SITUATION = "situation"
+    CONTROL = "control"
+    CAPACITY = "capacity"
+    TRUST = "trust"
 
 
 class AlertBackground(enum.Enum):
     hide = ""
-    green = "baixo"
-    yellow = "médio"
-    red = "alto"
+    blue = "novo normal"
+    yellow = "moderado"
+    orange = "alto"
+    red = "altíssimo"
 
 
 class IndicatorBackground(enum.Enum):
     hide = "nan"
-    green = "bom"
-    yellow = "insatisfatório"
-    red = "ruim"
+    blue = "0.0"
+    yellow = "1.0"
+    orange = "2.0"
+    red = "3.0"
     inloco = "Fonte: inloco"
 
 
@@ -143,32 +145,32 @@ Strategies: List[ContainmentStrategy] = [
 ]
 
 IndicatorCards: Dict[str, Indicator] = {
-    IndicatorType.RT.value: Indicator(
-        header="Ritmo de Contágio",
-        caption="Cada contaminado infecta em média outras",
-        unit="pessoas",
+    IndicatorType.SITUATION.value: Indicator(
+        header="SITUAÇÃO",
+        caption="Casos por dia por 100 mil habitantes:",
+        unit="",
         left_label="Semana passada:",
         right_label="Tendência 📈:",
     ),
-    IndicatorType.SUBNOTIFICATION_RATE.value: Indicator(
-        header="Subnotificação",
-        caption="A cada 10 pessoas doentes,",
-        unit="são diagnosticadas",
-        left_label="Casos confirmados:",
-        right_label="Ranking da UF:",
+    IndicatorType.CONTROL.value: Indicator(
+        header="CONTROLE",
+        caption="",
+        unit="There is no public data on testing.",
+        left_label="Rt:",
+        right_label="Tendência 📈:",
     ),
-    IndicatorType.HOSPITAL_CAPACITY.value: Indicator(
-        header="Capacidade Hospitalar",
-        caption="Os seus leitos estarão todos ocupados em",
+    IndicatorType.CAPACITY.value: Indicator(
+        header="CAPACIDADE",
+        caption="A capacidade hospitalar será atingida em",
         unit="mês(es)",
-        left_label="Leitos*:",
-        right_label="Leitos UTI:",
+        left_label="Número de Leitos*:",
+        right_label="Capacidade de UTI:",
     ),
-    IndicatorType.SOCIAL_ISOLATION.value: Indicator(
-        header="Isolamento Social",
-        caption="Na última semana, ficaram em casa cerca de",
-        unit="das pessoas",
-        left_label="Média semana passada:",
+    IndicatorType.TRUST.value: Indicator(
+        header="CONFIANÇA",
+        caption="A cada 10 pessoas infectadas, somente ",
+        unit="são diagnosticadas",
+        left_label="Mortes por dia:",
         right_label="Tendência 📈:",
     ),
 }

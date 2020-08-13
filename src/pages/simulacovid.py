@@ -27,9 +27,11 @@ from pandas import Timestamp
 
 
 def calculate_recovered(user_input, data):
-
+    print(data)
     confirmed_adjusted = int(
-        data[["confirmed_cases"]].sum() / data["notification_rate"].values[0]
+        # data[["confirmed_cases"]].sum() / data["notification_rate"].values[0]
+        data[["confirmed_cases"]].sum()
+        / 1
     )
 
     if confirmed_adjusted == 0:  # dont have any cases yet
@@ -139,7 +141,7 @@ def main(user_input, indicators, data, config, session_state):
                 min_range_ventilators=dday_ventilators["worst"],
                 max_range_ventilators=dday_ventilators["best"],
                 min_range_icu_beds=dday_icu_beds["worst"],
-                max_range_icu_beds=dday_icu_beds["best"]
+                max_range_icu_beds=dday_icu_beds["best"],
             ),
             plot_simulation(dfs, user_input),
         )

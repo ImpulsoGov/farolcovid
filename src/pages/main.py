@@ -52,7 +52,13 @@ def default_indicator(data, col, position, group):
 def update_indicators(indicators, data, config, user_input, session_state):
 
     # TODO: indicadores quando cidade não posssui dados
-    for group in config["br"]["indicators"].keys():
+    print(indicators)
+    for group in [
+        i
+        for i in config["br"]["indicators"].keys()
+        if i
+        not in ["social_isolation", "hospital_capacity", "subnotification_rate", "rt"]
+    ]:
 
         ref = [
             config["br"]["indicators"][group]["risk"]
@@ -61,33 +67,49 @@ def update_indicators(indicators, data, config, user_input, session_state):
         ][0]
 
         # Displays
-        indicators[group].display = fix_type(
-            data[config["br"]["indicators"][group]["display"]].fillna("- ").values[0],
-            group,
-        )
+        print(group)
+        # REDO THIS LATER
+        if config["br"]["indicators"][group]["display"] != "None":
+            indicators[group].display = fix_type(
+                data[config["br"]["indicators"][group]["display"]]
+                .fillna("- ")
+                .values[0],
+                group,
+            )
+        else:
+            indicators[group].display = "None"
 
         # Risk
-        indicators[group].risk = [
-            str(data[config["br"]["indicators"][group]["risk"]].values[0])
-            if group != "social_isolation"
-            else "Fonte: inloco"
-        ][0]
+        if config["br"]["indicators"][group]["risk"] != "None":
+            indicators[group].risk = [
+                str(data[config["br"]["indicators"][group]["risk"]].values[0])
+                if group != "social_isolation" and group != "control"
+                else "Fonte: inloco"
+            ][0]
+        else:
+            indicators[group].risk = "None"
 
         # Left display
-        indicators[group].left_display = fix_type(
-            data[config["br"]["indicators"][group]["left_display"]]
-            .fillna("- ")
-            .values[0],
-            group,
-        )
+        if config["br"]["indicators"][group]["left_display"] != "None":
+            indicators[group].left_display = fix_type(
+                data[config["br"]["indicators"][group]["left_display"]]
+                .fillna("- ")
+                .values[0],
+                group,
+            )
+        else:
+            indicators[group].left_display = "None"
 
         # Right display
-        indicators[group].right_display = fix_type(
-            data[config["br"]["indicators"][group]["right_display"]]
-            .fillna("- ")
-            .values[0],
-            group,
-        )
+        if config["br"]["indicators"][group]["right_display"] != "None":
+            indicators[group].right_display = fix_type(
+                data[config["br"]["indicators"][group]["right_display"]]
+                .fillna("- ")
+                .values[0],
+                group,
+            )
+        else:
+            indicators[group].right_display = "None"
 
         if data[ref].fillna("").values[0] == "":
 
@@ -98,9 +120,9 @@ def update_indicators(indicators, data, config, user_input, session_state):
                 indicators[group].right_display = "- "
                 indicators[group].left_display = "- "
 
-    indicators["subnotification_rate"].left_display = session_state.number_cases
-    indicators["hospital_capacity"].left_display = int(session_state.number_beds)
-    indicators["hospital_capacity"].right_display = int(session_state.number_icu_beds)
+    # indicators["subnotification_rate"].left_display = session_state.number_cases
+    # indicators["hospital_capacity"].left_display = int(session_state.number_beds)
+    # indicators["hospital_capacity"].right_display = int(session_state.number_icu_beds)
 
     # Caso o usuário altere os casos confirmados, usamos esse novo valor para a estimação
     # TODO: vamos acabar com o user_iput e manter só session_state?
@@ -124,8 +146,8 @@ def update_indicators(indicators, data, config, user_input, session_state):
         2: {"preffix": "até 2", "class": "insatisfatório"},
         3: {"preffix": "+ de 2", "class": "bom"},
     }
-    indicators["hospital_capacity"].risk = dic_dmonth[dmonth]["class"]
-    indicators["hospital_capacity"].display = dic_dmonth[dmonth]["preffix"]
+    # indicators["hospital_capacity"].risk = dic_dmonth[dmonth]["class"]
+    # indicators["hospital_capacity"].display = dic_dmonth[dmonth]["preffix"]
 
     return indicators
 
@@ -161,10 +183,10 @@ def choose_rt(user_input, dfs, level):
         user_input["rt_level"] = "nan"
         return user_input
 
-    elif len(df["rt_10days_ago_low"].values) > 0:
+    elif len(df["rt_low_95"].values) > 0:
         user_input["rt_values"] = {
-            "best": df["rt_10days_ago_low"].values[0],
-            "worst": df["rt_10days_ago_high"].values[0],
+            "best": df["rt_low_95"].values[0],
+            "worst": df["rt_high_95"].values[0],
         }
 
         user_input["rt_level"] = [
@@ -330,6 +352,7 @@ def main(session_state):
     )
 
     user_input, data = update_user_input_places(user_input, dfs, config)
+    print(data)
     # MAP
     map_place_id = utils.Dictionary().get_state_alphabetical_id_by_name(
         user_input["state_name"]
@@ -376,9 +399,9 @@ def main(session_state):
     }
 
     user_input["Rt"] = {
-        "best": data["rt_10days_ago_low"].values[0],
-        "worst": data["rt_10days_ago_high"].values[0],
-        "is_valid": data["rt_classification"].apply(str).values[0],
+        "best": data["rt_low_95"].values[0],
+        "worst": data["rt_high_95"].values[0],
+        "is_valid": data["rt_most_likely"].apply(str).values[0],
     }
 
     user_input["last_updated_cases"] = data["last_updated_subnotification"].max()
@@ -430,13 +453,15 @@ def main(session_state):
             config["br"]["seir_parameters"]["severe_duration"]
             + config["br"]["seir_parameters"]["critical_duration"]
         )
+        placeholder_value_pls_solve_this = 0
+        # de notificação ajustada para o município ou estado de ({int(100*data['notification_rate'].values[0])}%)
         st.write(
             f"""<div class="base-wrapper">
         O número de casos confirmados oficialmente no seu município ou estado é de {int(data['confirmed_cases'].sum())} em {pd.to_datetime(data["data_last_refreshed"].values[0]).strftime("%d/%m/%Y")}. 
-        Dada a progressão clínica da doença (em média, {infectious_period} dias) e a taxa de notificação ajustada para o município ou estado de ({int(100*data['notification_rate'].values[0])}%), 
+        Dada a progressão clínica da doença (em média, {infectious_period} dias) e a taxa de notificação ajustada para o município ou estado de ({placeholder_value_pls_solve_this}%), 
         <b>estimamos que o número de casos ativos é de {int(data['active_cases'].sum())}</b>.<br>
         <br>Caso queria, você pode mudar esse número para a simulação abaixo:
-                </div>""",
+        </div>""",
             unsafe_allow_html=True,
         )
 

@@ -42,6 +42,15 @@ def gen_banners():
     )
 
 
+@st.cache(suppress_st_warning=True)
+def loading_cached():
+    return loader.read_data(
+        "br",
+        loader.config,
+        endpoint=loader.config["br"]["api"]["endpoints"]["analysis"]["cases"],
+    )
+
+
 def main(user_input, indicators, data, config, session_state):
 
     st.write(
@@ -63,15 +72,13 @@ def main(user_input, indicators, data, config, session_state):
 
     try:
         # load data
-        br_cases = loader.read_data(
-            "br",
-            loader.config,
-            endpoint=config["br"]["api"]["endpoints"]["analysis"]["cases"],
-        )
+        print("loading br cases")
+        br_cases = loading_cached()
+        print("finished laoding br cases")
         my_dict = utils.Dictionary()
-        # da.prepare_heatmap(
-        # br_cases, place_type="state_id",
-        # )
+        da.prepare_heatmap(  # BRASIL MAP
+            br_cases, place_type="state_id",
+        )
         pass
     except Exception as e:
         st.write(str(e))
@@ -99,21 +106,30 @@ def main(user_input, indicators, data, config, session_state):
         </div>""",
         unsafe_allow_html=True,
     )
-    deaths_or_cases = st.selectbox(
-        "Mortes ou Mortes por Casos?", ["Mortes", "Mortes por casos"]
+    deaths_or_cases = (
+        st.selectbox("Mortes ou Mortes por Casos?", ["Mortes", "Mortes por casos"])
+        == "Mortes por casos"
     )
-    print("Checking")
+    print("checking")
     if city_name != "Todos":  # the user selected something
-        gen_banners()
+        print("passed")
+        br_cases = br_cases[br_cases["state_name"] == state_name]  # .reset_index()
+        # gen_banners()
         uf = my_dict.get_state_alphabetical_id_by_name(state_name)
-        print(uf)
         da.prepare_heatmap(
-            br_cases, place_type="city_name", group=uf, your_city=city_name
+            br_cases,
+            place_type="city_name",
+            group=uf,
+            your_city=city_name,
+            deaths_per_cases=deaths_or_cases,
         )
+        print("finished preparation")
     # COUNTRY HEATMAP
-    # prepare_heatmap(
-    # loader.read_data(
-    # "br", loader.config, endpoint=config["br"]["api"]["endpoints"]["analysis"]["owid"]
-    # ),
-    # place_type="country_pt",
-    # )
+    da.prepare_heatmap(
+        loader.read_data(
+            "br",
+            loader.config,
+            endpoint=config["br"]["api"]["endpoints"]["analysis"]["owid"],
+        ),
+        place_type="country_pt",
+    )

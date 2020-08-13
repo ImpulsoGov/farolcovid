@@ -9,6 +9,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 app.config["CORS_HEADERS"] = "Content-Type"
+# This will try to load the data and save it in cache, if this is not able to do so we might try again later
 try:
     cache_place_df = pd.read_csv("http://192.168.0.5:7000/br/maps")
     cache_place_df["cache"] = [None for i in range(cache_place_df.shape[0])]
@@ -16,7 +17,7 @@ except Exception as e:
     print("Map Datasource unreachable " + str(e))
     cache_place_df = None
 
-
+# For trying to redownload the cache in case of failure at initialization
 def check_for_cache_download():
     global cache_place_df
     if cache_place_df is None:
@@ -29,6 +30,7 @@ def check_for_cache_download():
 
 
 def main_clone(url):
+    """ Simply clones the webpage, with no cleaning"""
     # Browser
     br = mechanize.Browser()
 
@@ -56,10 +58,13 @@ def main_clone(url):
     ]
     html = br.open(url).read()
     soup = bs4.BeautifulSoup(html, "html.parser")
-    return soup
+    return soup  # gets our cloned page, but we still have some more cleaning to do
 
 
 def clone_with_src(url):
+    """ Clones but also redirects the URL so that the scripts hosted in that server will stil work.
+        (At least most of the times)
+    """
     soup = main_clone(url)
     for script in soup.find_all("script"):
         if script.get("src") != None and script["src"][0] != "h":
@@ -68,38 +73,51 @@ def clone_with_src(url):
 
 
 def simple_clone(url):
+    """ Just clones and makes it pretty by identing and etc"""
     return main_clone(url).prettify()
 
 
-def clone_map(url):
+def clone_map(url, is_brazil=False):
+    """ Clones our map webpage by replacing the script sources, link sources and adding new scripts hosted on our main streamlit server"""
     soup = main_clone(url)
-    for script in soup.find_all("script"):
+    for script in soup.find_all("script"):  # Replaces the sources of scripts
         if script.get("src") != None and script["src"][0] != "h":
             script["src"] = url + script["src"]
-    for link in soup.find_all("link"):
+    for link in soup.find_all("link"):  # Same with links
         if link.get("href") != None and link["href"][0] != "h":
             link["href"] = url + link["href"]
     # create a new tag
     body = soup.find("body")
-    tag = soup.new_tag("script")
-    tag[
-        "src"
-    ] = "https://datawrapper.dwcdn.net/lib/blocks/subscriptions.chart-blocks.255d0b80.js"
+
     clicker = soup.new_tag("script")
-    clicker["src"] = "/resources/map-reader-internal.js"
-    body.insert_after(clicker)
-    body["onload"] = "init_listener();"
-    # insert new tag after head tag
-    # body.insert_after(tag)
+    if is_brazil:
+        clicker["src"] = "/resources/map-reader-internal-country.js"
+    else:
+        clicker["src"] = "/resources/map-reader-internal-state.js"
+    body.insert_after(
+        clicker
+    )  # Adds the click listeners to engage with the parent page, which is farol
+    body[
+        "onload"
+    ] = "init_listener();"  # Makes it so that the listeners are initialized at iframe load
+
     return soup.prettify()
 
 
 def clone_two_levels(url):
+    """ For cloning of stuff that already interacts with parent windows"""
     soup = main_clone(url)
     for script in soup.find_all("script"):
         if script.get("src") != None and script["src"][0] != "h":
             script["src"] = url + script["src"]
     return soup.prettify().replace("window.parent", "window.parent.parent")
+
+
+# THESE CROSS ORIGIN DECORATORS ARE SUPER IMPORTANT FOR OU CROSS-SITE SCRIPTING
+# BECAUSE BASICALLY THEY SAY WE ARE AN OPEN API, WHICH ALLOWS US AND
+# OTHERS TO GET OUR MAPS, AS WELL AS USE THEM IT ON STREAMLIT APPLICATIONS BY
+# FOLLOWING THE SAME PROTOCOL FOR FINDING THE STATE AND CITY SELECTION BOX
+# THE STATE SELECTION BOX IS THE FIRST OF THE PAGE AND THE CITY SELECTION BOX IS THE THIRD
 
 
 @app.route("/")
@@ -115,25 +133,41 @@ def hello_world():
     origin="*", headers=["Content-Type", "Authorization", "access-control-allow-origin"]
 )
 def iframe_map():
-    check_for_cache_download()
+    """ Map cloning endpoint
+        Must be acessed by also providing a get argument called place_id
+        ex: ?place_id=SP for São Paul state
+        Gives the User our cloned datawrapper map with our custom javascript coded injected
+    """
+    check_for_cache_download()  # Checks for existing cache
     try:
-        place_df = pd.read_csv("http://192.168.0.5:7000/br/maps")
-    except Exception as e:
-        return "Map datasource unreachable" + str(e)
+        place_df = pd.read_csv(
+            "http://192.168.0.5:7000/br/maps"
+        )  # Reads our datasource for info of where to find the original plots
+        # and what build version they are
+    except:
+        return "Map datasource unreachable"
     try:
-        place_id = request.args.get("place_id")
+        try:
+            place_id = request.args.get("place_id")
+        except:
+            return "Place ID missing"
+        is_brazil = place_id == "BR"
         new_data = place_df.loc[place_df["place_id"] == place_id]
-        map_id = new_data["map_id"].values[0]
-        old_data = cache_place_df[cache_place_df["place_id"] == place_id]
+        map_id = new_data["map_id"].values[0]  # Datawrapper id of our map
+        old_data = cache_place_df[
+            cache_place_df["place_id"] == place_id
+        ]  # Old data we have in store of that same state
         old_index = old_data.index[0]
         if (
             old_data["hashes"].values[0] == new_data["hashes"].values[0]
             and old_data["map_id"].values[0] == new_data["map_id"].values[0]
             and old_data["cache"].values[0] == None
         ):
-            # its time to update with the new code
+            # its time to inser in our empty cache with the HTML code
             try:
-                map_code = clone_map(f"https://datawrapper.dwcdn.net/{map_id}/")
+                map_code = clone_map(
+                    f"https://datawrapper.dwcdn.net/{map_id}/", is_brazil=is_brazil
+                )
                 cache_place_df.iloc[old_index]["cache"] = map_code
                 return map_code
             except Exception as e:
@@ -142,17 +176,19 @@ def iframe_map():
             old_data["hashes"].values[0] == new_data["hashes"].values[0]
             and old_data["map_id"].values[0] == new_data["map_id"].values[0]
         ):
-            # Its already in cache
+            # Its already in cache, just return it
             return cache_place_df.iloc[old_index]["cache"]
         else:
-            # overriding the cache
-            map_code = clone_map(f"https://datawrapper.dwcdn.net/{map_id}/")
+            # overriding the cache with new cache info and html code
+            map_code = clone_map(
+                f"https://datawrapper.dwcdn.net/{map_id}/", is_brazil=is_brazil
+            )
             cache_place_df.iloc[old_index]["cache"] = map_code
             cache_place_df.iloc[old_index]["hashes"] = new_data["hashes"].values[0]
             cache_place_df.iloc[old_index]["map_id"] = new_data["map_id"].values[0]
             return map_code
     except exception as e:
-        return "Place id either not given or not found in our database : " + str(e)
+        return "A unknown exception has occured : " + str(e)
 
 
 if __name__ == "__main__":
