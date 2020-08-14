@@ -49,6 +49,15 @@ def default_indicator(data, col, position, group):
     return fix_type(data[col[position]].fillna("- ").values[0], group)
 
 
+def gen_indicator_explanation():
+    st.write(
+        f"""
+    Explanaton goes here
+    """,
+        unsafe_allow_html=True,
+    )
+
+
 def update_indicators(indicators, data, config, user_input, session_state):
 
     # TODO: indicadores quando cidade não posssui dados
@@ -361,7 +370,7 @@ def main(session_state):
         map_url = config["br"]["api"]["mapserver_local"]
     else:
         map_url = config["br"]["api"]["mapserver_external"]
-    #remove as well
+    # remove as well
     map_url = "http://192.168.0.5:5000/"
     st.write(
         f"""
@@ -483,6 +492,7 @@ def main(session_state):
 
     # INDICATORS CARDS
     indicators = IndicatorCards
+    gen_indicator_explanation()
     indicators = update_indicators(indicators, data, config, user_input, session_state)
 
     if "state" in user_input["place_type"]:

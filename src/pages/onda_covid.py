@@ -57,7 +57,7 @@ def main(user_input, indicators, data, config, session_state):
         f"""
         <div class="base-wrapper distanciamento-titlebox">
             <div class="distanciamento-titleboxtext">
-                <div class="distanciamento-title">ONDA COVID (PROV)</div>
+                <div class="distanciamento-title">ONDA COVID</div>
                 <div class="distanciamento-titlecaption">
                 Veja no gráfico como está seu estado na curva de contágio do novo coronavírus.<br>
                 Você também pode selecionar o seu estado e município no menu abaixo e comparar ele com outros municípios do mesmo estado.

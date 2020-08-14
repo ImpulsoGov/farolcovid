@@ -980,7 +980,8 @@ header>.toolbar { /* Hide toolbar menu */
 
 
 .product-section {
-    margin-top: 150px;
+    margin-top: none;
+    padding:0.5rem;
 }
 
 /* .pdf-button {
@@ -1004,7 +1005,7 @@ header>.toolbar { /* Hide toolbar menu */
     }
 
     .product-section {
-        margin-top: 1550px;
+        margin-top: none;
     }
 }
 
