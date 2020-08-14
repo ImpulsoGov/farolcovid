@@ -121,8 +121,8 @@ def update_indicators(indicators, data, config, user_input, session_state):
                 indicators[group].left_display = "- "
 
     # indicators["subnotification_rate"].left_display = session_state.number_cases
-    # indicators["hospital_capacity"].left_display = int(session_state.number_beds)
-    # indicators["hospital_capacity"].right_display = int(session_state.number_icu_beds)
+    indicators["capacity"].left_display = int(session_state.number_beds)
+    indicators["capacity"].right_display = int(session_state.number_icu_beds)
 
     # Caso o usuário altere os casos confirmados, usamos esse novo valor para a estimação
     # TODO: vamos acabar com o user_iput e manter só session_state?
@@ -357,16 +357,22 @@ def main(session_state):
     map_place_id = utils.Dictionary().get_state_alphabetical_id_by_name(
         user_input["state_name"]
     )
+    if os.getenv("IS_LOCAL") == "TRUE":
+        map_url = config["br"]["api"]["mapserver_local"]
+    else:
+        map_url = config["br"]["api"]["mapserver_external"]
+    #remove as well
+    map_url = "http://192.168.0.5:5000/"
     st.write(
         f"""
-    <iframe id="map" src="resources/iframe-gen.html?url=http://192.168.0.5:5000/map-iframe?place_id=BR" class="map-br" scrolling="no">
+    <iframe id="map" src="resources/iframe-gen.html?url={map_url}map-iframe?place_id=BR" class="map-br" scrolling="no">
     </iframe>
     """,
         unsafe_allow_html=True,
     )
     st.write(
         f"""
-    <iframe id="map-state" src="resources/iframe-gen.html?url=http://192.168.0.5:5000/map-iframe?place_id={map_place_id }" class="map-state" scrolling="no">
+    <iframe id="map-state" src="resources/iframe-gen.html?url={map_url}map-iframe?place_id={map_place_id}" class="map-state" scrolling="no">
     </iframe>
     """,
         unsafe_allow_html=True,
@@ -390,13 +396,22 @@ def main(session_state):
     )
 
     # POPULATION PARAMS
-    user_input["population_params"] = {
-        "N": int(data["population"].fillna(0).values[0]),
-        "D": int(data["deaths"].fillna(0).values[0]),
-        "I": int(data["active_cases"].fillna(0).values[0]),
-        "I_confirmed": int(data["confirmed_cases"].fillna(0).values[0]),
-        "I_compare": int(data["confirmed_cases"].fillna(0).values[0]),
-    }
+    try:
+        user_input["population_params"] = {
+            "N": int(data["population"].fillna(0).values[0]),
+            "D": int(data["deaths"].fillna(0).values[0]),
+            "I": int(data["active_cases"].fillna(0).values[0]),
+            "I_confirmed": int(data["confirmed_cases"].fillna(0).values[0]),
+            "I_compare": int(data["confirmed_cases"].fillna(0).values[0]),
+        }
+    except:
+        user_input["population_params"] = {
+            "N": int(data["population"].fillna(0).values[0]),
+            "D": int(data["deaths"].fillna(0).values[0]),
+            "I": 0,
+            "I_confirmed": int(data["confirmed_cases"].fillna(0).values[0]),
+            "I_compare": int(data["confirmed_cases"].fillna(0).values[0]),
+        }
 
     user_input["Rt"] = {
         "best": data["rt_low_95"].values[0],
@@ -455,11 +470,12 @@ def main(session_state):
         )
         placeholder_value_pls_solve_this = 0
         # de notificação ajustada para o município ou estado de ({int(100*data['notification_rate'].values[0])}%)
+        # <b>estimamos que o número de casos ativos é de {int(data['active_cases'].sum())}</b>
         st.write(
             f"""<div class="base-wrapper">
         O número de casos confirmados oficialmente no seu município ou estado é de {int(data['confirmed_cases'].sum())} em {pd.to_datetime(data["data_last_refreshed"].values[0]).strftime("%d/%m/%Y")}. 
         Dada a progressão clínica da doença (em média, {infectious_period} dias) e a taxa de notificação ajustada para o município ou estado de ({placeholder_value_pls_solve_this}%), 
-        <b>estimamos que o número de casos ativos é de {int(data['active_cases'].sum())}</b>.<br>
+        <b>estimamos que o número de casos ativos é de {0}</b>.<br>
         <br>Caso queria, você pode mudar esse número para a simulação abaixo:
         </div>""",
             unsafe_allow_html=True,
@@ -602,11 +618,12 @@ def main(session_state):
     # AMBASSADOR SECTION
     utils.gen_ambassador_section()
 
-    indicators["hospital_capacity"].left_display = user_input["number_beds"]
-    indicators["hospital_capacity"].right_display = user_input["number_icu_beds"]
-    indicators["subnotification_rate"].left_display = user_input["population_params"][
-        "D"
-    ]
+    # indicators["hospital_capacity"].left_display = user_input["number_beds"]
+    # indicators["hospital_capacity"].right_display = user_input["number_icu_beds"]
+    # indicators["subnotification_rate"].left_display = user_input["population_params"][
+    # "D"
+    # ]
+
     # PDF-REPORT GEN BUTTON
     # if st.button("Gerar Relatório PDF"):
     #     user_analytics.log_event("generated pdf")

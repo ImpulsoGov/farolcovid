@@ -600,14 +600,32 @@ def genIndicatorCard(indicator: Indicator):
     else:
         risk_html_class = "bold white-span p4"
     print(indicator.risk)
+    return f"""
+    <div class="saude-indicator-card flex flex-column mr" style="z-index:1;display:inline-block;position:relative;">
+        <span class="saude-card-header-v2">{indicator.header}</span>
+        <span class="saude-card-list-v2">{indicator.caption}</span>
+        <div class="flex flex-row flex-justify-space-between mt" style="width:250px;">
+        </div>
+        <div class="{IndicatorBackground(try_int(indicator.risk)).name}-alert-bg risk-pill " style="position:absolute;bottom:120px;">
+            <span class="{risk_html_class}">{indicator.risk}</span>
+        </div>
+        <div class="saude-card-display-text-v2 sdcardtext-left">
+                <span class="lighter">{indicator.left_label}<br></span>
+                <span class="bold">{indicator.left_display}</span>
+        </div>
+        <div class="saude-card-display-text-v2 sdcardtext-right">
+                <span class="lighter">{indicator.right_label}<br></span>
+                <span class="bold">{indicator.right_display}</span>
+        </div>
+    </div>"""
     return f"""<div class="indicator-card flex flex-column mr">
                         <span class="header p3">{indicator.header}</span>
                         <span class="p4">{indicator.caption}</span>
                         <span class="bold p2">{indicator.display}<span class="bold p5"> {indicator.unit}</span></span>
-                        <div class="{IndicatorBackground(indicator.risk).name}-alert-bg risk-pill">
+                        <div class="{IndicatorBackground(try_int(indicator.risk)).name}-alert-bg risk-pill">
                                 <span class="{risk_html_class}">{indicator.risk}</span>
                         </div>
-                        <div class="flex flex-row flex-justify-space-between mt"> 
+                        <div class="flex flex-row flex-justify-space-between mt" > 
                                 <div class="br {display_left} flex-column text-align-center pr">
                                         <span class="lighter">{indicator.left_label}</span>
                                         <span class="bold">{indicator.left_display}</span>
@@ -858,6 +876,13 @@ def genChartSimulationSection(simulation: SimulatorOutput, fig) -> None:
     )
 
     st.plotly_chart(fig, use_container_width=True)
+
+
+def try_int(possible_int):
+    try:
+        return int(float(possible_int))
+    except Exception as e:
+        return possible_int
 
 
 # def genVideoTutorial():

@@ -19,9 +19,11 @@
     --minor-padding: 0.5em;
     --main-border-radius: 20px;
     --main-border-radius-pill: 50px;
-    --main-red-alert: #FF5F6B;
+    --main-red-alert: #F02C2E;
     --main-green-alert: #17A700;
-    --main-yellow-alert:  #F2C94C;
+    --main-yellow-alert:  #F7B500;
+    --main-orange-alert: #F77800;
+    --main-blue-alert: #0090A7;
 }
 
 /* keyframes */

@@ -4,25 +4,34 @@ import mechanize
 import bs4
 from flask_cors import CORS, cross_origin
 import pandas as pd
+import yaml
+from dotenv import load_dotenv
+from pathlib import Path
+import os
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 app.config["CORS_HEADERS"] = "Content-Type"
-# This will try to load the data and save it in cache, if this is not able to do so we might try again later
-try:
-    cache_place_df = pd.read_csv("http://192.168.0.5:7000/br/maps")
-    cache_place_df["cache"] = [None for i in range(cache_place_df.shape[0])]
-except Exception as e:
-    print("Map Datasource unreachable " + str(e))
-    cache_place_df = None
 
+# URL INITIALIZATION
+env_path = Path("..") / ".env"
+load_dotenv(dotenv_path=env_path, override=True)
+config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
+
+if os.getenv("IS_LOCAL") == "TRUE":
+    datasource_url = config["br"]["api"]["local"]
+else:
+    datasource_url = config["br"]["api"]["external"]
+# Remove before publication
+# datasource_url = "http://192.168.0.5:7000/"
+datasource_url = datasource_url + config["br"]["api"]["endpoints"]["maps"]
 # For trying to redownload the cache in case of failure at initialization
 def check_for_cache_download():
     global cache_place_df
     if cache_place_df is None:
         try:
-            cache_place_df = pd.read_csv("http://192.168.0.5:7000/br/maps")
+            cache_place_df = pd.read_csv(datasource_url)
             cache_place_df["cache"] = [None for i in range(cache_place_df.shape[0])]
         except Exception as e:
             print("Map Datasource unreachable" + str(e))
@@ -141,7 +150,7 @@ def iframe_map():
     check_for_cache_download()  # Checks for existing cache
     try:
         place_df = pd.read_csv(
-            "http://192.168.0.5:7000/br/maps"
+            datasource_url
         )  # Reads our datasource for info of where to find the original plots
         # and what build version they are
     except:
@@ -192,5 +201,13 @@ def iframe_map():
 
 
 if __name__ == "__main__":
+    # This will try to load the data and save it in cache, if this is not able to do so we might try again later
+    try:
+        cache_place_df = pd.read_csv(datasource_url)
+        cache_place_df["cache"] = [None for i in range(cache_place_df.shape[0])]
+    except Exception as e:
+        print("Map Datasource unreachable " + str(e))
+        cache_place_df = None
+
     app.run(host="0.0.0.0", port=5000, debug=False)
 

@@ -58,10 +58,10 @@ class AlertBackground(enum.Enum):
 
 class IndicatorBackground(enum.Enum):
     hide = "nan"
-    blue = "0.0"
-    yellow = "1.0"
-    orange = "2.0"
-    red = "3.0"
+    blue = 0
+    yellow = 1
+    orange = 2
+    red = 3
     inloco = "Fonte: inloco"
 
 
