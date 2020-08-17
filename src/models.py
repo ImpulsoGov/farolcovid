@@ -42,24 +42,26 @@ class Illustration(enum.Enum):
 
 
 class IndicatorType(enum.Enum):
-    RT = "rt"
-    SUBNOTIFICATION_RATE = "subnotification_rate"
-    HOSPITAL_CAPACITY = "hospital_capacity"
-    SOCIAL_ISOLATION = "social_isolation"
+    SITUATION = "situation"
+    CONTROL = "control"
+    CAPACITY = "capacity"
+    TRUST = "trust"
 
 
 class AlertBackground(enum.Enum):
     hide = ""
-    green = "baixo"
-    yellow = "médio"
-    red = "alto"
+    blue = "novo normal"
+    yellow = "moderado"
+    orange = "alto"
+    red = "altíssimo"
 
 
 class IndicatorBackground(enum.Enum):
     hide = "nan"
-    green = "bom"
-    yellow = "insatisfatório"
-    red = "ruim"
+    blue = 0
+    yellow = 1
+    orange = 2
+    red = 3
     inloco = "Fonte: inloco"
 
 
@@ -143,33 +145,33 @@ Strategies: List[ContainmentStrategy] = [
 ]
 
 IndicatorCards: Dict[str, Indicator] = {
-    IndicatorType.RT.value: Indicator(
-        header="Ritmo de Contágio",
-        caption="Cada contaminado infecta em média outras",
-        unit="pessoas",
-        left_label="Semana passada:",
-        right_label="Tendência 📈:",
+    IndicatorType.SITUATION.value: Indicator(
+        header="SITUAÇÃO DA DOENÇA",
+        caption="Hoje são <b>reportados</b>❗ em média",
+        unit="casos/1mi hab.",
+        left_label="Dias neste alerta:",
+        right_label="Tendência:",
     ),
-    IndicatorType.SUBNOTIFICATION_RATE.value: Indicator(
-        header="Subnotificação",
-        caption="A cada 10 pessoas doentes,",
+    IndicatorType.CONTROL.value: Indicator(
+        header="CONTROLE DA DOENÇA",
+        caption="Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt para classificação.</b>",
+        unit="There is no public data on testing.",
+        left_label="Rt:",
+        right_label="Tendência:",
+    ),
+    IndicatorType.CAPACITY.value: Indicator(
+        header="CAPACIDADE DA REDE",
+        caption="A capacidade hospitalar será atingida em",
+        unit="meses",
+        left_label="Número de Leitos*:",
+        right_label="Capacidade de UTI:",
+    ),
+    IndicatorType.TRUST.value: Indicator(
+        header="CONFIANÇA NOS DADOS",
+        caption="A cada 10 pessoas infectadas, somente ",
         unit="são diagnosticadas",
-        left_label="Casos confirmados:",
-        right_label="Ranking da UF:",
-    ),
-    IndicatorType.HOSPITAL_CAPACITY.value: Indicator(
-        header="Capacidade Hospitalar",
-        caption="Os seus leitos estarão todos ocupados em",
-        unit="mês(es)",
-        left_label="Leitos*:",
-        right_label="Leitos UTI:",
-    ),
-    IndicatorType.SOCIAL_ISOLATION.value: Indicator(
-        header="Isolamento Social",
-        caption="Na última semana, ficaram em casa cerca de",
-        unit="das pessoas",
-        left_label="Média semana passada:",
-        right_label="Tendência 📈:",
+        left_label="Mortes por dia:",
+        right_label="Tendência:",
     ),
 }
 
@@ -184,15 +186,27 @@ class Product:
 
 ProductCards: List[Product] = [
     Product(
-        recommendation="Sugerido",
-        name="SimulaCovid",
-        caption="simule o impacto de diferentes ritmos de contágio da Covid-19 no seu sistema de saúde.",
-        image=Illustration.BUILDING.value,
+        recommendation="Simule",
+        name="SimulaCovid<br>",
+        caption="O que acontecerá com meu sistema de saúde local se o ritmo de contágio aumentar ou diminuir?",
+        image="https://i.imgur.com/4MLOdTL.png",
     ),
     Product(
-        recommendation="",
+        recommendation="Descubra",
+        name="Distanciamento Social<br>",
+        caption="As pessoas do meu município estão ficando em casa?",
+        image="https://i.imgur.com/xUzGirB.png",
+    ),
+    Product(
+        recommendation="Explore",
         name="Saúde em Ordem<br>",
-        caption="explore que setores não-essenciais da sua economia são menos expostos ao risco de contaminação por Covid-19",
-        image=Illustration.CITY.value,
+        caption="Quais atividades econômicas meu município deveria reabrir primeiro?",
+        image="https://i.imgur.com/PV38lNs.png",
+    ),
+    Product(
+        recommendation="Navegue",
+        name="Onda Covid<br>",
+        caption="Onde meu município está na curva da doença?",
+        image="https://i.imgur.com/l3vuQdP.png",
     ),
 ]

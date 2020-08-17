@@ -26,6 +26,7 @@ from streamlit import caching
 import session
 import time
 
+
 def main():
 
     # SESSION STATE
@@ -42,8 +43,8 @@ def main():
         city_name="Todos",
         city_id=None,
         number_beds=None,
-        number_ventilators = None,
-        number_icu_beds = None,
+        number_ventilators=None,
+        number_icu_beds=None,
         number_cases=None,
         number_deaths=None,
         population_params=dict(),

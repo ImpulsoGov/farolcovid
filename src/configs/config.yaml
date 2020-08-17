@@ -4,6 +4,11 @@ br:
     api:
         external: http://datasource.coronacidades.org/
         local: http://45.55.43.231:7000/
+<<<<<<< HEAD
+=======
+        mapserver_external: http://datasource.coronacidades.org:5000/
+        mapserver_local: http://192.168.0.5:5000/
+>>>>>>> texts-update
         endpoints:
             simulacovid: "br/cities/simulacovid/main"
             rt:
@@ -24,6 +29,7 @@ br:
                 cnae_sectors: "br/cnae/sectors"
             utilities:
                 place_ids: "br/places/ids"
+            maps: "br/maps"
     drive_paths:
         br_id_state_region_city: https://docs.google.com/spreadsheets/d/1pHkH9FZj-c_bCEdvCH9k54uog5QDEd_x5xi4YmDsqyY
         cities_population: https://docs.google.com/spreadsheets/d/1k8mXuUggBuBEghHhhLrLtA-5wa4JsAc-D35S5bNlf24
@@ -121,7 +127,7 @@ br:
             control_growth: 
                 column_name: "rt_growth"
                 cuts: [0, 0.9, 1.1, 1000]
-                categories: ['melhorando', 'estabilizando', 'piorando']
+                categories: ['melhorando', 'estabilizando', 'piorando⚠️']
 
             capacity_classification:
                 column_name: 'dday_icu_beds_best'
