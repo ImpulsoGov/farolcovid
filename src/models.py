@@ -146,32 +146,32 @@ Strategies: List[ContainmentStrategy] = [
 
 IndicatorCards: Dict[str, Indicator] = {
     IndicatorType.SITUATION.value: Indicator(
-        header="SITUAÇÃO",
-        caption="Casos por dia por 100 mil habitantes:",
-        unit="",
-        left_label="Semana passada:",
-        right_label="Tendência 📈:",
+        header="SITUAÇÃO DA DOENÇA",
+        caption="Hoje são <b>reportados</b>❗ em média",
+        unit="casos/1mi hab.",
+        left_label="Dias neste alerta:",
+        right_label="Tendência:",
     ),
     IndicatorType.CONTROL.value: Indicator(
-        header="CONTROLE",
-        caption="",
+        header="CONTROLE DA DOENÇA",
+        caption="Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt para classificação.</b>",
         unit="There is no public data on testing.",
         left_label="Rt:",
-        right_label="Tendência 📈:",
+        right_label="Tendência:",
     ),
     IndicatorType.CAPACITY.value: Indicator(
-        header="CAPACIDADE",
+        header="CAPACIDADE DA REDE",
         caption="A capacidade hospitalar será atingida em",
-        unit="mês(es)",
+        unit="meses",
         left_label="Número de Leitos*:",
         right_label="Capacidade de UTI:",
     ),
     IndicatorType.TRUST.value: Indicator(
-        header="CONFIANÇA",
+        header="CONFIANÇA NOS DADOS",
         caption="A cada 10 pessoas infectadas, somente ",
         unit="são diagnosticadas",
         left_label="Mortes por dia:",
-        right_label="Tendência 📈:",
+        right_label="Tendência:",
     ),
 }
 

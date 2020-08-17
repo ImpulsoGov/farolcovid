@@ -124,7 +124,7 @@ br:
             control_growth: 
                 column_name: "rt_growth"
                 cuts: [0, 0.9, 1.1, 1000]
-                categories: ['melhorando', 'estabilizando', 'piorando']
+                categories: ['melhorando', 'estabilizando', 'piorando⚠️']
 
             capacity_classification:
                 column_name: 'dday_icu_beds_best'
