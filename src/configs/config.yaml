@@ -4,8 +4,11 @@ br:
     api:
         external: http://datasource.coronacidades.org/
         local: http://45.55.43.231:7000/
+<<<<<<< HEAD
+=======
         mapserver_external: http://datasource.coronacidades.org:5000/
         mapserver_local: http://192.168.0.5:5000/
+>>>>>>> texts-update
         endpoints:
             simulacovid: "br/cities/simulacovid/main"
             rt:
@@ -135,50 +138,27 @@ br:
                 column_name: 'notification_rate'
                 cuts: [0, 0.4, 0.6, 0.8, 1.001]
                 categories: [3, 2, 1, 0]
-
     indicators:
-        rt:
-            risk: "control_classification"
-            right_display: "rt_growth"
-            left_display: ["rt_17days_ago_low", "rt_17days_ago_high"]
-            display: ["rt_low_95", "rt_high_95"]
-            message: "control_growth"
-        subnotification_rate:
-            risk: "subnotification_classification"
-            right_display: "subnotification_rank"
-            left_display: "confirmed_cases"
-            display: "notification_rate"
-        hospital_capacity:
-            risk: "dday_classification"
-            right_display: "number_icu_beds"
-            left_display: "number_beds"
-            display: "dday_beds_best_months"
-        social_isolation:
-            risk: "Fonte: inloco"
-            right_display: "inloco_growth"
-            left_display: "inloco_last_week_7days_avg"
-            display: "inloco_today_7days_avg"
         situation:
             risk: "situation_classification"
-            right_display: "None"
-            left_display: "None"
-            display: "None"
+            right_display: "None" # TODO: add daily_cases_mavg_ndays
+            left_display: "daily_cases_mavg_1mi_growth"
+            display: "daily_cases_mavg_1mi"
         control:
             risk: "control_classification"
-            right_display: "None"
+            right_display: "rt_growth"
             left_display: ["rt_low_95", "rt_high_95"]
             display: "None"
         capacity:
             risk: "capacity_classification"
-            right_display: "None"
-            left_display: "None"
-            display: "None"
+            right_display: "number_icu_beds"
+            left_display: "number_beds"
+            display: "dday_icu_beds_best"
         trust:
             risk: "trust_classification"
-            right_display: "None"
-            left_display: "None"
-            display: "None"
-
+            right_display: "new_deaths_growth"
+            left_display: "new_deaths_mavg_1mi" 
+            display: "notification_rate"
     inloco:
         replace: 
             "São Valério da Natividade":
