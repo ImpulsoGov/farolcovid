@@ -730,7 +730,7 @@ def genProductsSection(products: List[Product]):
     st.write(
         f"""
         <div class="base-wrapper">
-                <span class="section-header primary-span">COMO SEGUIR COM SEGURANÇA?</span>
+                <span class="section-header primary-span">O QUE MAIS VOCÊ QUER SABER SOBRE O SEU MUNICÍPIO?</span>
                 <div class="flex flex-row flex-space-around mt flex-m-column">{cards}</div>
         </div>
         """,

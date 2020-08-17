@@ -188,25 +188,25 @@ ProductCards: List[Product] = [
     Product(
         recommendation="Simule",
         name="SimulaCovid<br>",
-        caption="Simule o impacto de diferentes ritmos de contágio da Covid-19 no seu sistema de saúde.",
+        caption="O que acontecerá com meu sistema de saúde local se o ritmo de contágio aumentar ou diminuir?",
         image="https://i.imgur.com/4MLOdTL.png",
     ),
     Product(
-        recommendation="Leia",
+        recommendation="Descubra",
         name="Distanciamento Social<br>",
-        caption="Entenda como o seu local está seguindo medidas de segurança sanitária.",
+        caption="As pessoas do meu município estão ficando em casa?",
         image="https://i.imgur.com/xUzGirB.png",
     ),
     Product(
-        recommendation="",
+        recommendation="Explore",
         name="Saúde em Ordem<br>",
-        caption="Explore setores econômicos de seu <b>Estado</b> ou <b>Regional</b> menos expostos a contaminação por Covid-19",
+        caption="Quais atividades econômicas meu município deveria reabrir primeiro?",
         image="https://i.imgur.com/PV38lNs.png",
     ),
     Product(
-        recommendation="Explore",
+        recommendation="Navegue",
         name="Onda Covid<br>",
-        caption="Veja aonde estão municípios e estados na curva de mortes registradas até hoje",
+        caption="Onde meu município está na curva da doença?",
         image="https://i.imgur.com/l3vuQdP.png",
     ),
 ]

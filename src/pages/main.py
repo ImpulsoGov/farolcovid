@@ -647,7 +647,7 @@ def main(session_state):
     #     )
     # TOOLS
     products = ProductCards
-    products[2].recommendation = f'Risco {data["overall_alert"].values[0]}'
+    #products[2].recommendation = f'Risco {data["overall_alert"].values[0]}'
     # ADD NEW CARDS
 
     utils.genProductsSection(products)
