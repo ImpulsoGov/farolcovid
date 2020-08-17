@@ -366,10 +366,12 @@ def main(session_state):
     map_place_id = utils.Dictionary().get_state_alphabetical_id_by_name(
         user_input["state_name"]
     )
-    if os.getenv("IS_LOCAL") == "TRUE":
-        map_url = config["br"]["api"]["mapserver_local"]
-    else:
-        map_url = config["br"]["api"]["mapserver_external"]
+    
+    #if os.getenv("IS_LOCAL") == "TRUE":
+    #    map_url = config["br"]["api"]["mapserver_local"]
+    #else:
+    #    map_url = config["br"]["api"]["mapserver_external"]
+    
     # remove as well
     map_url = "http://192.168.0.5:5000/"
     st.write(

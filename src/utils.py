@@ -599,7 +599,7 @@ def translate_risk(risk_value):
 def genIndicatorCard(indicator: Indicator):
     display_left = "flex"
     display_right = "flex"
-
+    print(str(indicator.header))
     if str(indicator.left_display) == "nan":
         display_left = "hide-bg"
 
@@ -663,13 +663,12 @@ def genKPISection(
         stoplight = "%0a%0a"
     else:
         bg = AlertBackground(alert).name
+        caption = f"Risco {alert.upper()} de colapso no sistema de saúde;"
 
         if "state" in place_type:
             place_type = "estado"
-            caption = f"Seu estado está em Risco {alert.upper()}. <b>Note que {n_colapse_alert_cities} municípios avaliados estão em Risco Médio ou Alto de colapso</b>. Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
         else:
             place_type = "município"
-            caption = f"Risco {alert.upper()} de colapso no sistema de saúde (Veja Níveis de Risco no menu ao lado)"
 
         if alert == "baixo":
             stoplight = f"Meu {place_type} está em *ALERTA BAIXO*! E o seu? %0a%0a"
