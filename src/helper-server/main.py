@@ -57,7 +57,7 @@ def get_iframe_map(place_id):
             cache_place_df["place_id"] == place_id
         ]  # Old data we have in store of that same state
         old_index = old_data.index[0]
-        print(old_data)
+        # print(old_data)
         if (
             old_data["hashes"].values[0] == new_data["hashes"].values[0]
             and old_data["map_id"].values[0] == new_data["map_id"].values[0]

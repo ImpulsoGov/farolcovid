@@ -1951,5 +1951,265 @@ header>.toolbar { /* Hide toolbar menu */
         right:auto;
         padding: 3rem;
         box-sizing: border-box;
+        bottom:0vw;
     }
+}
+
+.big-table{
+    box-sizing: border-box;
+    position:relative;
+    width:90vw;
+    left:5vw;
+    top:0%;
+}
+.big-table-title-box{
+    position:relative;
+    height:10vw;
+}
+.big-table-title{
+    position:absolute;
+    left:0%;
+    top:2vw;
+    font-family: Oswald;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 3.2vw;
+    line-height: auto;
+    display: flex;
+    align-items: center;
+    color: #0097A7;
+    
+
+}
+.big-table-title-security-label{
+    position:absolute;
+    left:30%;
+    top:0.5vw;
+    font-family: Oswald;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 2.5vw;
+    line-height: auto;
+    display: flex;
+    align-items: center;
+    text-align: center;
+
+    color: #000000;
+}
+.big-table-title-economy-label{
+    position:absolute;
+    left:60%;
+    top:0.5vw;
+    font-family: Oswald;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 2.5vw;
+    line-height: auto;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+}
+.big-table-title-button{
+    position: absolute;
+    width: 10vw;
+    height: 3vw;
+    top: 5vw;
+    border-radius: 1.8vw;
+    font-size:1.5vw;
+    font-family: Oswald;
+    font-style: normal;
+    font-weight: normal;
+    color: #FFFFFF;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+    
+}
+.btbsecurity{
+    left:34%;
+}
+.btbeconomy{
+    left:67%;
+}
+.big-table-head-box{
+    position: relative;
+    width:100%;
+    height: 5vw;
+    left:0%;
+    top:0%;
+    background: #FFFFFF;
+    border: 2px solid #000000;
+    box-sizing: border-box;
+}
+
+.big-table-line{
+    position: absolute;
+    width: 0;
+    top:0vw;
+    z-index:1;
+    height:100%;
+    border-right: 2px solid #000000;
+}
+.btl0{
+    left: 20%;
+}
+.btl1{
+    left: 36%;
+}
+.btl2{
+    left: 52%;
+}
+.btl3{
+    left: 68%;
+}
+.btl4{
+    left: 84%;
+}
+.big-table-field {
+    position: absolute;
+    font-size:2vw;
+    top:0.0vw;
+    height:100%;
+    font-family: Oswald;
+    font-style: normal;
+    font-weight: bold;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+}
+.big-table-index-background{
+    left:0%;
+    width:20%;
+    height: 5vw;
+    position:absolute;
+    top:0px;
+    z-index:1;
+    border: 1px solid white;
+}
+/* btt is for title and btf is for field and bte for the end(total) row */
+.btt0 {
+    left:0%;
+    width:20%;
+    font-size:1.3vw;
+    line-height: 3.2;
+}
+
+.btt1 {
+    left:20%;
+    width:16%;
+    font-size:1.1vw;
+    line-height: 2.1;
+}
+.btt2{
+    left:36%;
+    width:16%;
+    font-size:1.1vw;
+}
+.btt3{
+    left:52%;
+    width:16%;
+    font-size:1.1vw;
+    line-height: 2.6;
+}
+.btt4{
+    left:68%;
+    width:16%;
+    font-size:1.1vw;
+    line-height: 2.2;
+}
+.btt5{
+    left:84%;
+    width:16%;
+    font-size:1.2vw;
+}
+.btf0 {
+    left:0%;
+    width:20%;
+    height:90%;
+    font-size:1.7vw;
+    line-height: 3.2;
+    z-index:2;
+}
+.btf1 {
+    left:20%;
+    width:16%;
+    height:90%;
+    font-size:1.7vw;
+}
+.btf2{
+    left:36%;
+    top:0.9vw;
+    width:16%;
+    font-size:2.3vw;
+    line-height: 1.3;
+}
+.btf3{
+    left:52%;
+    top:1.2vw;
+    width:16%;
+    font-size:2vw;
+    line-height: 1.2;
+}
+.btf4{
+    left:68%;
+    top:1.2vw;
+    width:16%;
+    font-size:1.7vw;
+}
+.btf5{
+    left:84%;
+    width:16%;
+    font-size:2vw;
+}
+.bte1 {
+    left:6%;
+    width:40%;
+    font-size:2vw;
+}
+.bte2{
+    left:46%;
+    width:18%;
+    font-size:1.2vw;
+}
+.bte3{
+    left:64%;
+    width:18%;
+    font-size:2vw;
+}
+.bte4{
+    left:82%;
+    width:18%;
+    font-size:1.7vw;
+}
+.bte5{
+    left:82%;
+    width:18%;
+    font-size:1.2vw;
+}
+.big-table-endspacer{
+    height: 5vw;
+}
+.big-table-row{
+    position: relative;
+    width: 100%;
+    height: 5vw;
+    left:0%;
+    box-sizing: border-box;
+}
+.btlgrey{
+    background: #EDEDED;
+}
+.btlwhite{
+    background: #FFFFFF;
+}
+.big-table-total-box{
+    position: relative;
+    width: 100%;
+    height: 5vw;
+    left:0%;
+    top:0%;
+    background: #FFFFFF;
+    border-top: 2px solid #000000;
+    box-sizing: border-box;
 }

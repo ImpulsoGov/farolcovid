@@ -22,6 +22,8 @@ import session
 from streamlit.server.Server import Server
 import os
 
+import bisect
+
 
 def fix_type(x, group):
 
@@ -254,6 +256,65 @@ def update_user_input_places(user_input, dfs, config):
     return user_input, utils.fix_dates(data)
 
 
+def gen_big_table(config, dfs):
+    st.write(dfs["state"])
+    state_data = dfs["state"].sort_values(by="state_name")
+    proportion = str((state_data.shape[0] + 1) * 5) + "vw"
+    text = f"""<div class="big-table" id="big-table">
+        <div class="big-table-title-box">
+            <div class="big-table-title">COMO ESTÃO OS ESTADOS?</div>
+        </div>
+        <div class="big-table-head-box">
+            <div class="big-table-line btl0" style="height: {proportion};"></div>
+            <div class="big-table-line btl1" style="height: {proportion};"></div>
+            <div class="big-table-line btl2" style="height: {proportion};"></div>
+            <div class="big-table-line btl3" style="height: {proportion};"></div>
+            <div class="big-table-line btl4" style="height: {proportion};"></div>
+            <div class="big-table-field btt0">Estado e nível de alerta</div>
+            <div class="big-table-field btt1">Média móvel de novos casos diarios por mi habitantes</div>
+            <div class="big-table-field btt2">Ritmo de contágio</div>
+            <div class="big-table-field btt3">Capacidade do sistema de saúde</div>
+            <div class="big-table-field btt4">Taxa de subnotificação</div>
+            <div class="big-table-field btt5">Média móvel de mortes diárias por mi habitantes</div>
+        </div>"""
+    row_order = 0
+    for index, sector_data in state_data.iterrows():
+        text += gen_sector_big_row(sector_data, row_order, config)
+        row_order += 1
+    text += f"""<div class="big-table-endspacer">
+        </div>
+    </div>"""
+    st.write(text, unsafe_allow_html=True)
+
+
+def gen_sector_big_row(my_state, index, config):
+    """ Generates a row of a table given the necessary information coming from a sector data row """
+    alert_info = {
+        "nan": ["grey", "❓"],
+        0: ["#0090A7", "👍"],
+        1: ["#F7B500", "😨"],
+        2: ["#F77800", "⚠"],
+        3: ["#F02C2E", "🛑"],
+    }
+    level_data = config["br"]["farolcovid"]["rules"]
+    return f"""<div class="big-table-row {["btlgrey","btlwhite"][index % 2]}">
+            <div class="big-table-index-background" style="background-color:{alert_info[my_state["overall_alert"]][0]};"></div>
+            <div class="big-table-field btf0">{my_state["state_name"]} {alert_info[my_state["overall_alert"]][1]}</div>
+            <div class="big-table-field btf1" style="color:{alert_info[find_level(level_data["situation_classification"]["cuts"],level_data["situation_classification"]["categories"],my_state["daily_cases_mavg_1mi"])][0]};">{"%0.2f"%my_state["daily_cases_mavg_1mi"]}</div>
+            <div class="big-table-field btf2" style="color:{alert_info[find_level(level_data["control_classification"]["cuts"],level_data["control_classification"]["categories"],my_state["rt_most_likely"])][0]};" > {"%0.2f"%my_state["rt_most_likely"]}</div>
+            <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["dday_icu_beds_best"])][0]};">{my_state["dday_icu_beds_best"]}-{my_state["dday_icu_beds_worst"]} dia(s)</div>
+            <div class="big-table-field btf4" style="color:{alert_info[find_level(level_data["trust_classification"]["cuts"],level_data["trust_classification"]["categories"],my_state["notification_rate"])][0]};">{int(my_state["subnotification_rate"]*100)}%</div>
+            <div class="big-table-field btf5">{"%0.2f"%my_state["new_deaths_mavg_1mi"]}</div>
+        </div>"""
+
+
+def find_level(cuts, levels, value):
+    if np.isnan(value):
+        return "nan"
+    index = bisect.bisect(cuts, value)
+    return levels[min(index - 1, len(levels) - 1)]
+
+
 @st.cache(suppress_st_warning=True)
 def get_data(config):
 
@@ -361,7 +422,6 @@ def main(session_state):
     )
 
     user_input, data = update_user_input_places(user_input, dfs, config)
-    print(data)
     # MAP
     map_place_id = utils.Dictionary().get_state_alphabetical_id_by_name(
         user_input["state_name"]
@@ -745,7 +805,9 @@ def main(session_state):
             ],
         )
         oc.main(user_input, indicators, data, config, session_state)
-
+    # BIG TABLE
+    gen_big_table(config, dfs)
+    # FOOTER
     utils.gen_whatsapp_button(config["impulso"]["contact"])
     utils.gen_footer()
     user_analytics.conclude_user_session(session_state)
