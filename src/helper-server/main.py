@@ -41,6 +41,7 @@ def check_for_cache_download():
 
 def get_iframe_map(place_id):
     """ Clones and adapts a map inteded for use in an iframe"""
+
     try:
         place_df = pd.read_csv(
             datasource_url
@@ -49,6 +50,7 @@ def get_iframe_map(place_id):
     except:
         return "Map datasource unreachable"
     try:
+
         is_brazil = place_id == "BR"
         new_data = place_df.loc[place_df["place_id"] == place_id]
         map_id = new_data["map_id"].values[0]  # Datawrapper id of our map
@@ -56,6 +58,7 @@ def get_iframe_map(place_id):
             cache_place_df["place_id"] == place_id
         ]  # Old data we have in store of that same state
         old_index = old_data.index[0]
+        print(old_data)
         if (
             old_data["hashes"].values[0] == new_data["hashes"].values[0]
             and old_data["map_id"].values[0] == new_data["map_id"].values[0]
@@ -66,7 +69,7 @@ def get_iframe_map(place_id):
                 map_code = clone_map(
                     f"https://datawrapper.dwcdn.net/{map_id}/", is_brazil=is_brazil
                 )
-                cache_place_df.iloc[old_index]["cache"] = map_code
+                cache_place_df.loc[old_index, "cache"] = map_code
                 return map_code
             except Exception as e:
                 return "An unknown error happened : " + str(e)
@@ -82,9 +85,9 @@ def get_iframe_map(place_id):
             map_code = clone_map(
                 f"https://datawrapper.dwcdn.net/{map_id}/", is_brazil=is_brazil
             )
-            cache_place_df.iloc[old_index]["cache"] = map_code
-            cache_place_df.iloc[old_index]["hashes"] = new_data["hashes"].values[0]
-            cache_place_df.iloc[old_index]["map_id"] = new_data["map_id"].values[0]
+            cache_place_df.loc[old_index, "cache"] = map_code
+            cache_place_df.loc[old_index, "hashes"] = new_data["hashes"].values[0]
+            cache_place_df.loc[old_index, "map_id"] = new_data["map_id"].values[0]
             return map_code
     except Exception as e:
         return "A unknown exception has occured : " + str(e)
@@ -132,7 +135,7 @@ def main_clone(url):
     except Exception as e:
         raise Exception(
             """Carregamento do mapa falhou, tente novamente mais tarde.<br> 
-    <button type="button" onclick="location.reload();">Clique aqui apra tentar novamente</button>
+    <button type="button" onclick="location.reload();">Clique aqui para tentar novamente</button>
     """
         )
     soup = bs4.BeautifulSoup(html, "html.parser")

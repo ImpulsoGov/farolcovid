@@ -1778,8 +1778,8 @@ header>.toolbar { /* Hide toolbar menu */
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 .map-br{
-    height:55vw;
-    width:65vw;
+    height:65vw;
+    width:60vw;
     max-height:none;
     overflow:hidden;
     position:relative;
@@ -1798,12 +1798,12 @@ header>.toolbar { /* Hide toolbar menu */
 }
 .map-state{
     padding:0;
-    height:40vw;
-    width:40vw;
+    height:30vw;
+    width:32vw;
     max-height:200vw !important;
     overflow:hidden;
     position:absolute;
-    right:0%;
+    right:3rem;
     bottom:0%;
     background-color: white;
 }
@@ -1922,4 +1922,43 @@ header>.toolbar { /* Hide toolbar menu */
     font-style: normal;
     font-size: 20px;
     color: #000000;
+}
+.alert-levels-map-overlay{
+    position:absolute;
+    width: 12vw;
+    height: 16vw;
+    bottom:5vw;
+    left:3em;
+    z-index:2;
+    padding:0 3em;
+    background-image: url("https://coronacidades.org/wp-content/uploads/2020/07/Logo-niveis.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain; 
+}
+@media only screen and (max-width: 425px) {
+    .alert-levels-map-overlay{
+        width: 25vw;
+        height: 35vw;
+    }
+}
+
+.selectors-box{
+    width:40vw;
+    height:260px;
+    bottom:35vw;
+    position:absolute;
+    right:3rem;
+    border: 0px solid black;
+    z-index:3;
+}
+@media only screen and (max-width: 425px) {
+    .selectors-box{
+        width:100vw;
+        height:auto;
+        position:relative;
+        right:auto;
+        padding: 3rem;
+        box-sizing: border-box;
+    }
 }
