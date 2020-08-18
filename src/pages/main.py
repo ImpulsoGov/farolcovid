@@ -248,7 +248,7 @@ def update_user_input_places(user_input, dfs, config):
 
 
 def gen_big_table(config, dfs):
-    st.write(dfs["state"])
+    # st.write(dfs["state"])
     state_data = dfs["state"].sort_values(by="state_name")
     proportion = str((state_data.shape[0] + 1) * 5) + "vw"
     text = f"""<div class="big-table" id="big-table">
