@@ -74,7 +74,7 @@ class Indicator:
         unit,
         left_label,
         right_label,
-        risk="",
+        risk="nan",
         display="",
         left_display="",
         right_display="",
@@ -88,7 +88,6 @@ class Indicator:
         self.right_label = right_label
         self.left_display = left_display
         self.right_display = right_display
-
 
 class ResourceAvailability(NamedTuple):
     locality: str
@@ -146,32 +145,32 @@ Strategies: List[ContainmentStrategy] = [
 
 IndicatorCards: Dict[str, Indicator] = {
     IndicatorType.SITUATION.value: Indicator(
-        header="SITUAÇÃO",
-        caption="Casos por dia por 100 mil habitantes:",
-        unit="",
-        left_label="Semana passada:",
-        right_label="Tendência 📈:",
+        header="SITUAÇÃO DA DOENÇA",
+        caption="Hoje são <b>reportados</b>❗ em média",
+        unit="casos/1mi hab.",
+        left_label="Dias neste alerta:",
+        right_label="Tendência:",
     ),
     IndicatorType.CONTROL.value: Indicator(
-        header="CONTROLE",
-        caption="",
+        header="CONTROLE DA DOENÇA",
+        caption="Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt para classificação.</b>",
         unit="There is no public data on testing.",
         left_label="Rt:",
-        right_label="Tendência 📈:",
+        right_label="Tendência:",
     ),
     IndicatorType.CAPACITY.value: Indicator(
-        header="CAPACIDADE",
+        header="CAPACIDADE DA REDE",
         caption="A capacidade hospitalar será atingida em",
-        unit="mês(es)",
+        unit="meses",
         left_label="Número de Leitos*:",
         right_label="Capacidade de UTI:",
     ),
     IndicatorType.TRUST.value: Indicator(
-        header="CONFIANÇA",
+        header="CONFIANÇA NOS DADOS",
         caption="A cada 10 pessoas infectadas, somente ",
         unit="são diagnosticadas",
         left_label="Mortes por dia:",
-        right_label="Tendência 📈:",
+        right_label="Tendência:",
     ),
 }
 
@@ -188,25 +187,44 @@ ProductCards: List[Product] = [
     Product(
         recommendation="Simule",
         name="SimulaCovid<br>",
-        caption="Simule o impacto de diferentes ritmos de contágio da Covid-19 no seu sistema de saúde.",
+        caption="O que acontecerá com meu sistema de saúde local se o ritmo de contágio aumentar ou diminuir?",
         image="https://i.imgur.com/4MLOdTL.png",
     ),
     Product(
-        recommendation="Leia",
+        recommendation="Descubra",
         name="Distanciamento Social<br>",
-        caption="Entenda como o seu local está seguindo medidas de segurança sanitária.",
+        caption="As pessoas do meu município estão ficando em casa?",
         image="https://i.imgur.com/xUzGirB.png",
     ),
     Product(
-        recommendation="",
+        recommendation="Explore",
         name="Saúde em Ordem<br>",
-        caption="Explore setores econômicos de seu <b>Estado</b> ou <b>Regional</b> menos expostos a contaminação por Covid-19",
+        caption="Quais atividades econômicas meu município deveria reabrir primeiro?",
         image="https://i.imgur.com/PV38lNs.png",
     ),
     Product(
-        recommendation="Explore",
+        recommendation="Navegue",
         name="Onda Covid<br>",
-        caption="Veja aonde estão municípios e estados na curva de mortes registradas até hoje",
+        caption="Onde meu município está na curva da doença?",
         image="https://i.imgur.com/l3vuQdP.png",
+    ),
+]
+
+class Dimension:
+    def __init__(self, text):
+        self.text = text
+
+DimensionCards: List[Dimension] = [
+    Dimension(
+        text = "<b>1. Situação da doença,</b> que busca medir como a doença está se espalhando no território.",
+    ),
+    Dimension(
+        text = "<b>2. Controle da doença,</b> que retrata a capacidade do poder público de detectar os casos.",
+    ),
+    Dimension(
+        text = "<b>3. Capacidade de respostas do sistema de saúde,</b> que reflete a situação do sistema de saúde e risco de colapso.",
+    ),
+    Dimension(
+        text = "<b>4. Confiança dos dados,</b> que reflete a qualidade das medições de casos sendo feitas pelos governos.",
     ),
 ]

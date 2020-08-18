@@ -16,6 +16,7 @@ from models import (
     IndicatorBackground,
     Illustration,
     Product,
+    Dimension,
 )
 from typing import List
 import re
@@ -206,7 +207,7 @@ class Dictionary:
                 "city_id"
             ].values[0]
         else:
-            dictioanry["state_num_id"].values[0]
+            dictionary["state_num_id"].values[0]
 
     def get_state_alphabetical_id_by_name(self, state_name):
         self.check_initialize()
@@ -595,6 +596,33 @@ def translate_risk(risk_value):
             print("risk translation fialed")
             return risk_value
 
+def genAnalysisDimmensionsCard(dimension: Dimension):
+    return f"""<div style="margin-top: 0px; display: inline-block; top:0x;">
+            <div class="dimension-card primary-span style="top:0x;">
+                {dimension.text}
+            </div>
+        </div>"""
+
+
+
+def genAnalysisDimmensionsSection(dimensions: List[Dimension]):
+    cards = list(map(genAnalysisDimmensionsCard, dimensions))
+    cards = "".join(cards)
+
+    st.write(
+        f"""
+        <div class="base-wrapper primary-span">
+            <div>
+                <span class="section-header">DIMENSÕES DA ANÁLISE</span>
+            </div>
+            <span class="p3">O que olhamos ao avaliar o cenário da pandemia em um lugar?</span>
+            <div class="flex flex-row flex-space-around mt flex-m-column" style="margin-bottom: 0px;height:auto; display:inline-block top:0x;">
+            {cards}
+            </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
+
 
 def genIndicatorCard(indicator: Indicator):
     display_left = "flex"
@@ -610,7 +638,7 @@ def genIndicatorCard(indicator: Indicator):
         risk_html_class = "black-span p4"
     else:
         risk_html_class = "bold white-span p4"
-    print(indicator.risk)
+
     return f"""
     <div class="saude-indicator-card flex flex-column mr" style="z-index:1;display:inline-block;position:relative;">
         <span class="saude-card-header-v2">{indicator.header}</span>
@@ -663,13 +691,12 @@ def genKPISection(
         stoplight = "%0a%0a"
     else:
         bg = AlertBackground(alert).name
+        caption = f"Risco {alert.upper()} de colapso no sistema de saúde;"
 
         if "state" in place_type:
             place_type = "estado"
-            caption = f"Seu estado está em Risco {alert.upper()}. <b>Note que {n_colapse_alert_cities} municípios avaliados estão em Risco Médio ou Alto de colapso</b>. Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
         else:
             place_type = "município"
-            caption = f"Risco {alert.upper()} de colapso no sistema de saúde (Veja Níveis de Risco no menu ao lado)"
 
         if alert == "baixo":
             stoplight = f"Meu {place_type} está em *ALERTA BAIXO*! E o seu? %0a%0a"
@@ -730,7 +757,7 @@ def genProductsSection(products: List[Product]):
     st.write(
         f"""
         <div class="base-wrapper">
-                <span class="section-header primary-span">COMO SEGUIR COM SEGURANÇA?</span>
+                <span class="section-header primary-span">O QUE MAIS VOCÊ QUER SABER SOBRE O SEU MUNICÍPIO?</span>
                 <div class="flex flex-row flex-space-around mt flex-m-column">{cards}</div>
         </div>
         """,
