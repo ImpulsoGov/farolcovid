@@ -58,8 +58,6 @@ def gen_indicator_explanation():
     )
 
 
-
-
 def update_indicators(indicators, data, config, user_input, session_state):
 
     # TODO: indicadores quando cidade não posssui dados
@@ -368,14 +366,13 @@ def main(session_state):
     map_place_id = utils.Dictionary().get_state_alphabetical_id_by_name(
         user_input["state_name"]
     )
-    
-    #if os.getenv("IS_LOCAL") == "TRUE":
-    #    map_url = config["br"]["api"]["mapserver_local"]
-    #else:
-    #    map_url = config["br"]["api"]["mapserver_external"]
-    
-    # remove as well
 
+    if os.getenv("IS_LOCAL") == "TRUE":
+        map_url = config["br"]["api"]["mapserver_local"]
+    else:
+        map_url = config["br"]["api"]["mapserver_external"]
+
+    # remove below as well
     map_url = "http://192.168.0.5:5000/"
     st.write(
         f"""
@@ -635,7 +632,7 @@ def main(session_state):
     #     )
     # TOOLS
     products = ProductCards
-    #products[2].recommendation = f'Risco {data["overall_alert"].values[0]}'
+    # products[2].recommendation = f'Risco {data["overall_alert"].values[0]}'
     # ADD NEW CARDS
 
     utils.genProductsSection(products)

@@ -25,7 +25,7 @@ else:
     datasource_url = config["br"]["api"]["external"]
 # Remove before publication
 datasource_url = "http://192.168.0.5:7000/"
-#datasource_url = datasource_url + config["br"]["api"]["endpoints"]["maps"]
+datasource_url = datasource_url + config["br"]["api"]["endpoints"]["maps"]
 
 # For trying to redownload the cache in case of failure at initialization
 def check_for_cache_download():
