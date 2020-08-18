@@ -597,13 +597,11 @@ def translate_risk(risk_value):
             return risk_value
 
 def genAnalysisDimmensionsCard(dimension: Dimension):
-    return f"""
-        <div class="base-wrapper flex flex-column" style="margin-top: 0px;">
-            <div class="dimension-card flex flex-column flex-space-between flex-align-items-center primary-span">
+    return f"""<div style="margin-top: 0px; display: inline-block; top:0x;">
+            <div class="dimension-card primary-span style="top:0x;">
                 {dimension.text}
             </div>
-        </div>
-        """
+        </div>"""
 
 
 
@@ -613,16 +611,15 @@ def genAnalysisDimmensionsSection(dimensions: List[Dimension]):
 
     st.write(
         f"""
-        <div class="base-wrapper">
+        <div class="base-wrapper primary-span">
             <div>
-                <span class="section-header primary-span">DIMENSÕES DA ANÁLISE</span>
+                <span class="section-header">DIMENSÕES DA ANÁLISE</span>
             </div>
-            <span class="lightblue-span p3">O que olhamos ao avaliar o cenário da pandemia em um lugar?</span>
-            <div class="alert-banner mb" style="margin-bottom: 0px;height:auto;">
+            <span class="p3">O que olhamos ao avaliar o cenário da pandemia em um lugar?</span>
+            <div class="flex flex-row flex-space-around mt flex-m-column" style="margin-bottom: 0px;height:auto; display:inline-block top:0x;">
             {cards}
             </div>
-        </div>
-        """,
+        </div>""",
         unsafe_allow_html=True,
     )
 

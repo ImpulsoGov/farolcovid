@@ -989,6 +989,8 @@ header>.toolbar { /* Hide toolbar menu */
     width: 280px;
     height: 200px;
     background-color: white;
+    margin-top: 0px;
+    display: inline-block;
 }
 
 /* .pdf-button {
