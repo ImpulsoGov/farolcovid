@@ -74,7 +74,7 @@ class Indicator:
         unit,
         left_label,
         right_label,
-        risk="",
+        risk="nan",
         display="",
         left_display="",
         right_display="",

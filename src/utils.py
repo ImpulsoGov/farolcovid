@@ -599,7 +599,7 @@ def translate_risk(risk_value):
 def genIndicatorCard(indicator: Indicator):
     display_left = "flex"
     display_right = "flex"
-    print(str(indicator.header))
+
     if str(indicator.left_display) == "nan":
         display_left = "hide-bg"
 
@@ -610,7 +610,7 @@ def genIndicatorCard(indicator: Indicator):
         risk_html_class = "black-span p4"
     else:
         risk_html_class = "bold white-span p4"
-    print(indicator.risk)
+
     return f"""
     <div class="saude-indicator-card flex flex-column mr" style="z-index:1;display:inline-block;position:relative;">
         <span class="saude-card-header-v2">{indicator.header}</span>

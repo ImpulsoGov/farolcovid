@@ -373,34 +373,36 @@ def main(session_state):
     #    map_url = config["br"]["api"]["mapserver_external"]
     
     # remove as well
-    map_url = "http://192.168.0.5:5000/"
-    st.write(
-        f"""
-    <iframe id="map" src="resources/iframe-gen.html?url={map_url}map-iframe?place_id=BR" class="map-br" scrolling="no">
-    </iframe>
-    """,
-        unsafe_allow_html=True,
-    )
-    st.write(
-        f"""
-    <iframe id="map-state" src="resources/iframe-gen.html?url={map_url}map-iframe?place_id={map_place_id}" class="map-state" scrolling="no">
-    </iframe>
-    """,
-        unsafe_allow_html=True,
-    )
-    # st.write(
-    # f"""
-    # <iframe src="resources/map-div-organizer.html">
-    # </iframe>""",
-    # unsafe_allow_html=True,
-    # )
-    # st.write(
-    # """
-    # <iframe id="mapReader" src="resources/map-reader.html" style="width:100%;">
-    # </iframe>
-    # """,
-    # unsafe_allow_html=True,
-    # )
+    #map_url = "http://192.168.0.5:5000/"
+    #st.write(
+    #    f"""
+    #<iframe id="map" src="resources/iframe-gen.html?url={map_url}map-iframe?place_id=BR" class="map-br" scrolling="no">
+    #</iframe>
+    #""",
+    #    unsafe_allow_html=True,
+    #)
+    #st.write(
+    #    f"""
+    #<iframe id="map-state" src="resources/iframe-gen.html?url={map_url}map-iframe?place_id={map_place_id}" class="map-state" scrolling="no">
+    #</iframe>
+    #""",
+    #    unsafe_allow_html=True,
+    #)
+    
+    ## st.write(
+    ## f"""
+    ## <iframe src="resources/map-div-organizer.html">
+    ## </iframe>""",
+    ## unsafe_allow_html=True,
+    ## )
+    ## st.write(
+    ## """
+    ## <iframe id="mapReader" src="resources/map-reader.html" style="width:100%;">
+    ## </iframe>
+    ## """,
+    ## unsafe_allow_html=True,
+    ## )
+    
     # SOURCES PARAMS
     user_input = utils.get_sources(
         user_input, data, dfs["city"], ["beds", "ventilators", "icu_beds"]
