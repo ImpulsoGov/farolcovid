@@ -25,7 +25,22 @@ def main(user_input, indicators, data, config, session_state):
         """,
         unsafe_allow_html=True,
     )
-
+    st.write(
+        f"""<div class="simulator-container simulator-card-bg">
+                        <div class="simulator-output-wrapper">
+                                <div class="simulator-output-row">
+                                        <span class="simulator-output-row-prediction-value">
+                                                em até 1 mês(es)
+                                        </span>  
+                                </div> 
+                                <span class="simulator-output-row-prediction-label">
+                                        será atingida a capacidade máxima de <b>leitos</b>
+                                </span>
+                        </div>
+                        <img src="https://i.imgur.com/27hutU0.png" class="simulator-output-image">
+                </div>""",
+        unsafe_allow_html=True,
+    )
     try:
         fig = plots.gen_social_dist_plots_state_session_wrapper(session_state)
         st.plotly_chart(fig, use_container_width=True)

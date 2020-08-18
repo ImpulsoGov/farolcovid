@@ -12,7 +12,7 @@ from model.simulator import run_simulation, get_dmonth
 # import pdf_report.pdfgen as pdfgen
 import pages.simulacovid as sm
 import pages.saude_em_ordem as so
-import pages.distanciamento as ds
+import pages.distancing as ds
 import pages.onda_covid as oc
 import plots
 import utils
@@ -49,15 +49,6 @@ def fix_type(x, group):
 def default_indicator(data, col, position, group):
 
     return fix_type(data[col[position]].fillna("- ").values[0], group)
-
-
-def gen_indicator_explanation():
-    st.write(
-        f"""
-    Explanaton goes here
-    """,
-        unsafe_allow_html=True,
-    )
 
 
 def update_indicators(indicators, data, config, user_input, session_state):
@@ -257,7 +248,7 @@ def update_user_input_places(user_input, dfs, config):
 
 
 def gen_big_table(config, dfs):
-    # st.write(dfs["state"])
+    st.write(dfs["state"])
     state_data = dfs["state"].sort_values(by="state_name")
     proportion = str((state_data.shape[0] + 1) * 5) + "vw"
     text = f"""<div class="big-table" id="big-table">
@@ -300,11 +291,11 @@ def gen_sector_big_row(my_state, index, config):
     return f"""<div class="big-table-row {["btlgrey","btlwhite"][index % 2]}">
             <div class="big-table-index-background" style="background-color:{alert_info[my_state["overall_alert"]][0]};"></div>
             <div class="big-table-field btf0">{my_state["state_name"]} {alert_info[my_state["overall_alert"]][1]}</div>
-            <div class="big-table-field btf1" style="color:{alert_info[find_level(level_data["situation_classification"]["cuts"],level_data["situation_classification"]["categories"],my_state["daily_cases_mavg_1mi"])][0]};">{"%0.2f"%my_state["daily_cases_mavg_1mi"]}</div>
+            <div class="big-table-field btf1" style="color:{alert_info[find_level(level_data["situation_classification"]["cuts"],level_data["situation_classification"]["categories"],my_state["daily_cases_mavg_100k"])][0]};">{"%0.2f"%my_state["daily_cases_mavg_100k"]}</div>
             <div class="big-table-field btf2" style="color:{alert_info[find_level(level_data["control_classification"]["cuts"],level_data["control_classification"]["categories"],my_state["rt_most_likely"])][0]};" > {"%0.2f"%my_state["rt_most_likely"]}</div>
-            <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["dday_icu_beds_best"])][0]};">{my_state["dday_icu_beds_best"]}-{my_state["dday_icu_beds_worst"]} dia(s)</div>
+            <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["dday_icu_beds"])][0]};">{my_state["dday_icu_beds"]} dia(s)</div>
             <div class="big-table-field btf4" style="color:{alert_info[find_level(level_data["trust_classification"]["cuts"],level_data["trust_classification"]["categories"],my_state["notification_rate"])][0]};">{int(my_state["subnotification_rate"]*100)}%</div>
-            <div class="big-table-field btf5">{"%0.2f"%my_state["new_deaths_mavg_1mi"]}</div>
+            <div class="big-table-field btf5">{"%0.2f"%my_state["new_deaths_mavg_100k"]}</div>
         </div>"""
 
 
@@ -540,17 +531,6 @@ def main(session_state):
             + config["br"]["seir_parameters"]["critical_duration"]
         )
         placeholder_value_pls_solve_this = 0
-        # de notificação ajustada para o município ou estado de ({int(100*data['notification_rate'].values[0])}%)
-        # <b>estimamos que o número de casos ativos é de {int(data['active_cases'].sum())}</b>
-        st.write(
-            f"""<div class="base-wrapper">
-        O número de casos confirmados oficialmente no seu município ou estado é de {int(data['confirmed_cases'].sum())} em {pd.to_datetime(data["data_last_refreshed"].values[0]).strftime("%d/%m/%Y")}. 
-        Dada a progressão clínica da doença (em média, {infectious_period} dias) e a taxa de notificação ajustada para o município ou estado de ({placeholder_value_pls_solve_this}%), 
-        <b>estimamos que o número de casos ativos é de {0}</b>.<br>
-        <br>Caso queria, você pode mudar esse número para a simulação abaixo:
-        </div>""",
-            unsafe_allow_html=True,
-        )
 
     # DIMENSIONS CARDS
     dimensions = DimensionCards
@@ -558,7 +538,6 @@ def main(session_state):
 
     # INDICATORS CARDS
     indicators = IndicatorCards
-    gen_indicator_explanation()
 
     indicators = update_indicators(indicators, data, config, user_input, session_state)
 

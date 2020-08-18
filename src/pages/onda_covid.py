@@ -72,9 +72,9 @@ def main(user_input, indicators, data, config, session_state):
 
     try:
         # load data
-        print("loading br cases")
+        # print("loading br cases")
         br_cases = loading_cached()
-        print("finished laoding br cases")
+        # print("finished laoding br cases")
         my_dict = utils.Dictionary()
         da.prepare_heatmap(  # BRASIL MAP
             br_cases, place_type="state_id",
@@ -110,9 +110,9 @@ def main(user_input, indicators, data, config, session_state):
         st.selectbox("Mortes ou Mortes por Casos?", ["Mortes", "Mortes por casos"])
         == "Mortes por casos"
     )
-    print("checking")
+    # print("checking")
     if city_name != "Todos":  # the user selected something
-        print("passed")
+        # print("passed")
         br_cases = br_cases[br_cases["state_name"] == state_name]  # .reset_index()
         # gen_banners()
         uf = my_dict.get_state_alphabetical_id_by_name(state_name)
@@ -123,7 +123,7 @@ def main(user_input, indicators, data, config, session_state):
             your_city=city_name,
             deaths_per_cases=deaths_or_cases,
         )
-        print("finished preparation")
+        # print("finished preparation")
     # COUNTRY HEATMAP
     da.prepare_heatmap(
         loader.read_data(

@@ -89,6 +89,7 @@ class Indicator:
         self.left_display = left_display
         self.right_display = right_display
 
+
 class ResourceAvailability(NamedTuple):
     locality: str
     cases: int
@@ -147,8 +148,8 @@ IndicatorCards: Dict[str, Indicator] = {
     IndicatorType.SITUATION.value: Indicator(
         header="SITUAÇÃO DA DOENÇA",
         caption="Hoje são <b>reportados</b>❗ em média",
-        unit="casos/1mi hab.",
-        left_label="Dias neste alerta:",
+        unit="casos/100k hab.",
+        left_label="Dias nesta tendência:",
         right_label="Tendência:",
     ),
     IndicatorType.CONTROL.value: Indicator(
@@ -161,7 +162,7 @@ IndicatorCards: Dict[str, Indicator] = {
     IndicatorType.CAPACITY.value: Indicator(
         header="CAPACIDADE DA REDE",
         caption="A capacidade hospitalar será atingida em",
-        unit="meses",
+        unit="dia(s)",
         left_label="Número de Leitos*:",
         right_label="Capacidade de UTI:",
     ),
@@ -210,21 +211,23 @@ ProductCards: List[Product] = [
     ),
 ]
 
+
 class Dimension:
     def __init__(self, text):
         self.text = text
 
+
 DimensionCards: List[Dimension] = [
     Dimension(
-        text = "<b>1. Situação da doença,</b> que busca medir como a doença está se espalhando no território.",
+        text="<b>1. Situação da doença,</b> que busca medir como a doença está se espalhando no território.",
     ),
     Dimension(
-        text = "<b>2. Controle da doença,</b> que retrata a capacidade do poder público de detectar os casos.",
+        text="<b>2. Controle da doença,</b> que retrata a capacidade do poder público de detectar os casos.",
     ),
     Dimension(
-        text = "<b>3. Capacidade de respostas do sistema de saúde,</b> que reflete a situação do sistema de saúde e risco de colapso.",
+        text="<b>3. Capacidade de respostas do sistema de saúde,</b> que reflete a situação do sistema de saúde e risco de colapso.",
     ),
     Dimension(
-        text = "<b>4. Confiança dos dados,</b> que reflete a qualidade das medições de casos sendo feitas pelos governos.",
+        text="<b>4. Confiança dos dados,</b> que reflete a qualidade das medições de casos sendo feitas pelos governos.",
     ),
 ]

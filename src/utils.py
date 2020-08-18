@@ -593,8 +593,8 @@ def translate_risk(risk_value):
         try:
             return loader.config["br"]["farolcovid"]["categories"][risk_value]
         except:
-            print("risk translation fialed")
             return risk_value
+
 
 def genAnalysisDimmensionsCard(dimension: Dimension):
     return f"""<div style="margin-top: 0px; display: inline-block; top:0x;">
@@ -602,7 +602,6 @@ def genAnalysisDimmensionsCard(dimension: Dimension):
                 {dimension.text}
             </div>
         </div>"""
-
 
 
 def genAnalysisDimmensionsSection(dimensions: List[Dimension]):
@@ -633,49 +632,32 @@ def genIndicatorCard(indicator: Indicator):
 
     if str(indicator.right_display) == "nan":
         display_right = "hide-bg"
-
+    if indicator.display == "None":
+        indicator.display = ""
+        indicator.unit = ""
     if indicator.risk == "Fonte: inloco":
         risk_html_class = "black-span p4"
     else:
         risk_html_class = "bold white-span p4"
-
     return f"""
-    <div class="saude-indicator-card flex flex-column mr" style="z-index:1;display:inline-block;position:relative;">
-        <span class="saude-card-header-v2">{indicator.header}</span>
-        <span class="saude-card-list-v2">{indicator.caption}</span>
+    <div class="main-indicator-card flex flex-column mr" style="z-index:1;display:inline-block;position:relative;">
+        <span class="main-card-header-v2">{indicator.header}</span>
+        <span class="main-card-list-v2">{indicator.caption}</span>
         <div class="flex flex-row flex-justify-space-between mt" style="width:250px;">
         </div>
+        <span class="bold p2 main-card-display-value">{indicator.display}<span class="bold p5">  {indicator.unit}</span></span>
         <div class="{IndicatorBackground(try_int(indicator.risk)).name}-alert-bg risk-pill " style="position:absolute;bottom:120px;">
-            <span class="{risk_html_class}">{indicator.risk}</span>
+            <span class="{risk_html_class}">{loader.config["br"]["farolcovid"]["categories"][int(indicator.risk.split(".")[0])] if indicator.risk not in ["nan","Fonte: inloco"] else ""}</span>
         </div>
-        <div class="saude-card-display-text-v2 sdcardtext-left">
+        <div class="main-card-display-text-v2 sdcardtext-left">
                 <span class="lighter">{indicator.left_label}<br></span>
                 <span class="bold">{indicator.left_display}</span>
         </div>
-        <div class="saude-card-display-text-v2 sdcardtext-right">
+        <div class="main-card-display-text-v2 sdcardtext-right">
                 <span class="lighter">{indicator.right_label}<br></span>
                 <span class="bold">{indicator.right_display}</span>
         </div>
     </div>"""
-    return f"""<div class="indicator-card flex flex-column mr">
-                        <span class="header p3">{indicator.header}</span>
-                        <span class="p4">{indicator.caption}</span>
-                        <span class="bold p2">{indicator.display}<span class="bold p5"> {indicator.unit}</span></span>
-                        <div class="{IndicatorBackground(try_int(indicator.risk)).name}-alert-bg risk-pill">
-                                <span class="{risk_html_class}">{indicator.risk}</span>
-                        </div>
-                        <div class="flex flex-row flex-justify-space-between mt" > 
-                                <div class="br {display_left} flex-column text-align-center pr">
-                                        <span class="lighter">{indicator.left_label}</span>
-                                        <span class="bold">{indicator.left_display}</span>
-                                </div>
-                                <div class=" bl flex flex-column text-align-center pl {display_right}">
-                                        <span class="lighter">{indicator.right_label}</span>
-                                        <span class="bold">{indicator.right_display}</span>
-                                </div>
-                        </div>
-                </div>
-        """
 
 
 def genKPISection(
@@ -818,13 +800,11 @@ def gen_ambassador_section() -> None:
         """
         <div class="base-wrapper">
                 <div class="ambassador-container">
-                        <span class="ambassador-question"><b>Quer saber em primeira mão os lançamentos e melhorias do Farol Covid e do Coronacidades?</b>
-                        Seja um Embaixador Coronacidades!</span>
-                        <a class="btn-ambassador" href="%s" target="blank">Quero ser embaixador</a>
+                        <span class="ambassador-question"><b>Quer aprofundar a análise para seu Município? ?</b><br>
+                        A equipe do Coronacidades está disponível de forma inteiramente gratuita!</span>
+                        <a class="btn-ambassador" href="https://coronacidades.org/fale-conosco/" target="blank">FALE CONOSCO</a>
                 </div>
-        </div>
-        """
-        % Link.AMBASSADOR_FORM.value,
+        </div>""",
         unsafe_allow_html=True,
     )
 
