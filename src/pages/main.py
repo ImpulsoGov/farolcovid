@@ -424,7 +424,7 @@ def main(session_state):
         map_url = config["br"]["api"]["mapserver_external"]
 
     # remove below as well
-    map_url = "http://192.168.0.5:5000/"
+    # map_url = "http://192.168.0.5:5000/"
     st.write(
         f"""
     <div class="brazil-map-div">
