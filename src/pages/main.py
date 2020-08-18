@@ -248,7 +248,7 @@ def update_user_input_places(user_input, dfs, config):
 
 
 def gen_big_table(config, dfs):
-    st.write(dfs["state"])
+    # st.write(dfs["state"])
     state_data = dfs["state"].sort_values(by="state_name")
     proportion = str((state_data.shape[0] + 1) * 5) + "vw"
     text = f"""<div class="big-table" id="big-table">
@@ -451,11 +451,8 @@ def main(session_state):
         </iframe>""",
         unsafe_allow_html=True,
     )
-
     # SOURCES PARAMS
-    user_input = utils.get_sources(
-        user_input, data, dfs["city"], ["beds", "icu_beds"]
-    )
+    user_input = utils.get_sources(user_input, data, dfs["city"], ["beds", "icu_beds"])
 
     # POPULATION PARAMS
     try:
