@@ -1,0 +1,20 @@
+<head>
+    <meta charset="UTF-8">
+    <script>
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        function move_selectbox() {
+            main_div = window.parent.document.getElementById("map-selection");
+            console.log(main_div);
+            selects = window.parent.document.getElementsByClassName("Widget row-widget stSelectbox");
+            console.log(selects);
+            for (i = 0; i < Math.min(selects.length, 3); i++) {
+                main_div.appendChild(selects[i]);
+                console.log(selects[i]);
+            }
+        }
+    </script>
+</head>
+
+<body onload="move_selectbox();">
+</body>

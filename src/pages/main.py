@@ -5,13 +5,15 @@ import numpy as np
 import pandas as pd
 
 # import sys
-from models import IndicatorType, IndicatorCards, ProductCards
+from models import IndicatorType, IndicatorCards, ProductCards, DimensionCards
 
 from model.simulator import run_simulation, get_dmonth
 
 # import pdf_report.pdfgen as pdfgen
 import pages.simulacovid as sm
 import pages.saude_em_ordem as so
+import pages.distancing as ds
+import pages.onda_covid as oc
 import plots
 import utils
 import amplitude
@@ -19,6 +21,8 @@ import session
 
 from streamlit.server.Server import Server
 import os
+
+import bisect
 
 
 def fix_type(x, group):
@@ -50,7 +54,13 @@ def default_indicator(data, col, position, group):
 def update_indicators(indicators, data, config, user_input, session_state):
 
     # TODO: indicadores quando cidade não posssui dados
-    for group in config["br"]["indicators"].keys():
+    # print(indicators)
+    for group in [
+        i
+        for i in config["br"]["indicators"].keys()
+        if i
+        not in ["social_isolation", "hospital_capacity", "subnotification_rate", "rt"]
+    ]:
 
         ref = [
             config["br"]["indicators"][group]["risk"]
@@ -59,33 +69,49 @@ def update_indicators(indicators, data, config, user_input, session_state):
         ][0]
 
         # Displays
-        indicators[group].display = fix_type(
-            data[config["br"]["indicators"][group]["display"]].fillna("- ").values[0],
-            group,
-        )
+        # print(group)
+        # REDO THIS LATER
+        if config["br"]["indicators"][group]["display"] != "None":
+            indicators[group].display = fix_type(
+                data[config["br"]["indicators"][group]["display"]]
+                .fillna("- ")
+                .values[0],
+                group,
+            )
+        else:
+            indicators[group].display = "None"
 
         # Risk
-        indicators[group].risk = [
-            str(data[config["br"]["indicators"][group]["risk"]].values[0])
-            if group != "social_isolation"
-            else "Fonte: inloco"
-        ][0]
+        if config["br"]["indicators"][group]["risk"] != "None":
+            indicators[group].risk = [
+                str(data[config["br"]["indicators"][group]["risk"]].values[0])
+                if group != "social_isolation" and group != "control"
+                else "Fonte: inloco"
+            ][0]
+        else:
+            indicators[group].risk = "None"
 
         # Left display
-        indicators[group].left_display = fix_type(
-            data[config["br"]["indicators"][group]["left_display"]]
-            .fillna("- ")
-            .values[0],
-            group,
-        )
+        if config["br"]["indicators"][group]["left_display"] != "None":
+            indicators[group].left_display = fix_type(
+                data[config["br"]["indicators"][group]["left_display"]]
+                .fillna("- ")
+                .values[0],
+                group,
+            )
+        else:
+            indicators[group].left_display = "None"
 
         # Right display
-        indicators[group].right_display = fix_type(
-            data[config["br"]["indicators"][group]["right_display"]]
-            .fillna("- ")
-            .values[0],
-            group,
-        )
+        if config["br"]["indicators"][group]["right_display"] != "None":
+            indicators[group].right_display = fix_type(
+                data[config["br"]["indicators"][group]["right_display"]]
+                .fillna("- ")
+                .values[0],
+                group,
+            )
+        else:
+            indicators[group].right_display = "None"
 
         if data[ref].fillna("").values[0] == "":
 
@@ -96,11 +122,9 @@ def update_indicators(indicators, data, config, user_input, session_state):
                 indicators[group].right_display = "- "
                 indicators[group].left_display = "- "
 
-    indicators["subnotification_rate"].left_display = session_state.number_cases
-    indicators["hospital_capacity"].left_display = int(session_state.number_beds)
-    indicators["hospital_capacity"].right_display = int(
-        session_state.number_icu_beds
-    )
+    # indicators["subnotification_rate"].left_display = session_state.number_cases
+    indicators["capacity"].left_display = int(session_state.number_beds)
+    indicators["capacity"].right_display = int(session_state.number_icu_beds)
 
     # Caso o usuário altere os casos confirmados, usamos esse novo valor para a estimação
     # TODO: vamos acabar com o user_iput e manter só session_state?
@@ -124,8 +148,8 @@ def update_indicators(indicators, data, config, user_input, session_state):
         2: {"preffix": "até 2", "class": "insatisfatório"},
         3: {"preffix": "+ de 2", "class": "bom"},
     }
-    indicators["hospital_capacity"].risk = dic_dmonth[dmonth]["class"]
-    indicators["hospital_capacity"].display = dic_dmonth[dmonth]["preffix"]
+    # indicators["hospital_capacity"].risk = dic_dmonth[dmonth]["class"]
+    # indicators["hospital_capacity"].display = dic_dmonth[dmonth]["preffix"]
 
     return indicators
 
@@ -161,10 +185,10 @@ def choose_rt(user_input, dfs, level):
         user_input["rt_level"] = "nan"
         return user_input
 
-    elif len(df["rt_10days_ago_low"].values) > 0:
+    elif len(df["rt_low_95"].values) > 0:
         user_input["rt_values"] = {
-            "best": df["rt_10days_ago_low"].values[0],
-            "worst": df["rt_10days_ago_high"].values[0],
+            "best": df["rt_low_95"].values[0],
+            "worst": df["rt_high_95"].values[0],
         }
 
         user_input["rt_level"] = [
@@ -221,6 +245,65 @@ def update_user_input_places(user_input, dfs, config):
     # Update dos ids
     user_input = update_user_input_ids(data, user_input)
     return user_input, utils.fix_dates(data)
+
+
+def gen_big_table(config, dfs):
+    st.write(dfs["state"])
+    state_data = dfs["state"].sort_values(by="state_name")
+    proportion = str((state_data.shape[0] + 1) * 5) + "vw"
+    text = f"""<div class="big-table" id="big-table">
+        <div class="big-table-title-box">
+            <div class="big-table-title">COMO ESTÃO OS ESTADOS?</div>
+        </div>
+        <div class="big-table-head-box">
+            <div class="big-table-line btl0" style="height: {proportion};"></div>
+            <div class="big-table-line btl1" style="height: {proportion};"></div>
+            <div class="big-table-line btl2" style="height: {proportion};"></div>
+            <div class="big-table-line btl3" style="height: {proportion};"></div>
+            <div class="big-table-line btl4" style="height: {proportion};"></div>
+            <div class="big-table-field btt0">Estado e nível de alerta</div>
+            <div class="big-table-field btt1">Média móvel de novos casos diarios por mi habitantes</div>
+            <div class="big-table-field btt2">Ritmo de contágio</div>
+            <div class="big-table-field btt3">Capacidade do sistema de saúde</div>
+            <div class="big-table-field btt4">Taxa de subnotificação</div>
+            <div class="big-table-field btt5">Média móvel de mortes diárias por mi habitantes</div>
+        </div>"""
+    row_order = 0
+    for index, sector_data in state_data.iterrows():
+        text += gen_sector_big_row(sector_data, row_order, config)
+        row_order += 1
+    text += f"""<div class="big-table-endspacer">
+        </div>
+    </div>"""
+    st.write(text, unsafe_allow_html=True)
+
+
+def gen_sector_big_row(my_state, index, config):
+    """ Generates a row of a table given the necessary information coming from a sector data row """
+    alert_info = {
+        "nan": ["grey", "❓"],
+        0: ["#0090A7", "👍"],
+        1: ["#F7B500", "😨"],
+        2: ["#F77800", "⚠"],
+        3: ["#F02C2E", "🛑"],
+    }
+    level_data = config["br"]["farolcovid"]["rules"]
+    return f"""<div class="big-table-row {["btlgrey","btlwhite"][index % 2]}">
+            <div class="big-table-index-background" style="background-color:{alert_info[my_state["overall_alert"]][0]};"></div>
+            <div class="big-table-field btf0">{my_state["state_name"]} {alert_info[my_state["overall_alert"]][1]}</div>
+            <div class="big-table-field btf1" style="color:{alert_info[find_level(level_data["situation_classification"]["cuts"],level_data["situation_classification"]["categories"],my_state["daily_cases_mavg_100k"])][0]};">{"%0.2f"%my_state["daily_cases_mavg_100k"]}</div>
+            <div class="big-table-field btf2" style="color:{alert_info[find_level(level_data["control_classification"]["cuts"],level_data["control_classification"]["categories"],my_state["rt_most_likely"])][0]};" > {"%0.2f"%my_state["rt_most_likely"]}</div>
+            <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["dday_icu_beds"])][0]};">{my_state["dday_icu_beds"]} dia(s)</div>
+            <div class="big-table-field btf4" style="color:{alert_info[find_level(level_data["trust_classification"]["cuts"],level_data["trust_classification"]["categories"],my_state["notification_rate"])][0]};">{int(my_state["subnotification_rate"]*100)}%</div>
+            <div class="big-table-field btf5">{"%0.2f"%my_state["new_deaths_mavg_100k"]}</div>
+        </div>"""
+
+
+def find_level(cuts, levels, value):
+    if np.isnan(value):
+        return "nan"
+    index = bisect.bisect(cuts, value)
+    return levels[min(index - 1, len(levels) - 1)]
 
 
 @st.cache(suppress_st_warning=True)
@@ -298,6 +381,12 @@ def main(session_state):
     config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
     dfs, places_ids = get_data(config)
 
+    # INitial header div
+    # st.write(
+    # "<div class='base-wrapper'><div class='map-selection' id='map-selection'></div></div>",
+    # unsafe_allow_html=True,
+    # )
+
     # REGION/CITY USER INPUT
     user_input = dict()
     user_input["state_name"] = st.selectbox("Estado", utils.filter_place(dfs, "state"))
@@ -324,6 +413,44 @@ def main(session_state):
     )
 
     user_input, data = update_user_input_places(user_input, dfs, config)
+    # MAP
+    map_place_id = utils.Dictionary().get_state_alphabetical_id_by_name(
+        user_input["state_name"]
+    )
+
+    if os.getenv("IS_LOCAL") == "TRUE":
+        map_url = config["br"]["api"]["mapserver_local"]
+    else:
+        map_url = config["br"]["api"]["mapserver_external"]
+
+    # remove below as well
+    # map_url = "http://192.168.0.5:5000/"
+    st.write(
+        f"""
+    <div class="brazil-map-div">
+        <div class="alert-levels-map-overlay">
+        </div>
+        <iframe id="map" src="resources/iframe-gen.html?url={map_url}map-iframe?place_id=BR" class="map-br" scrolling="no">
+        </iframe>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+    st.write(
+        f"""
+    <iframe id="map-state" src="resources/iframe-gen.html?url={map_url}map-iframe?place_id={map_place_id}" class="map-state" scrolling="no">
+    </iframe>
+    """,
+        unsafe_allow_html=True,
+    )
+    st.write(
+        f"""
+        <div class="selectors-box" id="selectors-box">
+        </div>
+        <iframe src="resources/select-box-mover.html?place_id={user_input["state_name"]}{user_input["health_region_name"]}{user_input["city_name"]}" height="0px">
+        </iframe>""",
+        unsafe_allow_html=True,
+    )
 
     # SOURCES PARAMS
     user_input = utils.get_sources(
@@ -331,18 +458,27 @@ def main(session_state):
     )
 
     # POPULATION PARAMS
-    user_input["population_params"] = {
-        "N": int(data["population"].fillna(0).values[0]),
-        "D": int(data["deaths"].fillna(0).values[0]),
-        "I": int(data["active_cases"].fillna(0).values[0]),
-        "I_confirmed": int(data["confirmed_cases"].fillna(0).values[0]),
-        "I_compare": int(data["confirmed_cases"].fillna(0).values[0]),
-    }
+    try:
+        user_input["population_params"] = {
+            "N": int(data["population"].fillna(0).values[0]),
+            "D": int(data["deaths"].fillna(0).values[0]),
+            "I": int(data["active_cases"].fillna(0).values[0]),
+            "I_confirmed": int(data["confirmed_cases"].fillna(0).values[0]),
+            "I_compare": int(data["confirmed_cases"].fillna(0).values[0]),
+        }
+    except:
+        user_input["population_params"] = {
+            "N": int(data["population"].fillna(0).values[0]),
+            "D": int(data["deaths"].fillna(0).values[0]),
+            "I": 0,
+            "I_confirmed": int(data["confirmed_cases"].fillna(0).values[0]),
+            "I_compare": int(data["confirmed_cases"].fillna(0).values[0]),
+        }
 
     user_input["Rt"] = {
-        "best": data["rt_10days_ago_low"].values[0],
-        "worst": data["rt_10days_ago_high"].values[0],
-        "is_valid": data["rt_classification"].apply(str).values[0],
+        "best": data["rt_low_95"].values[0],
+        "worst": data["rt_high_95"].values[0],
+        "is_valid": data["rt_most_likely"].apply(str).values[0],
     }
 
     user_input["last_updated_cases"] = data["last_updated_subnotification"].max()
@@ -394,18 +530,15 @@ def main(session_state):
             config["br"]["seir_parameters"]["severe_duration"]
             + config["br"]["seir_parameters"]["critical_duration"]
         )
-        st.write(
-            f"""<div class="base-wrapper">
-        O número de casos confirmados oficialmente no seu município ou estado é de {int(data['confirmed_cases'].sum())} em {pd.to_datetime(data["data_last_refreshed"].values[0]).strftime("%d/%m/%Y")}. 
-        Dada a progressão clínica da doença (em média, {infectious_period} dias) e a taxa de notificação ajustada para o município ou estado de ({int(100*data['notification_rate'].values[0])}%), 
-        <b>estimamos que o número de casos ativos é de {int(data['active_cases'].sum())}</b>.<br>
-        <br>Caso queria, você pode mudar esse número para a simulação abaixo:
-                </div>""",
-            unsafe_allow_html=True,
-        )
+        placeholder_value_pls_solve_this = 0
+
+    # DIMENSIONS CARDS
+    dimensions = DimensionCards
+    utils.genAnalysisDimmensionsSection(dimensions)
 
     # INDICATORS CARDS
     indicators = IndicatorCards
+
     indicators = update_indicators(indicators, data, config, user_input, session_state)
 
     if "state" in user_input["place_type"]:
@@ -515,37 +648,16 @@ def main(session_state):
         key_indicators_button_style,
         session_state,
     )
-    # CHANGE DATA SECTION
-    utils.genInputCustomizationSectionHeader(user_input["locality"])
-    old_user_input = dict(user_input)
-    user_input, session_state = utils.genInputFields(user_input, config, session_state)
-    if session_state.reset:
-        session.rerun()
-    if session_state.update:
-        opening_response = user_analytics.log_event(
-            "updated sim_numbers",
-            {
-                "beds_change": session_state.number_beds
-                - int(old_user_input["number_beds"]),
-                "icu_beds_change": session_state.number_icu_beds
-                - int(old_user_input["number_icu_beds"]),
-                "cases_change": session_state.number_cases
-                - int(old_user_input["population_params"]["I_confirmed"]),
-                "deaths_change": session_state.number_deaths
-                - int(old_user_input["population_params"]["D"]),
-            },
-        )
-        session_state.update = False
-        session.rerun()
 
     # AMBASSADOR SECTION
     utils.gen_ambassador_section()
 
-    indicators["hospital_capacity"].left_display = user_input["number_beds"]
-    indicators["hospital_capacity"].right_display = user_input["number_icu_beds"]
-    indicators["subnotification_rate"].left_display = user_input["population_params"][
-        "D"
-    ]
+    # indicators["hospital_capacity"].left_display = user_input["number_beds"]
+    # indicators["hospital_capacity"].right_display = user_input["number_icu_beds"]
+    # indicators["subnotification_rate"].left_display = user_input["population_params"][
+    # "D"
+    # ]
+
     # PDF-REPORT GEN BUTTON
     # if st.button("Gerar Relatório PDF"):
     #     user_analytics.log_event("generated pdf")
@@ -559,18 +671,26 @@ def main(session_state):
     #     )
     # TOOLS
     products = ProductCards
-    products[1].recommendation = f'Risco {data["overall_alert"].values[0]}'
+    # products[2].recommendation = f'Risco {data["overall_alert"].values[0]}'
+    # ADD NEW CARDS
+
     utils.genProductsSection(products)
 
     # SELECTION BUTTONS
     if session_state.continuation_selection is None:
-        session_state.continuation_selection = [False, False]
+        session_state.continuation_selection = [False, False, False, False]
     simula_button_name = "Clique Aqui"  # Simula covid 0space
     saude_button_name = "Clique Aqui "  # Saude em ordem 1space
-    if st.button(simula_button_name):
-        session_state.continuation_selection = [True, False]
-    if st.button(saude_button_name):
-        session_state.continuation_selection = [False, True]
+    distancia_button_name = "Clique_Aqui"  # Distanciamento social
+    onda_button_name = "Clique_Aqui "  # onda covid
+    if st.button(simula_button_name):  # SIMULA
+        session_state.continuation_selection = [True, False, False, False]
+    if st.button(distancia_button_name):  # DISTANCIAMENTO
+        session_state.continuation_selection = [False, True, False, False]
+    if st.button(saude_button_name):  # SAUDE
+        session_state.continuation_selection = [False, False, True, False]
+    if st.button(onda_button_name):  # ONDA
+        session_state.continuation_selection = [False, False, False, True]
 
     utils.stylizeButton(
         simula_button_name,
@@ -580,10 +700,22 @@ def main(session_state):
     )
 
     utils.stylizeButton(
-        saude_button_name,
+        distancia_button_name,
         """border: 1px solid black;""",
         session_state,
         others={"ui_binSelect": 2},
+    )
+    utils.stylizeButton(
+        saude_button_name,
+        """border: 1px solid black;""",
+        session_state,
+        others={"ui_binSelect": 3},
+    )
+    utils.stylizeButton(
+        onda_button_name,
+        """border: 1px solid black;""",
+        session_state,
+        others={"ui_binSelect": 4},
     )
     if session_state.continuation_selection[0]:
         user_analytics.safe_log_event(
@@ -594,7 +726,12 @@ def main(session_state):
                 "health_region": session_state.health_region_name,
                 "city": session_state.city_name,
             },
-            alternatives=["picked saude_em_ordem", "picked simulacovid"],
+            alternatives=[
+                "picked saude_em_ordem",
+                "picked simulacovid",
+                "picked onda",
+                "picked distanciamento",
+            ],
         )
         # Downloading the saved data from memory
         user_input["number_beds"] = session_state.number_beds
@@ -604,8 +741,24 @@ def main(session_state):
         sm.main(user_input, indicators, data, config, session_state)
         # TODO: remove comment on this later!
         # utils.gen_pdf_report()
-
     elif session_state.continuation_selection[1]:
+        user_analytics.safe_log_event(
+            "picked distanciamento",
+            session_state,
+            event_args={
+                "state": session_state.state_name,
+                "health_region": session_state.health_region_name,
+                "city": session_state.city_name,
+            },
+            alternatives=[
+                "picked saude_em_ordem",
+                "picked simulacovid",
+                "picked onda",
+                "picked distanciamento",
+            ],
+        )
+        ds.main(user_input, indicators, data, config, session_state)
+    elif session_state.continuation_selection[2]:
         user_analytics.safe_log_event(
             "picked saude_em_ordem",
             session_state,
@@ -614,11 +767,34 @@ def main(session_state):
                 "health_region": session_state.health_region_name,
                 "city": session_state.city_name,
             },
-            alternatives=["picked saude_em_ordem", "picked simulacovid"],
+            alternatives=[
+                "picked saude_em_ordem",
+                "picked simulacovid",
+                "picked onda",
+                "picked distanciamento",
+            ],
         )
         so.main(user_input, indicators, data, config, session_state)
-        pass
-
+    elif session_state.continuation_selection[3]:
+        user_analytics.safe_log_event(
+            "picked onda",
+            session_state,
+            event_args={
+                "state": session_state.state_name,
+                "health_region": session_state.health_region_name,
+                "city": session_state.city_name,
+            },
+            alternatives=[
+                "picked saude_em_ordem",
+                "picked simulacovid",
+                "picked onda",
+                "picked distanciamento",
+            ],
+        )
+        oc.main(user_input, indicators, data, config, session_state)
+    # BIG TABLE
+    gen_big_table(config, dfs)
+    # FOOTER
     utils.gen_whatsapp_button(config["impulso"]["contact"])
     utils.gen_footer()
     user_analytics.conclude_user_session(session_state)

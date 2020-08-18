@@ -5,15 +5,14 @@
         var x = window.parent.matchMedia("only screen and (max-width: 425px)")
         function changeStyle() {
             var button = findButt(urlParams.get("name"));
-            if (urlParams.get("ui_binSelect") == 1 || urlParams.get("ui_binSelect") == 2) {
-                makeItBinarySelection(button, urlParams.get("ui_binSelect"))
+            if (["1", "2", "3", "4"].includes(urlParams.get("ui_binSelect"))) {
+                makeItQuadSelection(button, urlParams.get("ui_binSelect"))
             }
             for (let key of urlParams.keys()) {
                 if (key != "name" && !key.includes("ui_")) {
                     button.style[key] = urlParams.get(key);
                 }
             }
-            //console.log(button.style);
         }
         function findButt(buttonName) {
             buttons = window.parent.document.getElementsByClassName("st-dg st-aj st-ak st-b0 st-dh st-di st-dj st-dk st-cs st-ct st-cu st-cv st-b5 st-dl st-ay st-dm st-dn st-do st-b9 st-dp st-ai st-dq st-dr st-ds st-dt st-d5 st-al st-cw st-am st-bm st-bn st-bo st-bp st-aq st-as st-ap st-ar st-du st-dv st-dw st-dx st-bl st-br st-dy st-dz st-e0 st-e1 st-e2 st-e3 st-e4 st-e5 st-e6 st-e7 st-e8 st-e9 st-ea st-eb");
@@ -33,7 +32,7 @@
             parentNode.insertBefore(node, nextSibling);
             return node;
         }
-        function makeItBinarySelection(button, pos) {
+        function makeItQuadSelection(button, pos) {
             try {
                 button.classList.add("flex");
             } catch (err) {
@@ -53,17 +52,13 @@
             button.parentElement.classList.add("flex-space-around");
             button.parentElement.classList.add("mt");
             button.parentElement.classList.add("flex-m-column");
-            if (button.parentElement.childNodes.length == 1) {
-                var helperButton = button.cloneNode(true);
-                helperButton.textContent = "XXX_PLACEHOLDER_XXX"
-                if (pos == 1) {
+            if (button.parentElement.childNodes.length == 1) { //if it is the first time this button is added, we add the placeholders
+                for (i = 0; i < 3; i++) { //adds the other placeholder buttons
+                    var helperButton = button.cloneNode(true);
+                    helperButton.textContent = "XXX_PLACEHOLDER_XXX";
                     button.parentElement.appendChild(helperButton);
-                } else if (pos == 2) {
-                    button.parentElement.insertBefore(helperButton, button)
-                } else {
-                    button.parentElement.appendChild(helperButton);
-                }
-
+                    button.parentNode.insertBefore(button.parentElement.childNodes[0], button.parentElement.childNodes[pos]);
+                } //position
             }
             button.style["z-index"] = 5;
             button.onmouseover = function () {
@@ -79,22 +74,11 @@
         function reposition(x) {
             var button = findButt(urlParams.get("name"));
             var pos = urlParams.get("ui_binSelect");
+            var topheights = [["-1580px", "-430px"], ["-1595px", "-445px"], ["-1610px", "-460px"], ["-1625px", "-475px"]];
             if (x.matches) { // If the thing is mobile
-                if (pos == 1) {
-                    button.parentElement.style.top = "-805px";
-                } else if (pos == 2) {
-                    button.parentElement.style.top = "-820px";
-                } else {
-                    button.parentElement.style.top = "-805px";
-                }
-            } else {
-                if (pos == 1) {
-                    button.parentElement.style.top = "-430px";
-                } else if (pos == 2) {
-                    button.parentElement.style.top = "-445px";
-                } else {
-                    button.parentElement.style.top = "-430px";
-                }
+                button.parentElement.style.top = topheights[pos - 1][0];
+            } else {//if thing is not
+                button.parentElement.style.top = topheights[pos - 1][1];
             }
         }
 

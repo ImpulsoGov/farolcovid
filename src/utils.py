@@ -16,6 +16,7 @@ from models import (
     IndicatorBackground,
     Illustration,
     Product,
+    Dimension,
 )
 from typing import List
 import re
@@ -62,10 +63,13 @@ def get_inloco_url(config):
 
 # DATES TOOLS
 
+
 def fix_dates(df):
     for col in df.columns:
         if "last_updated" in col:
-            df[col] = pd.to_datetime(df[col])#.apply(lambda x: x.strftime("%d/%m/%Y"))
+            df[col] = pd.to_datetime(
+                df[col]
+            )  # .apply(lambda x: x.strftime("%d/%m/%Y"))
     return df
 
 
@@ -203,7 +207,15 @@ class Dictionary:
                 "city_id"
             ].values[0]
         else:
-            dictioanry["state_num_id"].values[0]
+            dictionary["state_num_id"].values[0]
+
+    def get_state_alphabetical_id_by_name(self, state_name):
+        self.check_initialize()
+        if state_name == "Todos":
+            return "BR"
+        return self.dictionary.loc[self.dictionary["state_name"] == state_name][
+            "state_id"
+        ].values[0]
 
 
 name_dictionary = Dictionary()
@@ -506,7 +518,7 @@ def genInputFields(user_input, config, session):
         session.reset = False
     else:
         number_beds = int(session.number_beds)
-        #number_ventilators = int(session.number_ventilators)
+        # number_ventilators = int(session.number_ventilators)
         number_icu_beds = int(session.number_icu_beds)
         number_cases = int(session.number_cases)
         number_deaths = int(session.number_deaths)
@@ -574,6 +586,43 @@ def genInputFields(user_input, config, session):
     return user_input, session
 
 
+def translate_risk(risk_value):
+    if risk_value == "nan":
+        return "Indef"
+    else:
+        try:
+            return loader.config["br"]["farolcovid"]["categories"][risk_value]
+        except:
+            return risk_value
+
+
+def genAnalysisDimmensionsCard(dimension: Dimension):
+    return f"""<div style="margin-top: 0px; display: inline-block; top:0x;">
+            <div class="dimension-card primary-span style="top:0x;">
+                {dimension.text}
+            </div>
+        </div>"""
+
+
+def genAnalysisDimmensionsSection(dimensions: List[Dimension]):
+    cards = list(map(genAnalysisDimmensionsCard, dimensions))
+    cards = "".join(cards)
+
+    st.write(
+        f"""
+        <div class="base-wrapper primary-span">
+            <div>
+                <span class="section-header">DIMENSÕES DA ANÁLISE</span>
+            </div>
+            <span class="p3">O que olhamos ao avaliar o cenário da pandemia em um lugar?</span>
+            <div class="flex flex-row flex-space-around mt flex-m-column" style="margin-bottom: 0px;height:auto; display:inline-block top:0x;">
+            {cards}
+            </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
+
+
 def genIndicatorCard(indicator: Indicator):
     display_left = "flex"
     display_right = "flex"
@@ -583,31 +632,32 @@ def genIndicatorCard(indicator: Indicator):
 
     if str(indicator.right_display) == "nan":
         display_right = "hide-bg"
-
+    if indicator.display == "None":
+        indicator.display = ""
+        indicator.unit = ""
     if indicator.risk == "Fonte: inloco":
         risk_html_class = "black-span p4"
     else:
         risk_html_class = "bold white-span p4"
-
-    return f"""<div class="indicator-card flex flex-column mr">
-                        <span class="header p3">{indicator.header}</span>
-                        <span class="p4">{indicator.caption}</span>
-                        <span class="bold p2">{indicator.display}<span class="bold p5"> {indicator.unit}</span></span>
-                        <div class="{IndicatorBackground(indicator.risk).name}-alert-bg risk-pill">
-                                <span class="{risk_html_class}">{indicator.risk}</span>
-                        </div>
-                        <div class="flex flex-row flex-justify-space-between mt"> 
-                                <div class="br {display_left} flex-column text-align-center pr">
-                                        <span class="lighter">{indicator.left_label}</span>
-                                        <span class="bold">{indicator.left_display}</span>
-                                </div>
-                                <div class=" bl flex flex-column text-align-center pl {display_right}">
-                                        <span class="lighter">{indicator.right_label}</span>
-                                        <span class="bold">{indicator.right_display}</span>
-                                </div>
-                        </div>
-                </div>
-        """
+    return f"""
+    <div class="main-indicator-card flex flex-column mr" style="z-index:1;display:inline-block;position:relative;">
+        <span class="main-card-header-v2">{indicator.header}</span>
+        <span class="main-card-list-v2">{indicator.caption}</span>
+        <div class="flex flex-row flex-justify-space-between mt" style="width:250px;">
+        </div>
+        <span class="bold p2 main-card-display-value">{indicator.display}<span class="bold p5">  {indicator.unit}</span></span>
+        <div class="{IndicatorBackground(try_int(indicator.risk)).name}-alert-bg risk-pill " style="position:absolute;bottom:120px;">
+            <span class="{risk_html_class}">{loader.config["br"]["farolcovid"]["categories"][int(indicator.risk.split(".")[0])] if indicator.risk not in ["nan","Fonte: inloco"] else ""}</span>
+        </div>
+        <div class="main-card-display-text-v2 sdcardtext-left">
+                <span class="lighter">{indicator.left_label}<br></span>
+                <span class="bold">{indicator.left_display}</span>
+        </div>
+        <div class="main-card-display-text-v2 sdcardtext-right">
+                <span class="lighter">{indicator.right_label}<br></span>
+                <span class="bold">{indicator.right_display}</span>
+        </div>
+    </div>"""
 
 
 def genKPISection(
@@ -623,13 +673,12 @@ def genKPISection(
         stoplight = "%0a%0a"
     else:
         bg = AlertBackground(alert).name
+        caption = f"Risco {alert.upper()} de colapso no sistema de saúde;"
 
         if "state" in place_type:
             place_type = "estado"
-            caption = f"Seu estado está em Risco {alert.upper()}. <b>Note que {n_colapse_alert_cities} municípios avaliados estão em Risco Médio ou Alto de colapso</b>. Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
         else:
             place_type = "município"
-            caption = f"Risco {alert.upper()} de colapso no sistema de saúde (Veja Níveis de Risco no menu ao lado)"
 
         if alert == "baixo":
             stoplight = f"Meu {place_type} está em *ALERTA BAIXO*! E o seu? %0a%0a"
@@ -640,10 +689,10 @@ def genKPISection(
 
     cards = list(map(genIndicatorCard, indicators.values()))
     cards = "".join(cards)
-    msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  🚨%0a%0a{stoplight}😷 *Contágio*: Cada contaminado infecta em média outras *{indicators['rt'].display} pessoas* - _semana passada: {indicators['rt'].left_display}, tendência: {indicators['rt'].right_display}_%0a%0a🏥 *Capacidade*: A capacidade hospitalar será atingida em *{str(indicators['hospital_capacity'].display).replace("+", "mais")} mês(es)* %0a%0a🔍 *Subnotificação*: A cada 10 pessoas infectadas, *{indicators['subnotification_rate'].display} são diagnosticadas* %0a%0a🏠 *Isolamento*: Na última semana, *{indicators['social_isolation'].display} das pessoas ficou em casa* - _semana passada: {indicators['social_isolation'].left_display}, tendência: {indicators['social_isolation'].right_display}_%0a%0a---%0a%0a👉 Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui: https://coronacidades.org/farol-covid/"""
-
+    # msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  🚨%0a%0a{stoplight}😷 *Contágio*: Cada contaminado infecta em média outras *{indicators['rt'].display} pessoas* - _semana passada: {indicators['rt'].left_display}, tendência: {indicators['rt'].right_display}_%0a%0a🏥 *Capacidade*: A capacidade hospitalar será atingida em *{str(indicators['hospital_capacity'].display).replace("+", "mais")} mês(es)* %0a%0a🔍 *Subnotificação*: A cada 10 pessoas infectadas, *{indicators['subnotification_rate'].display} são diagnosticadas* %0a%0a🏠 *Isolamento*: Na última semana, *{indicators['social_isolation'].display} das pessoas ficou em casa* - _semana passada: {indicators['social_isolation'].left_display}, tendência: {indicators['social_isolation'].right_display}_%0a%0a---%0a%0a👉 Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui: https://coronacidades.org/farol-covid/"""
+    msg = "temporarily disabled"
     st.write(
-        """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;">
+        """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;height:auto;">
                 <div class="base-wrapper flex flex-column" style="margin-top: 0px;">
                         <div class="flex flex-row flex-space-between flex-align-items-center">
                          <span class="white-span header p1">%s</span>
@@ -653,7 +702,7 @@ def genKPISection(
                         <div class="flex flex-row flex-m-column">%s</div>
                 </div>
         </div>
-        <div class='base-wrapper product-section'></div>
+        <div class='base-wrapper product-section' ></div>
         """
         % (bg, locality, msg, caption, cards),
         unsafe_allow_html=True,
@@ -664,19 +713,23 @@ def genProductCard(product: Product):
     if product.recommendation == "Sugerido":
         badge_style = "primary-bg"
     elif product.recommendation == "Risco alto":
+        product.recommendation = "Espere"
         badge_style = f"red-alert-bg"
+    elif product.recommendation == "Risco baixo":
+        product.recommendation = "Explore"
+        badge_style = "primary-bg"
     else:
-        badge_style = "hide-bg"
+        badge_style = "primary-bg"
 
     return f"""<div class="flex flex-column elevated pr pl product-card mt  ">
+                <img src="{product.image}" style="height:100px;" class="card-image mt"/>
                 <div class="flex flex-row">
                         <span class="p3 header bold uppercase">{product.name}</span>
-                         <span class="{badge_style} ml secondary-badge">{product.recommendation}</span>
                 </div>
-                <span>{product.caption}</span>
-                <img src="{product.image}" style="width: 200px" class="mt"/>
-        </div>
-        """
+                <span class="selection-card-caption">{product.caption}</span>
+                <span class="{badge_style} ml secondary-badge">{product.recommendation}</span>
+                </div>
+                """
 
 
 def genProductsSection(products: List[Product]):
@@ -686,7 +739,7 @@ def genProductsSection(products: List[Product]):
     st.write(
         f"""
         <div class="base-wrapper">
-                <span class="section-header primary-span">COMO SEGUIR COM SEGURANÇA?</span>
+                <span class="section-header primary-span">O QUE MAIS VOCÊ QUER SABER SOBRE O SEU MUNICÍPIO?</span>
                 <div class="flex flex-row flex-space-around mt flex-m-column">{cards}</div>
         </div>
         """,
@@ -747,13 +800,11 @@ def gen_ambassador_section() -> None:
         """
         <div class="base-wrapper">
                 <div class="ambassador-container">
-                        <span class="ambassador-question"><b>Quer saber em primeira mão os lançamentos e melhorias do Farol Covid e do Coronacidades?</b>
-                        Seja um Embaixador Coronacidades!</span>
-                        <a class="btn-ambassador" href="%s" target="blank">Quero ser embaixador</a>
+                        <span class="ambassador-question"><b>Quer aprofundar a análise para seu Município? ?</b><br>
+                        A equipe do Coronacidades está disponível de forma inteiramente gratuita!</span>
+                        <a class="btn-ambassador" href="https://coronacidades.org/fale-conosco/" target="blank">FALE CONOSCO</a>
                 </div>
-        </div>
-        """
-        % Link.AMBASSADOR_FORM.value,
+        </div>""",
         unsafe_allow_html=True,
     )
 
@@ -843,6 +894,13 @@ def genChartSimulationSection(simulation: SimulatorOutput, fig) -> None:
     )
 
     st.plotly_chart(fig, use_container_width=True)
+
+
+def try_int(possible_int):
+    try:
+        return int(float(possible_int))
+    except Exception as e:
+        return possible_int
 
 
 # def genVideoTutorial():
