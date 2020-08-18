@@ -108,7 +108,7 @@ br:
         rules:
             # TODO: change new_cases column
             situation_classification:
-                column_name: 'daily_cases_mavg_1mi'
+                column_name: 'daily_cases_mavg_100k'
                 cuts: [0, 10, 20, 40, 100000]
                 categories: [0, 1, 2, 3]
 
@@ -135,9 +135,9 @@ br:
     indicators:
         situation:
             risk: "situation_classification"
-            right_display: "None" # TODO: add daily_cases_mavg_ndays
-            left_display: "daily_cases_mavg_1mi_growth"
-            display: "daily_cases_mavg_1mi"
+            right_display: "daily_cases_growth_ndays"
+            left_display: "daily_cases_growth"
+            display: "daily_cases_mavg_100k"
         control:
             risk: "control_classification"
             right_display: "rt_growth"
@@ -151,7 +151,7 @@ br:
         trust:
             risk: "trust_classification"
             right_display: "new_deaths_growth"
-            left_display: "new_deaths_mavg_1mi" 
+            left_display: "new_deaths_mavg_100k" 
             display: "notification_rate"
     inloco:
         replace: 
