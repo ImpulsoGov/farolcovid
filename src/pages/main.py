@@ -25,7 +25,21 @@ import os
 import bisect
 
 
-def fix_type(x, group):
+def fix_type(x, group, position):
+    if x == "- ":
+        return x
+
+    # print("\n\n AQUI:", x, group, position, "\n\n ====")
+    if (group == "situation" and position == "display") or (
+        group == "trust" and position == "left_display"
+    ):
+        return round(float(x), 2)
+
+    if group == "trust" and position == "display":
+        return int(round(10 * x, 0))
+
+    if group == "situation" and position == "left_display":
+        return str(int(x)) + " dias"
 
     if type(x) == np.ndarray:
         return " a ".join(
@@ -36,91 +50,45 @@ def fix_type(x, group):
         return x
 
     if type(x) == np.float64:
-        if (x <= 1) & (group == "subnotification_rate"):
-            return int(round(10 * x, 0))
-
         if (x <= 1) & (group == "social_isolation"):
             return str(int(round(100 * x, 0))) + "%"
-
         else:
             return int(x)
 
 
-def default_indicator(data, col, position, group):
-
-    return fix_type(data[col[position]].fillna("- ").values[0], group)
-
-
 def update_indicators(indicators, data, config, user_input, session_state):
-
     # TODO: indicadores quando cidade não posssui dados
-    # print(indicators)
-    for group in [
-        i
-        for i in config["br"]["indicators"].keys()
-        if i
-        not in ["social_isolation", "hospital_capacity", "subnotification_rate", "rt"]
-    ]:
+    for group in config["br"]["indicators"].keys():
+        # Fix values for each position
+        dic_indicators = dict()
+        for position in config["br"]["indicators"][group].keys():
+            # Filter indicators
+            if config["br"]["indicators"][group][position] != "None":
+                dic_indicators[position] = fix_type(
+                    data[config["br"]["indicators"][group][position]]
+                    .fillna("- ")
+                    .values[0],
+                    group,
+                    position,
+                )
+            else:
+                dic_indicators[position] = "None"
 
-        ref = [
-            config["br"]["indicators"][group]["risk"]
-            if group != "social_isolation"
-            else config["br"]["indicators"][group]["display"]
-        ][0]
-
-        # Displays
-        # print(group)
-        # REDO THIS LATER
-        if config["br"]["indicators"][group]["display"] != "None":
-            indicators[group].display = fix_type(
-                data[config["br"]["indicators"][group]["display"]]
-                .fillna("- ")
-                .values[0],
-                group,
-            )
-        else:
-            indicators[group].display = "None"
-
-        # Risk
-        if config["br"]["indicators"][group]["risk"] != "None":
-            indicators[group].risk = [
-                str(data[config["br"]["indicators"][group]["risk"]].values[0])
-                if group != "social_isolation" and group != "control"
-                else "Fonte: inloco"
-            ][0]
-        else:
-            indicators[group].risk = "None"
-
-        # Left display
-        if config["br"]["indicators"][group]["left_display"] != "None":
-            indicators[group].left_display = fix_type(
-                data[config["br"]["indicators"][group]["left_display"]]
-                .fillna("- ")
-                .values[0],
-                group,
-            )
-        else:
-            indicators[group].left_display = "None"
-
-        # Right display
-        if config["br"]["indicators"][group]["right_display"] != "None":
-            indicators[group].right_display = fix_type(
-                data[config["br"]["indicators"][group]["right_display"]]
-                .fillna("- ")
-                .values[0],
-                group,
-            )
-        else:
-            indicators[group].right_display = "None"
-
-        if data[ref].fillna("").values[0] == "":
-
-            indicators[group].display = "- "
-            indicators[group].risk = "nan"
+        if np.isnan(data[config["br"]["indicators"][group]["risk"]].values[0]):
+            print("aqui!!!")
+            # dic_indicators["display"] = "- "
+            dic_indicators["risk"] = "nan"
 
             if group == "rt":  # doesn't show values
                 indicators[group].right_display = "- "
                 indicators[group].left_display = "- "
+
+        print(dic_indicators)
+
+        indicators[group].risk = dic_indicators["risk"]
+        indicators[group].left_display = dic_indicators["left_display"]
+        indicators[group].right_display = dic_indicators["right_display"]
+        indicators[group].display = dic_indicators["display"]
 
     # indicators["subnotification_rate"].left_display = session_state.number_cases
     indicators["capacity"].left_display = int(session_state.number_beds)
@@ -135,21 +103,19 @@ def update_indicators(indicators, data, config, user_input, session_state):
         user_input["population_params"]["D"] = session_state.number_cases
 
     # Recalcula capacidade hospitalar
-    user_input["strategy"] = "estavel"
-    user_input = sm.calculate_recovered(user_input, data)
+    # user_input["strategy"] = "estavel"
+    # user_input = sm.calculate_recovered(user_input, data)
 
-    dmonth = get_dmonth(
-        run_simulation(user_input, config), "I2", session_state.number_beds
-    )["best"]
+    # dmonth = get_dmonth(
+    #     run_simulation(user_input, config), "I2", session_state.number_beds
+    # )["best"]
 
-    # TODO: add no config e juntar com farol
-    dic_dmonth = {
-        1: {"preffix": "até 1", "class": "ruim"},
-        2: {"preffix": "até 2", "class": "insatisfatório"},
-        3: {"preffix": "+ de 2", "class": "bom"},
-    }
-    # indicators["hospital_capacity"].risk = dic_dmonth[dmonth]["class"]
-    # indicators["hospital_capacity"].display = dic_dmonth[dmonth]["preffix"]
+    # # TODO: add no config e juntar com farol
+    # dic_dmonth = {
+    #     1: {"preffix": "até 1", "class": "ruim"},
+    #     2: {"preffix": "até 2", "class": "insatisfatório"},
+    #     3: {"preffix": "+ de 2", "class": "bom"},
+    # }
 
     return indicators
 
@@ -262,11 +228,11 @@ def gen_big_table(config, dfs):
             <div class="big-table-line btl3" style="height: {proportion};"></div>
             <div class="big-table-line btl4" style="height: {proportion};"></div>
             <div class="big-table-field btt0">Estado e nível de alerta</div>
-            <div class="big-table-field btt1">Média móvel de novos casos diarios por mi habitantes</div>
+            <div class="big-table-field btt1">Média móvel de novos casos por 100mil habitantes</div>
             <div class="big-table-field btt2">Ritmo de contágio</div>
             <div class="big-table-field btt3">Capacidade do sistema de saúde</div>
             <div class="big-table-field btt4">Taxa de subnotificação</div>
-            <div class="big-table-field btt5">Média móvel de mortes diárias por mi habitantes</div>
+            <div class="big-table-field btt5">Média móvel de novas mortes por 100mil habitantes</div>
         </div>"""
     row_order = 0
     for index, sector_data in state_data.iterrows():
@@ -320,8 +286,8 @@ def get_data(config):
         for place in ["city", "health_region", "state"]
     }
 
-    places_ids = loader.read_data("br", config, "br/places/ids")
-    return dfs, places_ids
+    # places_ids = loader.read_data("br", config, "br/places/ids")
+    return dfs
 
 
 def main(session_state):
@@ -366,20 +332,21 @@ def main(session_state):
     utils.genHeroSection(
         "Farol", "Entenda e controle a Covid-19 em sua cidade e estado."
     )
-    # TEMPORARY BANNER
+    # TEMPORARY BANNER - SEO
     st.write(
         """
     <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
-        <div class="white-span header p1" style="font-size:30px;">NOVO! Não deixe de conferir a nossa nova ferramenta (Saúde em Ordem) no final da página. Confira também a situação da saúde no seu local com o Simulacovid.</div>
+        <div class="white-span header p1" style="font-size:30px;">Selecione seu estado ou município no mapa abaixo:</div>
     </div>
     <div class="base-wrapper">
     </div>
     """,
         unsafe_allow_html=True,
     )
+
     # GET DATA
     config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
-    dfs, places_ids = get_data(config)
+    dfs = get_data(config)
 
     # INitial header div
     # st.write(
@@ -535,6 +502,9 @@ def main(session_state):
     indicators = update_indicators(indicators, data, config, user_input, session_state)
 
     if "state" in user_input["place_type"]:
+        data["overall_alert"] = data["overall_alert"].map(
+            config["br"]["farolcovid"]["categories"]
+        )
 
         # Add disclaimer to cities in state alert levels
         total_alert_cities = dfs["city"][
@@ -564,9 +534,8 @@ def main(session_state):
         """
         <div class='base-wrapper'>
             <i>* Utilizamos %s&percnt; da capacidade hospitalar reportada por %s em %s 
-            para cálculo da projeção de dias para atingir a capacidade máxima.<br>
-            Consideramos leitos disponíveis para Covid-19 os tipos: cirúrgicos, clínicos e hospital-dia.
-            Caso tenha dados mais atuais, sugerimos que mude abaixo e refaça essa estimação.</i>
+            para cálculo da projeção de dias para atingir capacidade máxima.<br><b>Para municípios, utilizamos os recursos da respectiva regional de saúde.</b>
+            São considerados leitos os tipos: cirúrgicos, clínicos e hospital-dia. A capacidade de UTI é dada pelo total de leitos UTI Covid adulto.</i>
         </div>
         """
         % (
@@ -587,27 +556,6 @@ def main(session_state):
         opening_response = user_analytics.log_event("picked key_indicators", dict())
         if st.button("Esconder"):
             pass
-
-        st.write(
-            f"""
-            <div class="base-wrapper">
-                    <span class="section-header primary-span">TAXA DE ISOLAMENTO SOCIAL EM {user_input["locality"]}</span>
-                    <br><br>
-                    Percentual de smartphones que não deixou o local de residência, em cada dia, calculado pela inloco. 
-                    Para mais informações, <a target="_blank" style="color:#3E758A;" href="https://mapabrasileirodacovid.inloco.com.br/pt/">veja aqui</a>.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        try:
-            fig = plots.gen_social_dist_plots_state_session_wrapper(session_state)
-            st.plotly_chart(fig, use_container_width=True)
-        except Exception as e:
-            st.write(
-                """<div class="base-wrapper"><b>Seu município ou estado não possui mais de 30 dias de dados, ou não possui o índice calculado pela inloco.</b>""",
-                unsafe_allow_html=True,
-            )
         st.write(
             f"""
             <div class="base-wrapper">
@@ -632,7 +580,7 @@ def main(session_state):
                 unsafe_allow_html=True,
             )
         st.write(
-            "<div class='base-wrapper'><i>Em breve:</i> gráficos de subnotificação.</div>",
+            "<div class='base-wrapper'><i>Em breve:</i> gráficos de subnotificação e média de casos.</div>",
             unsafe_allow_html=True,
         )
     key_indicators_button_style = """border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
