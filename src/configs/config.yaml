@@ -43,66 +43,10 @@ br:
             last_available_confirmed: 'confirmed_cases'
             new_confirmed: 'daily_cases'
             daily_cases_sum: 'infectious_period_cases'
-        drop: [
-            'estimated_population_2019',
-            'is_last',
-            'is_repeated',
-            'last_available_confirmed_per_100k_inhabitants',
-            'last_available_date',
-            'last_available_death_rate',
-            'new_deaths',
-            'place_type',
-            # 'state'
-        ]
         notification_window_days: 7
     cnes:
         source: 'DataSUS'
     farolcovid:
-        simulacovid:
-            columns: [
-                "state_num_id",
-                "state_id",
-                "state_name",
-                "health_region_id",
-                "health_region_name",
-                "city_id",
-                "city_name",
-                "population",
-                "last_updated_number_beds",
-                "author_number_beds",
-                "number_beds",
-                "last_updated_number_ventilators",
-                "author_number_ventilators",
-                "number_ventilators",
-                "confirmed_cases",
-                "active_cases",
-                "deaths",
-                "notification_rate",
-                # "state_notification_rate",
-                "last_updated_number_icu_beds",
-                "author_number_icu_beds",
-                "number_icu_beds"
-            ]   
-            state_agg: {
-                "population": sum,
-                "confirmed_cases": sum,
-                "active_cases": sum,
-                "deaths": sum,
-                "notification_rate": median, # TODO: remove after new dfs
-                "number_beds": sum,
-                "number_ventilators": sum,
-                "number_icu_beds": sum,
-            }   
-            health_region_agg: {
-                "population": sum,
-                "confirmed_cases": sum,
-                "active_cases": sum,
-                "deaths": sum,
-                "notification_rate": median, # TODO: remove after new dfs
-                "number_beds": sum,
-                "number_ventilators": sum,
-                "number_icu_beds": sum,
-            }  
         categories:
             {0: "novo normal", 1: "moderado", 2: "alto", 3: "altíssimo"}
         rules:
@@ -195,24 +139,6 @@ br:
         infected_health_care_proportion: 0.05
     simulacovid:
         resources_available_proportion: 0.5
-        columns:
-            cnes: [
-            "country_iso",
-            "country_name",
-            "state_num_id",
-            "health_region_id",
-            "city_id",
-            "population",
-            "last_updated_number_beds",
-            "author_number_beds",
-            "last_updated_number_ventilators",
-            "author_number_ventilators",
-            "number_ventilators",
-            "number_beds",
-            "number_icu_beds",
-            "last_updated_number_icu_beds",
-            "author_number_icu_beds",
-        ]
 
 impulso:
     contact:
