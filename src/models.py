@@ -89,7 +89,6 @@ class Indicator:
         self.left_display = left_display
         self.right_display = right_display
 
-
 class ResourceAvailability(NamedTuple):
     locality: str
     cases: int
@@ -208,5 +207,24 @@ ProductCards: List[Product] = [
         name="Onda Covid<br>",
         caption="Onde meu município está na curva da doença?",
         image="https://i.imgur.com/l3vuQdP.png",
+    ),
+]
+
+class Dimension:
+    def __init__(self, text):
+        self.text = text
+
+DimensionCards: List[Dimension] = [
+    Dimension(
+        text = "<b>1. Situação da doença,</b> que busca medir como a doença está se espalhando no território.",
+    ),
+    Dimension(
+        text = "<b>2. Controle da doença,</b> que retrata a capacidade do poder público de detectar os casos.",
+    ),
+    Dimension(
+        text = "<b>3. Capacidade de respostas do sistema de saúde,</b> que reflete a situação do sistema de saúde e risco de colapso.",
+    ),
+    Dimension(
+        text = "<b>4. Confiança dos dados,</b> que reflete a qualidade das medições de casos sendo feitas pelos governos.",
     ),
 ]

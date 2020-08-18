@@ -16,6 +16,7 @@ from models import (
     IndicatorBackground,
     Illustration,
     Product,
+    Dimension,
 )
 from typing import List
 import re
@@ -206,7 +207,7 @@ class Dictionary:
                 "city_id"
             ].values[0]
         else:
-            dictioanry["state_num_id"].values[0]
+            dictionary["state_num_id"].values[0]
 
     def get_state_alphabetical_id_by_name(self, state_name):
         self.check_initialize()
@@ -594,6 +595,36 @@ def translate_risk(risk_value):
         except:
             print("risk translation fialed")
             return risk_value
+
+def genAnalysisDimmensionsCard(dimension: Dimension):
+    return f"""
+        <div class="base-wrapper flex flex-column" style="margin-top: 0px;">
+            <div class="dimension-card flex flex-column flex-space-between flex-align-items-center primary-span">
+                {dimension.text}
+            </div>
+        </div>
+        """
+
+
+
+def genAnalysisDimmensionsSection(dimensions: List[Dimension]):
+    cards = list(map(genAnalysisDimmensionsCard, dimensions))
+    cards = "".join(cards)
+
+    st.write(
+        f"""
+        <div class="base-wrapper">
+            <div>
+                <span class="section-header primary-span">DIMENSÕES DA ANÁLISE</span>
+            </div>
+            <span class="lightblue-span p3">O que olhamos ao avaliar o cenário da pandemia em um lugar?</span>
+            <div class="alert-banner mb" style="margin-bottom: 0px;height:auto;">
+            {cards}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def genIndicatorCard(indicator: Indicator):

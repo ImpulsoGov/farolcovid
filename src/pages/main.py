@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 # import sys
-from models import IndicatorType, IndicatorCards, ProductCards
+from models import IndicatorType, IndicatorCards, ProductCards, DimensionCards
 
 from model.simulator import run_simulation, get_dmonth
 
@@ -56,6 +56,8 @@ def gen_indicator_explanation():
     """,
         unsafe_allow_html=True,
     )
+
+
 
 
 def update_indicators(indicators, data, config, user_input, session_state):
@@ -494,9 +496,14 @@ def main(session_state):
             unsafe_allow_html=True,
         )
 
+    # DIMENSIONS CARDS
+    dimensions = DimensionCards
+    utils.genAnalysisDimmensionsSection(dimensions)
+
     # INDICATORS CARDS
     indicators = IndicatorCards
     gen_indicator_explanation()
+
     indicators = update_indicators(indicators, data, config, user_input, session_state)
 
     if "state" in user_input["place_type"]:
