@@ -1883,7 +1883,7 @@ header>.toolbar { /* Hide toolbar menu */
     float:right;
     right:1em;
     bottom:0px;
-    height:23vw;
+    height:20vw;
 }
 @media only screen and (max-width: 425px) {
     .distanciamento-titleimage {
