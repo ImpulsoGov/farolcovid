@@ -374,8 +374,12 @@ def main(session_state):
     map_url = "http://192.168.0.5:5000/"
     st.write(
         f"""
-    <iframe id="map" src="resources/iframe-gen.html?url={map_url}map-iframe?place_id=BR" class="map-br" scrolling="no">
-    </iframe>
+    <div class="brazil-map-div">
+        <div class="alert-levels-map-overlay">
+        </div>
+        <iframe id="map" src="resources/iframe-gen.html?url={map_url}map-iframe?place_id=BR" class="map-br" scrolling="no">
+        </iframe>
+    </div>
     """,
         unsafe_allow_html=True,
     )
@@ -386,19 +390,14 @@ def main(session_state):
     """,
         unsafe_allow_html=True,
     )
-    # st.write(
-    # f"""
-    # <iframe src="resources/map-div-organizer.html">
-    # </iframe>""",
-    # unsafe_allow_html=True,
-    # )
-    # st.write(
-    # """
-    # <iframe id="mapReader" src="resources/map-reader.html" style="width:100%;">
-    # </iframe>
-    # """,
-    # unsafe_allow_html=True,
-    # )
+    st.write(
+        f"""
+        <div class="selectors-box" id="selectors-box">
+        </div>
+        <iframe src="resources/select-box-mover.html?place_id={user_input["state_name"]}{user_input["health_region_name"]}{user_input["city_name"]}" height="0px">
+        </iframe>""",
+        unsafe_allow_html=True,
+    )
     # SOURCES PARAMS
     user_input = utils.get_sources(
         user_input, data, dfs["city"], ["beds", "ventilators", "icu_beds"]
@@ -602,28 +601,6 @@ def main(session_state):
         key_indicators_button_style,
         session_state,
     )
-    # CHANGE DATA SECTION
-    utils.genInputCustomizationSectionHeader(user_input["locality"])
-    old_user_input = dict(user_input)
-    user_input, session_state = utils.genInputFields(user_input, config, session_state)
-    if session_state.reset:
-        session.rerun()
-    if session_state.update:
-        opening_response = user_analytics.log_event(
-            "updated sim_numbers",
-            {
-                "beds_change": session_state.number_beds
-                - int(old_user_input["number_beds"]),
-                "icu_beds_change": session_state.number_icu_beds
-                - int(old_user_input["number_icu_beds"]),
-                "cases_change": session_state.number_cases
-                - int(old_user_input["population_params"]["I_confirmed"]),
-                "deaths_change": session_state.number_deaths
-                - int(old_user_input["population_params"]["D"]),
-            },
-        )
-        session_state.update = False
-        session.rerun()
 
     # AMBASSADOR SECTION
     utils.gen_ambassador_section()
