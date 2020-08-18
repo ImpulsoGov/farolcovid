@@ -50,7 +50,6 @@ br:
             'last_available_confirmed_per_100k_inhabitants',
             'last_available_date',
             'last_available_death_rate',
-            'new_deaths',
             'place_type',
             # 'state'
         ]
