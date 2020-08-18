@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 # import sys
-from models import IndicatorType, IndicatorCards, ProductCards
+from models import IndicatorType, IndicatorCards, ProductCards, DimensionCards
 
 from model.simulator import run_simulation, get_dmonth
 
@@ -56,6 +56,8 @@ def gen_indicator_explanation():
     """,
         unsafe_allow_html=True,
     )
+
+
 
 
 def update_indicators(indicators, data, config, user_input, session_state):
@@ -366,11 +368,14 @@ def main(session_state):
     map_place_id = utils.Dictionary().get_state_alphabetical_id_by_name(
         user_input["state_name"]
     )
-    if os.getenv("IS_LOCAL") == "TRUE":
-        map_url = config["br"]["api"]["mapserver_local"]
-    else:
-        map_url = config["br"]["api"]["mapserver_external"]
+    
+    #if os.getenv("IS_LOCAL") == "TRUE":
+    #    map_url = config["br"]["api"]["mapserver_local"]
+    #else:
+    #    map_url = config["br"]["api"]["mapserver_external"]
+    
     # remove as well
+
     map_url = "http://192.168.0.5:5000/"
     st.write(
         f"""
@@ -398,6 +403,7 @@ def main(session_state):
         </iframe>""",
         unsafe_allow_html=True,
     )
+
     # SOURCES PARAMS
     user_input = utils.get_sources(
         user_input, data, dfs["city"], ["beds", "ventilators", "icu_beds"]
@@ -489,9 +495,14 @@ def main(session_state):
             unsafe_allow_html=True,
         )
 
+    # DIMENSIONS CARDS
+    dimensions = DimensionCards
+    utils.genAnalysisDimmensionsSection(dimensions)
+
     # INDICATORS CARDS
     indicators = IndicatorCards
     gen_indicator_explanation()
+
     indicators = update_indicators(indicators, data, config, user_input, session_state)
 
     if "state" in user_input["place_type"]:
@@ -624,7 +635,7 @@ def main(session_state):
     #     )
     # TOOLS
     products = ProductCards
-    products[2].recommendation = f'Risco {data["overall_alert"].values[0]}'
+    #products[2].recommendation = f'Risco {data["overall_alert"].values[0]}'
     # ADD NEW CARDS
 
     utils.genProductsSection(products)

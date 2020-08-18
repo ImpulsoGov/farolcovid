@@ -4,8 +4,6 @@ br:
     api:
         external: http://datasource.coronacidades.org/
         local: http://45.55.43.231:7000/
-        mapserver_external: http://datasource.coronacidades.org:5000/
-        mapserver_local: http://192.168.0.5:5000/
         endpoints:
             simulacovid: "br/cities/simulacovid/main"
             rt:
@@ -26,7 +24,6 @@ br:
                 cnae_sectors: "br/cnae/sectors"
             utilities:
                 place_ids: "br/places/ids"
-            maps: "br/maps"
     drive_paths:
         br_id_state_region_city: https://docs.google.com/spreadsheets/d/1pHkH9FZj-c_bCEdvCH9k54uog5QDEd_x5xi4YmDsqyY
         cities_population: https://docs.google.com/spreadsheets/d/1k8mXuUggBuBEghHhhLrLtA-5wa4JsAc-D35S5bNlf24
@@ -81,7 +78,7 @@ br:
                 "active_cases",
                 "deaths",
                 "notification_rate",
-                # "state_notification_rate",
+                "state_notification_rate",
                 "last_updated_number_icu_beds",
                 "author_number_icu_beds",
                 "number_icu_beds"
@@ -91,58 +88,85 @@ br:
                 "confirmed_cases": sum,
                 "active_cases": sum,
                 "deaths": sum,
-                "notification_rate": median, # TODO: remove after new dfs
+                "state_notification_rate": max,
                 "number_beds": sum,
                 "number_ventilators": sum,
-                "number_icu_beds": sum,
+                "number_icu_beds": sum
             }   
             health_region_agg: {
                 "population": sum,
                 "confirmed_cases": sum,
                 "active_cases": sum,
                 "deaths": sum,
-                "notification_rate": median, # TODO: remove after new dfs
+                "notification_rate": median,
                 "number_beds": sum,
                 "number_ventilators": sum,
-                "number_icu_beds": sum,
+                "number_icu_beds": sum
             }  
-        categories:
-            {0: "novo normal", 1: "moderado", 2: "alto", 3: "altíssimo"}
         rules:
-            # TODO: change new_cases column
-            situation_classification:
-                column_name: 'daily_cases_mavg_1mi'
-                cuts: [0, 10, 20, 40, 100000]
-                categories: [0, 1, 2, 3]
+            rt_classification:
+                column_name: 'rt_10days_ago_most_likely'
+                cuts: [0, 1, 1.2, 10]
+                categories: ['bom', 'insatisfatório', 'ruim'] # [1, 0, -1]
 
-            control_classification:
-                column_name: "rt_most_likely"
-                cuts: [0, 0.5, 1, 1.2, 10]
-                categories: [0, 1, 2, 3]
-
-            # TODO: create growth column
-            control_growth: 
-                column_name: "rt_growth"
+            rt_growth:
+                column_name: "rt_ratio_week_avg"
                 cuts: [0, 0.9, 1.1, 1000]
-                categories: ['melhorando', 'estabilizando', 'piorando']
+                categories: ['melhorando', 'estabilizando', 'piorando'] # [1, 0, -1]
 
-            capacity_classification:
-                column_name: 'dday_icu_beds_best'
-                cuts: [0, 15, 30, 60, 91.001]
-                categories: [3, 2, 1, 0]
-            
-            trust_classification:
-                column_name: 'notification_rate'
-                cuts: [0, 0.4, 0.6, 0.8, 1.001]
-                categories: [3, 2, 1, 0]
+            dday_classification:
+                column_name: 'dday_beds_best'
+                cuts: [0, 30, 60, 91.001]
+                categories: ['ruim', 'insatisfatório', 'bom'] # [-1, 0, 1]
 
+            subnotification_classification:
+                column_name: 'subnotification_rate'
+                cuts: [0, 0.5, 0.7, 1.001]
+                categories: ['bom', 'insatisfatório', 'ruim']  # [1, 0, -1]
+
+            inloco_growth:
+                column_name: 'inloco_ratio_week_avgs'
+                cuts: [0, 0.9, 1.1, 1000]
+                categories: ['piorando', 'estabilizando', 'melhorando'] # [-1, 0, 1]       
+        alerts:
+            alto: 
+                conditions: {
+                    rt_classification: "ruim",
+                    rt_growth: "piorando",
+                    dday_classification: "ruim",
+                    subnotification_classification: "ruim"
+                }
+                how: "any"
+            medio: 
+                conditions: {
+                    rt_classification: "insatisfatório",
+                    rt_growth: "melhorando|estabilizando",
+                    dday_classification: "bom|insatisfatório",
+                    subnotification_classification: "bom|insatisfatório"  
+                }
+                how: "all"
+            medio2: 
+                conditions: {
+                    rt_classification: "bom|insatisfatório",
+                    rt_growth: "melhorando|estabilizando",
+                    dday_classification: "bom|insatisfatório",
+                    subnotification_classification: "insatisfatório"  
+                }
+                how: "all"
+            baixo:
+                conditions: {
+                    rt_classification: "bom",
+                    rt_growth: "melhorando|estabilizando",
+                    dday_classification: "bom|insatisfatório",
+                    subnotification_classification: "bom"            
+                }
+                how: "all"
     indicators:
         rt:
-            risk: "control_classification"
+            risk: "rt_classification"
             right_display: "rt_growth"
             left_display: ["rt_17days_ago_low", "rt_17days_ago_high"]
-            display: ["rt_low_95", "rt_high_95"]
-            message: "control_growth"
+            display: ["rt_10days_ago_low", "rt_10days_ago_high"]
         subnotification_rate:
             risk: "subnotification_classification"
             right_display: "subnotification_rank"
@@ -158,27 +182,6 @@ br:
             right_display: "inloco_growth"
             left_display: "inloco_last_week_7days_avg"
             display: "inloco_today_7days_avg"
-        situation:
-            risk: "situation_classification"
-            right_display: "None"
-            left_display: "None"
-            display: "None"
-        control:
-            risk: "control_classification"
-            right_display: "None"
-            left_display: ["rt_low_95", "rt_high_95"]
-            display: "None"
-        capacity:
-            risk: "capacity_classification"
-            right_display: "None"
-            left_display: "None"
-            display: "None"
-        trust:
-            risk: "trust_classification"
-            right_display: "None"
-            left_display: "None"
-            display: "None"
-
     inloco:
         replace: 
             "São Valério da Natividade":
@@ -226,8 +229,12 @@ br:
             "country_iso",
             "country_name",
             "state_num_id",
+            "state_id",
+            "state_name",
             "health_region_id",
+            "health_region_name",
             "city_id",
+            "city_name",
             "population",
             "last_updated_number_beds",
             "author_number_beds",

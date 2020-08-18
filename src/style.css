@@ -147,7 +147,7 @@
 }
 
 .p3 {
-    font-size: 24px;
+    font-size: 20px;
 }
 
 @media only screen and (max-width: 425px) {
@@ -984,6 +984,15 @@ header>.toolbar { /* Hide toolbar menu */
     padding:0.5rem;
 }
 
+.dimension-card{
+    padding: var(--main-padding);
+    width: 280px;
+    height: 200px;
+    background-color: white;
+    margin-top: 0px;
+    display: inline-block;
+}
+
 /* .pdf-button {
     font-family: var(--main-header-font-family); 
     background-color: var(--main-primary);
@@ -1720,7 +1729,7 @@ header>.toolbar { /* Hide toolbar menu */
     position:absolute;
     font-style: normal;
     font-weight: normal;
-    font-size: 36px;
+    font-size: 26px;
 }
 .saude-card-list-v2{
     width:86%;
@@ -1729,7 +1738,7 @@ header>.toolbar { /* Hide toolbar menu */
     font-family: IBM Plex Sans;
     font-style: normal;
     font-weight: normal;
-    font-size: 16px;
+    font-size: 18px;
     line-height: 23px;
 }
 .saude-card-display-region-v2{
