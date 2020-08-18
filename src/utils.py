@@ -609,21 +609,26 @@ def genAnalysisDimmensionsSection(dimensions: List[Dimension]):
 
 
 def genIndicatorCard(indicator: Indicator):
-    display_left = "flex"
-    display_right = "flex"
+    # display_left = "flex"
+    # display_right = "flex"
 
-    if str(indicator.left_display) == "nan":
-        display_left = "hide-bg"
+    # if str(indicator.left_display) == "nan":
+    #     display_left = "hide-bg"
+    # if str(indicator.right_display) == "nan":
+    #     display_right = "hide-bg"
 
-    if str(indicator.right_display) == "nan":
-        display_right = "hide-bg"
     if indicator.display == "None":
         indicator.display = ""
         indicator.unit = ""
-    if indicator.risk == "Fonte: inloco":
-        risk_html_class = "black-span p4"
+
+    # Get name of alert by number
+    if indicator.risk == "nan":
+        alert = ""
     else:
-        risk_html_class = "bold white-span p4"
+        alert = loader.config["br"]["farolcovid"]["categories"][int(indicator.risk)]
+
+    risk_html_class = "bold white-span p4"
+
     return f"""
     <div class="main-indicator-card flex flex-column mr" style="z-index:1;display:inline-block;position:relative;">
         <span class="main-card-header-v2">{indicator.header}</span>
@@ -632,7 +637,7 @@ def genIndicatorCard(indicator: Indicator):
         </div>
         <span class="bold p2 main-card-display-value">{indicator.display}<span class="bold p5">  {indicator.unit}</span></span>
         <div class="{IndicatorBackground(try_int(indicator.risk)).name}-alert-bg risk-pill " style="position:absolute;bottom:120px;">
-            <span class="{risk_html_class}">{loader.config["br"]["farolcovid"]["categories"][int(indicator.risk.split(".")[0])] if indicator.risk not in ["nan","Fonte: inloco"] else ""}</span>
+            <span class="{risk_html_class}">{alert}</span>
         </div>
         <div class="main-card-display-text-v2 sdcardtext-left">
                 <span class="lighter">{indicator.left_label}<br></span>
