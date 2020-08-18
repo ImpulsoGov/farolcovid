@@ -451,11 +451,8 @@ def main(session_state):
         </iframe>""",
         unsafe_allow_html=True,
     )
-
     # SOURCES PARAMS
-    user_input = utils.get_sources(
-        user_input, data, dfs["city"], ["beds", "ventilators", "icu_beds"]
-    )
+    user_input = utils.get_sources(user_input, data, dfs["city"], ["beds", "icu_beds"])
 
     # POPULATION PARAMS
     try:
@@ -500,10 +497,6 @@ def main(session_state):
 
         session_state.number_beds = int(
             user_input["number_beds"]
-            * config["br"]["simulacovid"]["resources_available_proportion"]
-        )
-        session_state.number_ventilators = int(
-            user_input["number_ventilators"]
             * config["br"]["simulacovid"]["resources_available_proportion"]
         )
         session_state.number_icu_beds = int(
