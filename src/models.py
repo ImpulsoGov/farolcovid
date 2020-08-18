@@ -95,7 +95,7 @@ class ResourceAvailability(NamedTuple):
     cases: int
     deaths: int
     beds: int
-    ventilators: int
+    icu_beds: int
 
 
 class ContainmentStrategy(NamedTuple):
@@ -111,8 +111,6 @@ class SimulatorOutput(NamedTuple):
     color: BackgroundColor
     min_range_beds: int
     max_range_beds: int
-    min_range_ventilators: int
-    max_range_ventilators: int
     min_range_icu_beds: int
     max_range_icu_beds: int
 

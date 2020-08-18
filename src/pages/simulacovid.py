@@ -147,8 +147,8 @@ def main(user_input, indicators, data, config, session_state):
 
         dday_beds = simulator.get_dmonth(dfs, "I2", int(user_input["number_beds"]))
 
-        dday_ventilators = simulator.get_dmonth(
-            dfs, "I3", int(user_input["number_ventilators"])
+        dday_icu_beds = simulator.get_dmonth(
+            dfs, "I3", int(user_input["number_icu_beds"])
         )
         dday_icu_beds = simulator.get_dmonth(
             dfs, "I3", int(user_input["number_icu_beds"])
@@ -159,8 +159,6 @@ def main(user_input, indicators, data, config, session_state):
                 color=BackgroundColor.SIMULATOR_CARD_BG,
                 min_range_beds=dday_beds["worst"],
                 max_range_beds=dday_beds["best"],
-                min_range_ventilators=dday_ventilators["worst"],
-                max_range_ventilators=dday_ventilators["best"],
                 min_range_icu_beds=dday_icu_beds["worst"],
                 max_range_icu_beds=dday_icu_beds["best"],
             ),

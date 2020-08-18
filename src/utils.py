@@ -87,7 +87,7 @@ def get_sources(user_input, data, cities_sources, resources):
         "author_number": lambda x: x.drop_duplicates().str.cat(),
     }
 
-    for x in resources:  # beds, ventilators
+    for x in resources:
 
         for item in cols_agg.keys():
 
@@ -108,10 +108,6 @@ def get_sources(user_input, data, cities_sources, resources):
 
     user_input["last_updated_number_beds"] = pd.to_datetime(
         user_input["last_updated_number_beds"]
-    ).strftime("%d/%m")
-
-    user_input["last_updated_number_ventilators"] = pd.to_datetime(
-        user_input["last_updated_number_ventilators"]
     ).strftime("%d/%m")
 
     user_input["last_updated_number_icu_beds"] = pd.to_datetime(
@@ -492,20 +488,12 @@ def genInputFields(user_input, config, session):
     authors_beds = user_input["author_number_beds"]
     beds_update = user_input["last_updated_number_beds"]
 
-    authors_ventilators = user_input["author_number_ventilators"]
-    ventilators_update = user_input["last_updated_number_ventilators"]
-
     authors_icu_beds = user_input["author_number_icu_beds"]
     icu_beds_update = user_input["last_updated_number_icu_beds"]
 
     if session.reset or session.number_beds == None:
         number_beds = int(
             user_input["number_beds"]
-            * config["br"]["simulacovid"]["resources_available_proportion"]
-        )
-
-        number_ventilators = int(
-            user_input["number_ventilators"]
             * config["br"]["simulacovid"]["resources_available_proportion"]
         )
 
@@ -518,7 +506,6 @@ def genInputFields(user_input, config, session):
         session.reset = False
     else:
         number_beds = int(session.number_beds)
-        # number_ventilators = int(session.number_ventilators)
         number_icu_beds = int(session.number_icu_beds)
         number_cases = int(session.number_cases)
         number_deaths = int(session.number_deaths)
@@ -529,7 +516,6 @@ def genInputFields(user_input, config, session):
 
     if locality == "Brasil":
         authors_beds = "SUS e Embaixadores"
-        authors_ventilators = "SUS e Embaixadores"
         authors_icu_beds = "SUS e Embaixadores"
 
     user_input["number_beds"] = st.number_input(
@@ -564,7 +550,6 @@ def genInputFields(user_input, config, session):
     if st.button("Finalizar alteração"):
 
         session.number_beds = int(user_input["number_beds"])
-        session.number_ventilators = int(user_input["number_ventilators"])
         session.number_icu_beds = int(user_input["number_icu_beds"])
         session.number_cases = int(user_input["population_params"]["I_confirmed"])
         session.number_deaths = int(user_input["population_params"]["D"])
