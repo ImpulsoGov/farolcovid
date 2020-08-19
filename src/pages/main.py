@@ -23,6 +23,7 @@ from streamlit.server.Server import Server
 import os
 
 import bisect
+import math
 
 
 def fix_type(x, group, position):
@@ -40,6 +41,12 @@ def fix_type(x, group, position):
 
     if group == "situation" and position == "left_display":
         return str(int(x)) + " dias"
+
+    if group == "capacity" and position == "display":
+        x = math.ceil(x / 30)
+        # TODO: passar para config
+        dmonth = {1: "até 1", 2: "até 2", 3: "até 3", 4: "+ 3"}
+        return dmonth[x]
 
     if type(x) == np.ndarray:
         return " a ".join(
@@ -501,11 +508,10 @@ def main(session_state):
 
     indicators = update_indicators(indicators, data, config, user_input, session_state)
 
+    data["overall_alert"] = data["overall_alert"].map(
+        config["br"]["farolcovid"]["categories"]
+    )
     if "state" in user_input["place_type"]:
-        data["overall_alert"] = data["overall_alert"].map(
-            config["br"]["farolcovid"]["categories"]
-        )
-
         # Add disclaimer to cities in state alert levels
         total_alert_cities = dfs["city"][
             dfs["city"]["state_num_id"] == data["state_num_id"].unique()[0]

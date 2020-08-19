@@ -158,14 +158,14 @@ IndicatorCards: Dict[str, Indicator] = {
         right_label="Tendência:",
     ),
     IndicatorType.CAPACITY.value: Indicator(
-        header="CAPACIDADE DA REDE",
+        header="CAPACIDADE DO SISTEMA",
         caption="A capacidade hospitalar será atingida em",
-        unit="dia(s)",
+        unit="mês(es)",
         left_label="Número de Leitos*:",
         right_label="Capacidade de UTI:",
     ),
     IndicatorType.TRUST.value: Indicator(
-        header="CONFIANÇA NOS DADOS",
+        header="CONFIANÇA DOS DADOS",
         caption="A cada 10 pessoas infectadas, somente ",
         unit="são diagnosticadas",
         left_label="Mortes por dia:",
