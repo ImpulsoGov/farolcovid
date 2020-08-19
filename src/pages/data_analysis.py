@@ -203,6 +203,67 @@ def make_deaths_per_cases(row):
         return 0
 
 
+def gen_cards(df, your_city, group):
+    # State evalaution
+    state_evaluation_df = df.groupby(["last_updated"]).sum().sort_index(ascending=False)
+    peak_daily_deaths_day = state_evaluation_df["new_deaths"].idxmax()
+    peak_daily_deaths = state_evaluation_df.loc[
+        state_evaluation_df.index == peak_daily_deaths_day
+    ]["new_deaths"].values[0]
+
+    deaths_behaviour, behaviour_length = evaluate_scrolling_deaths_behaviour(
+        state_evaluation_df
+    )
+    # City evaluation for the banner
+    city_evaluation_df = (
+        df[df["city_name"] == your_city].groupby(["last_updated"]).sum()
+    )
+    (
+        city_deaths_behaviour,
+        city_behaviour_length,
+    ) = evaluate_scrolling_deaths_behaviour(city_evaluation_df)
+    city_peak_daily_deaths_day = city_evaluation_df["new_deaths"].idxmax()
+    city_peak_daily_deaths = city_evaluation_df.loc[
+        city_evaluation_df.index == city_peak_daily_deaths_day
+    ]["new_deaths"].values[0]
+    deaths_banner_design_dict = {
+        "stable": {"background-color": "grey", "text": "comportamento estável"},
+        "falling": {"background-color": "#0090A7", "text": "queda"},
+        "increasing": {"background-color": "#F02C2E", "text": "alta"},
+    }
+
+    st.write(
+        f"""<div class="distancing-cards">
+                <div class="distancing-container distancing-card-bg">
+                        <div class="distancing-output-wrapper">
+                                <div class="distancing-output-row">
+                                        <span class="distancing-output-row-prediction-value" style="font-size:24px;font-weight:normal;">
+                                                {group} está a <b>{behaviour_length} dia{["","s"][int(behaviour_length> 1)]} em {deaths_banner_design_dict[deaths_behaviour]["text"]}</b>
+                                        </span>  
+                                </div> 
+                                <span class="distancing-output-row-prediction-label">
+                                        da média móvel de mortes. O pico de mortes diárias até agora foi de {peak_daily_deaths} mortes em {peak_daily_deaths_day.strftime('%d/%m/%Y')}.
+                                </span>
+                        </div>
+                </div>
+                <div class="distancing-card-separator"></div>
+                <div class="distancing-container distancing-card-bg">
+                        <div class="distancing-output-wrapper">
+                                <div class="distancing-output-row">
+                                        <span class="distancing-output-row-prediction-value" style="font-size:24px;font-weight:normal;">
+                                                Seu município está a <b>{city_behaviour_length} dia{["","s"][int(city_behaviour_length> 1)]} em {deaths_banner_design_dict[city_deaths_behaviour]["text"]} </b>
+                                        </span>  
+                                </div> 
+                                <span class="distancing-output-row-prediction-label">
+                                        da média móvel de mortes. Seu pico de mortes diárias foi de {city_peak_daily_deaths} mortes em {city_peak_daily_deaths_day.strftime('%d/%m/%Y')}.
+                                </span>
+                        </div>
+                </div>
+            </div>""",
+        unsafe_allow_html=True,
+    )
+
+
 # @st.cache(suppress_st_warning=True)
 def prepare_heatmap(
     df, place_type, group=None, mavg_days=7, your_city=None, deaths_per_cases=False
@@ -230,50 +291,7 @@ def prepare_heatmap(
 
     if place_type == "city_name":
 
-        state_evaluation_df = (
-            df.groupby(["last_updated"]).sum().sort_index(ascending=False)
-        )
-        peak_daily_deaths_day = state_evaluation_df["new_deaths"].idxmax()
-        peak_daily_deaths = state_evaluation_df.loc[
-            state_evaluation_df.index == peak_daily_deaths_day
-        ]["new_deaths"].values[0]
-
-        deaths_behaviour, behaviour_length = evaluate_scrolling_deaths_behaviour(
-            state_evaluation_df
-        )
-        # City evaluation for the banner
-        city_evaluation_df = (
-            df[df["city_name"] == your_city].groupby(["last_updated"]).sum()
-        )
-        (
-            city_deaths_behaviour,
-            city_behaviour_length,
-        ) = evaluate_scrolling_deaths_behaviour(city_evaluation_df)
-        city_peak_daily_deaths_day = city_evaluation_df["new_deaths"].idxmax()
-        city_peak_daily_deaths = city_evaluation_df.loc[
-            city_evaluation_df.index == city_peak_daily_deaths_day
-        ]["new_deaths"].values[0]
-        deaths_banner_design_dict = {
-            "stable": {"background-color": "grey", "text": "comportamento estável"},
-            "falling": {"background-color": "#0090A7", "text": "queda"},
-            "increasing": {"background-color": "#F02C2E", "text": "alta"},
-        }
-        st.write(  # Initial banner
-            f"""
-        <div class="base-wrapper flex flex-column" style="background-color:{deaths_banner_design_dict[deaths_behaviour]["background-color"]}">
-            <div class="white-span header p1" style="font-size:30px;">
-            {group} está a {behaviour_length} dia{["","s"][int(behaviour_length> 1)]} em {deaths_banner_design_dict[deaths_behaviour]["text"]} da média móvel de mortes.<br>
-            O pico de mortes diárias até agora foi de {peak_daily_deaths} mortes em {peak_daily_deaths_day.strftime('%d/%b/%Y')}.
-            </div>
-        </div>
-        <div class="base-wrapper flex flex-column" style="background-color:{deaths_banner_design_dict[city_deaths_behaviour]["background-color"]}">
-            <div class="white-span header p1" style="font-size:30px;">
-            Seu município está a {city_behaviour_length} dia{["","s"][int(city_behaviour_length> 1)]} em {deaths_banner_design_dict[city_deaths_behaviour]["text"]} da média móvel de mortes.<br>
-            Seu pico de mortes diárias foi de {city_peak_daily_deaths} mortes em {city_peak_daily_deaths_day.strftime('%d/%b/%Y')}.
-            </div>
-        </div>""",
-            unsafe_allow_html=True,
-        )
+        gen_cards(df, your_city, group)
         legend = """
         <div class="base-wrapper">
             O gráfico abaixo mostra a média do número de mortes

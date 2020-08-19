@@ -42,6 +42,42 @@ def gen_banners():
     )
 
 
+def gen_cards(distancing_data):
+
+    st.write(
+        f"""<div class="distancing-cards">
+                <div class="distancing-container distancing-card-bg">
+                        <div class="distancing-output-wrapper">
+                                <div class="distancing-output-row">
+                                        <span class="distancing-output-row-prediction-value">
+                                                {int(distancing_data[-1]*100)}%
+                                        </span>  
+                                </div> 
+                                <span class="distancing-output-row-prediction-label">
+                                        das pessoas em média ficaram em casa nos últimos 7 dias.
+                                </span>
+                        </div>
+                        <img src="https://i.imgur.com/27hutU0.png" class="distancing-output-image">
+                </div>
+                <div class="distancing-card-separator"></div>
+                <div class="distancing-container distancing-card-bg">
+                        <div class="distancing-output-wrapper">
+                                <div class="distancing-output-row">
+                                        <span class="distancing-output-row-prediction-value">
+                                                {int(distancing_data[-8]*100)}%
+                                        </span>  
+                                </div> 
+                                <span class="distancing-output-row-prediction-label">
+                                        das pessoas em média ficaram em casa entre 14 e 7 dias atrás.
+                                </span>
+                        </div>
+                        <img src="https://i.imgur.com/27hutU0.png" class="distancing-output-image">
+                </div>
+            </div>""",
+        unsafe_allow_html=True,
+    )
+
+
 @st.cache(suppress_st_warning=True)
 def loading_cached():
     return loader.read_data(

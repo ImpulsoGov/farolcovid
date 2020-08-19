@@ -255,10 +255,11 @@ def gen_social_dist_plots(place_id, in_height=700, set_height=False):
     x_data = social_dist_plot.data[0]["x"]
     y_data = social_dist_plot.data[0]["y"]
     x_data, y_data = sort_by_x(x_data, y_data)
+    final_y = moving_average(y_data, n=7)
     social_dist_plot.add_trace(
         go.Scatter(
             x=x_data,
-            y=moving_average(y_data, n=7),
+            y=final_y,
             line={"color": "lightgrey", "dash": "dash",},  # 0
             name="Média móvel (últimos 7 dias)",
             showlegend=True,
@@ -277,7 +278,7 @@ def gen_social_dist_plots(place_id, in_height=700, set_height=False):
     if set_height:
         social_dist_plot.update_layout(height=in_height)
 
-    return social_dist_plot
+    return social_dist_plot, final_y
 
 
 def translate_dates(df, simple=True, lang_frame="pt_BR.utf8"):

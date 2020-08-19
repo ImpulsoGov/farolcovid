@@ -2287,3 +2287,96 @@ header>.toolbar { /* Hide toolbar menu */
     background-color: white;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
+.distancing-cards{
+    padding-left: 3rem;
+    padding-right: 3rem;
+    display:flex;
+    justify-content: space-between;
+}
+
+.distancing-container {
+    display: flex;
+    flex-direction: row;
+    padding: var(--main-padding);
+    border-radius: var(--main-border-radius);
+    align-items: center;
+    max-width: 650px;
+}
+
+.distancing-output-wrapper {
+    display: flex;
+    flex-direction: column;
+} 
+
+.distancing-output-timeframe {
+    font-weight: lighter;
+    font-size: 24px
+}
+
+.distancing-output-row {
+    display: flex;
+    flex-direction: row;   
+    /* justify-content: space-around; */
+    align-items: center;
+    /* margin: var(--main-item-margin) 0; */
+}
+
+.distancing-output-image {
+    width: 180px;
+    height: 180px;
+    margin-left: auto;
+
+}
+
+.distancing-output-row-prediction-value {
+    font-size: 48px;
+    font-weight: bold;
+    word-wrap: no-wrap;   
+    animation-name: fadein;
+    animation-duration: 5s;
+}
+
+.distancing-output-row-prediction-separator {
+    font-weight: 300;
+    font-size: 16px;
+}
+
+.distancing-output-row-prediction-label {
+    font-weight: lighter;
+    font-size: 24px;
+}
+.distancing-card-bg {
+    background-color: var(--main-simulator-card-bg);
+}
+.distancing-card-separator{
+    height:0px;
+    width:20px;
+}
+@media only screen and (max-width: 425px) {
+    .distancing-cards{
+        padding-left: 3rem;
+        padding-right: 3rem;
+        display:inline-block;
+        align-items: left;
+    }
+
+    .distancing-output-timeframe {
+        font-size: 18px;
+    }
+    .distancing-output-row-prediction-label {
+        font-weight: lighter;
+        font-size: 16px;
+    }
+
+    .distancing-output-row-prediction-value {
+        font-size: 36px;
+    }
+    .distancing-output-image {
+        width: 90px;
+        height: 90px;
+    }
+    .distancing-card-separator{
+        height:25px;
+        width:0px;
+    }
+}
