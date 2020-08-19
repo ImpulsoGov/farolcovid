@@ -109,6 +109,14 @@
     background-color: var(--main-yellow-alert);
 }
 
+.orange-alert {
+    color: var(--main-orange-alert);
+}
+
+.orange-alert-bg {
+    background-color: var(--main-orange-alert);
+}
+
 .red-alert {
     color: var(--main-red-alert);
 }
