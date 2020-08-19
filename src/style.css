@@ -1825,6 +1825,7 @@ header>.toolbar { /* Hide toolbar menu */
         padding:0 1em;
         height:100vw;
         width:100vw;
+        right:0rem;
         overflow:hidden;
         position:relative;
     }

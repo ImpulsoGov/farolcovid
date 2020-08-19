@@ -24,6 +24,7 @@ import loader
 from model import simulator
 from plots import plot_simulation
 from pandas import Timestamp
+import session
 
 
 def calculate_recovered(user_input, data):

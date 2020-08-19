@@ -802,8 +802,8 @@ def gen_ambassador_section() -> None:
 def genSimulatorOutput(output: SimulatorOutput) -> str:
 
     bed_img = "https://i.imgur.com/27hutU0.png"
-    ventilator_icon = "https://i.imgur.com/V419ZRI.png"
-
+    # ventilator_icon = "https://i.imgur.com/V419ZRI.png"
+    ventilator_icon = "https://i.imgur.com/yHpXidY.png"
     if output.min_range_beds < 3 and output.max_range_beds < 3:
         bed_projection = f"em até {output.max_range_beds} mês(es)"
     else:
