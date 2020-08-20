@@ -458,12 +458,12 @@ def gen_whatsapp_button(info) -> None:
 
 def gen_info_modal():
     return f"""
-    <a href="#open-modal" class="info-btn">Entenda mais</a>
-    <div id="open-modal" class="info-modal-window">
+    <a href="#entenda-mais" class="info-btn">Entenda mais</a>
+    <div id="entenda-mais" class="info-modal-window">
         <div>
-            <a href="#" title="Close" class="btn-close bold">&times</a>
+            <a href="#" title="Close" class="info-btn-close bold">&times</a>
+            <div style="margin: 10px 10px 10px 10px;">
             <h1 class="primary-span">Valores de referência</h1>
-            <div>
             <table>
             <tbody>
                 <tr>
@@ -481,7 +481,7 @@ def gen_info_modal():
                     <td><span>Novos casos diários (Média móvel 7 dias)</span></td>
                     <td class="light-blue-bg"><span>x &lt;= 10</span></td>
                     <td class="light-yellow-bg"><span>10&lt;x&lt;=19</span></td>
-                    <td class="light-orange-bg"><span>20&lt;= x&lt;=39</span></td>
+                    <td class="light-orange-bg"><span>20&lt;=x&lt;=39</span></td>
                     <td class="light-red-bg"><span>x &gt;= 40</span></td>
                 </tr>
                 <tr>

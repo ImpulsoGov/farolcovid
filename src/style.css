@@ -1110,13 +1110,12 @@ header>.toolbar { /* Hide toolbar menu */
 
 }
 
-.btn-close {
+.info-btn-close, .info-btn-close:hover {
     width: 30px;
     height:30px;
-    padding: 0.5em;
-    text-transform: uppercase;
     font-family: var(--main-header-font-family);
     color: white;
+    color: inherit;
     background-color: var(--main-primary);;
     font-weight: bold;
     text-align: center;
@@ -1128,7 +1127,6 @@ header>.toolbar { /* Hide toolbar menu */
     right: 10px;
     border: 0;
   }
-
 
 .info-table{
     width: 400;
