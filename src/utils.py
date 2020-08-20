@@ -461,62 +461,61 @@ def gen_info_modal():
     <a href="#open-modal" class="info-btn">Entenda mais</a>
     <div id="open-modal" class="info-modal-window">
         <div>
-            <a href="/" title="Close" class="info-modal-close">Close</a>
+            <a href="#" title="Close" class="btn-close bold">&times</a>
             <h1 class="primary-span">Valores de referência</h1>
             <div>
             <table>
             <tbody>
                 <tr>
-                    <td class="lightgrey-bg"><strong>Dimensão</strong></td>
-                    <td class="lightgrey-bg"><strong>Indicador</strong></td>
-                    <td class="lightgrey-bg"><strong>Novo Normal</strong></td>
-                    <td class="lightgrey-bg"><strong>Risco Moderado</strong></td>
-                    <td class="lightgrey-bg"><strong>Risco Alto</strong></td>
-                    <td class="lightgrey-bg"><strong>Risco Altíssimo</strong></td>
+                    <td class="grey-bg"><strong>Dimensão</strong></td>
+                    <td class="grey-bg"><strong>Indicador</strong></td>
+                    <td class="grey-bg"><strong>Novo Normal</strong></td>
+                    <td class="grey-bg"><strong>Risco Moderado</strong></td>
+                    <td class="grey-bg"><strong>Risco Alto</strong></td>
+                    <td class="grey-bg"><strong>Risco Altíssimo</strong></td>
                 </tr>
                 <tr>
                     <td rowspan="2">
-                    <p><span>Situation of Disease</span></p><br/>
-                    <p><em><span>(highest of the levels)</span></em>
+                    <p><span>Situação da doença <em>o mais alto dos níveis</em></span></p><br/>
                     </td>
-                    <td><span>Daily New Cases (7-day moving av)</span></td>
-                    <td class="light-green-bg"><span>x &lt;= 10</span></td>
-                    <td class="light-yellow-bg"><span>10 &lt; x &lt;= 19</span></td>
-                    <td class="light-orange-bg"><span>20 &lt;= x &lt;= 39</span></td>
+                    <td><span>Novos casos diários (Média móvel 7 dias)</span></td>
+                    <td class="light-blue-bg"><span>x &lt;= 10</span></td>
+                    <td class="light-yellow-bg"><span>10&lt;x&lt;=19</span></td>
+                    <td class="light-orange-bg"><span>20&lt;= x&lt;=39</span></td>
                     <td class="light-red-bg"><span>x &gt;= 40</span></td>
                 </tr>
                 <tr>
-                    <td><span>Trend Daily New Cases</span></td>
-                    <td class="lightgrey-bg" colspan="4"><span>If increasing*, move to higher level</span></td>
+                    <td><span>Tendência de novos casos diários</span></td>
+                    <td class="lightgrey-bg" colspan="4"><span>Se aumentando*, mover para o nível mais alto</span></td>
                 </tr>
                 <tr>
-                    <td><span>Control of Disease</span></td>
-                    <td><span>Effective Reproduction Number</span></td>
-                    <td class="light-green-bg""><span>&lt;0.5</span></td>
+                    <td><span>Controle da doença</span></td>
+                    <td><span>Número de reprodução efetiva</span></td>
+                    <td class="light-blue-bg""><span>&lt;0.5</span></td>
                     <td class="light-yellow-bg"><span>&lt;0.5 - 1&gt;</span></td>
                     <td class="light-orange-bg"><span>&lt;1 - 1.2&gt;</span>&nbsp;</td>
                     <td class="light-red-bg"><span>&gt;1.2</span></td>
                 </tr>
                 <tr>
-                    <td><span>Health System Capacity</span></td>
+                    <td><span>Capacidade de respostas do sistema de saúde</span></td>
                     <td><span>ICU Simulator Days til at Capacity</span></td>
-                    <td class="light-green-bg">x &gt; 2 months</td>
-                    <td class="light-yellow-bg"><span>1 - 2 months</span></td>
-                    <td class="light-orange-bg"><span>15 - 30 days</span></td>
-                    <td class="light-red-bg"><span>0 - 15 days</span></td>
+                    <td class="light-blue-bg">x &gt; 2 meses</td>
+                    <td class="light-yellow-bg"><span>1 - 2 meses</span></td>
+                    <td class="light-orange-bg"><span>15 - 30 dias</span></td>
+                    <td class="light-red-bg"><span>0 - 15 dias</span></td>
                 </tr>
                 <tr>
-                    <td><span>Trus in N's</span></td>
-                    <td><span>Under-reporting (reported cases out of each 10)</span></td>
-                    <td class="light-green-bg"><span>10 &gt;= x &gt; 8</span></td>
-                    <td class="light-yellow-bg"><span>8 &gt;= x &gt; 6</span></td>
-                    <td class="light-orange-bg"><span>6 &gt;= x &gt; 4</span></td>
-                    <td class="light-red-bg"><span>4 &gt;= x &gt;= 0</span></td>
+                    <td><span>Confiança dos dados</span></td>
+                    <td><span>Subnotificação (casos relatados em cada 10)</span></td>
+                    <td class="light-blue-bg"><span>10&gt;=x&gt;8</span></td>
+                    <td class="light-yellow-bg"><span>8&gt;=x&gt;6</span></td>
+                    <td class="light-orange-bg"><span>6&gt;=x&gt;4</span></td>
+                    <td class="light-red-bg"><span>4&gt;=x &gt;=0</span></td>
                 </tr>
             </tbody>
             </table>
             </div>
-            <sub>* An increase must be sustained for at lea.st 5 days, while a decrease must happen for at least 14 days. Other changes will be considered "stable"</sub>
+            <sub>* Um aumento deve ser sustentado por pelo menos 5 dias, enquanto uma diminuição deve ocorrer por pelo menos 14 dias. Outras mudanças serão consideradas "estáveis".</sub>
         </div>
     </div>"""
 
