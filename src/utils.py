@@ -458,19 +458,66 @@ def gen_whatsapp_button(info) -> None:
 
 def gen_info_modal():
     return f"""
-    <div class="container">
-        <div class="interior">
-            <a class="btn" href="#open-modal">👋 Basic CSS-Only Modal</a>
-        </div>
-    </div>
-    <div id="open-modal" class="modal-window">
+    <a href="#open-modal" class="info-btn">Entenda mais</a>
+    <div id="open-modal" class="info-modal-window">
         <div>
-            <a href="#" title="Close" class="modal-close">Close</a>
-            <h1>Voilà!</h1>
-            <div>A CSS-only modal based on the :target pseudo-class. Hope you find it helpful.</div>
-            <div><small>Check out</small></div>
-            <a href="https://aminoeditor.com" target="_blank">👉 Amino: Live CSS Editor for Chrome</div>
+            <a href="/" title="Close" class="info-modal-close">Close</a>
+            <h1 class="primary-span">Valores de referência</h1>
+            <div>
+            <table>
+            <tbody>
+                <tr>
+                    <td class="lightgrey-bg"><strong>Dimensão</strong></td>
+                    <td class="lightgrey-bg"><strong>Indicador</strong></td>
+                    <td class="lightgrey-bg"><strong>Novo Normal</strong></td>
+                    <td class="lightgrey-bg"><strong>Risco Moderado</strong></td>
+                    <td class="lightgrey-bg"><strong>Risco Alto</strong></td>
+                    <td class="lightgrey-bg"><strong>Risco Altíssimo</strong></td>
+                </tr>
+                <tr>
+                    <td rowspan="2">
+                    <p><span>Situation of Disease</span></p><br/>
+                    <p><em><span>(highest of the levels)</span></em>
+                    </td>
+                    <td><span>Daily New Cases (7-day moving av)</span></td>
+                    <td class="light-green-bg"><span>x &lt;= 10</span></td>
+                    <td class="light-yellow-bg"><span>10 &lt; x &lt;= 19</span></td>
+                    <td class="light-orange-bg"><span>20 &lt;= x &lt;= 39</span></td>
+                    <td class="light-red-bg"><span>x &gt;= 40</span></td>
+                </tr>
+                <tr>
+                    <td><span>Trend Daily New Cases</span></td>
+                    <td class="lightgrey-bg" colspan="4"><span>If increasing*, move to higher level</span></td>
+                </tr>
+                <tr>
+                    <td><span>Control of Disease</span></td>
+                    <td><span>Effective Reproduction Number</span></td>
+                    <td class="light-green-bg""><span>&lt;0.5</span></td>
+                    <td class="light-yellow-bg"><span>&lt;0.5 - 1&gt;</span></td>
+                    <td class="light-orange-bg"><span>&lt;1 - 1.2&gt;</span>&nbsp;</td>
+                    <td class="light-red-bg"><span>&gt;1.2</span></td>
+                </tr>
+                <tr>
+                    <td><span>Health System Capacity</span></td>
+                    <td><span>ICU Simulator Days til at Capacity</span></td>
+                    <td class="light-green-bg">x &gt; 2 months</td>
+                    <td class="light-yellow-bg"><span>1 - 2 months</span></td>
+                    <td class="light-orange-bg"><span>15 - 30 days</span></td>
+                    <td class="light-red-bg"><span>0 - 15 days</span></td>
+                </tr>
+                <tr>
+                    <td><span>Trus in N's</span></td>
+                    <td><span>Under-reporting (reported cases out of each 10)</span></td>
+                    <td class="light-green-bg"><span>10 &gt;= x &gt; 8</span></td>
+                    <td class="light-yellow-bg"><span>8 &gt;= x &gt; 6</span></td>
+                    <td class="light-orange-bg"><span>6 &gt;= x &gt; 4</span></td>
+                    <td class="light-red-bg"><span>4 &gt;= x &gt;= 0</span></td>
+                </tr>
+            </tbody>
+            </table>
             </div>
+            <sub>* An increase must be sustained for at lea.st 5 days, while a decrease must happen for at least 14 days. Other changes will be considered "stable"</sub>
+        </div>
     </div>"""
 
 
@@ -708,12 +755,12 @@ def genKPISection(
                          </div>
                         <span class="white-span p3">%s</span>
                         <div class="flex flex-row flex-m-column">%s</div>
-                        <a href="_" class="info" target="_blank">Saiba mais</a>
+                        <div class = "info">%s</div>
                 </div>
         </div>
         <div class='base-wrapper product-section' ></div>
         """
-        % (bg, locality, msg, caption, cards),
+        % (bg, locality, msg, caption, cards, info_modal),
         unsafe_allow_html=True,
     )
 

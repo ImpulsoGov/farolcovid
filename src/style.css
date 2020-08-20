@@ -24,6 +24,10 @@
     --main-yellow-alert:  #F7B500;
     --main-orange-alert: #F77800;
     --main-blue-alert: #0090A7;
+    --main-light-green:#93C47D;
+    --main-light-yellow: #FFE599;
+    --main-light-orange: #F9CB9C;
+    --main-light-red:#EA9999;
 }
 
 /* keyframes */
@@ -66,6 +70,22 @@
 
 .light-blue-gradient-bg {
     background: linear-gradient(284.63deg, #02CEE3 0%, #CAFAFF 101.47%);
+}
+
+.light-green-bg{
+    background-color: var(--main-light-green);
+}
+
+.light-yellow-bg{
+    background-color: var(--main-light-yellow);
+}
+
+.light-orange-bg{
+    background-color: var(--main-light-orange);
+}
+
+.light-red-bg{
+    background-color: var(--main-light-red);
 }
 
 .simulator-card-bg {
@@ -1018,10 +1038,14 @@ header>.toolbar { /* Hide toolbar menu */
 }
   
 .info{
+    margin-top: 1.5em;
+}
+
+.info-btn{
     border: 1px solid var(--main-white);
     box-sizing: border-box;
     border-radius: 15px;
-    width: 110px;
+    width: 150px;
     padding: 0.5em;
     text-transform: uppercase;
     font-family: var(--main-header-font-family);
@@ -1035,11 +1059,50 @@ header>.toolbar { /* Hide toolbar menu */
     margin-top: 1.5em;
 }
   
-.info:hover {
+.info-btn:hover {
     color: var(--main-primary);
     background-color: white;
     text-decoration: none;
 }
+
+.info-modal-window {
+    position: fixed;
+    opacity: 0.98;
+    background-color: white;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 999;
+    visibility: hidden;
+    pointer-events: none;
+    transition: all 0.3s;
+}
+.info-modal-window:target{
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+}
+.info-modal-window:div{
+    width: 500px;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 2em;
+    background: #ffffff;
+}
+
+.info-modal-close{
+    box-align: right;
+}
+
+.info-table{
+    width: 400;
+    height: auto;
+    
+}
+
 
 /* .pdf-button {
     font-family: var(--main-header-font-family); 
@@ -2424,3 +2487,4 @@ header>.toolbar { /* Hide toolbar menu */
         width:0px;
     }
 }
+
