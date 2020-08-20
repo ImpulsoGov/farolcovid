@@ -1006,6 +1006,41 @@ header>.toolbar { /* Hide toolbar menu */
     font-size:24px;
 }
 
+/* question FAB */
+
+.info-header {
+    font-weight: bold !important;
+    color: var(--main-primary);
+    font-size: 10px;
+    margin-top: 2px;
+    margin-left: -25px !important;
+    width: 100px;
+}
+  
+.info{
+    border: 1px solid var(--main-white);
+    box-sizing: border-box;
+    border-radius: 15px;
+    width: 110px;
+    padding: 0.5em;
+    text-transform: uppercase;
+    font-family: var(--main-header-font-family);
+    background-color: var(--main-primary);
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    font-size: 18px;
+    animation-name: fadein;
+    animation-duration: 3s;
+    margin-top: 1.5em;
+}
+  
+.info:hover {
+    color: var(--main-primary);
+    background-color: white;
+    text-decoration: none;
+}
+
 /* .pdf-button {
     font-family: var(--main-header-font-family); 
     background-color: var(--main-primary);

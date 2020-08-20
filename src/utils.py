@@ -456,6 +456,23 @@ def gen_whatsapp_button(info) -> None:
         unsafe_allow_html=True,
     )
 
+def gen_info_modal():
+    return f"""
+    <div class="container">
+        <div class="interior">
+            <a class="btn" href="#open-modal">👋 Basic CSS-Only Modal</a>
+        </div>
+    </div>
+    <div id="open-modal" class="modal-window">
+        <div>
+            <a href="#" title="Close" class="modal-close">Close</a>
+            <h1>Voilà!</h1>
+            <div>A CSS-only modal based on the :target pseudo-class. Hope you find it helpful.</div>
+            <div><small>Check out</small></div>
+            <a href="https://aminoeditor.com" target="_blank">👉 Amino: Live CSS Editor for Chrome</div>
+            </div>
+    </div>"""
+
 
 # VIEW COMPONENTS FAROLCOVID
 
@@ -679,6 +696,7 @@ def genKPISection(
 
     cards = list(map(genIndicatorCard, indicators.values()))
     cards = "".join(cards)
+    info_modal = gen_info_modal()
     # msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  🚨%0a%0a{stoplight}😷 *Contágio*: Cada contaminado infecta em média outras *{indicators['rt'].display} pessoas* - _semana passada: {indicators['rt'].left_display}, tendência: {indicators['rt'].right_display}_%0a%0a🏥 *Capacidade*: A capacidade hospitalar será atingida em *{str(indicators['hospital_capacity'].display).replace("+", "mais")} mês(es)* %0a%0a🔍 *Subnotificação*: A cada 10 pessoas infectadas, *{indicators['subnotification_rate'].display} são diagnosticadas* %0a%0a🏠 *Isolamento*: Na última semana, *{indicators['social_isolation'].display} das pessoas ficou em casa* - _semana passada: {indicators['social_isolation'].left_display}, tendência: {indicators['social_isolation'].right_display}_%0a%0a---%0a%0a👉 Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui: https://coronacidades.org/farol-covid/"""
     msg = "temporarily disabled"
     st.write(
@@ -690,6 +708,7 @@ def genKPISection(
                          </div>
                         <span class="white-span p3">%s</span>
                         <div class="flex flex-row flex-m-column">%s</div>
+                        <a href="_" class="info" target="_blank">Saiba mais</a>
                 </div>
         </div>
         <div class='base-wrapper product-section' ></div>
