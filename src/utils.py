@@ -461,10 +461,11 @@ def gen_info_modal():
     <a href="#entenda-mais" class="info-btn">Entenda mais</a>
     <div id="entenda-mais" class="info-modal-window">
         <div>
-            <a href="#" title="Close" class="info-btn-close bold">&times</a>
-            <div style="margin: 10px 10px 10px 10px;">
+            <a href="#" title="Close" class="info-btn-close" style="color: white;">&times</a>
+            <div style="margin: 10px 15px 15px 15px;">
             <h1 class="primary-span">Valores de referência</h1>
-            <table>
+            <div class="info-div-table">
+            <table class="info-table">
             <tbody>
                 <tr>
                     <td class="grey-bg"><strong>Dimensão</strong></td>
@@ -516,6 +517,7 @@ def gen_info_modal():
             </table>
             </div>
             <sub>* Um aumento deve ser sustentado por pelo menos 5 dias, enquanto uma diminuição deve ocorrer por pelo menos 14 dias. Outras mudanças serão consideradas "estáveis".</sub>
+            </div>
         </div>
     </div>"""
 
