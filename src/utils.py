@@ -801,9 +801,9 @@ def gen_ambassador_section() -> None:
 
 def genSimulatorOutput(output: SimulatorOutput) -> str:
 
-    bed_img = "https://i.imgur.com/27hutU0.png"
-    # ventilator_icon = "https://i.imgur.com/V419ZRI.png"
-    ventilator_icon = "https://i.imgur.com/yHpXidY.png"
+    beds_img = "https://i.imgur.com/27hutU0.png"
+    icu_beds_img = "https://i.imgur.com/Oh4l8qM.png"
+
     if output.min_range_beds < 3 and output.max_range_beds < 3:
         bed_projection = f"em até {output.max_range_beds} mês(es)"
     else:
@@ -846,10 +846,10 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
         </div>""" % (
         output.color.value,
         bed_projection,
-        bed_img,
+        beds_img,
         output.color.value,
         icu_bed_projection,
-        ventilator_icon,
+        icu_beds_img,
     )
 
     return output.strip("\n\t")
