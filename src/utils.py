@@ -790,7 +790,7 @@ def gen_ambassador_section() -> None:
         """
         <div class="base-wrapper">
                 <div class="ambassador-container">
-                        <span class="ambassador-question"><b>Quer aprofundar a análise para seu Município? ?</b><br>
+                        <span class="ambassador-question"><b>Quer aprofundar a análise para seu Município?</b><br>
                         A equipe do Coronacidades está disponível de forma inteiramente gratuita!</span>
                         <a class="btn-ambassador" href="https://coronacidades.org/fale-conosco/" target="blank">FALE CONOSCO</a>
                 </div>
@@ -816,7 +816,7 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
 
     output = """
         <div>
-                <div class="simulator-container %s">
+                <div class="simulator-container simulator-beds-card-bg">
                         <div class="simulator-output-wrapper">
                                 <div class="simulator-output-row">
                                         <span class="simulator-output-row-prediction-value">
@@ -830,7 +830,7 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
                         <img src="%s" class="simulator-output-image"/>
                 </div>
                 <br />
-                <div class="simulator-container %s">
+                <div class="simulator-container simulator-icu-beds-card-bg">
                         <div class="simulator-output-wrapper">
                                 <div class="simulator-output-row">
                                         <span class="simulator-output-row-prediction-value">
@@ -844,10 +844,8 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
                         <img src="%s" class="simulator-output-image"/>
                 </div>
         </div>""" % (
-        output.color.value,
         bed_projection,
         beds_img,
-        output.color.value,
         icu_bed_projection,
         icu_beds_img,
     )

@@ -157,7 +157,7 @@ def main(user_input, indicators, data, config, session_state):
 
         utils.genChartSimulationSection(
             SimulatorOutput(
-                color=BackgroundColor.SIMULATOR_CARD_BG,
+                # color=BackgroundColor.SIMULATOR_CARD_BG,
                 min_range_beds=dday_beds["worst"],
                 max_range_beds=dday_beds["best"],
                 min_range_icu_beds=dday_icu_beds["worst"],

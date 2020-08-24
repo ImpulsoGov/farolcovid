@@ -108,7 +108,7 @@ class ContainmentStrategy(NamedTuple):
 
 
 class SimulatorOutput(NamedTuple):
-    color: BackgroundColor
+    # color: BackgroundColor
     min_range_beds: int
     max_range_beds: int
     min_range_icu_beds: int
