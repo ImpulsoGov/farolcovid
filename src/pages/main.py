@@ -335,10 +335,24 @@ def main(session_state):
     )
 
     utils.localCSS("style.css")
+    
 
     utils.genHeroSection(
         "Farol", "Entenda e controle a Covid-19 em sua cidade e estado."
     )
+    
+    #TEMPORARY BANNER FC
+    info_novidade = utils.gen_info_novidades()
+    st.write(
+        """
+        <div>
+            <div style="float: right;" style="font-size:30px;">%s</div>
+        </div>
+        """
+        %(info_novidade),
+        unsafe_allow_html=True,
+    )
+
     # TEMPORARY BANNER - SEO
     st.write(
         """

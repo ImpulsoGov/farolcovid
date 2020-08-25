@@ -456,6 +456,25 @@ def gen_whatsapp_button(info) -> None:
         unsafe_allow_html=True,
     )
 
+def gen_info_novidades():
+    return f"""
+    <a href="#novidades" class="info-btn">Novidades!</a>
+    <div id="novidades" class="info-modal-window">
+        <div>
+            <a href="#" title="Close" class="info-btn-close" style="color: white;">&times</a>
+            <div style="margin: 10px 15px 15px 15px;">
+                <h1 class="primary-span">Novidades!</h1>
+                <p> [fluxograma de novidades]</p>
+                <p> 1. Melhoramos os indicadores com a metodologia dos Níveis de Alerta</p>
+                <p> 2. Temos novas seções: </p>
+                icon1 
+                icon2
+                icon3
+            </div>
+        </div>
+    </div>"""
+
+
 def gen_info_modal():
     return f"""
     <a href="#entenda-mais" class="info-btn">Entenda mais</a>
