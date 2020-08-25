@@ -195,10 +195,20 @@ br:
         # => our values:
         doubling_rate: 1.15
         incubation_period: 5
-        i1_percentage: 0.855
-        i2_percentage: 0.12
-        i3_percentage: 0.025
+        i1_percentage: 0.855 # 0.801
+        i2_percentage: 0.12 # 0.138
+        i3_percentage: 0.025 # 0.061
         infected_health_care_proportion: 0.05
+        hospitalized_by_age_perc:
+            "from_0_to_9": 0.00002
+            "from_10_to_19": 0.0004
+            "from_20_to_29": 0.011
+            "from_30_to_39": 0.034
+            "from_40_to_49": 0.043
+            "from_50_to_59": 0.082
+            "from_60_to_69": 0.118
+            "from_70_to_79": 0.166
+            "from_80_to_older": 0.184
     simulacovid:
         resources_available_proportion: 0.5
 
