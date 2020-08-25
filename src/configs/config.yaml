@@ -79,7 +79,6 @@ br:
                 column_name: 'notification_rate'
                 cuts: [0, 0.4, 0.6, 0.8, 1.001]
                 categories: [3, 2, 1, 0]
-
     indicators:
         situation:
             risk: "situation_classification"
@@ -101,7 +100,6 @@ br:
             right_display: "new_deaths_growth"
             left_display: "new_deaths_mavg_100k"
             display: "notification_rate"
-
     inloco:
         replace: 
             "São Valério da Natividade":
@@ -113,6 +111,65 @@ br:
             "Boa Saúde":
                 "state_name": "Rio Grande do Norte"
                 "correct_name": "Boa Saúde"
+    maps:
+        idStateCode:
+            AC: acre
+            AL: alagoas
+            AM: amazonas
+            AP: amapa
+            BA: bahia
+            CE: ceara
+            DF: None
+            ES: espirito-santo
+            GO: goias
+            MA: maranhao
+            MG: minas-gerias
+            MS: mato-grosso-sul
+            MT: mato-grosso
+            PA: para
+            PB: paraiba
+            PE: pernambuco
+            PI: piaui
+            PR: parana
+            RJ: rio-de-janeiro
+            RN: rio-grande-do-norte
+            RO: rodonia
+            RR: roraima
+            RS: rio-grande-do-sul
+            SC: santa-catarina
+            SE: sergipe
+            SP: sao-paolo
+            TO: tocantins
+        idStatesMap:
+            AC: 6zLqg
+            AL: IRhKt
+            AM: 97xgC
+            AP: JGbPm
+            BA: R5kLm
+            CE: 4Ydg6
+            DF: 3xrpK
+            ES: 23wLN
+            GO: 40VYf
+            MA: vzsRd
+            MG: G4PAe
+            MS: q2Uu7
+            MT: Tyyca
+            PA: 8IEyQ
+            PB: hsTA2
+            PE: DwEMX
+            PI: lspE8
+            PR: V388R
+            RJ: avtwO
+            RN: esfff
+            RO: 8ETGW
+            RR: 2vwNn
+            RS: VwAqA
+            SC: fW157
+            SE: CMYA0
+            SP: 9IXnG
+            TO: 32WAE
+        BR_ID: NvbGP
+        MAP_FOLDER_ID: "37343"
     rt_parameters:
         r_t_range_max: 12
         optimal_sigma: 0.01 # best sigma for Brazil (prior hyperparameters)
