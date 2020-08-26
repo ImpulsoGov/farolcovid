@@ -37,7 +37,7 @@ def fix_type(x, group, position):
         return round(float(x), 2)
 
     if group == "trust" and position == "display":
-        return int(round(10 * x, 0))
+        return int(round(10 * (1 - x), 0)) # muda para não notificado
 
     if group == "situation" and position == "left_display":
         return str(int(x)) + " dias"
@@ -82,7 +82,7 @@ def update_indicators(indicators, data, config, user_input, session_state):
                 dic_indicators[position] = "None"
 
         if np.isnan(data[config["br"]["indicators"][group]["risk"]].values[0]):
-            print("aqui!!!")
+            # print("aqui!!!")
             # dic_indicators["display"] = "- "
             dic_indicators["risk"] = "nan"
 

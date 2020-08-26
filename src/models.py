@@ -154,7 +154,7 @@ IndicatorCards: Dict[str, Indicator] = {
         header="CONTROLE DA DOENÇA",
         caption="Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt para classificação.</b>",
         unit="There is no public data on testing.",
-        left_label="Rt:",
+        left_label="Taxa de contágio (Rt):",
         right_label="Tendência:",
     ),
     IndicatorType.CAPACITY.value: Indicator(
@@ -166,8 +166,8 @@ IndicatorCards: Dict[str, Indicator] = {
     ),
     IndicatorType.TRUST.value: Indicator(
         header="CONFIANÇA DOS DADOS",
-        caption="A cada 10 pessoas infectadas, somente ",
-        unit="são diagnosticadas",
+        caption="A cada 10 pessoas infectadas,",
+        unit="não são diagnosticadas",
         left_label="Mortes por dia:",
         right_label="Tendência:",
     ),
@@ -186,7 +186,7 @@ ProductCards: List[Product] = [
     Product(
         recommendation="Simule",
         name="SimulaCovid<br>",
-        caption="O que acontecerá com meu sistema de saúde local se o ritmo de contágio aumentar ou diminuir?",
+        caption="O que acontecerá com meu sistema de saúde local se a taxa de contágio aumentar ou diminuir?",
         image="https://i.imgur.com/4MLOdTL.png",
     ),
     Product(

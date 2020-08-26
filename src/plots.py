@@ -42,15 +42,22 @@ def plot_heatmap(df, x, y, z, title, colorscale="oranges"):
 def plot_rt(t, title=""):
     # TODO: put dicts in config
     rt_classification = {
-        "Risco médio: Uma pessoa infecta em média outras 1-1.2": {
-            "threshold": 1,
-            "color": "rgba(132,217,217,1)",
+        "Risco médio: Uma pessoa infecta em média mais 1.2 outras": {
+            "threshold": 1.2,
+            "color": "#F02C2E",
             "fill": None,
             "width": 3,
         },
-        "Risco alto: Uma pessoa infecta em média mais 1.2 outras": {
-            "threshold": 1.2,
-            "color": "rgba(242,185,80,1)",
+
+        "Risco alto: Uma pessoa infecta em média outras 1.0-1.2": {
+            "threshold": 1,
+            "color": "#F77800",
+            "fill": None,
+            "width": 3,
+        },
+        "Risco moderado: Uma pessoa infecta em média outras 0.5-1": {
+            "threshold": 0.5,
+            "color": "#F7B500",
             "fill": None,
             "width": 3,
         },
@@ -73,7 +80,7 @@ def plot_rt(t, title=""):
             "fill": None,
             "showlegend": True,
             "name": "<b>Valor médio em {}={}</b>".format(
-                t["last_updated"].max().strftime("%d/%m"), t["Rt_most_likely"].iloc[-1]
+                t["last_updated"].max().strftime("%d/%m"), round(t["Rt_most_likely"].iloc[-1], 2)
             ),
             "layout": {"color": "rgba(63, 61, 87, 0.8)", "width": 3},
         },
@@ -132,7 +139,7 @@ def plot_rt_wrapper(place_id, place_type):
             "br", config, config["br"]["api"]["endpoints"]["rt"][endpoints[place_type]]
         )
         .query(f"{place_type} == {place_id}")
-        .sort_values("last_updated")[:-10]
+        .sort_values("last_updated")
     )
 
     if len(data) < 30:

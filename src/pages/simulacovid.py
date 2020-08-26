@@ -64,7 +64,7 @@ def main(user_input, indicators, data, config, session_state):
                     <span class="section-header primary-span">Simule o impacto de diferentes ritmos de contágio no seu sistema hospitalar</span>
                     <br><br>
                     <span>Agora é a hora de se preparar para evitar a sobrecarga hospitalar. 
-                    No momento, em {user_input["locality"]}, estimamos que <b>o ritmo de contágio esteja entre {indicators["control"].left_display}</b>, 
+                    No momento, em {user_input["locality"]}, estimamos que <b>a taxa de contágio esteja entre {indicators["control"].left_display}</b>, 
                     ou seja, cada pessoa doente infectará em média entre outras {indicators["control"].left_display} pessoas.
                     </span>
             </div>""",
@@ -80,7 +80,7 @@ def main(user_input, indicators, data, config, session_state):
                     <br><br>
                     <span>Agora é a hora de se preparar para evitar a sobrecarga hospitalar. 
                     No momento, em {user_input["locality"]}, não temos dados suficientes para estimativa do ritmo de contágio. 
-                    Por isso, <b>iremos simular com o ritmo de contágio do seu {places[user_input["rt_level"]]}, que está entre {str(user_input["rt_values"]["best"])}-{str(user_input["rt_values"]["worst"])}</b>, 
+                    Por isso, <b>iremos simular com a taxa de contágio do seu {places[user_input["rt_level"]]}, que está entre {str(user_input["rt_values"]["best"])}-{str(user_input["rt_values"]["worst"])}</b>, 
                     ou seja, cada pessoa doente infectará em média entre outras {str(user_input["rt_values"]["best"])}-{str(user_input["rt_values"]["worst"])} pessoas.
                     </span>
             </div>""",

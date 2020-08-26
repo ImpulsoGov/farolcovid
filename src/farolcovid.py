@@ -102,7 +102,7 @@ def main():
         "Menu",
         [
             "FarolCovid",
-            "Análises",
+            # "Análises",
             "Níveis de Risco",
             "Estimando Ritmo de Contágio",
             "Modelo Epidemiológico",
@@ -135,6 +135,7 @@ def main():
     elif page == "Estimando Ritmo de Contágio":
         if __name__ == "__main__":
             rt.main(session_state)
+            
     elif page == "Metodologia do Saúde em Ordem":
         if __name__ == "__main__":
             sod.main(session_state)
