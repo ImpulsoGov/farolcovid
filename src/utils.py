@@ -876,9 +876,9 @@ def gen_ambassador_section() -> None:
 
 def genSimulatorOutput(output: SimulatorOutput) -> str:
 
-    bed_img = "https://i.imgur.com/27hutU0.png"
-    # ventilator_icon = "https://i.imgur.com/V419ZRI.png"
-    ventilator_icon = "https://i.imgur.com/yHpXidY.png"
+    beds_img = "https://i.imgur.com/27hutU0.png"
+    icu_beds_img = "https://i.imgur.com/Oh4l8qM.png"
+
     if output.min_range_beds < 3 and output.max_range_beds < 3:
         bed_projection = f"em até {output.max_range_beds} mês(es)"
     else:
@@ -891,7 +891,7 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
 
     output = """
         <div>
-                <div class="simulator-container %s">
+                <div class="simulator-container simulator-beds-card-bg">
                         <div class="simulator-output-wrapper">
                                 <div class="simulator-output-row">
                                         <span class="simulator-output-row-prediction-value">
@@ -905,7 +905,7 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
                         <img src="%s" class="simulator-output-image"/>
                 </div>
                 <br />
-                <div class="simulator-container %s">
+                <div class="simulator-container simulator-icu-beds-card-bg">
                         <div class="simulator-output-wrapper">
                                 <div class="simulator-output-row">
                                         <span class="simulator-output-row-prediction-value">
@@ -919,12 +919,10 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
                         <img src="%s" class="simulator-output-image"/>
                 </div>
         </div>""" % (
-        output.color.value,
         bed_projection,
-        bed_img,
-        output.color.value,
+        beds_img,
         icu_bed_projection,
-        ventilator_icon,
+        icu_beds_img,
     )
 
     return output.strip("\n\t")

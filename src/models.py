@@ -108,7 +108,7 @@ class ContainmentStrategy(NamedTuple):
 
 
 class SimulatorOutput(NamedTuple):
-    color: BackgroundColor
+    # color: BackgroundColor
     min_range_beds: int
     max_range_beds: int
     min_range_icu_beds: int
@@ -154,7 +154,7 @@ IndicatorCards: Dict[str, Indicator] = {
         header="CONTROLE DA DOENÇA",
         caption="Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt para classificação.</b>",
         unit="There is no public data on testing.",
-        left_label="Rt:",
+        left_label="Taxa de contágio (Rt):",
         right_label="Tendência:",
     ),
     IndicatorType.CAPACITY.value: Indicator(
@@ -166,8 +166,8 @@ IndicatorCards: Dict[str, Indicator] = {
     ),
     IndicatorType.TRUST.value: Indicator(
         header="CONFIANÇA DOS DADOS",
-        caption="A cada 10 pessoas infectadas, somente ",
-        unit="são diagnosticadas",
+        caption="A cada 10 pessoas infectadas,",
+        unit="não são diagnosticadas",
         left_label="Mortes por dia:",
         right_label="Tendência:",
     ),

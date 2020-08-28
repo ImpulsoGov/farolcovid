@@ -30,7 +30,7 @@ br:
     drive_paths:
         br_id_state_region_city: https://docs.google.com/spreadsheets/d/1pHkH9FZj-c_bCEdvCH9k54uog5QDEd_x5xi4YmDsqyY
         cities_population: https://docs.google.com/spreadsheets/d/1k8mXuUggBuBEghHhhLrLtA-5wa4JsAc-D35S5bNlf24
-        health_infrastructure: https://docs.google.com/spreadsheets/d/1MqkUvMuC8C2rc_-U46ZOMgvG3MZ8KXg5NMoj68UBivQ
+        health_infrastructure: https://docs.google.com/spreadsheets/d/1MwhUWQmb7A_Io6Af4jDiMMBKh0BpAcq2BrCg8RGIfBs
         embaixadores: https://docs.google.com/spreadsheets/d/1CASa-MdJS_o2tffWlIS--FSskSxhJUw3pA1L5AGIe04
         CNAE_sectors: https://docs.google.com/spreadsheets/d/1pP8dY9kRa9EvX3KcVPfMWJ8exDaoT1_bBggSKfD3y0k
         br_states_reopening_data: https://docs.google.com/spreadsheets/d/1H20RNeTJqON8cqhwiZJdfXqVYbFVKrG5
@@ -53,22 +53,15 @@ br:
         categories:
             {0: "novo normal", 1: "moderado", 2: "alto", 3: "altíssimo"}
         rules:
-            # TODO: change new_cases column
             situation_classification:
                 column_name: 'daily_cases_mavg_100k'
-                cuts: [0, 10, 20, 40, 100000]
+                cuts: [0, 3, 10, 25, 100000]
                 categories: [0, 1, 2, 3]
 
             control_classification:
                 column_name: "rt_most_likely"
                 cuts: [0, 0.5, 1, 1.2, 10]
                 categories: [0, 1, 2, 3]
-
-            # TODO: create growth column
-            control_growth: 
-                column_name: "rt_growth"
-                cuts: [0, 0.9, 1.1, 1000]
-                categories: ['melhorando', 'estabilizando', 'piorando']
 
             capacity_classification:
                 column_name: 'dday_icu_beds'
@@ -77,9 +70,8 @@ br:
             
             trust_classification:
                 column_name: 'notification_rate'
-                cuts: [0, 0.4, 0.6, 0.8, 1.001]
+                cuts: [0, 0.3, 0.4, 0.6, 1.001]
                 categories: [3, 2, 1, 0]
-
     indicators:
         situation:
             risk: "situation_classification"
@@ -101,7 +93,6 @@ br:
             right_display: "new_deaths_growth"
             left_display: "new_deaths_mavg_100k"
             display: "notification_rate"
-
     inloco:
         replace: 
             "São Valério da Natividade":
@@ -113,6 +104,65 @@ br:
             "Boa Saúde":
                 "state_name": "Rio Grande do Norte"
                 "correct_name": "Boa Saúde"
+    maps:
+        idStateCode:
+            AC: acre
+            AL: alagoas
+            AM: amazonas
+            AP: amapa
+            BA: bahia
+            CE: ceara
+            DF: None
+            ES: espirito-santo
+            GO: goias
+            MA: maranhao
+            MG: minas-gerias
+            MS: mato-grosso-sul
+            MT: mato-grosso
+            PA: para
+            PB: paraiba
+            PE: pernambuco
+            PI: piaui
+            PR: parana
+            RJ: rio-de-janeiro
+            RN: rio-grande-do-norte
+            RO: rodonia
+            RR: roraima
+            RS: rio-grande-do-sul
+            SC: santa-catarina
+            SE: sergipe
+            SP: sao-paolo
+            TO: tocantins
+        idStatesMap:
+            AC: 6zLqg
+            AL: IRhKt
+            AM: 97xgC
+            AP: JGbPm
+            BA: R5kLm
+            CE: 4Ydg6
+            DF: 3xrpK
+            ES: 23wLN
+            GO: 40VYf
+            MA: vzsRd
+            MG: G4PAe
+            MS: q2Uu7
+            MT: Tyyca
+            PA: 8IEyQ
+            PB: hsTA2
+            PE: DwEMX
+            PI: lspE8
+            PR: V388R
+            RJ: avtwO
+            RN: esfff
+            RO: 8ETGW
+            RR: 2vwNn
+            RS: VwAqA
+            SC: fW157
+            SE: CMYA0
+            SP: 9IXnG
+            TO: 32WAE
+        BR_ID: NvbGP
+        MAP_FOLDER_ID: "37343"
     rt_parameters:
         r_t_range_max: 12
         optimal_sigma: 0.01 # best sigma for Brazil (prior hyperparameters)
@@ -138,10 +188,20 @@ br:
         # => our values:
         doubling_rate: 1.15
         incubation_period: 5
-        i1_percentage: 0.855
-        i2_percentage: 0.12
-        i3_percentage: 0.025
+        i1_percentage: 0.855 # 0.801
+        i2_percentage: 0.12 # 0.138
+        i3_percentage: 0.025 # 0.061
         infected_health_care_proportion: 0.05
+        hospitalized_by_age_perc:
+            "from_0_to_9": 0.00002
+            "from_10_to_19": 0.0004
+            "from_20_to_29": 0.011
+            "from_30_to_39": 0.034
+            "from_40_to_49": 0.043
+            "from_50_to_59": 0.082
+            "from_60_to_69": 0.118
+            "from_70_to_79": 0.166
+            "from_80_to_older": 0.184
     simulacovid:
         resources_available_proportion: 0.5
     icons:
