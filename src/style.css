@@ -1147,6 +1147,10 @@ header>.toolbar { /* Hide toolbar menu */
     box-shadow: 0 0 60px 10px rgba(0, 0, 0, 0.9);
 
 }
+
+.sub li{
+    font-size: 12px;
+}
 @media only screen and (max-width: 425px) {
     /*max-height: 700px*/
     .info-modal-window {

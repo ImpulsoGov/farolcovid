@@ -481,43 +481,50 @@ def gen_info_modal():
                     <p><span>Situação da doença <em>o mais alto dos níveis</em></span></p><br/>
                     </td>
                     <td><span>Novos casos diários (Média móvel 7 dias)</span></td>
-                    <td class="light-blue-bg"><span>x &lt;= 10</span></td>
-                    <td class="light-yellow-bg"><span>10&lt;x&lt;=19</span></td>
-                    <td class="light-orange-bg"><span>20&lt;=x&lt;=39</span></td>
-                    <td class="light-red-bg"><span>x &gt;= 40</span></td>
+                    <td class="light-blue-bg bold"><span>x &lt;= 10</span></td>
+                    <td class="light-yellow-bg bold"><span>10&lt;x&lt;=19</span></td>
+                    <td class="light-orange-bg bold"><span>20&lt;=x&lt;=39</span></td>
+                    <td class="light-red-bg bold"><span>x &gt;= 40</span></td>
                 </tr>
                 <tr>
                     <td><span>Tendência de novos casos diários</span></td>
-                    <td class="lightgrey-bg" colspan="4"><span>Se aumentando*, mover para o nível mais alto</span></td>
+                    <td class="lightgrey-bg" colspan="4"><span>Se crescendo*, mover para o nível mais alto</span></td>
                 </tr>
                 <tr>
                     <td><span>Controle da doença</span></td>
                     <td><span>Número de reprodução efetiva</span></td>
-                    <td class="light-blue-bg""><span>&lt;0.5</span></td>
-                    <td class="light-yellow-bg"><span>&lt;0.5 - 1&gt;</span></td>
-                    <td class="light-orange-bg"><span>&lt;1 - 1.2&gt;</span>&nbsp;</td>
-                    <td class="light-red-bg"><span>&gt;1.2</span></td>
+                    <td class="light-blue-bg bold"><span>&lt;0.5</span></td>
+                    <td class="light-yellow-bg bold"><span>&lt;0.5 - 1&gt;</span></td>
+                    <td class="light-orange-bg bold"><span>&lt;1 - 1.2&gt;</span>&nbsp;</td>
+                    <td class="light-red-bg bold"><span>&gt;1.2</span></td>
                 </tr>
                 <tr>
                     <td><span>Capacidade de respostas do sistema de saúde</span></td>
                     <td><span>ICU Simulator Days til at Capacity</span></td>
-                    <td class="light-blue-bg">x &gt; 2 meses</td>
-                    <td class="light-yellow-bg"><span>1 - 2 meses</span></td>
-                    <td class="light-orange-bg"><span>15 - 30 dias</span></td>
-                    <td class="light-red-bg"><span>0 - 15 dias</span></td>
+                    <td class="light-blue-bg bold">x &gt; 2 meses</td>
+                    <td class="light-yellow-bg bold"><span>1 - 2 meses</span></td>
+                    <td class="light-orange-bg bold"><span>15 - 30 dias</span></td>
+                    <td class="light-red-bg bold"><span>0 - 15 dias</span></td>
                 </tr>
                 <tr>
                     <td><span>Confiança dos dados</span></td>
                     <td><span>Subnotificação (casos relatados em cada 10)</span></td>
-                    <td class="light-blue-bg"><span>10&gt;=x&gt;8</span></td>
-                    <td class="light-yellow-bg"><span>8&gt;=x&gt;6</span></td>
-                    <td class="light-orange-bg"><span>6&gt;=x&gt;4</span></td>
-                    <td class="light-red-bg"><span>4&gt;=x &gt;=0</span></td>
+                    <td class="light-blue-bg bold"><span>10&gt;=x&gt;8</span></td>
+                    <td class="light-yellow-bg bold"><span>8&gt;=x&gt;6</span></td>
+                    <td class="light-orange-bg bold"><span>6&gt;=x&gt;4</span></td>
+                    <td class="light-red-bg bold"><span>4&gt;=x&gt;=0</span></td>
                 </tr>
             </tbody>
             </table>
             </div>
-            <sub>* Um aumento deve ser sustentado por pelo menos 5 dias, enquanto uma diminuição deve ocorrer por pelo menos 14 dias. Outras mudanças serão consideradas "estáveis".</sub>
+            <div style="font-size: 12px">
+                * Como determinamos a tendência:
+                <ul class="sub"> 
+                    <li> Crescendo: caso o aumento de novos casos esteja acontecendo por pelo menos 5 dias. </li>
+                    <li> Descrescendo: caso a diminuição de novos casos esteja acontecendo por pelo menos 14 dias. </li>
+                    <li> Estabilizando: qualquer outra mudança. </li>
+                </ul>
+            </div>
             </div>
         </div>
     </div>"""
@@ -858,7 +865,7 @@ def gen_ambassador_section() -> None:
         """
         <div class="base-wrapper">
                 <div class="ambassador-container">
-                        <span class="ambassador-question"><b>Quer aprofundar a análise para seu Município? ?</b><br>
+                        <span class="ambassador-question"><b>Quer aprofundar a análise para seu Município?</b><br>
                         A equipe do Coronacidades está disponível de forma inteiramente gratuita!</span>
                         <a class="btn-ambassador" href="https://coronacidades.org/fale-conosco/" target="blank">FALE CONOSCO</a>
                 </div>
