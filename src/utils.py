@@ -459,7 +459,7 @@ def gen_whatsapp_button(info) -> None:
 
 def gen_info_modal():
     return f"""
-    <a href="#entenda-mais" class="info-btn">Entenda mais</a>
+    <a href="#entenda-mais" class="info-btn">Entenda a classificação dos níveis</a>
     <div id="entenda-mais" class="info-modal-window">
         <div>
             <a href="#" title="Close" class="info-btn-close" style="color: white;">&times</a>
