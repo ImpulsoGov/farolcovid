@@ -341,6 +341,15 @@ def main(session_state):
     utils.genHeroSection(
         "Farol", "Entenda e controle a Covid-19 em sua cidade e estado."
     )
+
+    config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
+
+
+    farolcovid_logo = config["br"]["icons"]["farolcovid_logo"]
+    simulacovid_logo = config["br"]["icons"]["simulacovid_logo"]
+    distanciamentosocial_logo = config["br"]["icons"]["distanciamentosocial_logo"]
+    saudeemordem_logo = config["br"]["icons"]["saudeemordem_logo"]
+    ondacovid_logo = config["br"]["icons"]["ondacovid_logo"]
     
     #TEMPORARY BANNER FC
     st.write(
@@ -358,7 +367,7 @@ def main(session_state):
                     <div style="margin: 10px 15px 15px 15px;">
                         <h1 class="primary-span">Saiba como cada ferramenta apoia a resposta ao coronavírus</h1>
                         <p class="darkblue-span uppercase"> <b>Farol Covid</b> </p>
-                        <img class="img-modal" src="https://i.imgur.com/qKMzYRB.png" alt="Ícone Farol Covid">
+                        <img class="img-modal" src=%s alt="Ícone Farol Covid">
                         <div>	
                             <p> Acompanhe as 4 dimensões:</p>
                             - Situação da Doença (número de novos casos por habitante);</br>
@@ -369,20 +378,20 @@ def main(session_state):
                         </div>
                         <div>
                         <p class="darkblue-span uppercase"> <b>SimulaCovid</b> </p>
-                        <img class="img-modal" src="https://i.imgur.com/OxTlsuW.png" alt="Ícone SimulaCovid">	
+                        <img class="img-modal" src=%s alt="Ícone SimulaCovid">	
                         <p style="height:100px;">Simule o que pode acontecer com o sistema de saúde local se o ritmo de contágio aumentar 
                             ou diminuir e planeje suas ações para evitar a sobrecarga hospitalar.</p>
                         </div>
                         <div>
                         <p class="darkblue-span uppercase"> <b>Distanciamento Social</b> </p>
-                        <img class="img-modal" src="https://i.imgur.com/frUVHrY.png" alt="Ícone Distanciamento Social">
+                        <img class="img-modal" src=%s alt="Ícone Distanciamento Social">
                             <p style="height:100px;">Acompanhe a atualização diária do índice e descubra como está a circulação de pessoas 
                                 e o distanciamento social no seu estado ou município.    
                             </p>
                         </div>
                         <div>
                         <p class="darkblue-span uppercase"> <b>Saúde em Ordem</b> </p>
-                        <img class="img-modal" src="https://i.imgur.com/M0jr43n.png" alt="Ícone Saúde em Ordem">
+                        <img class="img-modal" src=%s alt="Ícone Saúde em Ordem">
                         <p> Entenda quais atividades deveriam reabrir primeiro na sua região, considerando: </p>
                             - Segurança Sanitária: quais setores trazem menor risco de exposição à Covid-19 para os trabalhadores.</br>
                             - Contribuição Econômica: quais setores movimentam mais a economia daquele estado ou regional de saúde.</br>
@@ -390,13 +399,19 @@ def main(session_state):
                         </div>
                         <div>
                         <p class="darkblue-span uppercase"> <b>Onda Covid</b> </p>
-                        <img class="img-modal" src="https://i.imgur.com/Oy7IiGB.png" alt="Ícone Onda Covid">
+                        <img class="img-modal" src=%s alt="Ícone Onda Covid">
                         <p>Com base no número de óbitos de Covid-19 registrados, acompanhe se seu município já saiu do pico da doença. </p>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>""",
+        </div>""" %(
+            farolcovid_logo,
+            simulacovid_logo,
+            distanciamentosocial_logo,
+            saudeemordem_logo,
+            ondacovid_logo
+        ),
         unsafe_allow_html=True,
     )
 
@@ -409,7 +424,6 @@ def main(session_state):
     )
 
     # GET DATA
-    config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
     dfs = get_data(config)
 
     # INitial header div
