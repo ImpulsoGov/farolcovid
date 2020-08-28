@@ -225,10 +225,12 @@ def gen_big_table(config, dfs):
     # st.write(dfs["state"])
     state_data = dfs["state"].sort_values(by="state_name")
     proportion = str((state_data.shape[0] + 1) * 5) + "vw"
-    text = f"""<div class="big-table" id="big-table">
-        <div class="big-table-title-box">
-            <div class="big-table-title">COMO ESTÃO OS ESTADOS?</div>
-        </div>
+    text = f"""
+    
+    <div class="base-wrapper flex flex-column" style="background-color: rgb(0, 144, 167);">
+        <div class="section-header white-span">NÍVEIS DE RISCO: Como estão os estados?</div>
+    </div><br><br>
+    <div class="big-table" id="big-table">
         <div class="big-table-head-box">
             <div class="big-table-line btl0" style="height: {proportion};"></div>
             <div class="big-table-line btl1" style="height: {proportion};"></div>
@@ -241,7 +243,8 @@ def gen_big_table(config, dfs):
             <div class="big-table-field btt3">Capacidade do sistema de saúde</div>
             <div class="big-table-field btt4">Taxa de subnotificação</div>
             <div class="big-table-field btt5">Média móvel de novas mortes por 100mil habitantes</div>
-        </div>"""
+        </div>
+    """
     row_order = 0
     for index, sector_data in state_data.iterrows():
         text += gen_sector_big_row(sector_data, row_order, config)
