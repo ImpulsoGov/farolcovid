@@ -2095,17 +2095,17 @@ header>.toolbar { /* Hide toolbar menu */
 .distanciamento-titleimage{
     position:absolute;
     float:right;
-    right:1em;
+    right:3em;
     bottom:0px;
-    height:20vw;
+    height:24vw;
 }
 @media only screen and (max-width: 425px) {
     .distanciamento-titleimage {
         width:70vw;
         right:-5vw;
         bottom:0;
+        height:0vw;
         float:none;
-        height:auto;
         position:relative;
     }
     .distanciamento-titlebox{
@@ -2191,6 +2191,7 @@ header>.toolbar { /* Hide toolbar menu */
     top:0%;
 }
 .big-table-title-box{
+    background-color: var(--main-primary);
     position:relative;
     height:10vw;
 }
