@@ -456,41 +456,6 @@ def gen_whatsapp_button(info) -> None:
         unsafe_allow_html=True,
     )
 
-def gen_info_novidades():
-    return f"""
-    <a href="#novidades" class="info-btn">Novidades!</a>
-    <div id="novidades" class="nov-modal-window">
-        <div>
-            <a href="#" title="Close" class="info-btn-close" style="color: white;">&times</a>
-            <div style="margin: 10px 15px 15px 15px;">
-                <h1 class="primary-span">Saiba como cada ferramenta apoia a resposta ao coronavírus</h1>
-                <p class="darkblue-span uppercase"> <b>Farol Covid</b> </p>
-                <p> Acompanhe as 4 dimensões:</p>
-                <ul>
-                    <li>Situação da Doença (número de novos casos por habitante)</li>
-                    <li>Controle da Doença (ritmo de contágio)</li>
-                    <li>Capacidade do sistema (número de leitos e capacidade UTI)</li>
-                    <li>Confiança de dados (taxa de subnotificação)</li>
-                </ul>
-                <p> E descubra o nível de alerta do estado, regional de saúde ou município.</p>
-                <p class="darkblue-span uppercase"> <b>SimulaCovid</b> </p>
-                    <p>Simule o que pode acontecer com o sistema de saúde local se o ritmo de contágio aumentar 
-                    ou diminuir e planeje suas ações para evitar a sobrecarga hospitalar.</p>
-                <p class="darkblue-span uppercase"> <b>Distanciamento Social</b> </p>
-                    <p>Acompanhe a atualização diária do índice e descubra como está a circulação de pessoas 
-                    e o distanciamento social no seu estado ou município.</p>
-                <p class="darkblue-span uppercase"> <b>Saúde em Ordem</b> </p>
-                    Entenda quais atividades deveriam reabrir primeiro na sua região, considerando:
-                <ul>
-                    <li>Segurança Sanitária: quais setores trazem menor risco de exposição à Covid-19 para os trabalhadores.</li>
-                    <li>Contribuição Econômica: quais setores movimentam mais a economia daquele estado ou regional de saúde.</li>
-                </ul>
-                <p class="darkblue-span uppercase"> <b>Onda Covid</b> </p>
-                    Com base no número de óbitos de Covid-19 registrados, acompanhe se seu município já saiu do pico da doença. 
-            </div>
-        </div>
-    </div>"""
-
 
 def gen_info_modal():
     return f"""
