@@ -1042,6 +1042,7 @@ header>.toolbar { /* Hide toolbar menu */
     opacity: 1;
     background-color: white;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 15px;
     
     padding: 20px 50px 20px 20px;
     overflow: auto;
@@ -1057,6 +1058,14 @@ header>.toolbar { /* Hide toolbar menu */
 .nov-modal-window:target{
     visibility: visible;
     pointer-events: auto;
+}
+
+@media only screen and (max-width: 425px) {
+    /*max-height: 700px*/
+    .nov-modal-window {
+        width: 80%;
+        height: 80%;
+    }
 }
 
 .info-header {
@@ -1100,6 +1109,7 @@ header>.toolbar { /* Hide toolbar menu */
     opacity: 0.98;
     background-color: white;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 15px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

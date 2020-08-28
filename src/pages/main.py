@@ -345,6 +345,8 @@ def main(session_state):
     st.write(
         """
         <div>
+            <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
+            <div class="white-span header p1" style="font-size:30px;">Novidades:</div>
             <div style="float: right;" style="font-size:30px;">
                 <a href="#novidades" class="info-btn">Novidades!</a>
                 <div id="novidades" class="nov-modal-window">
@@ -379,20 +381,15 @@ def main(session_state):
                     </div>
                 </div>
             </div>
-        </div>
-        """,
+        </div>""",
         unsafe_allow_html=True,
     )
 
-    # TEMPORARY BANNER - SEO
     st.write(
         """
-    <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
-        <div class="white-span header p1" style="font-size:30px;">Selecione seu estado ou município no mapa abaixo:</div>
-    </div>
-    <div class="base-wrapper">
-    </div>
-    """,
+    <div class="base-wrapper primary-span">
+        <span class="section-header">Selecione seu estado ou município no mapa abaixo:</span>
+    </div>""",
         unsafe_allow_html=True,
     )
 
