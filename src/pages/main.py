@@ -20,6 +20,7 @@ import amplitude
 import session
 
 from streamlit.server.Server import Server
+from PIL import Image
 import os
 
 import bisect
@@ -349,7 +350,7 @@ def main(session_state):
             <div class="white-span header p1" style="font-size:30px;">O Farol Covid está de cara nova! Aprimoramos e adicionamos novas ferramentas.</div>
             <div style="margin-top: 15px;"></div>
             <div>
-                <a href="#novidades" class="info-btn">Veja como navegar!</a>
+                <a href="#novidades" class="info-btn">Veja como navegar</a>
             </div>
             <div id="novidades" class="nov-modal-window">
                 <div>
@@ -357,29 +358,41 @@ def main(session_state):
                     <div style="margin: 10px 15px 15px 15px;">
                         <h1 class="primary-span">Saiba como cada ferramenta apoia a resposta ao coronavírus</h1>
                         <p class="darkblue-span uppercase"> <b>Farol Covid</b> </p>
-                        <p> Acompanhe as 4 dimensões:</p>
-                        <ul>
-                            <li>Situação da Doença (número de novos casos por habitante)</li>
-                            <li>Controle da Doença (ritmo de contágio)</li>
-                            <li>Capacidade do sistema (número de leitos e capacidade UTI)</li>
-                            <li>Confiança de dados (taxa de subnotificação)</li>
-                        </ul>
-                        <p> E descubra o nível de alerta do estado, regional de saúde ou município.</p>
+                        <img class="img-modal" src="https://i.imgur.com/qKMzYRB.png" alt="Ícone Farol Covid">
+                        <div>	
+                            <p> Acompanhe as 4 dimensões:</p>
+                            - Situação da Doença (número de novos casos por habitante);</br>
+                            - Controle da Doença (ritmo de contágio)</br>
+                            - Capacidade do sistema (número de leitos e capacidade UTI)</br>
+                            - Confiança de dados (taxa de subnotificação)</br>
+                            <p> E descubra o nível de alerta do estado, regional de saúde ou município.</p>
+                        </div>
+                        <div>
                         <p class="darkblue-span uppercase"> <b>SimulaCovid</b> </p>
-                            <p>Simule o que pode acontecer com o sistema de saúde local se o ritmo de contágio aumentar 
+                        <img class="img-modal" src="https://i.imgur.com/OxTlsuW.png" alt="Ícone SimulaCovid">	
+                        <p style="height:100px;">Simule o que pode acontecer com o sistema de saúde local se o ritmo de contágio aumentar 
                             ou diminuir e planeje suas ações para evitar a sobrecarga hospitalar.</p>
+                        </div>
+                        <div>
                         <p class="darkblue-span uppercase"> <b>Distanciamento Social</b> </p>
-                            <p>Acompanhe a atualização diária do índice e descubra como está a circulação de pessoas 
+                        <img class="img-modal" src="https://i.imgur.com/frUVHrY.png" alt="Ícone Distanciamento Social">
+                            <p style="height:100px;">Acompanhe a atualização diária do índice e descubra como está a circulação de pessoas 
                                 e o distanciamento social no seu estado ou município.    
                             </p>
+                        </div>
+                        <div>
                         <p class="darkblue-span uppercase"> <b>Saúde em Ordem</b> </p>
-                            Entenda quais atividades deveriam reabrir primeiro na sua região, considerando:
-                        <ul>
-                            <li>Segurança Sanitária: quais setores trazem menor risco de exposição à Covid-19 para os trabalhadores.</li>
-                            <li>Contribuição Econômica: quais setores movimentam mais a economia daquele estado ou regional de saúde.</li>
-                        </ul>
+                        <img class="img-modal" src="https://i.imgur.com/M0jr43n.png" alt="Ícone Saúde em Ordem">
+                        <p> Entenda quais atividades deveriam reabrir primeiro na sua região, considerando: </p>
+                            - Segurança Sanitária: quais setores trazem menor risco de exposição à Covid-19 para os trabalhadores.</br>
+                            - Contribuição Econômica: quais setores movimentam mais a economia daquele estado ou regional de saúde.</br>
+                        <p> </p>
+                        </div>
+                        <div>
                         <p class="darkblue-span uppercase"> <b>Onda Covid</b> </p>
-                            Com base no número de óbitos de Covid-19 registrados, acompanhe se seu município já saiu do pico da doença. 
+                        <img class="img-modal" src="https://i.imgur.com/Oy7IiGB.png" alt="Ícone Onda Covid">
+                        <p>Com base no número de óbitos de Covid-19 registrados, acompanhe se seu município já saiu do pico da doença. </p>
+                        </div>
                     </div>
                 </div>
             </div>
