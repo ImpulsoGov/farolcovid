@@ -18,6 +18,7 @@ import pages.main as fc
 import pages.risk_description as rd
 import pages.rt_description as rt
 import pages.saude_em_ordem_description as sod
+import pages.farol_covid_description as fod
 
 import utils
 
@@ -102,6 +103,7 @@ def main():
         "Menu",
         [
             "FarolCovid",
+            "Metodologia do Farol Covid",
             # "Análises",
             "Níveis de Risco",
             "Estimando Ritmo de Contágio",
@@ -139,6 +141,9 @@ def main():
     elif page == "Metodologia do Saúde em Ordem":
         if __name__ == "__main__":
             sod.main(session_state)
+    elif page == "Metodologia do Farol Covid":
+        if __name__ == "__main__":
+            fod.main(session_state)
 
 
 if __name__ == "__main__":
