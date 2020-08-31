@@ -20,7 +20,6 @@ import amplitude
 import session
 
 from streamlit.server.Server import Server
-from PIL import Image
 import os
 
 import bisect
@@ -652,7 +651,7 @@ def main(session_state):
                 unsafe_allow_html=True,
             )
         st.write(
-            "<div class='base-wrapper'><i>Em breve:</i> gráficos de subnotificação e média de casos.</div>",
+            "<div class='base-wrapper'><i>Em breve:</i> gráficos de subnotificação e média móvel de novos casos por 100k habitantes.</div>",
             unsafe_allow_html=True,
         )
     key_indicators_button_style = """border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
