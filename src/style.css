@@ -1119,6 +1119,7 @@ header>.toolbar { /* Hide toolbar menu */
 .info-btn:hover {
     color: var(--main-primary);
     background-color: white;
+    text-decoration: none;
 }
 
 .info-modal-window {

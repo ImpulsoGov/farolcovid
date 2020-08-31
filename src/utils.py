@@ -478,13 +478,13 @@ def gen_info_modal():
                 </tr>
                 <tr>
                     <td rowspan="2">
-                    <p><span>Situação da doença <em>o mais alto dos níveis</em></span></p><br/>
+                    <p><span>Situação da doença</span></p><br/>
                     </td>
                     <td><span>Novos casos diários (Média móvel 7 dias)</span></td>
-                    <td class="light-blue-bg bold"><span>x &lt;= 10</span></td>
-                    <td class="light-yellow-bg bold"><span>10&lt;x&lt;=19</span></td>
-                    <td class="light-orange-bg bold"><span>20&lt;=x&lt;=39</span></td>
-                    <td class="light-red-bg bold"><span>x &gt;= 40</span></td>
+                    <td class="light-blue-bg bold"><span>x &lt;= 3</span></td>
+                    <td class="light-yellow-bg bold"><span>3 &lt;x&lt;= 10</span></td>
+                    <td class="light-orange-bg bold"><span>11&lt;=x&lt;=24</span></td>
+                    <td class="light-red-bg bold"><span>x &gt;= 25</span></td>
                 </tr>
                 <tr>
                     <td><span>Tendência de novos casos diários</span></td>
@@ -500,19 +500,19 @@ def gen_info_modal():
                 </tr>
                 <tr>
                     <td><span>Capacidade de respostas do sistema de saúde</span></td>
-                    <td><span>ICU Simulator Days til at Capacity</span></td>
-                    <td class="light-blue-bg bold">x &gt; 2 meses</td>
-                    <td class="light-yellow-bg bold"><span>1 - 2 meses</span></td>
+                    <td><span>Projeção de tempo para ocupação total de leitos UTI</span></td>
+                    <td class="light-blue-bg bold">60 - 90 dias</td>
+                    <td class="light-yellow-bg bold"><span>30 - 60 dias</span></td>
                     <td class="light-orange-bg bold"><span>15 - 30 dias</span></td>
                     <td class="light-red-bg bold"><span>0 - 15 dias</span></td>
                 </tr>
                 <tr>
                     <td><span>Confiança dos dados</span></td>
                     <td><span>Subnotificação (casos relatados em cada 10)</span></td>
-                    <td class="light-blue-bg bold"><span>10&gt;=x&gt;8</span></td>
-                    <td class="light-yellow-bg bold"><span>8&gt;=x&gt;6</span></td>
-                    <td class="light-orange-bg bold"><span>6&gt;=x&gt;4</span></td>
-                    <td class="light-red-bg bold"><span>4&gt;=x&gt;=0</span></td>
+                    <td class="light-blue-bg bold"><span>10&gt;=x&gt;6</span></td>
+                    <td class="light-yellow-bg bold"><span>6&gt;=x&gt;4</span></td>
+                    <td class="light-orange-bg bold"><span>4&gt;=x&gt;3</span></td>
+                    <td class="light-red-bg bold"><span>3&gt;=x&gt;=0</span></td>
                 </tr>
             </tbody>
             </table>
@@ -537,18 +537,18 @@ def genHeroSection(title: str, subtitle: str):
     st.write(
         f"""
         <div class="base-wrapper hero-bg">
-                    <a href="https://coronacidades.org/" target="blank" class="logo-link"><span class="logo-bold">corona</span><span class="logo-lighter">cidades</span></a>
-                    <div class="hero-wrapper">
-                            <div class="hero-container">
-                                    <div class="hero-container-content">
-                                            <span class="hero-container-product primary-span">{title}<br/>Covid</span>
-                                            <span class="hero-container-subtitle primary-span">{subtitle}</span>
-                                    </div>
-                            </div>
-                    <div class="hero-container-image">   
-                        <img style="width: 100%;" src="https://i.imgur.com/CkYDPR7.png"/>
+            <a href="https://coronacidades.org/" target="blank" class="logo-link"><span class="logo-bold">corona</span><span class="logo-lighter">cidades</span></a>
+            <div class="hero-wrapper">
+                <div class="hero-container">
+                    <div class="hero-container-content">
+                        <span class="hero-container-product primary-span">{title}<br/>Covid</span>
+                        <span class="hero-container-subtitle primary-span">{subtitle}</span>
                     </div>
+                 </div>
+                <div class="hero-container-image">   
+                    <img style="width: 100%;" src="https://i.imgur.com/CkYDPR7.png"/>
                 </div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
