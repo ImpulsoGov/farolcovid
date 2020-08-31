@@ -864,7 +864,7 @@ def gen_ambassador_section() -> None:
     st.write(
         """
         <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
-            <div class="white-span header p1" style="font-size:30px;">Usamos dados abertos e históricos para calcular os indicadores acima.</div>
+            <div class="white-span header p1" style="font-size:30px;">Usamos dados abertos e históricos para calcular os indicadores acima</div>
             <span class="white-span"> <b>Quer aprofundar a análise para seu Estado ou Município?</b> A equipe do Coronacidades está disponível de forma inteiramente gratuita!</span>
             <a class="btn-ambassador" href="https://coronacidades.org/fale-conosco/" target="blank">FALE CONOSCO</a>
         </div>""",
