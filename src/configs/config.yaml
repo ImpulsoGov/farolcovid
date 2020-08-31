@@ -55,7 +55,7 @@ br:
         rules:
             situation_classification:
                 column_name: 'daily_cases_mavg_100k'
-                cuts: [0, 3, 10, 25, 100000]
+                cuts: [0, 3.7, 12.5, 27.4, 1000000]
                 categories: [0, 1, 2, 3]
 
             control_classification:
