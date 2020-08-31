@@ -20,7 +20,6 @@ import amplitude
 import session
 
 from streamlit.server.Server import Server
-from PIL import Image
 import os
 
 import bisect

@@ -537,15 +537,17 @@ def genHeroSection(title: str, subtitle: str):
     st.write(
         f"""
         <div class="base-wrapper hero-bg">
-                <a href="https://coronacidades.org/" target="blank" class="logo-link"><span class="logo-bold">corona</span><span class="logo-lighter">cidades</span></a>
-                <div class="hero-wrapper">
-                        <div class="hero-container">
-                                <div class="hero-container-content">
-                                        <span class="hero-container-product primary-span">{title}<br/>Covid</span>
-                                        <span class="hero-container-subtitle primary-span">{subtitle}</span>
-                                </div>
-                        </div>   
-                        <img class="hero-container-image" src="https://i.imgur.com/l3vuQdP.png"/>
+                    <a href="https://coronacidades.org/" target="blank" class="logo-link"><span class="logo-bold">corona</span><span class="logo-lighter">cidades</span></a>
+                    <div class="hero-wrapper">
+                            <div class="hero-container">
+                                    <div class="hero-container-content">
+                                            <span class="hero-container-product primary-span">{title}<br/>Covid</span>
+                                            <span class="hero-container-subtitle primary-span">{subtitle}</span>
+                                    </div>
+                            </div>
+                    <div class="hero-container-image">   
+                        <img style="width: 100%;" src="https://i.imgur.com/CkYDPR7.png"/>
+                    </div>
                 </div>
         </div>
         """,
