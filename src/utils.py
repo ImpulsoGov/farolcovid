@@ -508,11 +508,11 @@ def gen_info_modal():
                 </tr>
                 <tr>
                     <td><span>Confiança dos dados</span></td>
-                    <td><span>Subnotificação (casos relatados em cada 10)</span></td>
-                    <td class="light-blue-bg bold"><span>10&gt;=x&gt;6</span></td>
+                    <td><span>Subnotificação (casos <b>não</b> diagnosticados a cada 10 infectados)</span></td>
+                    <td class="light-blue-bg bold"><span>4&gt;=x&gt;0</span></td>
                     <td class="light-yellow-bg bold"><span>6&gt;=x&gt;4</span></td>
-                    <td class="light-orange-bg bold"><span>4&gt;=x&gt;3</span></td>
-                    <td class="light-red-bg bold"><span>3&gt;=x&gt;=0</span></td>
+                    <td class="light-orange-bg bold"><span>7&gt;=x&gt;6</span></td>
+                    <td class="light-red-bg bold"><span>10&gt;=x&gt;=7</span></td>
                 </tr>
             </tbody>
             </table>
@@ -537,14 +537,14 @@ def genHeroSection(title: str, subtitle: str):
     st.write(
         f"""
         <div class="base-wrapper hero-bg">
-            <a href="https://coronacidades.org/" target="blank" class="logo-link"><span class="logo-bold">corona</span><span class="logo-lighter">cidades</span></a>
             <div class="hero-wrapper">
-                <div class="hero-container">
-                    <div class="hero-container-content">
-                        <span class="hero-container-product primary-span">{title}<br/>Covid</span>
-                        <span class="hero-container-subtitle primary-span">{subtitle}</span>
-                    </div>
-                 </div>
+            <div class="hero-container">
+                <a href="https://coronacidades.org/" target="blank" class="logo-link"><span class="logo-bold">corona</span><span class="logo-lighter">cidades</span></a>
+                <div class="hero-container-content">
+                    <span class="hero-container-product primary-span">{title}<br/>Covid</span>
+                    <span class="hero-container-subtitle primary-span">{subtitle}</span>
+                </div>
+            </div>
                 <div class="hero-container-image">   
                     <img style="width: 100%;" src="https://i.imgur.com/CkYDPR7.png"/>
                 </div>
