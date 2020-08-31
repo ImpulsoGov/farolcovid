@@ -701,6 +701,13 @@ def genIndicatorCard(indicator: Indicator):
         alert = ""
     else:
         alert = loader.config["br"]["farolcovid"]["categories"][int(indicator.risk)]
+    
+    if indicator.right_display == "estabilizando":
+        indicator_right_display = "estabilizando em " + alert
+    else:
+        indicator_right_display = indicator.right_display
+    
+    
 
     risk_html_class = "bold white-span p4"
 
@@ -720,7 +727,7 @@ def genIndicatorCard(indicator: Indicator):
         </div>
         <div class="main-card-display-text-v2 sdcardtext-right">
                 <span class="lighter">{indicator.right_label}<br></span>
-                <span class="bold">{indicator.right_display}</span>
+                <span class="bold">{indicator_right_display}</span>
         </div>
     </div>"""
 
