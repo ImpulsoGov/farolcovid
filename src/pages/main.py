@@ -28,10 +28,17 @@ import math
 
 
 def fix_type(x, group, position):
+    if type(x) == np.ndarray:
+        if "- " in x:
+            return "- "
+        else:
+            return " a ".join(
+                [str(round(i, 1)) if type(i) != str else i.strip() for i in x]
+            )
+
     if x == "- ":
         return x
 
-    # print("\n\n AQUI:", x, group, position, "\n\n ====")
     if (group == "situation" and position == "display") or (
         group == "trust" and position == "left_display"
     ):
@@ -48,11 +55,6 @@ def fix_type(x, group, position):
         # TODO: passar para config
         dmonth = {1: "até 1", 2: "até 2", 3: "até 3", 4: "+ 3"}
         return dmonth[x]
-
-    if type(x) == np.ndarray:
-        return " a ".join(
-            [str(round(i, 1)) if type(i) != str else i.strip() for i in x]
-        )
 
     if (type(x) == str) or (type(x) == np.int64) or (type(x) == int):
         return x
@@ -109,21 +111,6 @@ def update_indicators(indicators, data, config, user_input, session_state):
     ):
         user_input["population_params"]["I"] = session_state.number_cases
         user_input["population_params"]["D"] = session_state.number_cases
-
-    # Recalcula capacidade hospitalar
-    # user_input["strategy"] = "estavel"
-    # user_input = sm.calculate_recovered(user_input, data)
-
-    # dmonth = get_dmonth(
-    #     run_simulation(user_input, config), "I2", session_state.number_beds
-    # )["best"]
-
-    # # TODO: add no config e juntar com farol
-    # dic_dmonth = {
-    #     1: {"preffix": "até 1", "class": "ruim"},
-    #     2: {"preffix": "até 2", "class": "insatisfatório"},
-    #     3: {"preffix": "+ de 2", "class": "bom"},
-    # }
 
     return indicators
 
@@ -296,7 +283,6 @@ def get_data(config):
             config,
             endpoint=config["br"]["api"]["endpoints"]["farolcovid"][place],
         )
-        .replace({"medio": "médio", "insatisfatorio": "insatisfatório"})
         .pipe(utils.fix_dates)
         for place in ["city", "health_region", "state"]
     }
@@ -593,17 +579,17 @@ def main(session_state):
     )
     if "state" in user_input["place_type"]:
         # Add disclaimer to cities in state alert levels
-        total_alert_cities = dfs["city"][
-            dfs["city"]["state_num_id"] == data["state_num_id"].unique()[0]
-        ]["overall_alert"].value_counts()
+        total_alert_regions = dfs["health_region"][
+            dfs["health_region"]["state_num_id"] == data["state_num_id"].unique()[0]
+        ].assign(overall_alert=lambda df: df["overall_alert"].map(config["br"]["farolcovid"]["categories"]))["overall_alert"].value_counts()
 
         utils.genKPISection(
             place_type=user_input["place_type"],
             locality=user_input["locality"],
             alert=data["overall_alert"].values[0],
             indicators=indicators,
-            n_colapse_alert_cities=total_alert_cities[
-                total_alert_cities.index.isin(["alto", "médio"])
+            n_colapse_regions=total_alert_regions[
+                total_alert_regions.index.isin(["altíssimo", "alto"])
             ].sum(),
         )
 

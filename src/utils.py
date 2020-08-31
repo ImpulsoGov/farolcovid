@@ -682,13 +682,6 @@ def genAnalysisDimmensionsSection(dimensions: List[Dimension]):
 
 
 def genIndicatorCard(indicator: Indicator):
-    # display_left = "flex"
-    # display_right = "flex"
-
-    # if str(indicator.left_display) == "nan":
-    #     display_left = "hide-bg"
-    # if str(indicator.right_display) == "nan":
-    #     display_right = "hide-bg"
 
     if indicator.display == "None":
         indicator.display = ""
@@ -728,33 +721,44 @@ def genKPISection(
     locality: str,
     alert: str,
     indicators: Dict[str, Indicator],
-    n_colapse_alert_cities: int = 0,
+    n_colapse_regions: int = 0,
 ):
+    print("\n\nQual o alerta?", alert)
     if not isinstance(alert, str):
         bg = "gray"
-        caption = "Sugerimos que confira o nível de risco de seu estado. (Veja Níveis de Risco no menu ao lado)<br/>Seu município nao possui dados suficientes para calcularmos o nível de risco."
+        alert="Sem classificação"
+        caption = "Sugerimos que confira o nível de risco de seu estado. (Veja Níveis de Risco no menu ao lado)<br/>Seu município não possui dados consistentes suficientes para calcularmos o nível de risco."
         stoplight = "%0a%0a"
     else:
         bg = AlertBackground(alert).name
-        caption = f"Risco {alert.upper()} de colapso no sistema de saúde;"
 
         if "state" in place_type:
             place_type = "estado"
+            if n_colapse_regions > 0:
+                caption = f"Seu estado está em Risco {alert.upper()} de colapso. <b>Note que {n_colapse_regions} regionais de saúde avaliadas estão em Risco Alto ou Altíssimo</b>.<br>Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
+            else:
+                caption = f"Seu estado está em Risco {alert.upper()} de colapso. Nenhuma regional de saúde avaliada está em Risco Alto ou Altíssimo de colapso.<br>Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
+
+        elif "healt_region" in place_type:
+            place_type = "regional"
+            caption = f"Risco {alert.upper()} de colapso no sistema de saúde."
         else:
             place_type = "município"
+            caption = f"Risco {alert.upper()} de colapso no sistema de saúde."
 
-        if alert == "baixo":
-            stoplight = f"Meu {place_type} está em *ALERTA BAIXO*! E o seu? %0a%0a"
-        elif alert == "médio":
-            stoplight = f"Meu {place_type} está em *ALERTA MÉDIO*! E o seu? %0a%0a"
-        else:
-            stoplight = f"Meu {place_type} está em *ALERTA ALTO*! E o seu? %0a%0a"
+    msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  
+    🚨%0a%0aNÍVEL DE ALERTA: {alert.upper()}
+    %0a%0a😷 *SITUAÇÃO DA DOENÇA*: Hoje são reportados❗em média *{indicators['situation'].display} casos por 100mil habitantes.
+    %0a%0a *CONTROLE DA DOENÇA*: A taxa de contágio mais recente é de *{indicators['control'].left_display}* - ou seja, uma pessoa infecta em média *{indicators['control'].left_display}* outras.
+    %0a%0a🏥 *CAPACIDADE DO SISTEMA*: A capacidade hospitalar será atingida em *{str(indicators['capacity'].display).replace("+", "mais")} meses* 
+    %0a%0a🔍 *CONFIANÇA DOS DADOS*: A cada 10 pessoas infectadas, *{indicators['trust'].display} são diagnosticadas* 
+    %0a%0a👉 Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui: https://coronacidades.org/farol-covid/"""
+    # msg = "temporarily disabled"
 
     cards = list(map(genIndicatorCard, indicators.values()))
     cards = "".join(cards)
     info_modal = gen_info_modal()
-    # msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  🚨%0a%0a{stoplight}😷 *Contágio*: Cada contaminado infecta em média outras *{indicators['rt'].display} pessoas* - _semana passada: {indicators['rt'].left_display}, tendência: {indicators['rt'].right_display}_%0a%0a🏥 *Capacidade*: A capacidade hospitalar será atingida em *{str(indicators['hospital_capacity'].display).replace("+", "mais")} mês(es)* %0a%0a🔍 *Subnotificação*: A cada 10 pessoas infectadas, *{indicators['subnotification_rate'].display} são diagnosticadas* %0a%0a🏠 *Isolamento*: Na última semana, *{indicators['social_isolation'].display} das pessoas ficou em casa* - _semana passada: {indicators['social_isolation'].left_display}, tendência: {indicators['social_isolation'].right_display}_%0a%0a---%0a%0a👉 Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui: https://coronacidades.org/farol-covid/"""
-    msg = "temporarily disabled"
+    
     st.write(
         """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;height:auto;">
                 <div class="base-wrapper flex flex-column" style="margin-top: 0px;">
