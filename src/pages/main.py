@@ -37,7 +37,7 @@ def fix_type(x, group, position):
         return round(float(x), 2)
 
     if group == "trust" and position == "display":
-        return int(round(10 * x, 0))
+        return int(round(10 * (1 - x), 0)) # muda para não notificado
 
     if group == "situation" and position == "left_display":
         return str(int(x)) + " dias"
@@ -82,7 +82,7 @@ def update_indicators(indicators, data, config, user_input, session_state):
                 dic_indicators[position] = "None"
 
         if np.isnan(data[config["br"]["indicators"][group]["risk"]].values[0]):
-            print("aqui!!!")
+            # print("aqui!!!")
             # dic_indicators["display"] = "- "
             dic_indicators["risk"] = "nan"
 
@@ -224,10 +224,12 @@ def gen_big_table(config, dfs):
     # st.write(dfs["state"])
     state_data = dfs["state"].sort_values(by="state_name")
     proportion = str((state_data.shape[0] + 1) * 5) + "vw"
-    text = f"""<div class="big-table" id="big-table">
-        <div class="big-table-title-box">
-            <div class="big-table-title">COMO ESTÃO OS ESTADOS?</div>
-        </div>
+    text = f"""
+    
+    <div class="base-wrapper flex flex-column" style="background-color: rgb(0, 144, 167);">
+        <div class="section-header white-span">NÍVEIS DE RISCO: Como estão os estados?</div>
+    </div><br><br>
+    <div class="big-table" id="big-table">
         <div class="big-table-head-box">
             <div class="big-table-line btl0" style="height: {proportion};"></div>
             <div class="big-table-line btl1" style="height: {proportion};"></div>
@@ -240,7 +242,8 @@ def gen_big_table(config, dfs):
             <div class="big-table-field btt3">Capacidade do sistema de saúde</div>
             <div class="big-table-field btt4">Taxa de subnotificação</div>
             <div class="big-table-field btt5">Média móvel de novas mortes por 100mil habitantes</div>
-        </div>"""
+        </div>
+    """
     row_order = 0
     for index, sector_data in state_data.iterrows():
         text += gen_sector_big_row(sector_data, row_order, config)
@@ -261,12 +264,16 @@ def gen_sector_big_row(my_state, index, config):
         3: ["#F02C2E", "🛑"],
     }
     level_data = config["br"]["farolcovid"]["rules"]
+
+    # TODO: passar para config
+    dmonth = {1: "até 1", 2: "até 2", 3: "até 3", 4: "+ 3"}
+
     return f"""<div class="big-table-row {["btlgrey","btlwhite"][index % 2]}">
             <div class="big-table-index-background" style="background-color:{alert_info[my_state["overall_alert"]][0]};"></div>
             <div class="big-table-field btf0">{my_state["state_name"]} {alert_info[my_state["overall_alert"]][1]}</div>
             <div class="big-table-field btf1" style="color:{alert_info[find_level(level_data["situation_classification"]["cuts"],level_data["situation_classification"]["categories"],my_state["daily_cases_mavg_100k"])][0]};">{"%0.2f"%my_state["daily_cases_mavg_100k"]}</div>
             <div class="big-table-field btf2" style="color:{alert_info[find_level(level_data["control_classification"]["cuts"],level_data["control_classification"]["categories"],my_state["rt_most_likely"])][0]};" > {"%0.2f"%my_state["rt_most_likely"]}</div>
-            <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["dday_icu_beds"])][0]};">{my_state["dday_icu_beds"]} dia(s)</div>
+            <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["dday_icu_beds"])][0]};">{dmonth[math.ceil(my_state["dday_icu_beds"] / 30)]} mês(es)</div>
             <div class="big-table-field btf4" style="color:{alert_info[find_level(level_data["trust_classification"]["cuts"],level_data["trust_classification"]["categories"],my_state["notification_rate"])][0]};">{int(my_state["subnotification_rate"]*100)}%</div>
             <div class="big-table-field btf5">{"%0.2f"%my_state["new_deaths_mavg_100k"]}</div>
         </div>"""

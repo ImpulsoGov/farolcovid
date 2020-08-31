@@ -10,7 +10,7 @@ def gen_cards(distancing_data):
                         <div class="distancing-output-wrapper">
                                 <div class="distancing-output-row">
                                         <span class="distancing-output-row-prediction-value">
-                                                {int(distancing_data[-1]*100)}%
+                                                {round(distancing_data[-1]*100, 0)}%
                                         </span>  
                                 </div> 
                                 <span class="distancing-output-row-prediction-label">
@@ -24,7 +24,7 @@ def gen_cards(distancing_data):
                         <div class="distancing-output-wrapper">
                                 <div class="distancing-output-row">
                                         <span class="distancing-output-row-prediction-value">
-                                                {int(distancing_data[-8]*100)}%
+                                                {round(distancing_data[-8]*100, 0)}%
                                         </span>  
                                 </div> 
                                 <span class="distancing-output-row-prediction-label">

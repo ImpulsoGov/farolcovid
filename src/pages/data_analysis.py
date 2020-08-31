@@ -232,30 +232,41 @@ def gen_cards(df, your_city, group):
         "increasing": {"background-color": "#F02C2E", "text": "alta"},
     }
 
+    if city_peak_daily_deaths >= 1:
+        pico = f"Seu pico de mortes diárias foi de {city_peak_daily_deaths} mortes em {city_peak_daily_deaths_day.strftime('%d/%m/%Y')}"
+    else:
+        pico = f"Seu município ainda não reportou nenhuma morte."
+
     st.write(
         f"""<div class="distancing-cards">
                 <div class="distancing-container distancing-card-bg">
                         <div class="distancing-output-wrapper">
+                                <span class="distancing-output-row-prediction-label">
+                                    Seu estado ({group}) está há 
+                                </span>
                                 <div class="distancing-output-row">
-                                        <span class="distancing-output-row-prediction-value" style="font-size:24px;font-weight:normal;">
-                                                {group} está a <b>{behaviour_length} dia{["","s"][int(behaviour_length> 1)]} em {deaths_banner_design_dict[deaths_behaviour]["text"]}</b>
+                                        <span class="distancing-output-row-prediction-value" style="font-size:28px;font-weight:normal;">
+                                                <b>{behaviour_length} dia{["","s"][int(behaviour_length> 1)]} em {deaths_banner_design_dict[deaths_behaviour]["text"]}</b>
                                         </span>  
                                 </div> 
                                 <span class="distancing-output-row-prediction-label">
-                                        da média móvel de mortes. O pico de mortes diárias até agora foi de {peak_daily_deaths} mortes em {peak_daily_deaths_day.strftime('%d/%m/%Y')}.
+                                        da média móvel de mortes. O pico de mortes diárias até hoje foi de {peak_daily_deaths} mortes, em {peak_daily_deaths_day.strftime('%d/%m/%Y')}.
                                 </span>
                         </div>
                 </div>
                 <div class="distancing-card-separator"></div>
                 <div class="distancing-container distancing-card-bg">
                         <div class="distancing-output-wrapper">
+                                <span class="distancing-output-row-prediction-label">
+                                        Seu município ({your_city}) está há 
+                                </span>
                                 <div class="distancing-output-row">
-                                        <span class="distancing-output-row-prediction-value" style="font-size:24px;font-weight:normal;">
-                                                Seu município está a <b>{city_behaviour_length} dia{["","s"][int(city_behaviour_length> 1)]} em {deaths_banner_design_dict[city_deaths_behaviour]["text"]} </b>
+                                        <span class="distancing-output-row-prediction-value" style="font-size:28px;font-weight:normal;">
+                                                <b>{city_behaviour_length} dia{["","s"][int(city_behaviour_length> 1)]} em {deaths_banner_design_dict[city_deaths_behaviour]["text"]} </b>
                                         </span>  
                                 </div> 
                                 <span class="distancing-output-row-prediction-label">
-                                        da média móvel de mortes. Seu pico de mortes diárias foi de {city_peak_daily_deaths} mortes em {city_peak_daily_deaths_day.strftime('%d/%m/%Y')}.
+                                        da média móvel de mortes. {pico}
                                 </span>
                         </div>
                 </div>
@@ -339,7 +350,7 @@ def prepare_heatmap(
 
         legend = """
         <div class="base-wrapper">
-            <span class="section-header primary-span">MORTES DIÁRIAS POR PAÍS</span>
+            <span class="section-header primary-span">ONDA DE MORTES DIÁRIAS POR PAÍS</span>
             <br><br>
             O gráfico abaixo mostra a média do número de mortes
             diárias dos últimos cinco dias para os 30 países com mais 
