@@ -204,6 +204,12 @@ br:
             "from_80_to_older": 0.184
     simulacovid:
         resources_available_proportion: 0.5
+    icons:
+        farolcovid_logo: "https://i.imgur.com/l3vuQdP.png"
+        simulacovid_logo: "https://i.imgur.com/OxTlsuW.png"
+        distanciamentosocial_logo: "https://i.imgur.com/frUVHrY.png"
+        saudeemordem_logo: "https://i.imgur.com/M0jr43n.png"
+        ondacovid_logo: "https://i.imgur.com/Oy7IiGB.png"
 
 impulso:
     contact:

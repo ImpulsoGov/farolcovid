@@ -1,5 +1,6 @@
 import streamlit as st
 import plots
+import utils
 
 
 def gen_cards(distancing_data):
@@ -40,16 +41,16 @@ def gen_cards(distancing_data):
 
 def main(user_input, indicators, data, config, session_state):
 
+    utils.genHeroSection(
+        title1="DISTANCIAMENTO", 
+        title2="SOCIAL",
+        subtitle="Explore o cumprimento de medidas de segurança sanitária na sua cidade.", 
+        logo="https://i.imgur.com/VkG1NLL.png",
+        header=False
+    )
+
     st.write(
         f"""
-        <div class="base-wrapper distanciamento-titlebox">
-            <div class="distanciamento-titleboxtext">
-                <div class="distanciamento-title">DISTANCIAMENTO SOCIAL</div>
-                <div class="distanciamento-titlecaption">Explore o cumprimento de medidas de segurança sanitária na sua cidade.</div>
-                <div class="distanciamento-titlecity"></div>
-            </div>
-            <img src="https://i.imgur.com/VkG1NLL.png" class="distanciamento-titleimage">
-        </div>
         <div class="base-wrapper">
                 <span class="section-header primary-span">TAXA DE ISOLAMENTO SOCIAL EM {user_input["locality"]}</span>
                 <br><br>

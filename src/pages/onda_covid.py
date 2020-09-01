@@ -89,21 +89,12 @@ def loading_cached():
 
 def main(user_input, indicators, data, config, session_state):
 
-    st.write(
-        f"""
-        <div class="base-wrapper distanciamento-titlebox">
-            <div class="distanciamento-titleboxtext">
-                <div class="distanciamento-title">ONDA COVID</div>
-                <div class="distanciamento-titlecaption">
-                Veja no gráfico como está seu estado na curva de contágio do novo coronavírus.<br>
-                Você também pode selecionar o seu estado e município no menu abaixo e comparar ele com outros municípios do mesmo estado.
-                </div>
-                <div class="distanciamento-titlecity"></div>
-            </div>
-            <img src="https://i.imgur.com/6rCXt22.png" class="distanciamento-titleimage">
-        </div>
-        """,
-        unsafe_allow_html=True,
+    utils.genHeroSection(
+        title1="Onda", 
+        title2="Covid",
+        subtitle="Veja e compare a evolução da curva de contágio da Covid-19 em seu estado ou município.", 
+        logo="https://i.imgur.com/Oy7IiGB.png",
+        header=False
     )
 
     try:
@@ -112,12 +103,14 @@ def main(user_input, indicators, data, config, session_state):
         br_cases = loading_cached()
         # print("finished laoding br cases")
         my_dict = utils.Dictionary()
-        da.prepare_heatmap(  # BRASIL MAP
-            br_cases, place_type="state_id",
-        )
+        # ONDA POR ESTADO
+        da.prepare_heatmap(br_cases, place_type="state_id")
+        st.write("")
         pass
     except Exception as e:
         st.write(str(e))
+
+    # ONDA POR MUNICIPIO
     st.write(
         """
         <div class="base-wrapper">
@@ -154,7 +147,9 @@ def main(user_input, indicators, data, config, session_state):
             deaths_per_cases=deaths_or_cases,
         )
         # print("finished preparation")
-    # COUNTRY HEATMAP
+    
+    # ONDA POR PAÍS
+    st.write("")
     da.prepare_heatmap(
         loader.read_data(
             "br",

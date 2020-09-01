@@ -41,7 +41,6 @@ states = pd.read_csv(os.path.join(configs_path, "states_table.csv"))
 
 # DATASOURCE TOOLS
 
-
 def get_inloco_url(config):
 
     api_inloco = dict()
@@ -62,7 +61,6 @@ def get_inloco_url(config):
 
 
 # DATES TOOLS
-
 
 def fix_dates(df):
     for col in df.columns:
@@ -118,7 +116,6 @@ def get_sources(user_input, data, cities_sources, resources):
 
 
 # PLACES TOOLS
-
 
 def add_all(x, all_string="Todos", first=None):
     formatted = [all_string] + list(x)
@@ -213,8 +210,6 @@ class Dictionary:
             "state_id"
         ].values[0]
 
-
-name_dictionary = Dictionary()
 # def get_state_str_id_by_id(place_id):
 
 #     states = pd.read_csv(
@@ -375,7 +370,6 @@ def reload_window():
 
 # JAVASCRIPT HACK METHODS
 
-
 def stylizeButton(name, style_string, session_state, others=dict()):
     """ adds a css option to a button you made """
     session_state.button_styles[name] = [style_string, others]
@@ -418,7 +412,6 @@ def hide_iframes():
 
 # END OF JAVASCRIPT HACK METHODS
 
-
 def gen_pdf_report():
     st.write(
         """
@@ -457,23 +450,103 @@ def gen_whatsapp_button(info) -> None:
     )
 
 
+def gen_info_modal():
+    return f"""
+    <a href="#entenda-mais" class="info-btn">Entenda a classificação dos níveis</a>
+    <div id="entenda-mais" class="info-modal-window">
+        <div>
+            <a href="#" title="Close" class="info-btn-close" style="color: white;">&times</a>
+            <div style="margin: 10px 15px 15px 15px;">
+            <h1 class="primary-span">Valores de referência</h1>
+            <div class="info-div-table">
+            <table class="info-table">
+            <tbody>
+                <tr>
+                    <td class="grey-bg"><strong>Dimensão</strong></td>
+                    <td class="grey-bg"><strong>Indicador</strong></td>
+                    <td class="grey-bg"><strong>Novo Normal</strong></td>
+                    <td class="grey-bg"><strong>Risco Moderado</strong></td>
+                    <td class="grey-bg"><strong>Risco Alto</strong></td>
+                    <td class="grey-bg"><strong>Risco Altíssimo</strong></td>
+                </tr>
+                <tr>
+                    <td rowspan="2">
+                    <p><span>Situação da doença</span></p><br/>
+                    </td>
+                    <td><span>Novos casos diários (Média móvel 7 dias)</span></td>
+                    <td class="light-blue-bg bold"><span>x&lt;=3.7</span></td>
+                    <td class="light-yellow-bg bold"><span>3.7&lt;x&lt;=12.5</span></td>
+                    <td class="light-orange-bg bold"><span>12.5&lt;=x&lt;=27.4</span></td>
+                    <td class="light-red-bg bold"><span>x &gt;= 27.4</span></td>
+                </tr>
+                <tr>
+                    <td><span>Tendência de novos casos diários</span></td>
+                    <td class="lightgrey-bg" colspan="4"><span>Se crescendo*, mover para o nível mais alto</span></td>
+                </tr>
+                <tr>
+                    <td><span>Controle da doença</span></td>
+                    <td><span>Número de reprodução efetiva</span></td>
+                    <td class="light-blue-bg bold"><span>&lt;0.5</span></td>
+                    <td class="light-yellow-bg bold"><span>&lt;0.5 - 1&gt;</span></td>
+                    <td class="light-orange-bg bold"><span>&lt;1 - 1.2&gt;</span>&nbsp;</td>
+                    <td class="light-red-bg bold"><span>&gt;1.2</span></td>
+                </tr>
+                <tr>
+                    <td><span>Capacidade de respostas do sistema de saúde</span></td>
+                    <td><span>Projeção de tempo para ocupação total de leitos UTI</span></td>
+                    <td class="light-blue-bg bold">60 - 90 dias</td>
+                    <td class="light-yellow-bg bold"><span>30 - 60 dias</span></td>
+                    <td class="light-orange-bg bold"><span>15 - 30 dias</span></td>
+                    <td class="light-red-bg bold"><span>0 - 15 dias</span></td>
+                </tr>
+                <tr>
+                    <td><span>Confiança dos dados</span></td>
+                    <td><span>Subnotificação (casos <b>não</b> diagnosticados a cada 10 infectados)</span></td>
+                    <td class="light-blue-bg bold"><span>4&gt;=x&gt;0</span></td>
+                    <td class="light-yellow-bg bold"><span>6&gt;=x&gt;4</span></td>
+                    <td class="light-orange-bg bold"><span>7&gt;=x&gt;6</span></td>
+                    <td class="light-red-bg bold"><span>10&gt;=x&gt;=7</span></td>
+                </tr>
+            </tbody>
+            </table>
+            </div>
+            <div style="font-size: 12px">
+                * Como determinamos a tendência:
+                <ul class="sub"> 
+                    <li> Crescendo: caso o aumento de novos casos esteja acontecendo por pelo menos 5 dias. </li>
+                    <li> Descrescendo: caso a diminuição de novos casos esteja acontecendo por pelo menos 14 dias. </li>
+                    <li> Estabilizando: qualquer outra mudança. </li>
+                </ul>
+            </div>
+            </div>
+        </div>
+    </div>"""
+
+
 # VIEW COMPONENTS FAROLCOVID
 
+def genHeroSection(title1: str, title2: str, subtitle: str, logo: str, header: bool):
 
-def genHeroSection(title: str, subtitle: str):
+    if header:
+        header = """<a href="https://coronacidades.org/" target="blank" class="logo-link"><span class="logo-bold">corona</span><span class="logo-lighter">cidades</span></a>"""
+    else:
+        header = """<br>"""
+
     st.write(
         f"""
         <div class="base-wrapper hero-bg">
-                <a href="https://coronacidades.org/" target="blank" class="logo-link"><span class="logo-bold">corona</span><span class="logo-lighter">cidades</span></a>
-                <div class="hero-wrapper">
-                        <div class="hero-container">
-                                <div class="hero-container-content">
-                                        <span class="hero-container-product primary-span">{title}<br/>Covid</span>
-                                        <span class="hero-container-subtitle primary-span">{subtitle}</span>
-                                </div>
-                        </div>   
-                        <img class="hero-container-image" src="https://i.imgur.com/l3vuQdP.png"/>
+            <div class="hero-wrapper">
+            <div class="hero-container">
+                {header}
+                <div class="hero-container-content">
+                    <span class="hero-container-product primary-span">{title1}<br/>{title2}</span>
+                    <span class="hero-container-subtitle primary-span">{subtitle}</span>
                 </div>
+            </div>
+                <div class="hero-container-image">   
+                    <img style="width: 100%;" src={logo}/>
+                </div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -571,6 +644,7 @@ def genInputFields(user_input, config, session):
     return user_input, session
 
 
+# TODO: not used
 def translate_risk(risk_value):
     if risk_value == "nan":
         return "Indef"
@@ -609,13 +683,6 @@ def genAnalysisDimmensionsSection(dimensions: List[Dimension]):
 
 
 def genIndicatorCard(indicator: Indicator):
-    # display_left = "flex"
-    # display_right = "flex"
-
-    # if str(indicator.left_display) == "nan":
-    #     display_left = "hide-bg"
-    # if str(indicator.right_display) == "nan":
-    #     display_right = "hide-bg"
 
     if indicator.display == "None":
         indicator.display = ""
@@ -626,6 +693,13 @@ def genIndicatorCard(indicator: Indicator):
         alert = ""
     else:
         alert = loader.config["br"]["farolcovid"]["categories"][int(indicator.risk)]
+    
+    if indicator.right_display == "estabilizando":
+        indicator_right_display = "estabilizando em " + alert
+    else:
+        indicator_right_display = indicator.right_display
+    
+    
 
     risk_html_class = "bold white-span p4"
 
@@ -645,7 +719,7 @@ def genIndicatorCard(indicator: Indicator):
         </div>
         <div class="main-card-display-text-v2 sdcardtext-right">
                 <span class="lighter">{indicator.right_label}<br></span>
-                <span class="bold">{indicator.right_display}</span>
+                <span class="bold">{indicator_right_display}</span>
         </div>
     </div>"""
 
@@ -655,32 +729,44 @@ def genKPISection(
     locality: str,
     alert: str,
     indicators: Dict[str, Indicator],
-    n_colapse_alert_cities: int = 0,
+    n_colapse_regions: int = 0,
 ):
+    print("\n\nQual o alerta?", alert)
     if not isinstance(alert, str):
         bg = "gray"
-        caption = "Sugerimos que confira o nível de risco de seu estado. (Veja Níveis de Risco no menu ao lado)<br/>Seu município nao possui dados suficientes para calcularmos o nível de risco."
+        alert="Sem classificação"
+        caption = "Sugerimos que confira o nível de risco de seu estado. (Veja Níveis de Risco no menu ao lado)<br/>Seu município não possui dados consistentes suficientes para calcularmos o nível de risco."
         stoplight = "%0a%0a"
     else:
         bg = AlertBackground(alert).name
-        caption = f"Risco {alert.upper()} de colapso no sistema de saúde;"
 
         if "state" in place_type:
             place_type = "estado"
+            if n_colapse_regions > 0:
+                caption = f"Seu estado está em Risco {alert.upper()} de colapso. <b>Note que {n_colapse_regions} regionais de saúde avaliadas estão em Risco Alto ou Altíssimo</b>.<br>Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
+            else:
+                caption = f"Seu estado está em Risco {alert.upper()} de colapso. Nenhuma regional de saúde avaliada está em Risco Alto ou Altíssimo de colapso.<br>Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
+
+        elif "healt_region" in place_type:
+            place_type = "regional"
+            caption = f"Risco {alert.upper()} de colapso no sistema de saúde."
         else:
             place_type = "município"
+            caption = f"Risco {alert.upper()} de colapso no sistema de saúde."
 
-        if alert == "baixo":
-            stoplight = f"Meu {place_type} está em *ALERTA BAIXO*! E o seu? %0a%0a"
-        elif alert == "médio":
-            stoplight = f"Meu {place_type} está em *ALERTA MÉDIO*! E o seu? %0a%0a"
-        else:
-            stoplight = f"Meu {place_type} está em *ALERTA ALTO*! E o seu? %0a%0a"
+    msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  
+    🚨%0a%0aNÍVEL DE ALERTA: {alert.upper()}
+    %0a%0a😷 *SITUAÇÃO DA DOENÇA*: Hoje são reportados❗em média *{indicators['situation'].display} casos por 100mil habitantes.
+    %0a%0a *CONTROLE DA DOENÇA*: A taxa de contágio mais recente é de *{indicators['control'].left_display}* - ou seja, uma pessoa infecta em média *{indicators['control'].left_display}* outras.
+    %0a%0a🏥 *CAPACIDADE DO SISTEMA*: A capacidade hospitalar será atingida em *{str(indicators['capacity'].display).replace("+", "mais")} meses* 
+    %0a%0a🔍 *CONFIANÇA DOS DADOS*: A cada 10 pessoas infectadas, *{indicators['trust'].display} são diagnosticadas* 
+    %0a%0a👉 Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui: https://coronacidades.org/farol-covid/"""
+    # msg = "temporarily disabled"
 
     cards = list(map(genIndicatorCard, indicators.values()))
     cards = "".join(cards)
-    # msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  🚨%0a%0a{stoplight}😷 *Contágio*: Cada contaminado infecta em média outras *{indicators['rt'].display} pessoas* - _semana passada: {indicators['rt'].left_display}, tendência: {indicators['rt'].right_display}_%0a%0a🏥 *Capacidade*: A capacidade hospitalar será atingida em *{str(indicators['hospital_capacity'].display).replace("+", "mais")} mês(es)* %0a%0a🔍 *Subnotificação*: A cada 10 pessoas infectadas, *{indicators['subnotification_rate'].display} são diagnosticadas* %0a%0a🏠 *Isolamento*: Na última semana, *{indicators['social_isolation'].display} das pessoas ficou em casa* - _semana passada: {indicators['social_isolation'].left_display}, tendência: {indicators['social_isolation'].right_display}_%0a%0a---%0a%0a👉 Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui: https://coronacidades.org/farol-covid/"""
-    msg = "temporarily disabled"
+    info_modal = gen_info_modal()
+    
     st.write(
         """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;height:auto;">
                 <div class="base-wrapper flex flex-column" style="margin-top: 0px;">
@@ -690,11 +776,12 @@ def genKPISection(
                          </div>
                         <span class="white-span p3">%s</span>
                         <div class="flex flex-row flex-m-column">%s</div>
+                        <div class = "info">%s</div>
                 </div>
         </div>
         <div class='base-wrapper product-section' ></div>
         """
-        % (bg, locality, msg, caption, cards),
+        % (bg, locality, msg, caption, cards, info_modal),
         unsafe_allow_html=True,
     )
 
@@ -788,12 +875,11 @@ def gen_ambassador_section() -> None:
 
     st.write(
         """
-        <div class="base-wrapper">
-                <div class="ambassador-container">
-                        <span class="ambassador-question"><b>Quer aprofundar a análise para seu Município?</b><br>
-                        A equipe do Coronacidades está disponível de forma inteiramente gratuita!</span>
-                        <a class="btn-ambassador" href="https://coronacidades.org/fale-conosco/" target="blank">FALE CONOSCO</a>
-                </div>
+        <br>
+        <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
+            <div class="white-span header p1" style="font-size:30px;">IMPORTANTE: Usamos dados abertos e históricos para calcular os indicadores.</div><br>
+            <span class="white-span"> <b>Quer aprofundar a análise para seu Estado ou Município?</b> A equipe do Coronacidades está disponível de forma inteiramente gratuita!</span>
+            <a class="btn-ambassador" href="https://coronacidades.org/fale-conosco/" target="blank">FALE CONOSCO</a>
         </div>""",
         unsafe_allow_html=True,
     )

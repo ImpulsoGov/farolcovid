@@ -350,7 +350,7 @@ def prepare_heatmap(
 
         legend = """
         <div class="base-wrapper">
-            <span class="section-header primary-span">MORTES DIÁRIAS POR PAÍS</span>
+            <span class="section-header primary-span">ONDA DE MORTES DIÁRIAS POR PAÍS</span>
             <br><br>
             O gráfico abaixo mostra a média do número de mortes
             diárias dos últimos cinco dias para os 30 países com mais 

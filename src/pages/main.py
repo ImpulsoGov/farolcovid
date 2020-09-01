@@ -27,10 +27,17 @@ import math
 
 
 def fix_type(x, group, position):
+    if type(x) == np.ndarray:
+        if "- " in x:
+            return "- "
+        else:
+            return " a ".join(
+                [str(round(i, 1)) if type(i) != str else i.strip() for i in x]
+            )
+
     if x == "- ":
         return x
 
-    # print("\n\n AQUI:", x, group, position, "\n\n ====")
     if (group == "situation" and position == "display") or (
         group == "trust" and position == "left_display"
     ):
@@ -47,11 +54,6 @@ def fix_type(x, group, position):
         # TODO: passar para config
         dmonth = {1: "até 1", 2: "até 2", 3: "até 3", 4: "+ 3"}
         return dmonth[x]
-
-    if type(x) == np.ndarray:
-        return " a ".join(
-            [str(round(i, 1)) if type(i) != str else i.strip() for i in x]
-        )
 
     if (type(x) == str) or (type(x) == np.int64) or (type(x) == int):
         return x
@@ -108,21 +110,6 @@ def update_indicators(indicators, data, config, user_input, session_state):
     ):
         user_input["population_params"]["I"] = session_state.number_cases
         user_input["population_params"]["D"] = session_state.number_cases
-
-    # Recalcula capacidade hospitalar
-    # user_input["strategy"] = "estavel"
-    # user_input = sm.calculate_recovered(user_input, data)
-
-    # dmonth = get_dmonth(
-    #     run_simulation(user_input, config), "I2", session_state.number_beds
-    # )["best"]
-
-    # # TODO: add no config e juntar com farol
-    # dic_dmonth = {
-    #     1: {"preffix": "até 1", "class": "ruim"},
-    #     2: {"preffix": "até 2", "class": "insatisfatório"},
-    #     3: {"preffix": "+ de 2", "class": "bom"},
-    # }
 
     return indicators
 
@@ -224,10 +211,13 @@ def gen_big_table(config, dfs):
     # st.write(dfs["state"])
     state_data = dfs["state"].sort_values(by="state_name")
     proportion = str((state_data.shape[0] + 1) * 5) + "vw"
-    text = f"""<div class="big-table" id="big-table">
-        <div class="big-table-title-box">
-            <div class="big-table-title">COMO ESTÃO OS ESTADOS?</div>
-        </div>
+    text = f"""
+    <br>
+    <div class="base-wrapper flex flex-column" style="background-color: rgb(0, 144, 167);">
+        <div class="white-span header p1" style="font-size:30px;">FAROL COVID: Como estão os estados?</div>
+        <div class="white-span">Uma visão detalhada dos indicadores para os estados brasileiros.</div>
+    </div><br><br>
+    <div class="big-table" id="big-table">
         <div class="big-table-head-box">
             <div class="big-table-line btl0" style="height: {proportion};"></div>
             <div class="big-table-line btl1" style="height: {proportion};"></div>
@@ -240,7 +230,8 @@ def gen_big_table(config, dfs):
             <div class="big-table-field btt3">Capacidade do sistema de saúde</div>
             <div class="big-table-field btt4">Taxa de subnotificação</div>
             <div class="big-table-field btt5">Média móvel de novas mortes por 100mil habitantes</div>
-        </div>"""
+        </div>
+    """
     row_order = 0
     for index, sector_data in state_data.iterrows():
         text += gen_sector_big_row(sector_data, row_order, config)
@@ -292,7 +283,6 @@ def get_data(config):
             config,
             endpoint=config["br"]["api"]["endpoints"]["farolcovid"][place],
         )
-        .replace({"medio": "médio", "insatisfatorio": "insatisfatório"})
         .pipe(utils.fix_dates)
         for place in ["city", "health_region", "state"]
     }
@@ -302,7 +292,7 @@ def get_data(config):
 
 
 def main(session_state):
-    # START Google Analytics
+    #  ==== GOOGLE ANALYTICS SETUP ====
     GOOGLE_ANALYTICS_CODE = os.getenv("GOOGLE_ANALYTICS_CODE")
     if GOOGLE_ANALYTICS_CODE:
         import pathlib
@@ -330,40 +320,101 @@ def main(session_state):
             script_tag_loader.string = GA_JS
             soup.head.append(script_tag_loader)
             index_path.write_text(str(soup))
-    # END Google Analytics
+    # ====
 
-    # Get user info
+    # Amplitude: Get user info
     user_analytics = amplitude.gen_user(utils.get_server_session())
     opening_response = user_analytics.safe_log_event(
         "opened farol", session_state, is_new_page=True
     )
 
     utils.localCSS("style.css")
-
+    
     utils.genHeroSection(
-        "Farol", "Entenda e controle a Covid-19 em sua cidade e estado."
+        title1="Farol", 
+        title2="Covid",
+        subtitle="Entenda e controle a Covid-19 em sua cidade e estado.", 
+        logo="https://i.imgur.com/CkYDPR7.png",
+        header=True
     )
-    # TEMPORARY BANNER - SEO
+
+    config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
+    
+    #TEMPORARY BANNER FC
     st.write(
         """
-    <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
-        <div class="white-span header p1" style="font-size:30px;">Selecione seu estado ou município no mapa abaixo:</div>
-    </div>
-    <div class="base-wrapper">
-    </div>
-    """,
+        <div>
+            <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
+                <div class="white-span header p1" style="font-size:30px;">O FAROLCOVID ESTÁ DE CARA NOVA!</div>
+                <span class="white-span">Aprimoramos a plataforma e adicionamos novas ferramentas para acompanhamento da crise da Covid-19 no Brasil. <b>Que tal explorar com a gente?</b></span>
+                <br><div style="margin-top: 15px;"></div>
+            <div>
+                <a href="#novidades" class="info-btn">Entenda como navegar</a>
+            </div>
+            <div id="novidades" class="nov-modal-window">
+                <div>
+                    <a href="#" title="Close" class="info-btn-close" style="color: white;">&times</a>
+                    <div style="margin: 10px 15px 15px 15px;">
+                        <h1 class="primary-span">Saiba como cada ferramenta apoia a resposta ao coronavírus</h1>
+                        <p class="darkblue-span uppercase"> <b>Farol Covid</b> </p>
+                        <img class="img-modal" src=%s alt="Ícone Farol Covid">
+                        <div>	
+                            <p> Acompanhe as 4 dimensões:</p>
+                            - Situação da Doença (número de novos casos por habitante);</br>
+                            - Controle da Doença (ritmo de contágio)</br>
+                            - Capacidade do sistema (número de leitos e capacidade UTI)</br>
+                            - Confiança de dados (taxa de subnotificação)</br>
+                            <p> E descubra o nível de alerta do estado, regional de saúde ou município.</p>
+                        </div>
+                        <div>
+                        <p class="darkblue-span uppercase"> <b>SimulaCovid</b> </p>
+                        <img class="img-modal" src=%s alt="Ícone SimulaCovid">	
+                        <p style="height:100px;">Simule o que pode acontecer com o sistema de saúde local se o ritmo de contágio aumentar 
+                            ou diminuir e planeje suas ações para evitar a sobrecarga hospitalar.</p>
+                        </div>
+                        <div>
+                        <p class="darkblue-span uppercase"> <b>Distanciamento Social</b> </p>
+                        <img class="img-modal" src=%s alt="Ícone Distanciamento Social">
+                            <p style="height:100px;">Acompanhe a atualização diária do índice e descubra como está a circulação de pessoas 
+                                e o distanciamento social no seu estado ou município.    
+                            </p>
+                        </div>
+                        <div>
+                        <p class="darkblue-span uppercase"> <b>Saúde em Ordem</b> </p>
+                        <img class="img-modal" src=%s alt="Ícone Saúde em Ordem">
+                        <p> Entenda quais atividades deveriam reabrir primeiro na sua região, considerando: </p>
+                            - Segurança Sanitária: quais setores trazem menor risco de exposição à Covid-19 para os trabalhadores.</br>
+                            - Contribuição Econômica: quais setores movimentam mais a economia daquele estado ou regional de saúde.</br>
+                        <p> </p>
+                        </div>
+                        <div>
+                        <p class="darkblue-span uppercase"> <b>Onda Covid</b> </p>
+                        <img class="img-modal" src=%s alt="Ícone Onda Covid">
+                        <p>Com base no número de óbitos de Covid-19 registrados, acompanhe se seu município já saiu do pico da doença. </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>""" %(
+            config["br"]["icons"]["farolcovid_logo"],
+            config["br"]["icons"]["simulacovid_logo"],
+            config["br"]["icons"]["distanciamentosocial_logo"],
+            config["br"]["icons"]["saudeemordem_logo"],
+            config["br"]["icons"]["ondacovid_logo"]
+        ),
+        unsafe_allow_html=True,
+    )
+
+    st.write(
+        """
+    <div class="base-wrapper primary-span">
+        <span class="section-header">Selecione seu estado ou município no mapa abaixo:</span>
+    </div>""",
         unsafe_allow_html=True,
     )
 
     # GET DATA
-    config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
     dfs = get_data(config)
-
-    # INitial header div
-    # st.write(
-    # "<div class='base-wrapper'><div class='map-selection' id='map-selection'></div></div>",
-    # unsafe_allow_html=True,
-    # )
 
     # REGION/CITY USER INPUT
     user_input = dict()
@@ -391,7 +442,8 @@ def main(session_state):
     )
 
     user_input, data = update_user_input_places(user_input, dfs, config)
-    # MAP
+    
+    # GENERATE MAPS
     map_place_id = utils.Dictionary().get_state_alphabetical_id_by_name(
         user_input["state_name"]
     )
@@ -401,15 +453,15 @@ def main(session_state):
     else:
         map_url = config["br"]["api"]["mapserver_external"]
 
-    # remove below as well
-    # map_url = "http://192.168.0.5:5000/"
     st.write(
         f"""
     <div class="brazil-map-div">
         <div class="alert-levels-map-overlay">
         </div>
+        <div>
         <iframe id="map" src="resources/iframe-gen.html?url={map_url}map-iframe?place_id=BR" class="map-br" scrolling="no">
         </iframe>
+        </div>
     </div>
     """,
         unsafe_allow_html=True,
@@ -429,6 +481,7 @@ def main(session_state):
         </iframe>""",
         unsafe_allow_html=True,
     )
+
     # SOURCES PARAMS
     user_input = utils.get_sources(user_input, data, dfs["city"], ["beds", "icu_beds"])
 
@@ -517,17 +570,17 @@ def main(session_state):
     )
     if "state" in user_input["place_type"]:
         # Add disclaimer to cities in state alert levels
-        total_alert_cities = dfs["city"][
-            dfs["city"]["state_num_id"] == data["state_num_id"].unique()[0]
-        ]["overall_alert"].value_counts()
+        total_alert_regions = dfs["health_region"][
+            dfs["health_region"]["state_num_id"] == data["state_num_id"].unique()[0]
+        ].assign(overall_alert=lambda df: df["overall_alert"].map(config["br"]["farolcovid"]["categories"]))["overall_alert"].value_counts()
 
         utils.genKPISection(
             place_type=user_input["place_type"],
             locality=user_input["locality"],
             alert=data["overall_alert"].values[0],
             indicators=indicators,
-            n_colapse_alert_cities=total_alert_cities[
-                total_alert_cities.index.isin(["alto", "médio"])
+            n_colapse_regions=total_alert_regions[
+                total_alert_regions.index.isin(["altíssimo", "alto"])
             ].sum(),
         )
 
@@ -590,14 +643,14 @@ def main(session_state):
                 unsafe_allow_html=True,
             )
         st.write(
-            "<div class='base-wrapper'><i>Em breve:</i> gráficos de subnotificação e média de casos.</div>",
+            "<div class='base-wrapper'><i>Em breve:</i> gráficos de subnotificação e média móvel de novos casos por 100k habitantes.</div>",
             unsafe_allow_html=True,
         )
-    key_indicators_button_style = """border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
+    
     utils.stylizeButton(
-        "Confira a evolução de indicadores-chave",
-        key_indicators_button_style,
-        session_state,
+        name="Confira a evolução de indicadores-chave",
+        style_string="""border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;""",
+        session_state=session_state,
     )
 
     # AMBASSADOR SECTION
@@ -620,16 +673,18 @@ def main(session_state):
     #         pdfgen.gen_pdf_report(user_input, indicators, data, config),
     #         unsafe_allow_html=True,
     #     )
+    
     # TOOLS
     products = ProductCards
     # products[2].recommendation = f'Risco {data["overall_alert"].values[0]}'
-    # ADD NEW CARDS
 
     utils.genProductsSection(products)
 
     # SELECTION BUTTONS
+    # TODO: limpar esse código! está 100% repetido!!!
     if session_state.continuation_selection is None:
         session_state.continuation_selection = [False, False, False, False]
+
     simula_button_name = "Clique Aqui"  # Simula covid 0space
     saude_button_name = "Clique Aqui "  # Saude em ordem 1space
     distancia_button_name = "Clique_Aqui"  # Distanciamento social
@@ -644,28 +699,28 @@ def main(session_state):
         session_state.continuation_selection = [False, False, False, True]
 
     utils.stylizeButton(
-        simula_button_name,
-        """border: 1px solid black;""",
-        session_state,
+        name=simula_button_name,
+        style_string="""border: 1px solid black;""",
+        session_state=session_state,
         others={"ui_binSelect": 1},
     )
 
     utils.stylizeButton(
-        distancia_button_name,
-        """border: 1px solid black;""",
-        session_state,
+        name=distancia_button_name,
+        style_string="""border: 1px solid black;""",
+        session_state=session_state,
         others={"ui_binSelect": 2},
     )
     utils.stylizeButton(
-        saude_button_name,
-        """border: 1px solid black;""",
-        session_state,
+        name=saude_button_name,
+        style_string="""border: 1px solid black;""",
+        session_state=session_state,
         others={"ui_binSelect": 3},
     )
     utils.stylizeButton(
-        onda_button_name,
-        """border: 1px solid black;""",
-        session_state,
+        name=onda_button_name,
+        style_string="""border: 1px solid black;""",
+        session_state=session_state,
         others={"ui_binSelect": 4},
     )
     if session_state.continuation_selection[0]:
@@ -692,6 +747,7 @@ def main(session_state):
         sm.main(user_input, indicators, data, config, session_state)
         # TODO: remove comment on this later!
         # utils.gen_pdf_report()
+
     elif session_state.continuation_selection[1]:
         user_analytics.safe_log_event(
             "picked distanciamento",
@@ -709,6 +765,7 @@ def main(session_state):
             ],
         )
         ds.main(user_input, indicators, data, config, session_state)
+
     elif session_state.continuation_selection[2]:
         user_analytics.safe_log_event(
             "picked saude_em_ordem",
@@ -726,6 +783,7 @@ def main(session_state):
             ],
         )
         so.main(user_input, indicators, data, config, session_state)
+
     elif session_state.continuation_selection[3]:
         user_analytics.safe_log_event(
             "picked onda",
@@ -743,6 +801,7 @@ def main(session_state):
             ],
         )
         oc.main(user_input, indicators, data, config, session_state)
+
     # BIG TABLE
     gen_big_table(config, dfs)
     # FOOTER

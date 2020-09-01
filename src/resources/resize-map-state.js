@@ -2,12 +2,20 @@
 function resize_iframe_map() {
     max_width = document.getElementById("chart").getBoundingClientRect()["width"];
     max_height = max_width * 1;
+    
     map = document.getElementsByTagName("svg")[0];
     regions = document.getElementsByClassName("geo borders")[0];
+
     dimensions_data = regions.getBoundingClientRect();
-    //console.log("max_width = ");
-    //console.log(max_width)
-    //console.log(dimensions_data);
+
+    console.log(dimensions_data);
+    console.log(document.getElementById("chart"));
+
+    header = document.getElementById("header");
+    header.setAttribute(width, 0);
+    header_width = document.getElementById("header").getBoundingClientRect()["width"];
+    console.log(header_width);
+
     scale_factor = 1 + Math.min((max_height - dimensions_data["height"]) / dimensions_data["height"], (max_width - dimensions_data["width"]) / dimensions_data["width"]);
     map.setAttribute("transform", "scale(" + scale_factor + ")");
     ymove = -(regions.getBoundingClientRect()["top"] - document.getElementById("chart").getBoundingClientRect()["top"]) - 10;
