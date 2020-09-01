@@ -169,7 +169,7 @@ def get_alert_color(value):
 def plot_inloco(place_id, df, decoration=False):
 
     fig = go.Figure()
-    names = utils.name_dictionary.get_place_names_by_id(place_id)
+    names = utils.Dictionary().get_place_names_by_id(place_id)
     state_id = int(str(place_id)[:2])
 
     # Add traces
