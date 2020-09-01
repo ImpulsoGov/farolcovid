@@ -10,15 +10,12 @@ env_path = Path("..") / ".env"
 load_dotenv(dotenv_path=env_path, override=True)
 
 # Pages
-# import pages.simulacovid as sm
-import pages.model_description as md
 import pages.team as tm
-import pages.data_analysis as anal
+
+# import pages.model_description as md
+# import pages.saude_em_ordem_description as sod
 import pages.main as fc
-import pages.risk_description as rd
-import pages.rt_description as rt
-import pages.saude_em_ordem_description as sod
-import pages.farol_covid_description as fod
+import pages.methodology as method
 
 import utils
 
@@ -74,78 +71,24 @@ def main():
     # For Http debug
     # st.write(utils.parse_headers(utils.get_server_session().ws.request))
 
-    # BUTTON STYLE
-    # st.markdown(
-    #     """<style>
-    #             button[data-baseweb="button"] {
-    #                 border: 1px solid var(--main-white);
-    #                 box-sizing: border-box;
-    #                 border-radius: 12px;
-    #                 width: auto;
-    #                 padding: 0.5em;
-    #                 text-transform: uppercase;
-    #                 font-family: var(--main-header-font-family);
-    #                 color: var(--main-white);
-    #                 background-color: var(--main-primary);
-    #                 font-weight: bold;
-    #                 text-align: center;
-    #                 text-decoration: none;
-    #                 font-size: 12px;
-    #                 animation-name: fadein;
-    #                 animation-duration: 3s;
-    #                 margin-top: 1em;
-    #             } </style>""",
-    #     unsafe_allow_html=True,
-    # )
-
     # MENU
     page = st.sidebar.radio(
-        "Menu",
-        [
-            "FarolCovid",
-            "Metodologia do Farol Covid",
-            # "Análises",
-            "Níveis de Risco",
-            "Estimando Ritmo de Contágio",
-            "Modelo Epidemiológico",
-            "Metodologia do Saúde em Ordem",
-            "Quem somos?",
-        ],
+        "Menu", ["FarolCovid", "Modelos, limitações e fontes", "Quem somos?",],
     )
 
-    if page == "Modelo Epidemiológico":
-        if __name__ == "__main__":
-            md.main(session_state)
-
-    elif page == "FarolCovid":
+    if page == "FarolCovid":
         if __name__ == "__main__":
             fc.main(session_state)
             utils.applyButtonStyles(session_state)
-
-    elif page == "Análises":
-        if __name__ == "__main__":
-            anal.main(session_state)
 
     elif page == "Quem somos?":
         if __name__ == "__main__":
             tm.main(session_state)
 
-    elif page == "Níveis de Risco":
+    elif page == "Modelos, limitações e fontes":
         if __name__ == "__main__":
-            rd.main(session_state)
-
-    elif page == "Estimando Ritmo de Contágio":
-        if __name__ == "__main__":
-            rt.main(session_state)
-            
-    elif page == "Metodologia do Saúde em Ordem":
-        if __name__ == "__main__":
-            sod.main(session_state)
-    elif page == "Metodologia do Farol Covid":
-        if __name__ == "__main__":
-            fod.main(session_state)
+            method.main(session_state)
 
 
 if __name__ == "__main__":
     main()
-
