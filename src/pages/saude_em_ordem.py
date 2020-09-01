@@ -302,8 +302,11 @@ def gen_detailed_vision(economic_data, session_state, config):
     else:  # If the button is not clicked plot it as well but do not alter the flag
         if session_state.saude_ordem_data["opened_detailed_view"] is True:
             display_detailed_plot(economic_data, session_state)
-    detailed_button_style = """border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
-    utils.stylizeButton("Visão Detalhada", detailed_button_style, session_state)
+
+    utils.stylizeButton(
+        name="Visão Detalhada", 
+        style_string="""border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;""", 
+        session_state=session_state)
 
 
 def get_clean_data(in_econ_data):
@@ -511,9 +514,11 @@ def gen_sector_tables(
             gen_single_table(session_state, score_groups, table_index, default_size)
         else:
             gen_single_table(session_state, score_groups, table_index, default_size)
-        table_button_style = """border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
+
         utils.stylizeButton(
-            "Mostrar/Ocultar mais da Fase " + number, table_button_style, session_state,
+            name="Mostrar/Ocultar mais da Fase " + number, 
+            style_string="""border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;""", 
+            session_state=session_state,
         )
 
 
