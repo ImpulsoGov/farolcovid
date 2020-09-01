@@ -1,0 +1,49 @@
+<head>
+    <meta charset="UTF-8">
+    <script>
+        function moveSelectBoxes() {
+            box = window.parent.document.getElementById("selectors-box");
+            //console.log(box.childNodes);
+            var selectBoxes = window.parent.document.getElementsByClassName("Widget row-widget stSelectbox");
+            //console.log(selectBoxes);
+            for (i = 0; i < 3; i++) {
+                //console.log(selectBoxes[0]);
+                if (selectBoxes[0].parentNode.id != box.id) {
+                    label = selectBoxes[0].getElementsByTagName("label")[0];
+                    var foundInside = false;
+                    //console.log("is different");
+                    for (j = 0; j < box.childNodes.length; j++) { //replace with one inside
+                        //console.log(box.childNodes);
+                        if (box.childNodes[j].getElementsByTagName) {
+                            if (box.childNodes[j].getElementsByTagName("label")[0].innerText == label.innerText) {
+                                //console.log("replacing");
+                                box.replaceChild(selectBoxes[0], box.childNodes[j]);
+                                foundInside = true;
+                            }
+                        }
+                    }
+                    if (!foundInside) {
+                        //console.log("appending");
+                        box.appendChild(selectBoxes[0]);
+                    }
+                }
+            }
+            //console.log(box.childNodes);
+            //console.log("restyling");
+            for (i = 0; i < box.childNodes.length; i++) {
+                if (box.childNodes[i] && box.childNodes[i].setAttribute) {
+                    box.childNodes[i].style["width"] = "auto";
+                }
+
+            }
+            //var firstchild = box.firstChild;
+            //while (box.childNodes.length > 3) {
+            //box.removeChild(firstchild);
+            //firstchild = box.firstchild;
+            //}
+        }
+    </script>
+</head>
+
+<body onload="moveSelectBoxes();">
+</body>

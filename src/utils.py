@@ -16,6 +16,7 @@ from models import (
     IndicatorBackground,
     Illustration,
     Product,
+    Dimension,
 )
 from typing import List
 import re
@@ -39,7 +40,6 @@ cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
 states = pd.read_csv(os.path.join(configs_path, "states_table.csv"))
 
 # DATASOURCE TOOLS
-
 
 def get_inloco_url(config):
 
@@ -65,7 +65,9 @@ def get_inloco_url(config):
 def fix_dates(df):
     for col in df.columns:
         if "last_updated" in col:
-            df[col] = pd.to_datetime(df[col])#.apply(lambda x: x.strftime("%d/%m/%Y"))
+            df[col] = pd.to_datetime(
+                df[col]
+            )  # .apply(lambda x: x.strftime("%d/%m/%Y"))
     return df
 
 
@@ -83,7 +85,7 @@ def get_sources(user_input, data, cities_sources, resources):
         "author_number": lambda x: x.drop_duplicates().str.cat(),
     }
 
-    for x in resources:  # beds, ventilators
+    for x in resources:
 
         for item in cols_agg.keys():
 
@@ -106,15 +108,14 @@ def get_sources(user_input, data, cities_sources, resources):
         user_input["last_updated_number_beds"]
     ).strftime("%d/%m")
 
-    user_input["last_updated_number_ventilators"] = pd.to_datetime(
-        user_input["last_updated_number_ventilators"]
+    user_input["last_updated_number_icu_beds"] = pd.to_datetime(
+        user_input["last_updated_number_icu_beds"]
     ).strftime("%d/%m")
 
     return user_input
 
 
 # PLACES TOOLS
-
 
 def add_all(x, all_string="Todos", first=None):
     formatted = [all_string] + list(x)
@@ -199,10 +200,16 @@ class Dictionary:
                 "city_id"
             ].values[0]
         else:
-            dictioanry["state_num_id"].values[0]
+            dictionary["state_num_id"].values[0]
 
+    def get_state_alphabetical_id_by_name(self, state_name):
+        self.check_initialize()
+        if state_name == "Todos":
+            return "BR"
+        return self.dictionary.loc[self.dictionary["state_name"] == state_name][
+            "state_id"
+        ].values[0]
 
-name_dictionary = Dictionary()
 # def get_state_str_id_by_id(place_id):
 
 #     states = pd.read_csv(
@@ -363,7 +370,6 @@ def reload_window():
 
 # JAVASCRIPT HACK METHODS
 
-
 def stylizeButton(name, style_string, session_state, others=dict()):
     """ adds a css option to a button you made """
     session_state.button_styles[name] = [style_string, others]
@@ -406,7 +412,6 @@ def hide_iframes():
 
 # END OF JAVASCRIPT HACK METHODS
 
-
 def gen_pdf_report():
     st.write(
         """
@@ -445,23 +450,103 @@ def gen_whatsapp_button(info) -> None:
     )
 
 
+def gen_info_modal():
+    return f"""
+    <a href="#entenda-mais" class="info-btn">Entenda a classificação dos níveis</a>
+    <div id="entenda-mais" class="info-modal-window">
+        <div>
+            <a href="#" title="Close" class="info-btn-close" style="color: white;">&times</a>
+            <div style="margin: 10px 15px 15px 15px;">
+            <h1 class="primary-span">Valores de referência</h1>
+            <div class="info-div-table">
+            <table class="info-table">
+            <tbody>
+                <tr>
+                    <td class="grey-bg"><strong>Dimensão</strong></td>
+                    <td class="grey-bg"><strong>Indicador</strong></td>
+                    <td class="grey-bg"><strong>Novo Normal</strong></td>
+                    <td class="grey-bg"><strong>Risco Moderado</strong></td>
+                    <td class="grey-bg"><strong>Risco Alto</strong></td>
+                    <td class="grey-bg"><strong>Risco Altíssimo</strong></td>
+                </tr>
+                <tr>
+                    <td rowspan="2">
+                    <p><span>Situação da doença</span></p><br/>
+                    </td>
+                    <td><span>Novos casos diários (Média móvel 7 dias)</span></td>
+                    <td class="light-blue-bg bold"><span>x&lt;=3.7</span></td>
+                    <td class="light-yellow-bg bold"><span>3.7&lt;x&lt;=12.5</span></td>
+                    <td class="light-orange-bg bold"><span>12.5&lt;=x&lt;=27.4</span></td>
+                    <td class="light-red-bg bold"><span>x &gt;= 27.4</span></td>
+                </tr>
+                <tr>
+                    <td><span>Tendência de novos casos diários</span></td>
+                    <td class="lightgrey-bg" colspan="4"><span>Se crescendo*, mover para o nível mais alto</span></td>
+                </tr>
+                <tr>
+                    <td><span>Controle da doença</span></td>
+                    <td><span>Número de reprodução efetiva</span></td>
+                    <td class="light-blue-bg bold"><span>&lt;0.5</span></td>
+                    <td class="light-yellow-bg bold"><span>&lt;0.5 - 1&gt;</span></td>
+                    <td class="light-orange-bg bold"><span>&lt;1 - 1.2&gt;</span>&nbsp;</td>
+                    <td class="light-red-bg bold"><span>&gt;1.2</span></td>
+                </tr>
+                <tr>
+                    <td><span>Capacidade de respostas do sistema de saúde</span></td>
+                    <td><span>Projeção de tempo para ocupação total de leitos UTI</span></td>
+                    <td class="light-blue-bg bold">60 - 90 dias</td>
+                    <td class="light-yellow-bg bold"><span>30 - 60 dias</span></td>
+                    <td class="light-orange-bg bold"><span>15 - 30 dias</span></td>
+                    <td class="light-red-bg bold"><span>0 - 15 dias</span></td>
+                </tr>
+                <tr>
+                    <td><span>Confiança dos dados</span></td>
+                    <td><span>Subnotificação (casos <b>não</b> diagnosticados a cada 10 infectados)</span></td>
+                    <td class="light-blue-bg bold"><span>4&gt;=x&gt;0</span></td>
+                    <td class="light-yellow-bg bold"><span>6&gt;=x&gt;4</span></td>
+                    <td class="light-orange-bg bold"><span>7&gt;=x&gt;6</span></td>
+                    <td class="light-red-bg bold"><span>10&gt;=x&gt;=7</span></td>
+                </tr>
+            </tbody>
+            </table>
+            </div>
+            <div style="font-size: 12px">
+                * Como determinamos a tendência:
+                <ul class="sub"> 
+                    <li> Crescendo: caso o aumento de novos casos esteja acontecendo por pelo menos 5 dias. </li>
+                    <li> Descrescendo: caso a diminuição de novos casos esteja acontecendo por pelo menos 14 dias. </li>
+                    <li> Estabilizando: qualquer outra mudança. </li>
+                </ul>
+            </div>
+            </div>
+        </div>
+    </div>"""
+
+
 # VIEW COMPONENTS FAROLCOVID
 
+def genHeroSection(title1: str, title2: str, subtitle: str, logo: str, header: bool):
 
-def genHeroSection(title: str, subtitle: str):
+    if header:
+        header = """<a href="https://coronacidades.org/" target="blank" class="logo-link"><span class="logo-bold">corona</span><span class="logo-lighter">cidades</span></a>"""
+    else:
+        header = """<br>"""
+
     st.write(
         f"""
         <div class="base-wrapper hero-bg">
-                <a href="https://coronacidades.org/" target="blank" class="logo-link"><span class="logo-bold">corona</span><span class="logo-lighter">cidades</span></a>
-                <div class="hero-wrapper">
-                        <div class="hero-container">
-                                <div class="hero-container-content">
-                                        <span class="hero-container-product primary-span">{title}<br/>Covid</span>
-                                        <span class="hero-container-subtitle primary-span">{subtitle}</span>
-                                </div>
-                        </div>   
-                        <img class="hero-container-image" src="https://i.imgur.com/l3vuQdP.png"/>
+            <div class="hero-wrapper">
+            <div class="hero-container">
+                {header}
+                <div class="hero-container-content">
+                    <span class="hero-container-product primary-span">{title1}<br/>{title2}</span>
+                    <span class="hero-container-subtitle primary-span">{subtitle}</span>
                 </div>
+            </div>
+                <div class="hero-container-image">   
+                    <img style="width: 100%;" src={logo}/>
+                </div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -476,16 +561,17 @@ def genInputFields(user_input, config, session):
     authors_beds = user_input["author_number_beds"]
     beds_update = user_input["last_updated_number_beds"]
 
-    authors_ventilators = user_input["author_number_ventilators"]
-    ventilators_update = user_input["last_updated_number_ventilators"]
+    authors_icu_beds = user_input["author_number_icu_beds"]
+    icu_beds_update = user_input["last_updated_number_icu_beds"]
+
     if session.reset or session.number_beds == None:
         number_beds = int(
             user_input["number_beds"]
             * config["br"]["simulacovid"]["resources_available_proportion"]
         )
 
-        number_ventilators = int(
-            user_input["number_ventilators"]
+        number_icu_beds = int(
+            user_input["number_icu_beds"]
             * config["br"]["simulacovid"]["resources_available_proportion"]
         )
         number_cases = int(user_input["population_params"]["I_confirmed"])
@@ -493,7 +579,7 @@ def genInputFields(user_input, config, session):
         session.reset = False
     else:
         number_beds = int(session.number_beds)
-        number_ventilators = int(session.number_ventilators)
+        number_icu_beds = int(session.number_icu_beds)
         number_cases = int(session.number_cases)
         number_deaths = int(session.number_deaths)
 
@@ -503,7 +589,7 @@ def genInputFields(user_input, config, session):
 
     if locality == "Brasil":
         authors_beds = "SUS e Embaixadores"
-        authors_ventilators = "SUS e Embaixadores"
+        authors_icu_beds = "SUS e Embaixadores"
 
     user_input["number_beds"] = st.number_input(
         f"Número de leitos destinados aos pacientes com Covid-19 (50% do reportado em {authors_beds}; atualizado: {beds_update})",
@@ -512,11 +598,11 @@ def genInputFields(user_input, config, session):
         number_beds,
     )
 
-    user_input["number_ventilators"] = st.number_input(
-        f"Número de ventiladores destinados aos pacientes com Covid-19 (50% do reportado em {authors_ventilators}; atualizado: {ventilators_update}):",
+    user_input["number_icu_beds"] = st.number_input(
+        f"Número de leitos UTI destinados aos pacientes com Covid-19 (50% do reportado em {authors_icu_beds}; atualizado: {icu_beds_update}):",
         0,
         None,
-        number_ventilators,
+        number_icu_beds,
     )
 
     user_input["population_params"]["I_confirmed"] = st.number_input(
@@ -537,7 +623,7 @@ def genInputFields(user_input, config, session):
     if st.button("Finalizar alteração"):
 
         session.number_beds = int(user_input["number_beds"])
-        session.number_ventilators = int(user_input["number_ventilators"])
+        session.number_icu_beds = int(user_input["number_icu_beds"])
         session.number_cases = int(user_input["population_params"]["I_confirmed"])
         session.number_deaths = int(user_input["population_params"]["D"])
 
@@ -558,40 +644,84 @@ def genInputFields(user_input, config, session):
     return user_input, session
 
 
-def genIndicatorCard(indicator: Indicator):
-    display_left = "flex"
-    display_right = "flex"
-
-    if str(indicator.left_display) == "nan":
-        display_left = "hide-bg"
-
-    if str(indicator.right_display) == "nan":
-        display_right = "hide-bg"
-
-    if indicator.risk == "Fonte: inloco":
-        risk_html_class = "black-span p4"
+# TODO: not used
+def translate_risk(risk_value):
+    if risk_value == "nan":
+        return "Indef"
     else:
-        risk_html_class = "bold white-span p4"
+        try:
+            return loader.config["br"]["farolcovid"]["categories"][risk_value]
+        except:
+            return risk_value
 
-    return f"""<div class="indicator-card flex flex-column mr">
-                        <span class="header p3">{indicator.header}</span>
-                        <span class="p4">{indicator.caption}</span>
-                        <span class="bold p2">{indicator.display}<span class="bold p5"> {indicator.unit}</span></span>
-                        <div class="{IndicatorBackground(indicator.risk).name}-alert-bg risk-pill">
-                                <span class="{risk_html_class}">{indicator.risk}</span>
-                        </div>
-                        <div class="flex flex-row flex-justify-space-between mt"> 
-                                <div class="br {display_left} flex-column text-align-center pr">
-                                        <span class="lighter">{indicator.left_label}</span>
-                                        <span class="bold">{indicator.left_display}</span>
-                                </div>
-                                <div class=" bl flex flex-column text-align-center pl {display_right}">
-                                        <span class="lighter">{indicator.right_label}</span>
-                                        <span class="bold">{indicator.right_display}</span>
-                                </div>
-                        </div>
-                </div>
-        """
+
+def genAnalysisDimmensionsCard(dimension: Dimension):
+    return f"""<div style="margin-top: 0px; display: inline-block; top:0x;">
+            <div class="dimension-card primary-span style="top:0x;">
+                {dimension.text}
+            </div>
+        </div>"""
+
+
+def genAnalysisDimmensionsSection(dimensions: List[Dimension]):
+    cards = list(map(genAnalysisDimmensionsCard, dimensions))
+    cards = "".join(cards)
+
+    st.write(
+        f"""
+        <div class="base-wrapper primary-span">
+            <div>
+                <span class="section-header">DIMENSÕES DA ANÁLISE</span>
+            </div>
+            <span class="p3">O que olhamos ao avaliar o cenário da pandemia em um lugar?</span>
+            <div class="flex flex-row flex-space-around mt flex-m-column" style="margin-bottom: 0px;height:auto; display:inline-block top:0x;">
+            {cards}
+            </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
+
+
+def genIndicatorCard(indicator: Indicator):
+
+    if indicator.display == "None":
+        indicator.display = ""
+        indicator.unit = ""
+
+    # Get name of alert by number
+    if indicator.risk == "nan":
+        alert = ""
+    else:
+        alert = loader.config["br"]["farolcovid"]["categories"][int(indicator.risk)]
+    
+    if indicator.right_display == "estabilizando":
+        indicator_right_display = "estabilizando em " + alert
+    else:
+        indicator_right_display = indicator.right_display
+    
+    
+
+    risk_html_class = "bold white-span p4"
+
+    return f"""
+    <div class="main-indicator-card flex flex-column mr" style="z-index:1;display:inline-block;position:relative;">
+        <span class="main-card-header-v2">{indicator.header}</span>
+        <span class="main-card-list-v2">{indicator.caption}</span>
+        <div class="flex flex-row flex-justify-space-between mt" style="width:250px;">
+        </div>
+        <span class="bold p2 main-card-display-value">{indicator.display}<span class="bold p5">  {indicator.unit}</span></span>
+        <div class="{IndicatorBackground(try_int(indicator.risk)).name}-alert-bg risk-pill " style="position:absolute;bottom:120px;">
+            <span class="{risk_html_class}">{alert}</span>
+        </div>
+        <div class="main-card-display-text-v2 sdcardtext-left">
+                <span class="lighter">{indicator.left_label}<br></span>
+                <span class="bold">{indicator.left_display}</span>
+        </div>
+        <div class="main-card-display-text-v2 sdcardtext-right">
+                <span class="lighter">{indicator.right_label}<br></span>
+                <span class="bold">{indicator_right_display}</span>
+        </div>
+    </div>"""
 
 
 def genKPISection(
@@ -599,35 +729,46 @@ def genKPISection(
     locality: str,
     alert: str,
     indicators: Dict[str, Indicator],
-    n_colapse_alert_cities: int = 0,
+    n_colapse_regions: int = 0,
 ):
+    print("\n\nQual o alerta?", alert)
     if not isinstance(alert, str):
         bg = "gray"
-        caption = "Sugerimos que confira o nível de risco de seu estado. (Veja Níveis de Risco no menu ao lado)<br/>Seu município nao possui dados suficientes para calcularmos o nível de risco."
+        alert="Sem classificação"
+        caption = "Sugerimos que confira o nível de risco de seu estado. (Veja Níveis de Risco no menu ao lado)<br/>Seu município não possui dados consistentes suficientes para calcularmos o nível de risco."
         stoplight = "%0a%0a"
     else:
         bg = AlertBackground(alert).name
 
         if "state" in place_type:
             place_type = "estado"
-            caption = f"Seu estado está em Risco {alert.upper()}. <b>Note que {n_colapse_alert_cities} municípios avaliados estão em Risco Médio ou Alto de colapso</b>. Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
+            if n_colapse_regions > 0:
+                caption = f"Seu estado está em Risco {alert.upper()} de colapso. <b>Note que {n_colapse_regions} regionais de saúde avaliadas estão em Risco Alto ou Altíssimo</b>.<br>Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
+            else:
+                caption = f"Seu estado está em Risco {alert.upper()} de colapso. Nenhuma regional de saúde avaliada está em Risco Alto ou Altíssimo de colapso.<br>Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
+
+        elif "healt_region" in place_type:
+            place_type = "regional"
+            caption = f"Risco {alert.upper()} de colapso no sistema de saúde."
         else:
             place_type = "município"
-            caption = f"Risco {alert.upper()} de colapso no sistema de saúde (Veja Níveis de Risco no menu ao lado)"
+            caption = f"Risco {alert.upper()} de colapso no sistema de saúde."
 
-        if alert == "baixo":
-            stoplight = f"Meu {place_type} está em *ALERTA BAIXO*! E o seu? %0a%0a"
-        elif alert == "médio":
-            stoplight = f"Meu {place_type} está em *ALERTA MÉDIO*! E o seu? %0a%0a"
-        else:
-            stoplight = f"Meu {place_type} está em *ALERTA ALTO*! E o seu? %0a%0a"
+    msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  
+    🚨%0a%0aNÍVEL DE ALERTA: {alert.upper()}
+    %0a%0a😷 *SITUAÇÃO DA DOENÇA*: Hoje são reportados❗em média *{indicators['situation'].display} casos por 100mil habitantes.
+    %0a%0a *CONTROLE DA DOENÇA*: A taxa de contágio mais recente é de *{indicators['control'].left_display}* - ou seja, uma pessoa infecta em média *{indicators['control'].left_display}* outras.
+    %0a%0a🏥 *CAPACIDADE DO SISTEMA*: A capacidade hospitalar será atingida em *{str(indicators['capacity'].display).replace("+", "mais")} meses* 
+    %0a%0a🔍 *CONFIANÇA DOS DADOS*: A cada 10 pessoas infectadas, *{indicators['trust'].display} são diagnosticadas* 
+    %0a%0a👉 Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui: https://coronacidades.org/farol-covid/"""
+    # msg = "temporarily disabled"
 
     cards = list(map(genIndicatorCard, indicators.values()))
     cards = "".join(cards)
-    msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  🚨%0a%0a{stoplight}😷 *Contágio*: Cada contaminado infecta em média outras *{indicators['rt'].display} pessoas* - _semana passada: {indicators['rt'].left_display}, tendência: {indicators['rt'].right_display}_%0a%0a🏥 *Capacidade*: A capacidade hospitalar será atingida em *{str(indicators['hospital_capacity'].display).replace("+", "mais")} mês(es)* %0a%0a🔍 *Subnotificação*: A cada 10 pessoas infectadas, *{indicators['subnotification_rate'].display} são diagnosticadas* %0a%0a🏠 *Isolamento*: Na última semana, *{indicators['social_isolation'].display} das pessoas ficou em casa* - _semana passada: {indicators['social_isolation'].left_display}, tendência: {indicators['social_isolation'].right_display}_%0a%0a---%0a%0a👉 Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui: https://coronacidades.org/farol-covid/"""
-
+    info_modal = gen_info_modal()
+    
     st.write(
-        """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;">
+        """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;height:auto;">
                 <div class="base-wrapper flex flex-column" style="margin-top: 0px;">
                         <div class="flex flex-row flex-space-between flex-align-items-center">
                          <span class="white-span header p1">%s</span>
@@ -635,11 +776,12 @@ def genKPISection(
                          </div>
                         <span class="white-span p3">%s</span>
                         <div class="flex flex-row flex-m-column">%s</div>
+                        <div class = "info">%s</div>
                 </div>
         </div>
-        <div class='base-wrapper product-section'></div>
+        <div class='base-wrapper product-section' ></div>
         """
-        % (bg, locality, msg, caption, cards),
+        % (bg, locality, msg, caption, cards, info_modal),
         unsafe_allow_html=True,
     )
 
@@ -648,19 +790,23 @@ def genProductCard(product: Product):
     if product.recommendation == "Sugerido":
         badge_style = "primary-bg"
     elif product.recommendation == "Risco alto":
+        product.recommendation = "Espere"
         badge_style = f"red-alert-bg"
+    elif product.recommendation == "Risco baixo":
+        product.recommendation = "Explore"
+        badge_style = "primary-bg"
     else:
-        badge_style = "hide-bg"
+        badge_style = "primary-bg"
 
     return f"""<div class="flex flex-column elevated pr pl product-card mt  ">
+                <img src="{product.image}" style="height:100px;" class="card-image mt"/>
                 <div class="flex flex-row">
                         <span class="p3 header bold uppercase">{product.name}</span>
-                         <span class="{badge_style} ml secondary-badge">{product.recommendation}</span>
                 </div>
-                <span>{product.caption}</span>
-                <img src="{product.image}" style="width: 200px" class="mt"/>
-        </div>
-        """
+                <span class="selection-card-caption">{product.caption}</span>
+                <span class="{badge_style} ml secondary-badge">{product.recommendation}</span>
+                </div>
+                """
 
 
 def genProductsSection(products: List[Product]):
@@ -670,7 +816,7 @@ def genProductsSection(products: List[Product]):
     st.write(
         f"""
         <div class="base-wrapper">
-                <span class="section-header primary-span">COMO SEGUIR COM SEGURANÇA?</span>
+                <span class="section-header primary-span">O QUE MAIS VOCÊ QUER SABER SOBRE O SEU MUNICÍPIO?</span>
                 <div class="flex flex-row flex-space-around mt flex-m-column">{cards}</div>
         </div>
         """,
@@ -729,37 +875,34 @@ def gen_ambassador_section() -> None:
 
     st.write(
         """
-        <div class="base-wrapper">
-                <div class="ambassador-container">
-                        <span class="ambassador-question"><b>Quer saber em primeira mão os lançamentos e melhorias do Farol Covid e do Coronacidades?</b>
-                        Seja um Embaixador Coronacidades!</span>
-                        <a class="btn-ambassador" href="%s" target="blank">Quero ser embaixador</a>
-                </div>
-        </div>
-        """
-        % Link.AMBASSADOR_FORM.value,
+        <br>
+        <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
+            <div class="white-span header p1" style="font-size:30px;">IMPORTANTE: Usamos dados abertos e históricos para calcular os indicadores.</div><br>
+            <span class="white-span"> <b>Quer aprofundar a análise para seu Estado ou Município?</b> A equipe do Coronacidades está disponível de forma inteiramente gratuita!</span>
+            <a class="btn-ambassador" href="https://coronacidades.org/fale-conosco/" target="blank">FALE CONOSCO</a>
+        </div>""",
         unsafe_allow_html=True,
     )
 
 
 def genSimulatorOutput(output: SimulatorOutput) -> str:
 
-    bed_img = "https://i.imgur.com/27hutU0.png"
-    ventilator_icon = "https://i.imgur.com/V419ZRI.png"
+    beds_img = "https://i.imgur.com/27hutU0.png"
+    icu_beds_img = "https://i.imgur.com/Oh4l8qM.png"
 
     if output.min_range_beds < 3 and output.max_range_beds < 3:
         bed_projection = f"em até {output.max_range_beds} mês(es)"
     else:
         bed_projection = "mais de 2 meses"
 
-    if output.min_range_ventilators < 3 and output.max_range_ventilators < 3:
-        ventilator_projection = f"em até {output.max_range_ventilators} mês(es)"
+    if output.min_range_icu_beds < 3 and output.max_range_icu_beds < 3:
+        icu_bed_projection = f"em até {output.max_range_icu_beds} mês(es)"
     else:
-        ventilator_projection = "mais de 2 meses"
+        icu_bed_projection = "mais de 2 meses"
 
     output = """
         <div>
-                <div class="simulator-container %s">
+                <div class="simulator-container simulator-beds-card-bg">
                         <div class="simulator-output-wrapper">
                                 <div class="simulator-output-row">
                                         <span class="simulator-output-row-prediction-value">
@@ -773,7 +916,7 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
                         <img src="%s" class="simulator-output-image"/>
                 </div>
                 <br />
-                <div class="simulator-container %s">
+                <div class="simulator-container simulator-icu-beds-card-bg">
                         <div class="simulator-output-wrapper">
                                 <div class="simulator-output-row">
                                         <span class="simulator-output-row-prediction-value">
@@ -781,18 +924,16 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
                                         </span>  
                                 </div> 
                                 <span class="simulator-output-row-prediction-label">
-                                        meses será atingida a capacidade máxima de <b>ventiladores</b>
+                                        meses será atingida a capacidade máxima de <b>leitos UTI</b>
                                 </span>
                         </div>
                         <img src="%s" class="simulator-output-image"/>
                 </div>
         </div>""" % (
-        output.color.value,
         bed_projection,
-        bed_img,
-        output.color.value,
-        ventilator_projection,
-        ventilator_icon,
+        beds_img,
+        icu_bed_projection,
+        icu_beds_img,
     )
 
     return output.strip("\n\t")
@@ -827,6 +968,13 @@ def genChartSimulationSection(simulation: SimulatorOutput, fig) -> None:
     )
 
     st.plotly_chart(fig, use_container_width=True)
+
+
+def try_int(possible_int):
+    try:
+        return int(float(possible_int))
+    except Exception as e:
+        return possible_int
 
 
 # def genVideoTutorial():

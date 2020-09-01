@@ -24,12 +24,15 @@ import loader
 from model import simulator
 from plots import plot_simulation
 from pandas import Timestamp
+import session
 
 
 def calculate_recovered(user_input, data):
-
+    print(data)
     confirmed_adjusted = int(
-        data[["confirmed_cases"]].sum() / data["notification_rate"].values[0]
+        # data[["confirmed_cases"]].sum() / data["notification_rate"].values[0]
+        data[["confirmed_cases"]].sum()
+        / 1
     )
 
     if confirmed_adjusted == 0:  # dont have any cases yet
@@ -53,6 +56,17 @@ def calculate_recovered(user_input, data):
 def main(user_input, indicators, data, config, session_state):
     user_analytics = amplitude.gen_user(utils.get_server_session())
 
+    utils.localCSS("style.css")
+    
+    utils.genHeroSection(
+        title1="Simula", 
+        title2="Covid",
+        subtitle="Um simulador da demanda por leitos hospitalares.", 
+        logo="https://i.imgur.com/w5yVANW.png",
+        header=False
+    )
+
+
     if (
         user_input["place_type"] == user_input["rt_level"]
     ):  # indicators["rt"].display != "- ":
@@ -62,8 +76,8 @@ def main(user_input, indicators, data, config, session_state):
                     <span class="section-header primary-span">Simule o impacto de diferentes ritmos de contágio no seu sistema hospitalar</span>
                     <br><br>
                     <span>Agora é a hora de se preparar para evitar a sobrecarga hospitalar. 
-                    No momento, em {user_input["locality"]}, estimamos que <b>o ritmo de contágio esteja entre {indicators["rt"].display}</b>, 
-                    ou seja, cada pessoa doente infectará em média entre outras {indicators["rt"].display} pessoas.
+                    No momento, em {user_input["locality"]}, estimamos que <b>a taxa de contágio esteja entre {indicators["control"].left_display}</b>, 
+                    ou seja, cada pessoa doente infectará em média entre outras {indicators["control"].left_display} pessoas.
                     </span>
             </div>""",
             unsafe_allow_html=True,
@@ -78,12 +92,35 @@ def main(user_input, indicators, data, config, session_state):
                     <br><br>
                     <span>Agora é a hora de se preparar para evitar a sobrecarga hospitalar. 
                     No momento, em {user_input["locality"]}, não temos dados suficientes para estimativa do ritmo de contágio. 
-                    Por isso, <b>iremos simular com o ritmo de contágio do seu {places[user_input["rt_level"]]}, que está entre {str(user_input["rt_values"]["best"])}-{str(user_input["rt_values"]["worst"])}</b>, 
+                    Por isso, <b>iremos simular com a taxa de contágio do seu {places[user_input["rt_level"]]}, que está entre {str(user_input["rt_values"]["best"])}-{str(user_input["rt_values"]["worst"])}</b>, 
                     ou seja, cada pessoa doente infectará em média entre outras {str(user_input["rt_values"]["best"])}-{str(user_input["rt_values"]["worst"])} pessoas.
                     </span>
             </div>""",
             unsafe_allow_html=True,
         )
+    # CHANGE DATA SECTION
+    utils.genInputCustomizationSectionHeader(user_input["locality"])
+    old_user_input = dict(user_input)
+    user_input, session_state = utils.genInputFields(user_input, config, session_state)
+    
+    if session_state.reset:
+        session.rerun()
+    if session_state.update:
+        opening_response = user_analytics.log_event(
+            "updated sim_numbers",
+            {
+                "beds_change": session_state.number_beds
+                - int(old_user_input["number_beds"]),
+                "icu_beds_change": session_state.number_icu_beds
+                - int(old_user_input["number_icu_beds"]),
+                "cases_change": session_state.number_cases
+                - int(old_user_input["population_params"]["I_confirmed"]),
+                "deaths_change": session_state.number_deaths
+                - int(old_user_input["population_params"]["D"]),
+            },
+        )
+        session_state.update = False
+        session.rerun()
 
     dic_scenarios = {
         "Cenário Estável: O que acontece se seu ritmo de contágio continuar constante?": "estavel",
@@ -100,7 +137,6 @@ def main(user_input, indicators, data, config, session_state):
         pass
 
     else:
-
         # calculate recovered cases
         user_input = calculate_recovered(user_input, data)
 
@@ -124,17 +160,20 @@ def main(user_input, indicators, data, config, session_state):
 
         dday_beds = simulator.get_dmonth(dfs, "I2", int(user_input["number_beds"]))
 
-        dday_ventilators = simulator.get_dmonth(
-            dfs, "I3", int(user_input["number_ventilators"])
+        dday_icu_beds = simulator.get_dmonth(
+            dfs, "I3", int(user_input["number_icu_beds"])
+        )
+        dday_icu_beds = simulator.get_dmonth(
+            dfs, "I3", int(user_input["number_icu_beds"])
         )
 
         utils.genChartSimulationSection(
             SimulatorOutput(
-                color=BackgroundColor.SIMULATOR_CARD_BG,
+                # color=BackgroundColor.SIMULATOR_CARD_BG,
                 min_range_beds=dday_beds["worst"],
                 max_range_beds=dday_beds["best"],
-                min_range_ventilators=dday_ventilators["worst"],
-                max_range_ventilators=dday_ventilators["best"],
+                min_range_icu_beds=dday_icu_beds["worst"],
+                max_range_icu_beds=dday_icu_beds["best"],
             ),
             plot_simulation(dfs, user_input),
         )

@@ -10,7 +10,67 @@ def main(session_state):
     opening_response = user_analytics.safe_log_event(
         "opened model", session_state, is_new_page=True
     )
-    st.header("Metodologia")
+
+    st.write("v1.4 - Atualizações")
+    st.subheader("Inicialização dos estados")
+
+    st.write(
+        """
+        Nosso modelo de projeção da capacidade hospitalar estima 2 tipos de demandas baseadas na
+        intensidade da infecção: **casos severos (I2) e casos graves (I3)**. Como ponto de partida do modelo,
+        determinamos qual o percentual de casos severos e graves dentre o total de casos ativos - já
+        ajustados pela taxa de subnotificação conforme definimos anteriormente (ver Inicialização dos
+        estados em v1.2). 
+        
+        Devido à mudança no cálculo de subnotificação, passamos a estimar casos
+        assintomáticos dentre o total de casos ativos e consideramos também a distribuição etária da
+        população na definição dos percentuais considerados para a inicialização. Conforme o levantamento de
+        parâmetros de referência de Alison Hill (2020), cerca de 30% dos casos totais são assintomáticos.
+        Dentre os 70% restantes, passamos a calcular o percentual de hospitalizados graves (I2 / I) e
+        severos (I3 / I) estimando a proporção esperada de hospitalizações na região/estado (I2+I3 / I).
+        
+        A proporção esperada de hospitalizações é dada pela estimativa de hospitalizações de cada faixa, de
+        Verity, Robert, et al. (2020) num amplo estudo com base em 3.665 casos na China, ponderado pelo
+        total da população em cada faixa etária (População residente em 2019 - CNES). Esse valor nos fornece
+        o percentual total de hospitalizações esperadas na população (I2+I3/I). Para obter o percentual por
+        intensidade do caso, mantivemos a razão entre severos (I3) e graves (I2) constante: antes tínhamos
+        12.5% graves e 2.5% severos do total de casos ativos (I) - ou seja, uma razão de 0.2 severos em
+        relação a graves -, que passa a ser de 83.3% graves (I2) e 16.7% severos (I3) do percentual estimado
+        de hospitalizados (I2+I3 / I).  Alteramos ainda a categoria “Ventiladores” para “Leitos UTI-Covid”
+        seguindo a atualização realizada na base do CNES, que agora conta com as categorias “UTI-Covid
+        Adulto” e “UTI-Covid Infantil”.  A taxa de contágio utilizada nos diferentes cenários segue a nova
+        metodologia da Taxa de Contágio descrita nos indicadores dos Níveis de Alerta.
+        """
+    )
+
+    st.header("Limitações atualizadas do modelo")
+
+    st.write(
+        """
+        - O modelo trata cada cidade como um sistema fechado. Ou seja, não há mobilidade ou
+          transmissão entre cidades. Também não modelamos a entrada simultânea de múltiplas pessoas
+          infectadas no sistema fechado.  Além disso, tratamos todos os casos como igualmente
+          capazes de infectar outras pessoas suscetíveis, não modelando a existência de
+          "super-disseminadores".
+        - Esta é uma doença nova. Portanto, parâmetros que modelam sua dinâmica de infecção e
+          transmissão são ainda preliminares e podem mudar com o tempo. Faremos um esforço contínuo
+          de atualização desses parâmetros para o melhor conhecimento científico. A velocidade de
+          transmissão e a dinâmica de progressão da doença entre brasileiros podem estar sub ou
+          superestimados. Os resultados da simulação devem ser interpretados de acordo.
+        - Os números básicos de reprodução estimados para cada cenário são meramente fictícios, não
+          estão atrelados diretamente a nenhuma intervenção que dobre ou diminua pela metade o valor
+          observado hoje. Não esperamos, portanto, uma equivalência perfeita com a situação
+          brasileira.  Os dados do número de leitos e leitos UTI Covid são atualizados mensalmente
+          no DATASUS CNES e há conhecidos problemas de reporte.
+        - Os dados do número de casos confirmados em cada município reportados pelas secretarias
+          estaduais de saúde frequentemente refletem metodologia distinta do que aqueles reportados
+          pelo próprio município. Adicionalmente, existe um lag temporal entre o reporte em boletins
+          epidemiológicos, a atualização no Brasil.io e o input do novo dado em nossa ferramenta.
+          Sugerimos que o usuário ajuste esse parâmetro na hora de realizar a simulação.
+        - A análise não considera o desenvolvimento de medidas de mitigação como vacinas e
+          medicamentos anti-virais.
+        """
+    )
 
     st.write("v1.3 - Atualizações")
 
@@ -619,17 +679,17 @@ def main(session_state):
     st.write(df.drop("URL", axis=1).to_html(escape=False), unsafe_allow_html=True)
     st.write("<br>", unsafe_allow_html=True)
 
-    st.subheader("Programa de Embaixadores")
-    st.write(
-        """
-        Para esta versão, também são integrados dados atualizados enviados pelos 
-        nossos Embaixadores. Os Embaixadores serão devidamente identificados como contribuidores, 
-        exceto se o Embaixador preferir colaborar de maneira anônima
-        
-        **Para se tornar um embaixador, inscreva-se [aqui](https://forms.gle/iPFE7T6Wrq4JzoEw9)**
-        """
-    )
-    st.write("<br>", unsafe_allow_html=True)
+    # st.subheader("Programa de Embaixadores")
+    # st.write(
+    #     """
+    #     Para esta versão, também são integrados dados atualizados enviados pelos
+    #     nossos Embaixadores. Os Embaixadores serão devidamente identificados como contribuidores,
+    #     exceto se o Embaixador preferir colaborar de maneira anônima
+
+    #     **Para se tornar um embaixador, inscreva-se [aqui](https://forms.gle/iPFE7T6Wrq4JzoEw9)**
+    #     """
+    # )
+    # st.write("<br>", unsafe_allow_html=True)
 
     st.header("Referências")
 
@@ -647,7 +707,7 @@ def main(session_state):
 
         Max Roser, Hannah Ritchie, Esteban Ortiz-Ospina and Joe Hasell (2020) - "Coronavirus Disease (COVID-19)". Published online at OurWorldInData.org. Retrieved from: 'https://ourworldindata.org/coronavirus' [Online Resource]
 
-        Walker, P.G., Whittaker, C., Watson, O., Baguelin, M., Ainslie, K.E.C., Bhatia, S., Bhatt, S., Boonyasiri, A., Boyd, O., Cattarino, L. and Cucunubá, Z., 2020. The global impact of COVID-19 and strategies for mitigation and suppression. Imperial College London, doi: https://doi. org/10.25561/77735.
+        Walker, P.G., Whittaker, C., Watson, O., Baguelin, M., Ainslie, K.E.C., Bhatia, S., Bhatt, S., Boonyasiri, A., Boyd, O., Cattarino, L. and Cucunubá, Z., 2020. The global impact of COVID-19 and strategies for mitigation and suppression. Imperial College London, doi: https://doi.org/10.25561/77735.
 
         [1] Wang, C, et al. (2020) Evolving Epidemiology and Impact of Non-pharmaceutical Interventions on the Outbreak of Coronavirus Disease 2019 in Wuhan, China. DOI: https://doi.org/10.1101/2020.03.03.20030593 e pdf de apresentação https://docs.google.com/presentation/d/1-rvZs0zsXF_0Tw8TNsBxKH4V1LQQXq7Az9kDfCgZDfE/edit#slide=id.p1
         
@@ -657,4 +717,4 @@ def main(session_state):
 
 
 if __name__ == "__main__":
-    main()
+    main(session_state=None)

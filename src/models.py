@@ -42,24 +42,26 @@ class Illustration(enum.Enum):
 
 
 class IndicatorType(enum.Enum):
-    RT = "rt"
-    SUBNOTIFICATION_RATE = "subnotification_rate"
-    HOSPITAL_CAPACITY = "hospital_capacity"
-    SOCIAL_ISOLATION = "social_isolation"
+    SITUATION = "situation"
+    CONTROL = "control"
+    CAPACITY = "capacity"
+    TRUST = "trust"
 
 
 class AlertBackground(enum.Enum):
     hide = ""
-    green = "baixo"
-    yellow = "médio"
-    red = "alto"
+    blue = "novo normal"
+    yellow = "moderado"
+    orange = "alto"
+    red = "altíssimo"
 
 
 class IndicatorBackground(enum.Enum):
     hide = "nan"
-    green = "bom"
-    yellow = "insatisfatório"
-    red = "ruim"
+    blue = 0
+    yellow = 1
+    orange = 2
+    red = 3
     inloco = "Fonte: inloco"
 
 
@@ -72,7 +74,7 @@ class Indicator:
         unit,
         left_label,
         right_label,
-        risk="",
+        risk="nan",
         display="",
         left_display="",
         right_display="",
@@ -93,7 +95,7 @@ class ResourceAvailability(NamedTuple):
     cases: int
     deaths: int
     beds: int
-    ventilators: int
+    icu_beds: int
 
 
 class ContainmentStrategy(NamedTuple):
@@ -106,11 +108,11 @@ class ContainmentStrategy(NamedTuple):
 
 
 class SimulatorOutput(NamedTuple):
-    color: BackgroundColor
+    # color: BackgroundColor
     min_range_beds: int
     max_range_beds: int
-    min_range_ventilators: int
-    max_range_ventilators: int
+    min_range_icu_beds: int
+    max_range_icu_beds: int
 
 
 Strategies: List[ContainmentStrategy] = [
@@ -141,33 +143,33 @@ Strategies: List[ContainmentStrategy] = [
 ]
 
 IndicatorCards: Dict[str, Indicator] = {
-    IndicatorType.RT.value: Indicator(
-        header="Ritmo de Contágio",
-        caption="Cada contaminado infecta em média outras",
-        unit="pessoas",
-        left_label="Semana passada:",
-        right_label="Tendência 📈:",
+    IndicatorType.SITUATION.value: Indicator(
+        header="SITUAÇÃO DA DOENÇA",
+        caption="Hoje são <b>reportados</b>❗ em média",
+        unit="casos/100k hab.",
+        left_label="Nesta tendência há:",
+        right_label="Tendência:",
     ),
-    IndicatorType.SUBNOTIFICATION_RATE.value: Indicator(
-        header="Subnotificação",
-        caption="A cada 10 pessoas doentes,",
-        unit="são diagnosticadas",
-        left_label="Casos confirmados:",
-        right_label="Ranking da UF:",
+    IndicatorType.CONTROL.value: Indicator(
+        header="CONTROLE DA DOENÇA",
+        caption="Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt para classificação.</b>",
+        unit="There is no public data on testing.",
+        left_label="Taxa de contágio (Rt):",
+        right_label="Tendência:",
     ),
-    IndicatorType.HOSPITAL_CAPACITY.value: Indicator(
-        header="Capacidade Hospitalar*",
-        caption="Os seus leitos estarão todos ocupados em",
+    IndicatorType.CAPACITY.value: Indicator(
+        header="CAPACIDADE DO SISTEMA",
+        caption="Se nada mudar, a capacidade hospitalar de seu estado ou da sua regional de saúde será atingida em",
         unit="mês(es)",
-        left_label="Leitos:",
-        right_label="Ventiladores:",
+        left_label="Número de Leitos*:",
+        right_label="Capacidade de UTI:",
     ),
-    IndicatorType.SOCIAL_ISOLATION.value: Indicator(
-        header="Isolamento Social",
-        caption="Na última semana, ficaram em casa cerca de",
-        unit="das pessoas",
-        left_label="Média semana passada:",
-        right_label="Tendência 📈:",
+    IndicatorType.TRUST.value: Indicator(
+        header="CONFIANÇA DOS DADOS",
+        caption="A cada 10 pessoas infectadas,",
+        unit="não são diagnosticadas",
+        left_label="Mortes por dia:",
+        right_label="Tendência:",
     ),
 }
 
@@ -182,15 +184,48 @@ class Product:
 
 ProductCards: List[Product] = [
     Product(
-        recommendation="Sugerido",
-        name="SimulaCovid",
-        caption="simule o impacto de diferentes ritmos de contágio da Covid-19 no seu sistema de saúde.",
-        image=Illustration.BUILDING.value,
+        recommendation="Simule",
+        name="SimulaCovid<br>",
+        caption="O que acontecerá com meu sistema de saúde local se o ritmo de contágio aumentar ou diminuir?",
+        image="https://i.imgur.com/OxTlsuW.png",
     ),
     Product(
-        recommendation="",
+        recommendation="Descubra",
+        name="Distanciamento Social<br>",
+        caption="As pessoas do meu município estão ficando em casa?",
+        image="https://i.imgur.com/frUVHrY.png",
+    ),
+    Product(
+        recommendation="Explore",
         name="Saúde em Ordem<br>",
-        caption="explore que setores não-essenciais da sua economia são menos expostos ao risco de contaminação por Covid-19",
-        image=Illustration.CITY.value,
+        caption="Quais atividades econômicas meu município deveria reabrir primeiro?",
+        image="https://i.imgur.com/M0jr43n.png",
+    ),
+    Product(
+        recommendation="Navegue",
+        name="Onda Covid<br>",
+        caption="Onde meu município está na curva da doença?",
+        image="https://i.imgur.com/Oy7IiGB.png",
+    ),
+]
+
+
+class Dimension:
+    def __init__(self, text):
+        self.text = text
+
+
+DimensionCards: List[Dimension] = [
+    Dimension(
+        text="<b>1. Situação da doença,</b> que busca medir como a doença está se espalhando no território.",
+    ),
+    Dimension(
+        text="<b>2. Controle da doença,</b> que retrata a capacidade do poder público de detectar os casos.",
+    ),
+    Dimension(
+        text="<b>3. Capacidade de respostas do sistema de saúde,</b> que reflete a situação do sistema de saúde e risco de colapso.",
+    ),
+    Dimension(
+        text="<b>4. Confiança dos dados,</b> que reflete a qualidade das medições de casos sendo feitas pelos governos.",
     ),
 ]

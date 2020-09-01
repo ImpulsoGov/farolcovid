@@ -9,12 +9,9 @@ ipykernel
 requests
 cufflinks
 python-dotenv
-weasyprint
-psutil
-google-api-python-client
-google-auth-httplib2
-google-auth-oauthlib
-oauth2client
 ua-parser
 bs4
 lxml
+mechanize
+flask
+flask-cors
