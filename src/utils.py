@@ -481,10 +481,10 @@ def gen_info_modal():
                     <p><span>Situação da doença</span></p><br/>
                     </td>
                     <td><span>Novos casos diários (Média móvel 7 dias)</span></td>
-                    <td class="light-blue-bg bold"><span>x &lt;= 3</span></td>
-                    <td class="light-yellow-bg bold"><span>3 &lt;x&lt;= 10</span></td>
-                    <td class="light-orange-bg bold"><span>11&lt;=x&lt;=24</span></td>
-                    <td class="light-red-bg bold"><span>x &gt;= 25</span></td>
+                    <td class="light-blue-bg bold"><span>x&lt;=3.7</span></td>
+                    <td class="light-yellow-bg bold"><span>3.7&lt;x&lt;=12.5</span></td>
+                    <td class="light-orange-bg bold"><span>12.5&lt;=x&lt;=27.4</span></td>
+                    <td class="light-red-bg bold"><span>x &gt;= 27.4</span></td>
                 </tr>
                 <tr>
                     <td><span>Tendência de novos casos diários</span></td>
