@@ -329,9 +329,12 @@ def main(session_state):
 
     utils.localCSS("style.css")
     
-
     utils.genHeroSection(
-        "Farol", "Entenda e controle a Covid-19 em sua cidade e estado."
+        title1="Farol", 
+        title2="Covid",
+        subtitle="Entenda e controle a Covid-19 em sua cidade e estado.", 
+        logo="https://i.imgur.com/CkYDPR7.png",
+        header=True
     )
 
     config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
@@ -681,6 +684,7 @@ def main(session_state):
     #         pdfgen.gen_pdf_report(user_input, indicators, data, config),
     #         unsafe_allow_html=True,
     #     )
+    
     # TOOLS
     products = ProductCards
     # products[2].recommendation = f'Risco {data["overall_alert"].values[0]}'

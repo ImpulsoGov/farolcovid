@@ -89,20 +89,12 @@ def loading_cached():
 
 def main(user_input, indicators, data, config, session_state):
 
-    st.write(
-        f"""
-        <div class="base-wrapper distanciamento-titlebox">
-            <div class="distanciamento-titleboxtext">
-                <div class="distanciamento-title">ONDA COVID</div>
-                <div class="distanciamento-titlecaption">
-                Veja e compare a evolução da curva de contágio da Covid-19 em seu estado ou município.<br>
-                </div>
-                <div class="distanciamento-titlecity"></div>
-            </div>
-            <img src="https://i.imgur.com/Oy7IiGB.png" class="distanciamento-titleimage">
-        </div>
-        """,
-        unsafe_allow_html=True,
+    utils.genHeroSection(
+        title1="Onda", 
+        title2="Covid",
+        subtitle="Veja e compare a evolução da curva de contágio da Covid-19 em seu estado ou município.", 
+        logo="https://i.imgur.com/Oy7IiGB.png",
+        header=False
     )
 
     try:

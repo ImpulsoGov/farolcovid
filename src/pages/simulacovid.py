@@ -55,6 +55,18 @@ def calculate_recovered(user_input, data):
 
 def main(user_input, indicators, data, config, session_state):
     user_analytics = amplitude.gen_user(utils.get_server_session())
+
+    utils.localCSS("style.css")
+    
+    utils.genHeroSection(
+        title1="Simula", 
+        title2="Covid",
+        subtitle="Um simulador da demanda por leitos hospitalares.", 
+        logo="https://i.imgur.com/w5yVANW.png",
+        header=False
+    )
+
+
     if (
         user_input["place_type"] == user_input["rt_level"]
     ):  # indicators["rt"].display != "- ":
@@ -90,6 +102,7 @@ def main(user_input, indicators, data, config, session_state):
     utils.genInputCustomizationSectionHeader(user_input["locality"])
     old_user_input = dict(user_input)
     user_input, session_state = utils.genInputFields(user_input, config, session_state)
+    
     if session_state.reset:
         session.rerun()
     if session_state.update:
@@ -124,7 +137,6 @@ def main(user_input, indicators, data, config, session_state):
         pass
 
     else:
-
         # calculate recovered cases
         user_input = calculate_recovered(user_input, data)
 

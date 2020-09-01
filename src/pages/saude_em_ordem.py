@@ -125,23 +125,6 @@ def chunks(l, n):
 
 
 # SEÇÃO DE INTRODUÇÃO
-def gen_header():  # NOT USED FOR NOW
-    st.write(
-        """
-        <div class="base-wrapper">
-            <div class="hero-wrapper">
-                    <div class="hero-container">
-                            <div class="hero-container-content">
-                                    <span class="hero-container-product primary-span">SAÚDE EM<br>ORDEM</span>
-                                    <span class="hero-container-subtitle primary-span">Contribuindo para uma retomada inteligente</span>
-                            </div>
-                    </div>   
-                    <img class="hero-container-image" src="https://i.imgur.com/FiNi6fy.png">
-            </div>
-        </div>""",
-        unsafe_allow_html=True,
-    )
-
 
 def gen_intro(alert):
     if alert == "baixo":
@@ -656,6 +639,7 @@ def gen_partners_section():
 
 # MAIN
 def main(user_input, indicators, data, config, session_state):
+    # TODO:o que isso faz??
     st.write(
         '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
         unsafe_allow_html=True,
@@ -668,12 +652,21 @@ def main(user_input, indicators, data, config, session_state):
             "opened_tables": [True, True, True, True],
             "opened_detailed_view": False,
         }
+
+    utils.genHeroSection(
+        title1="Saúde", 
+        title2="Em Ordem",
+        subtitle="Contribuindo para uma retomada segura da economia.", 
+        logo="https://i.imgur.com/FiNi6fy.png",
+        header=False
+    )
+    
     gen_intro(alert=data["overall_alert"].values[0])
     gen_slider(session_state)
     score_groups, economic_data, place_name = get_score_groups(
         config, session_state, session_state.saude_ordem_data["slider_value"]
     )
-    # gen_header()
+
     gen_illustrative_plot(score_groups, session_state, place_name)
     gen_detailed_vision(economic_data, session_state, config)
     gen_sector_tables(

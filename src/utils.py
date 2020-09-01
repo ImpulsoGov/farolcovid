@@ -41,7 +41,6 @@ states = pd.read_csv(os.path.join(configs_path, "states_table.csv"))
 
 # DATASOURCE TOOLS
 
-
 def get_inloco_url(config):
 
     api_inloco = dict()
@@ -62,7 +61,6 @@ def get_inloco_url(config):
 
 
 # DATES TOOLS
-
 
 def fix_dates(df):
     for col in df.columns:
@@ -118,7 +116,6 @@ def get_sources(user_input, data, cities_sources, resources):
 
 
 # PLACES TOOLS
-
 
 def add_all(x, all_string="Todos", first=None):
     formatted = [all_string] + list(x)
@@ -213,8 +210,6 @@ class Dictionary:
             "state_id"
         ].values[0]
 
-
-name_dictionary = Dictionary()
 # def get_state_str_id_by_id(place_id):
 
 #     states = pd.read_csv(
@@ -375,7 +370,6 @@ def reload_window():
 
 # JAVASCRIPT HACK METHODS
 
-
 def stylizeButton(name, style_string, session_state, others=dict()):
     """ adds a css option to a button you made """
     session_state.button_styles[name] = [style_string, others]
@@ -417,7 +411,6 @@ def hide_iframes():
 
 
 # END OF JAVASCRIPT HACK METHODS
-
 
 def gen_pdf_report():
     st.write(
@@ -532,21 +525,26 @@ def gen_info_modal():
 
 # VIEW COMPONENTS FAROLCOVID
 
+def genHeroSection(title1: str, title2: str, subtitle: str, logo: str, header: bool):
 
-def genHeroSection(title: str, subtitle: str):
+    if header:
+        header = """<a href="https://coronacidades.org/" target="blank" class="logo-link"><span class="logo-bold">corona</span><span class="logo-lighter">cidades</span></a>"""
+    else:
+        header = """<br>"""
+
     st.write(
         f"""
         <div class="base-wrapper hero-bg">
             <div class="hero-wrapper">
             <div class="hero-container">
-                <a href="https://coronacidades.org/" target="blank" class="logo-link"><span class="logo-bold">corona</span><span class="logo-lighter">cidades</span></a>
+                {header}
                 <div class="hero-container-content">
-                    <span class="hero-container-product primary-span">{title}<br/>Covid</span>
+                    <span class="hero-container-product primary-span">{title1}<br/>{title2}</span>
                     <span class="hero-container-subtitle primary-span">{subtitle}</span>
                 </div>
             </div>
                 <div class="hero-container-image">   
-                    <img style="width: 100%;" src="https://i.imgur.com/CkYDPR7.png"/>
+                    <img style="width: 100%;" src={logo}/>
                 </div>
             </div>
         </div>
@@ -646,6 +644,7 @@ def genInputFields(user_input, config, session):
     return user_input, session
 
 
+# TODO: not used
 def translate_risk(risk_value):
     if risk_value == "nan":
         return "Indef"
