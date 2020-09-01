@@ -42,15 +42,22 @@ def plot_heatmap(df, x, y, z, title, colorscale="oranges"):
 def plot_rt(t, title=""):
     # TODO: put dicts in config
     rt_classification = {
-        "Risco médio: Uma pessoa infecta em média outras 1-1.2": {
-            "threshold": 1,
-            "color": "rgba(132,217,217,1)",
+        "Risco médio: Uma pessoa infecta em média mais 1.2 outras": {
+            "threshold": 1.2,
+            "color": "#F02C2E",
             "fill": None,
             "width": 3,
         },
-        "Risco alto: Uma pessoa infecta em média mais 1.2 outras": {
-            "threshold": 1.2,
-            "color": "rgba(242,185,80,1)",
+
+        "Risco alto: Uma pessoa infecta em média outras 1.0-1.2": {
+            "threshold": 1,
+            "color": "#F77800",
+            "fill": None,
+            "width": 3,
+        },
+        "Risco moderado: Uma pessoa infecta em média outras 0.5-1": {
+            "threshold": 0.5,
+            "color": "#F7B500",
             "fill": None,
             "width": 3,
         },
@@ -73,7 +80,7 @@ def plot_rt(t, title=""):
             "fill": None,
             "showlegend": True,
             "name": "<b>Valor médio em {}={}</b>".format(
-                t["last_updated"].max().strftime("%d/%m"), t["Rt_most_likely"].iloc[-1]
+                t["last_updated"].max().strftime("%d/%m"), round(t["Rt_most_likely"].iloc[-1], 2)
             ),
             "layout": {"color": "rgba(63, 61, 87, 0.8)", "width": 3},
         },
@@ -132,7 +139,7 @@ def plot_rt_wrapper(place_id, place_type):
             "br", config, config["br"]["api"]["endpoints"]["rt"][endpoints[place_type]]
         )
         .query(f"{place_type} == {place_id}")
-        .sort_values("last_updated")[:-10]
+        .sort_values("last_updated")
     )
 
     if len(data) < 30:
@@ -162,7 +169,7 @@ def get_alert_color(value):
 def plot_inloco(place_id, df, decoration=False):
 
     fig = go.Figure()
-    names = utils.name_dictionary.get_place_names_by_id(place_id)
+    names = utils.Dictionary().get_place_names_by_id(place_id)
     state_id = int(str(place_id)[:2])
 
     # Add traces
@@ -255,10 +262,11 @@ def gen_social_dist_plots(place_id, in_height=700, set_height=False):
     x_data = social_dist_plot.data[0]["x"]
     y_data = social_dist_plot.data[0]["y"]
     x_data, y_data = sort_by_x(x_data, y_data)
+    final_y = moving_average(y_data, n=7)
     social_dist_plot.add_trace(
         go.Scatter(
             x=x_data,
-            y=moving_average(y_data, n=7),
+            y=final_y,
             line={"color": "lightgrey", "dash": "dash",},  # 0
             name="Média móvel (últimos 7 dias)",
             showlegend=True,
@@ -277,7 +285,7 @@ def gen_social_dist_plots(place_id, in_height=700, set_height=False):
     if set_height:
         social_dist_plot.update_layout(height=in_height)
 
-    return social_dist_plot
+    return social_dist_plot, final_y
 
 
 def translate_dates(df, simple=True, lang_frame="pt_BR.utf8"):

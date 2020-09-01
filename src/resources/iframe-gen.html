@@ -1,0 +1,31 @@
+<head>
+    <meta charset="UTF-8">
+    <script>
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        function main() {
+            url = urlParams.get("url");
+            httpGetAsync(url, displayPage)
+        }
+        function httpGetAsync(theUrl, callback) {
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+                    callback(xmlHttp);
+            }
+            xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+            xmlHttp.send(null);
+        }
+        function displayPage(content) {
+            document.open();
+            document.write(content.response);
+            document.close();
+        }
+    </script>
+</head>
+
+<body onload="main();">
+    <h2>Carregando Mapa...</h2>
+    <button onclick="main();">Clique aqui se o mapa não aparecer</button>
+    <div id="page"></div>
+</body>
