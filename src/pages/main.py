@@ -346,7 +346,7 @@ def main(session_state):
         <div>
             <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
                 <div class="white-span header p1" style="font-size:30px;">O FAROLCOVID ESTÁ DE CARA NOVA!</div>
-                <span class="white-span">Aprimoramos a plataforma e adicionamos novas ferramentas para acompanhamento da crise da Covid-19 no Brasil. <b>Que tal explorar com a gente?</b></span>
+                <span class="white-span">Aprimoramos a plataforma e adicionamos novas ferramentas para acompanhamento da crise da Covid-19 no Brasil.<br><b>Que tal explorar com a gente?</b></span>
                 <br><div style="margin-top: 15px;"></div>
             <div>
                 <a href="#novidades" class="info-btn">Entenda como navegar</a>
