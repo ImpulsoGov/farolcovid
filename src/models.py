@@ -145,7 +145,7 @@ Strategies: List[ContainmentStrategy] = [
 IndicatorCards: Dict[str, Indicator] = {
     IndicatorType.SITUATION.value: Indicator(
         header="SITUAÇÃO DA DOENÇA",
-        caption="Hoje são <b>reportados</b>❗ em média",
+        caption="Hoje são <b>reportados</b> em média",
         unit="casos/100k hab.",
         left_label="Nesta tendência há:",
         right_label="Tendência:",
@@ -159,7 +159,7 @@ IndicatorCards: Dict[str, Indicator] = {
     ),
     IndicatorType.CAPACITY.value: Indicator(
         header="CAPACIDADE DO SISTEMA",
-        caption="Se nada mudar, a capacidade hospitalar de seu estado ou da sua regional de saúde será atingida em",
+        caption="Se nada mudar, a capacidade hospitalar de seu <b>estado ou regional de saúde</b> será atingida em",
         unit="mês(es)",
         left_label="Número de Leitos*:",
         right_label="Capacidade de UTI:",
