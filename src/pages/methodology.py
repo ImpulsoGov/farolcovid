@@ -535,9 +535,7 @@ def main(session_state):
         coronavirus disease 2019 (COVID-19) in China. Journal of Hospital Infection. DOI:
         https://doi.org/10.1016/j.jhin.2020.03.002 <br> <br>Y. O. de Lima, D. M. Costa, and J. M. de Souza. Covid-19:
         Risco de contágio por ocupação no Brasil: Nota metodológica. Technical report, 2020.
-        <br> <br>[2] Wang, J., Zhou, M., & Liu, F., 2020. Serial interval of novel coronavirus (COVID-19) infections. Journal of Hospital Infection. DOI:
-        https://doi.org/10.1016/j.jhin.2020.03.002 <br> <br>Y. O. de Lima, D. M. Costa, and J. M. de Souza. Covid-19:
-        Risco de contágio por ocupação no Brasil: Nota metodológica. Technical report, 2020.
+        <br>
         </div>""",
         unsafe_allow_html=True,
     )
