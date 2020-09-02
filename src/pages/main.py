@@ -459,7 +459,7 @@ def main(session_state):
         <div class="alert-levels-map-overlay">
         </div>
         <div>
-        <iframe id="map" src="resources/iframe-gen.html?url={map_url}map-iframe?place_id=BR" class="map-br" scrolling="no">
+        <iframe id="map" src="resources/iframe-gen.html?url={map_url}maps/map-iframe?place_id=BR" class="map-br" scrolling="no">
         </iframe>
         </div>
     </div>
@@ -468,7 +468,7 @@ def main(session_state):
     )
     st.write(
         f"""
-    <iframe id="map-state" src="resources/iframe-gen.html?url={map_url}map-iframe?place_id={map_place_id}" class="map-state" scrolling="no">
+    <iframe id="map-state" src="resources/iframe-gen.html?url={map_url}maps/map-iframe?place_id={map_place_id}" class="map-state" scrolling="no">
     </iframe>
     """,
         unsafe_allow_html=True,
