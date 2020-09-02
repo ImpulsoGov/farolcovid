@@ -61,7 +61,7 @@ def main(session_state):
             de referência:<br><br>
             <span class="subsection-header">Situação da Covid-19: Qual a incidência da doença na minha população?</span><br>
             <b>Indicador</b>: Novos casos por 100k habitantes (média movel 7 dias).<br>
-            <b>Qual sua tendência?</b> Aumentadno, estabilizando ou diminuindo?<br><br>
+            <b>Qual sua tendência?</b> Aumentando, estabilizando ou diminuindo?<br><br>
             <span class="subsection-header">Controle da Covid-19: Estamos conseguindo frear o surgimento de novos casos?</span><br>
             <b>Indicador</b>: Taxa de contágio (Número efetivo de Reprodução - R_t)<br>
             <b>Qual sua tendência?</b>Aumentado, estabilizando ou diminuindo?<br><br>

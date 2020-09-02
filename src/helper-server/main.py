@@ -212,7 +212,7 @@ def hello_world():
     return "Hello, World!"
 
 
-@app.route("/map-iframe", methods=["GET"])
+@app.route("/maps/map-iframe", methods=["GET"])
 @cross_origin(
     origin="*", headers=["Content-Type", "Authorization", "access-control-allow-origin"]
 )

@@ -44,7 +44,7 @@ def fix_type(x, group, position):
         return round(float(x), 2)
 
     if group == "trust" and position == "display":
-        return int(round(10 * (1 - x), 0)) # muda para não notificado
+        return int(round(10 * (1 - x), 0))  # muda para não notificado
 
     if group == "situation" and position == "left_display":
         return str(int(x)) + " dias"
@@ -282,8 +282,7 @@ def get_data(config):
             "br",
             config,
             endpoint=config["br"]["api"]["endpoints"]["farolcovid"][place],
-        )
-        .pipe(utils.fix_dates)
+        ).pipe(utils.fix_dates)
         for place in ["city", "health_region", "state"]
     }
 
@@ -329,24 +328,24 @@ def main(session_state):
     )
 
     utils.localCSS("style.css")
-    
+
     utils.genHeroSection(
-        title1="Farol", 
+        title1="Farol",
         title2="Covid",
-        subtitle="Entenda e controle a Covid-19 em sua cidade e estado.", 
+        subtitle="Entenda e controle a Covid-19 em sua cidade e estado.",
         logo="https://i.imgur.com/CkYDPR7.png",
-        header=True
+        header=True,
     )
 
     config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
-    
-    #TEMPORARY BANNER FC
+
+    # TEMPORARY BANNER FC
     st.write(
         """
         <div>
             <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
                 <div class="white-span header p1" style="font-size:30px;">O FAROLCOVID ESTÁ DE CARA NOVA!</div>
-                <span class="white-span">Aprimoramos a plataforma e adicionamos novas ferramentas para acompanhamento da crise da Covid-19 no Brasil.<br><b>Que tal explorar com a gente?</b></span>
+                <span class="white-span">Aprimoramos a plataforma, a metodologia e adicionamos novas ferramentas para acompanhamento da crise da Covid-19 no Brasil.<br><b>Que tal explorar com a gente?</b></span>
                 <br><div style="margin-top: 15px;"></div>
             <div>
                 <a href="#novidades" class="info-btn">Entenda como navegar</a>
@@ -358,13 +357,12 @@ def main(session_state):
                         <h1 class="primary-span">Saiba como cada ferramenta apoia a resposta ao coronavírus</h1>
                         <p class="darkblue-span uppercase"> <b>Farol Covid</b> </p>
                         <img class="img-modal" src=%s alt="Ícone Farol Covid">
-                        <div>	
-                            <p> Acompanhe as 4 dimensões:</p>
-                            - Situação da Doença (número de novos casos por habitante);</br>
-                            - Controle da Doença (ritmo de contágio)</br>
-                            - Capacidade do sistema (número de leitos e capacidade UTI)</br>
-                            - Confiança de dados (taxa de subnotificação)</br>
-                            <p> E descubra o nível de alerta do estado, regional de saúde ou município.</p>
+                        <div>
+                            <p> <b>Importante: mudamos a metodologia dos indicadores - veja mais em Modelos, limitações e fontes no menu lateral.</b> Descubra o nível de alerta do estado, regional de saúde ou município de acordo com os indicadores:</p>
+                            - <b>Situação da doença</b>: média de novos casos 100 mil por habitantes;</br>
+                            - <b>Controle da doença</b>: taxa de contágio</br>
+                            - <b>Capacidade do sistema</b>: tempo para ocupação de leitos UTI Covid</br>
+                            - <b>Confiança de dados</b>: taxa de subnotificação de casos</br><br>
                         </div>
                         <div>
                         <p class="darkblue-span uppercase"> <b>SimulaCovid</b> </p>
@@ -382,9 +380,9 @@ def main(session_state):
                         <div>
                         <p class="darkblue-span uppercase"> <b>Saúde em Ordem</b> </p>
                         <img class="img-modal" src=%s alt="Ícone Saúde em Ordem">
-                        <p> Entenda quais atividades deveriam reabrir primeiro na sua região, considerando: </p>
-                            - Segurança Sanitária: quais setores trazem menor risco de exposição à Covid-19 para os trabalhadores.</br>
-                            - Contribuição Econômica: quais setores movimentam mais a economia daquele estado ou regional de saúde.</br>
+                        <p> Entenda quais atividades deveriam reabrir primeiro no seu estado ou regional, considerando:
+                            - <b>Segurança Sanitária</b>: quais setores têm menor exposição à Covid-19?</br>
+                            - <b>Contribuição Econômica</b>: quais setores movimentam mais a economia local?</br></p>
                         <p> </p>
                         </div>
                         <div>
@@ -395,12 +393,13 @@ def main(session_state):
                     </div>
                 </div>
             </div>
-        </div>""" %(
+        </div>"""
+        % (
             config["br"]["icons"]["farolcovid_logo"],
             config["br"]["icons"]["simulacovid_logo"],
             config["br"]["icons"]["distanciamentosocial_logo"],
             config["br"]["icons"]["saudeemordem_logo"],
-            config["br"]["icons"]["ondacovid_logo"]
+            config["br"]["icons"]["ondacovid_logo"],
         ),
         unsafe_allow_html=True,
     )
@@ -442,7 +441,7 @@ def main(session_state):
     )
 
     user_input, data = update_user_input_places(user_input, dfs, config)
-    
+
     # GENERATE MAPS
     map_place_id = utils.Dictionary().get_state_alphabetical_id_by_name(
         user_input["state_name"]
@@ -459,7 +458,7 @@ def main(session_state):
         <div class="alert-levels-map-overlay">
         </div>
         <div>
-        <iframe id="map" src="resources/iframe-gen.html?url={map_url}map-iframe?place_id=BR" class="map-br" scrolling="no">
+        <iframe id="map" src="resources/iframe-gen.html?url={map_url}maps/map-iframe?place_id=BR" class="map-br" scrolling="no">
         </iframe>
         </div>
     </div>
@@ -468,7 +467,7 @@ def main(session_state):
     )
     st.write(
         f"""
-    <iframe id="map-state" src="resources/iframe-gen.html?url={map_url}map-iframe?place_id={map_place_id}" class="map-state" scrolling="no">
+    <iframe id="map-state" src="resources/iframe-gen.html?url={map_url}maps/map-iframe?place_id={map_place_id}" class="map-state" scrolling="no">
     </iframe>
     """,
         unsafe_allow_html=True,
@@ -570,9 +569,17 @@ def main(session_state):
     )
     if "state" in user_input["place_type"]:
         # Add disclaimer to cities in state alert levels
-        total_alert_regions = dfs["health_region"][
-            dfs["health_region"]["state_num_id"] == data["state_num_id"].unique()[0]
-        ].assign(overall_alert=lambda df: df["overall_alert"].map(config["br"]["farolcovid"]["categories"]))["overall_alert"].value_counts()
+        total_alert_regions = (
+            dfs["health_region"][
+                dfs["health_region"]["state_num_id"] == data["state_num_id"].unique()[0]
+            ]
+            .assign(
+                overall_alert=lambda df: df["overall_alert"].map(
+                    config["br"]["farolcovid"]["categories"]
+                )
+            )["overall_alert"]
+            .value_counts()
+        )
 
         utils.genKPISection(
             place_type=user_input["place_type"],
@@ -646,7 +653,7 @@ def main(session_state):
             "<div class='base-wrapper'><i>Em breve:</i> gráficos de subnotificação e média móvel de novos casos por 100k habitantes.</div>",
             unsafe_allow_html=True,
         )
-    
+
     utils.stylizeButton(
         name="Confira a evolução de indicadores-chave",
         style_string="""border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;""",
@@ -673,7 +680,7 @@ def main(session_state):
     #         pdfgen.gen_pdf_report(user_input, indicators, data, config),
     #         unsafe_allow_html=True,
     #     )
-    
+
     # TOOLS
     products = ProductCards
     # products[2].recommendation = f'Risco {data["overall_alert"].values[0]}'
