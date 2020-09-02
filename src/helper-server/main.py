@@ -89,7 +89,7 @@ def get_iframe_map(place_id):
             cache_place_df.loc[old_index, "map_id"] = new_data["map_id"].values[0]
             return map_code
     except Exception as e:
-        return "A unknown exception has occured : " + str(e)
+        return "A unknown exception has occurred : " + str(e)
 
 
 def preload_cache():
@@ -242,6 +242,6 @@ if __name__ == "__main__":
         cache_place_df = None
     print("Preloading cache")
     preload_cache()
-    print("cache loaded sucessfully")
+    print("cache loaded successfully")
     app.run(host="0.0.0.0", port=5000, debug=False)
 
