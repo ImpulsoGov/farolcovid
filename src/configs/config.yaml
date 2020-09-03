@@ -4,7 +4,7 @@ br:
     api:
         external: http://datasource.coronacidades.org/
         local: http://45.55.43.231:7000/
-        mapserver_external: http://datasource.coronacidades.org:5000/
+        mapserver_external: https://helper.coronacidades.org/
         mapserver_local: http://45.55.43.231:5000/
         endpoints:
             simulacovid: "br/cities/simulacovid/main"

@@ -447,7 +447,7 @@ def main(session_state):
         user_input["state_name"]
     )
 
-    if os.getenv("IS_LOCAL") == "TRUE":
+    if os.getenv("IS_LOCAL").upper() == "TRUE":
         map_url = config["br"]["api"]["mapserver_local"]
     else:
         map_url = config["br"]["api"]["mapserver_external"]
