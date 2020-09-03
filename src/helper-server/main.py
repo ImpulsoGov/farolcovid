@@ -172,11 +172,11 @@ def clone_map(url, is_brazil=False):
     clicker = soup.new_tag("script")
     resizer = soup.new_tag("script")
     if is_brazil:
-        clicker["src"] = "/resources/map-reader-internal-country.js"
-        resizer["src"] = "/resources/resize-map-state.js"
+        clicker["src"] = "/static/js/map-reader-internal-country.js"
+        resizer["src"] = "/static/js/resize-map-state.js"
     else:
-        clicker["src"] = "/resources/map-reader-internal-state.js"
-        resizer["src"] = "/resources/resize-map-state.js"
+        clicker["src"] = "/static/js/map-reader-internal-state.js"
+        resizer["src"] = "/static/js/resize-map-state.js"
     body.insert_after(
         clicker
     )  # Adds the click listeners to engage with the parent page, which is farol
