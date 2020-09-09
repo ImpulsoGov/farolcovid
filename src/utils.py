@@ -852,8 +852,8 @@ def gen_footer() -> None:
                                 Trata-se de contribuição à elaboração de cenários por parte dos governos e não configura qualquer obrigação ou responsabilidade perante as decisões efetivadas.
                                 Saiba mais sobre os cálculos por trás de análises e indicadores em nossas páginas de Níveis de Risco e Modelo Epidemiológico (menu lateral esquerdo), 
                                 que mantemos atualizadas conforme evoluímos em nossas metodologias.<br><br></span>
-                                <span><i>Todo código da ferramenta pode ser acessado no <a class="github-link" href="https://github.com/ImpulsoGov/farolcovid">Github do projeto</a>
-                                e os dados estão disponíveis em nossa <a class="github-link" href="https://github.com/ImpulsoGov/coronacidades-datasource/blob/master/README.md">API</a>.</i></span>
+                                <span><i>Todo código da ferramenta pode ser acessado no <a target="_blank" class="github-link" href="https://github.com/ImpulsoGov/farolcovid">Github do projeto</a>
+                                e os dados estão disponíveis em nossa <a target="_blank" class="github-link" href="https://github.com/ImpulsoGov/coronacidades-datasource/blob/master/README.md">API</a>.</i></span>
                                 </br></br></span>
                                 <img class="logo-img" src="%s"/>
                                 <div class="logo-section">
