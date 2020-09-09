@@ -2336,23 +2336,25 @@ header>.toolbar { /* Hide toolbar menu */
     left:36%;
     width:16%;
     font-size:1.1vw;
+    line-height: 2.1;
 }
 .btt3{
     left:52%;
     width:16%;
     font-size:1.1vw;
-    line-height: 2.6;
+    line-height: 2.1;
 }
 .btt4{
     left:68%;
     width:16%;
     font-size:1.1vw;
-    line-height: 2.2;
+    line-height: 2.1;
 }
 .btt5{
     left:84%;
     width:16%;
-    font-size:1.2vw;
+    font-size:1.1vw;
+    line-height: 2.1;
 }
 .btf0 {
     left:0%;
@@ -2599,4 +2601,3 @@ header>.toolbar { /* Hide toolbar menu */
         width:0px;
     }
 }
-

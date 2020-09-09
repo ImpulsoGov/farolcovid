@@ -225,11 +225,11 @@ def gen_big_table(config, dfs):
             <div class="big-table-line btl3" style="height: {proportion};"></div>
             <div class="big-table-line btl4" style="height: {proportion};"></div>
             <div class="big-table-field btt0">Estado e nível de alerta</div>
-            <div class="big-table-field btt1">Média móvel de novos casos por 100mil habitantes</div>
+            <div class="big-table-field btt1">Média móvel (últimos 7 dias) de novos casos por 100mil habitantes</div>
             <div class="big-table-field btt2">Ritmo de contágio</div>
             <div class="big-table-field btt3">Capacidade do sistema de saúde</div>
             <div class="big-table-field btt4">Taxa de subnotificação</div>
-            <div class="big-table-field btt5">Média móvel de novas mortes por 100mil habitantes</div>
+            <div class="big-table-field btt5">Média móvel (últimos 7 dias) de novas mortes por 100mil habitantes</div>
         </div>
     """
     row_order = 0
@@ -650,7 +650,7 @@ def main(session_state):
                 unsafe_allow_html=True,
             )
         st.write(
-            "<div class='base-wrapper'><i>Em breve:</i> gráficos de subnotificação e média móvel de novos casos por 100k habitantes.</div>",
+            "<div class='base-wrapper'><i>Em breve:</i> gráficos de subnotificação e média móvel (últimos 7 dias) de novos casos por 100k habitantes.</div>",
             unsafe_allow_html=True,
         )
 
