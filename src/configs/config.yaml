@@ -64,7 +64,7 @@ br:
                 categories: [0, 1, 2, 3]
 
             capacity_classification:
-                column_name: 'dday_icu_beds'
+                column_name: 'dday_beds'
                 cuts: [0, 15, 20, 30, 91.001]
                 categories: [3, 2, 1, 0]
             
@@ -87,7 +87,7 @@ br:
             risk: "capacity_classification"
             right_display: "number_icu_beds"
             left_display: "number_beds"
-            display: "dday_icu_beds"
+            display: "dday_beds"
         trust:
             risk: "trust_classification"
             right_display: "new_deaths_growth"
