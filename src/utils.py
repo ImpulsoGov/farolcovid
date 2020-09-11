@@ -905,16 +905,6 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
     bed_projection = dday_preffix(output.max_range_beds) + " dias"
     icu_bed_projection = dday_preffix(output.max_range_icu_beds) + " dias"
 
-    # if output.min_range_beds < 3 and output.max_range_beds < 3:
-    #     bed_projection = f"em até {output.max_range_beds} mês(es)"
-    # else:
-    #     bed_projection = "mais de 2 meses"
-
-    # if output.min_range_icu_beds < 3 and output.max_range_icu_beds < 3:
-    #     icu_bed_projection = f"em até {output.max_range_icu_beds} mês(es)"
-    # else:
-    #     icu_bed_projection = "mais de 2 meses"
-
     output = """
         <div>
                 <div class="simulator-container simulator-beds-card-bg">

@@ -27,29 +27,66 @@ from pandas import Timestamp
 import session
 
 
-def calculate_recovered(user_input, data):
-    print(data)
+# CAPACITY
+def _calculate_recovered(df, params):
+
     confirmed_adjusted = int(
-        # data[["confirmed_cases"]].sum() / data["notification_rate"].values[0]
-        data[["confirmed_cases"]].sum()
-        / 1
+        df[["confirmed_cases"]].sum() / df["notification_rate"].values[0]
     )
 
     if confirmed_adjusted == 0:  # dont have any cases yet
-        user_input["population_params"]["R"] = 0
-        return user_input
+        params["population_params"]["R"] = 0
+        return params
 
-    user_input["population_params"]["R"] = (
+    params["population_params"]["R"] = (
         confirmed_adjusted
-        - user_input["population_params"]["I"]
-        - user_input["population_params"]["D"]
+        - params["population_params"]["I"]
+        - params["population_params"]["D"]
     )
 
-    if user_input["population_params"]["R"] < 0:
-        user_input["population_params"]["R"] = (
-            confirmed_adjusted - user_input["population_params"]["D"]
+    if params["population_params"]["R"] < 0:
+        params["population_params"]["R"] = (
+            confirmed_adjusted - params["population_params"]["D"]
         )
 
+    return params
+
+
+def _prepare_simulation(user_input, config):
+
+    # based on Alison Hill: 40% asymptomatic
+    user_input["population_params"]["I"] = [
+        int(
+            user_input["population_params"]["I"]
+            * (1 - config["br"]["seir_parameters"]["asymptomatic_proportion"])
+        )
+        if not np.isnan(user_input["population_params"]["I"])
+        else 1
+    ][0]
+
+    place_specific_params = loader.read_data(
+        "br",
+        config,
+        endpoint=config["br"]["api"]["endpoints"]["parameters"][
+            user_input["place_type"]
+        ],
+    ).set_index(user_input["place_type"])
+    place_id = user_input["place_type"]
+
+    user_input["place_specific_params"] = {
+        "fatality_ratio": place_specific_params["fatality_ratio"].loc[
+            int(user_input[place_id])
+        ],
+        "i1_percentage": place_specific_params["i1_percentage"].loc[
+            int(user_input[place_id])
+        ],
+        "i2_percentage": place_specific_params["i2_percentage"].loc[
+            int(user_input[place_id])
+        ],
+        "i3_percentage": place_specific_params["i3_percentage"].loc[
+            int(user_input[place_id])
+        ],
+    }
     return user_input
 
 
@@ -57,15 +94,14 @@ def main(user_input, indicators, data, config, session_state):
     user_analytics = amplitude.gen_user(utils.get_server_session())
 
     utils.localCSS("style.css")
-    
-    utils.genHeroSection(
-        title1="Simula", 
-        title2="Covid",
-        subtitle="Um simulador da demanda por leitos hospitalares.", 
-        logo="https://i.imgur.com/w5yVANW.png",
-        header=False
-    )
 
+    utils.genHeroSection(
+        title1="Simula",
+        title2="Covid",
+        subtitle="Um simulador da demanda por leitos hospitalares.",
+        logo="https://i.imgur.com/w5yVANW.png",
+        header=False,
+    )
 
     if (
         user_input["place_type"] == user_input["rt_level"]
@@ -102,7 +138,7 @@ def main(user_input, indicators, data, config, session_state):
     utils.genInputCustomizationSectionHeader(user_input["locality"])
     old_user_input = dict(user_input)
     user_input, session_state = utils.genInputFields(user_input, config, session_state)
-    
+
     if session_state.reset:
         session.rerun()
     if session_state.update:
@@ -138,7 +174,7 @@ def main(user_input, indicators, data, config, session_state):
 
     else:
         # calculate recovered cases
-        user_input = calculate_recovered(user_input, data)
+        user_input = _calculate_recovered(data, user_input)
 
         # SIMULATOR SCENARIOS: BEDS & RESPIRATORS
         user_input["strategy"] = dic_scenarios[option]
@@ -150,14 +186,13 @@ def main(user_input, indicators, data, config, session_state):
             user_analytics.log_event("picked negative_scenario")
 
         # Caso o usuário altere os casos confirmados, usamos esse valor para a estimação
-
         if (session_state.number_cases is not None) and (
             session_state.number_cases != user_input["population_params"]["I_compare"]
         ):
             user_input["population_params"]["I"] = session_state.number_cases
 
-        dfs = simulator.run_simulation(user_input, config)
-
+        # Roda a simulação
+        dfs = simulator.run_simulation(_prepare_simulation(user_input, config), config)
         dday_beds = simulator.get_dmonth(dfs, "I2", int(user_input["number_beds"]))
 
         dday_icu_beds = simulator.get_dmonth(

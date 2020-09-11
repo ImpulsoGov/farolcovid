@@ -7,8 +7,6 @@ import pandas as pd
 # import sys
 from models import IndicatorType, IndicatorCards, ProductCards, DimensionCards
 
-from model.simulator import run_simulation, get_dmonth
-
 # import pdf_report.pdfgen as pdfgen
 import pages.simulacovid as sm
 import pages.saude_em_ordem as so
