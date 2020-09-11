@@ -572,7 +572,7 @@ def genInputFields(user_input, config, session):
 
         number_icu_beds = int(
             user_input["number_icu_beds"]
-            * config["br"]["simulacovid"]["resources_available_proportion"]
+            #* config["br"]["simulacovid"]["resources_available_proportion"]
         )
         number_cases = int(user_input["population_params"]["I_confirmed"])
         number_deaths = int(user_input["population_params"]["D"])
@@ -599,7 +599,7 @@ def genInputFields(user_input, config, session):
     )
 
     user_input["number_icu_beds"] = st.number_input(
-        f"Número de leitos UTI destinados aos pacientes com Covid-19 (50% do reportado em {authors_icu_beds}; atualizado: {icu_beds_update}):",
+        f"Número de leitos UTI destinados aos pacientes com Covid-19 (100% do reportado em {authors_icu_beds}; atualizado: {icu_beds_update}):",
         0,
         None,
         number_icu_beds,
