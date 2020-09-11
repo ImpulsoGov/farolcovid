@@ -26,6 +26,10 @@ br:
                 cnae_sectors: "br/cnae/sectors"
             utilities:
                 place_ids: "br/places/ids"
+            parameters:
+                state_num_id: "br/states/parameters"
+                health_region_id: "br/health_region/parameters"
+                city_id: "br/cities/parameters"
             maps: "br/maps"
     drive_paths:
         br_id_state_region_city: https://docs.google.com/spreadsheets/d/1pHkH9FZj-c_bCEdvCH9k54uog5QDEd_x5xi4YmDsqyY
@@ -65,7 +69,7 @@ br:
 
             capacity_classification:
                 column_name: 'dday_icu_beds'
-                cuts: [0, 15, 30, 60, 91.001]
+                cuts: [0, 30, 60, 90, 91.001]
                 categories: [3, 2, 1, 0]
             
             trust_classification:
@@ -180,6 +184,7 @@ br:
             ln_massa_salarial: "ln_total_wage_bill"
             sections: "sector"
     seir_parameters:
+        asymptomatic_proportion: 0.3
         # => new values:
         mild_duration: 6 # time from symptoms to hospitalization
         severe_duration: 6 # time from symptoms to ICU admit (12) - time from symptoms to hospitalization

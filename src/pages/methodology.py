@@ -2,8 +2,7 @@ import streamlit as st
 import amplitude
 import utils
 from PIL import Image
-from pages import model_description
-from pages import saude_em_ordem_description
+from pages import model_description, rt_description, saude_em_ordem_description
 
 
 def main(session_state):
@@ -385,56 +384,58 @@ def main(session_state):
             unsafe_allow_html=True,
         )
 
-        st.write(
-            """<div class="base-wrapper">
-            <span class="subsection-header"><b>O que é?</b></span><br> 
-            O número de reprodução efetivo (Rt) traduz a quantidade de pessoas que cada pessoa
-            doente infectará em determinado intervalo de tempo.  Já o número básico de reprodução
-            (<i>R0</i>) da uma doença traduz qual a dinâmica de contágio de todo o curso de transmissão em
-            determinado grupo populacional, sendo, portanto, fixo para a doença. Mas a quantidade de
-            novas infecções geradas por cada pessoa varia ao longo do tempo: se, no início, há menos
-            pessoas imunes, ele tende a ser mais alto; enquanto, tudo mais constante, o aumento da
-            imunidade na população se traduzirá em um número menor de novas infecções. Igualmente,
-            mudanças de comportamento - como a redução de contato entre pessoas ou uso de máscaras, no
-            caso de doenças transmitidas por vias áreas, como a Covid-19 - também influenciam o número
-            de novas infecções.<br><br> A Covid-19 chegou em momentos distintos em cada cidade brasileira e
-            a sociedade também reagiu de maneira diferente em cada uma delas. Portanto, medir o
-            <i>Rt</i>, traduzindo o <i>R0</i> para o momento específico no qual cada local se encontra, a
-            nível municipal e estadual, traz informações importantes sobre a taxa de contágio da doença.
-            Enquanto o <i>R0</i> é um número geral, portanto, o  então é calculado para cada local e
-            momento no tempo. Por exemplo, um <i>Rt</i> maior do que 1 indica que, mantendo-se o
-            comportamento e intervenções ativas até aquele dia, ainda há tendência de crescimento
-            exponencial da doença naquela população. Esperamos que cada pessoa infectada naquele momento
-            infectará mais de uma pessoa no futuro - gerando uma curva de contágio que se acelera
-            rapidamente. Já um <i>Rt</i> abaixo de 1 se traduz na expectativa de que o número de novas infecções 
-            vai diminuir ao longo do tempo, indicando que a situação está sob controle se todas as medidas e
-            comportamentos forem mantidos.<br><br>Uma boa notícia: por causa da mudança de comportamento, o
-            <i>Rt</i> tende a ser menor que o <i>R0</i>, como explicam os desenvolvedores do
-            <i>CovidActNow</i>. Calculá-lo também nos permite, portanto, comparar qual seria a evolução
-            do contágio da Covid-19 caso medidas restritivas de contato e contágio não tivessem sido
-            adotadas.<br> Medir diretamente o número efetivo de reprodução da Covid-19 não é possível.
-            Porém, podemos estimar o número de reprodução instantâneo (<i>Rt</i>) mais provável pelo
-            número de novos casos por dia.<br><br>
-            <span class="subsection-header"><b>Como funciona o modelo?</b></span><br> 
-            O modelo utilizado para o cálculo do Rt foi desenvolvido por Cori et.
-            al (2013) e implementado no pacote <i>EpiEstim</i>, podendo ser utilizado no R (linguagem de
-            programação) ou no Excel. Ele toma como entrada a série de casos da doença na população e
-            estima o Rt utilizando um modelo bayesiano. Esse modelo estima a distribuição a posteriori
-            do Rt dado o número de casos ativos no tempo <i>t</i> e a infectividadde da doença no local.
-            A infectividade pode ser entendida como a probabilidade de um indivíduo infectar pessoas o
-            momento de evolução da doenca no qual se encontra - por exemplo, um indivíduo com Covid no
-            4º dia de sintomas é mais infeccioso que o um indivíduo no 15º dia.  Esse valor não é
-            observado, portanto, é estimado pela distribuição esperada do tempo de geração da doença
-            (intevalo serial) - que é o tempo esperado entre uma pessoa apresentar os sintomas e uma
-            pessoa contaminada por esta passar a apresentar os sintomas da doença. Esse número para a
-            Covid hoje segue uma distribuição com média de 4.7 e desvio padrão de 2.9 (Hiroshi, 2020).<br><br>
-            Dada a série de novos casos por dia, e a média e desvio padrão do intervalo serial, o modelo
-            então estima o valor mais provável do número de reprodução básica da doença no tempo
-            <i>t</i> e os respectivos intervalos de confiança. Utilizamos o intevalo de 95% de confiança
-            para reportar as estimativas.
-            </div>""",
-            unsafe_allow_html=True,
-        )
+        rt_description.main(session_state)
+
+        # st.write(
+        #     """<div class="base-wrapper">
+        #     <span class="subsection-header"><b>O que é?</b></span><br> 
+        #     O número de reprodução efetivo (Rt) traduz a quantidade de pessoas que cada pessoa
+        #     doente infectará em determinado intervalo de tempo.  Já o número básico de reprodução
+        #     (<i>R0</i>) da uma doença traduz qual a dinâmica de contágio de todo o curso de transmissão em
+        #     determinado grupo populacional, sendo, portanto, fixo para a doença. Mas a quantidade de
+        #     novas infecções geradas por cada pessoa varia ao longo do tempo: se, no início, há menos
+        #     pessoas imunes, ele tende a ser mais alto; enquanto, tudo mais constante, o aumento da
+        #     imunidade na população se traduzirá em um número menor de novas infecções. Igualmente,
+        #     mudanças de comportamento - como a redução de contato entre pessoas ou uso de máscaras, no
+        #     caso de doenças transmitidas por vias áreas, como a Covid-19 - também influenciam o número
+        #     de novas infecções.<br><br> A Covid-19 chegou em momentos distintos em cada cidade brasileira e
+        #     a sociedade também reagiu de maneira diferente em cada uma delas. Portanto, medir o
+        #     <i>Rt</i>, traduzindo o <i>R0</i> para o momento específico no qual cada local se encontra, a
+        #     nível municipal e estadual, traz informações importantes sobre a taxa de contágio da doença.
+        #     Enquanto o <i>R0</i> é um número geral, portanto, o  então é calculado para cada local e
+        #     momento no tempo. Por exemplo, um <i>Rt</i> maior do que 1 indica que, mantendo-se o
+        #     comportamento e intervenções ativas até aquele dia, ainda há tendência de crescimento
+        #     exponencial da doença naquela população. Esperamos que cada pessoa infectada naquele momento
+        #     infectará mais de uma pessoa no futuro - gerando uma curva de contágio que se acelera
+        #     rapidamente. Já um <i>Rt</i> abaixo de 1 se traduz na expectativa de que o número de novas infecções 
+        #     vai diminuir ao longo do tempo, indicando que a situação está sob controle se todas as medidas e
+        #     comportamentos forem mantidos.<br><br>Uma boa notícia: por causa da mudança de comportamento, o
+        #     <i>Rt</i> tende a ser menor que o <i>R0</i>, como explicam os desenvolvedores do
+        #     <i>CovidActNow</i>. Calculá-lo também nos permite, portanto, comparar qual seria a evolução
+        #     do contágio da Covid-19 caso medidas restritivas de contato e contágio não tivessem sido
+        #     adotadas.<br> Medir diretamente o número efetivo de reprodução da Covid-19 não é possível.
+        #     Porém, podemos estimar o número de reprodução instantâneo (<i>Rt</i>) mais provável pelo
+        #     número de novos casos por dia.<br><br>
+        #     <span class="subsection-header"><b>Como funciona o modelo?</b></span><br> 
+        #     O modelo utilizado para o cálculo do Rt foi desenvolvido por Cori et.
+        #     al (2013) e implementado no pacote <i>EpiEstim</i>, podendo ser utilizado no R (linguagem de
+        #     programação) ou no Excel. Ele toma como entrada a série de casos da doença na população e
+        #     estima o Rt utilizando um modelo bayesiano. Esse modelo estima a distribuição a posteriori
+        #     do Rt dado o número de casos ativos no tempo <i>t</i> e a infectividadde da doença no local.
+        #     A infectividade pode ser entendida como a probabilidade de um indivíduo infectar pessoas o
+        #     momento de evolução da doenca no qual se encontra - por exemplo, um indivíduo com Covid no
+        #     4º dia de sintomas é mais infeccioso que o um indivíduo no 15º dia.  Esse valor não é
+        #     observado, portanto, é estimado pela distribuição esperada do tempo de geração da doença
+        #     (intevalo serial) - que é o tempo esperado entre uma pessoa apresentar os sintomas e uma
+        #     pessoa contaminada por esta passar a apresentar os sintomas da doença. Esse número para a
+        #     Covid hoje segue uma distribuição com média de 4.7 e desvio padrão de 2.9 (Hiroshi, 2020).<br><br>
+        #     Dada a série de novos casos por dia, e a média e desvio padrão do intervalo serial, o modelo
+        #     então estima o valor mais provável do número de reprodução básica da doença no tempo
+        #     <i>t</i> e os respectivos intervalos de confiança. Utilizamos o intevalo de 95% de confiança
+        #     para reportar as estimativas.
+        #     </div>""",
+        #     unsafe_allow_html=True,
+        # )
 
     if (
         indicador
