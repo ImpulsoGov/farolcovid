@@ -163,9 +163,6 @@ def main(user_input, indicators, data, config, session_state):
         dday_icu_beds = simulator.get_dmonth(
             dfs, "I3", int(user_input["number_icu_beds"])
         )
-        dday_icu_beds = simulator.get_dmonth(
-            dfs, "I3", int(user_input["number_icu_beds"])
-        )
 
         utils.genChartSimulationSection(
             SimulatorOutput(

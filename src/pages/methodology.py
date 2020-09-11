@@ -66,7 +66,7 @@ def main(session_state):
             <b>Indicador</b>: Taxa de contágio (Número efetivo de Reprodução - R_t)<br>
             <b>Qual sua tendência?</b>Aumentado, estabilizando ou diminuindo?<br><br>
             <span class="subsection-header">Capacidade do sistema: Como está a capacidade de resposta do sistema de saúde? </span><br>
-            <b>Indicador</b>: Dias até atingir ocupação total de leitos UTI-Covid<br>
+            <b>Indicador</b>: Dias até atingir ocupação total de leitos enfermaria<br>
             <b>Qual sua tendência?</b> Aumentado, estabilizando ou diminuindo?<br><br>
             <span class="subsection-header">Confiança nos dados: Quão representativo são os casos oficialmente identificados 
             frente ao total de casos esperados?</span><br>
@@ -131,7 +131,7 @@ def main(session_state):
                 </tr>
                 <tr>
                     <td><span>Capacidade de respostas do sistema de saúde</span></td>
-                    <td><span>Projeção de tempo para ocupação total de leitos UTI</span></td>
+                    <td><span>Projeção de tempo para ocupação total de leitos enfermaria</span></td>
                     <td class="light-blue-bg bold">60 - 90 dias</td>
                     <td class="light-yellow-bg bold"><span>30 - 60 dias</span></td>
                     <td class="light-orange-bg bold"><span>15 - 30 dias</span></td>
@@ -219,7 +219,7 @@ def main(session_state):
         [
             "SITUAÇÃO DA DOENÇA: Média móvel de novos casos por 100 mil habitantes",
             "CONTROLE DA DOENÇA: Taxa de contágio (Rt)",
-            "CAPACIDADE DO SISTEMA: Dias até atingir ocupação total de leitos UTI-Covid",
+            "CAPACIDADE DO SISTEMA: Dias até atingir ocupação total de leitos enfermaria",
             "CONFIANÇA NOS DADOS: Taxa de subnotificação de casos",
         ],
     )
@@ -438,7 +438,7 @@ def main(session_state):
 
     if (
         indicador
-        == "CAPACIDADE DO SISTEMA: Dias até atingir ocupação total de leitos UTI-Covid"
+        == "CAPACIDADE DO SISTEMA: Dias até atingir ocupação total de leitos enfermaria"
     ):
 
         st.write(
