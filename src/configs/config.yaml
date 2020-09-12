@@ -26,10 +26,10 @@ br:
                 cnae_sectors: "br/cnae/sectors"
             utilities:
                 place_ids: "br/places/ids"
-            # parameters:
-            #     states: "br/states/parameters"
-            #     health_region: "br/health_region/parameters"
-            #     cities_region: "br/cities/parameters"
+            parameters:
+                state_num_id: "br/states/parameters"
+                health_region_id: "br/health_region/parameters"
+                city_id: "br/cities/parameters"
             maps: "br/maps"
     drive_paths:
         br_id_state_region_city: https://docs.google.com/spreadsheets/d/1pHkH9FZj-c_bCEdvCH9k54uog5QDEd_x5xi4YmDsqyY

@@ -14,19 +14,6 @@ import datetime as dt
 import math
 
 
-def iterate_simulation(current_state, seir_parameters, phase, initial):
-    """
-    Iterate over simulation phase, returning evolution and new current state.
-    """
-
-    res = entrypoint(current_state, seir_parameters, phase, initial)
-    current_state = (
-        res.drop("scenario", axis=1).iloc[-1].to_dict()
-    )  # new initial = last date
-
-    return res, current_state
-
-
 def get_rt(user_input, bound):
     """
     Get reproduction rate from scenario choice.
@@ -76,8 +63,10 @@ def run_simulation(user_input, config):
         # Get Rts
         phase["R0"] = get_rt(user_input, bound)
 
+        # Run model projection
         res = entrypoint(
             user_input["population_params"],
+            user_input["place_specific_params"],
             config["br"]["seir_parameters"],
             phase=phase,
             initial=True,
@@ -112,10 +101,7 @@ def get_dmonth(dfs, col, resource_number):
     dday = get_dday(dfs, col, resource_number)
 
     for bound, v in dday.items():
-        if v == 91:
-            dday[bound] = 3
-        else:
-            dday[bound] = math.ceil(v / 30)
+        dday[bound] = math.ceil(v / 30)
 
     return dday
 

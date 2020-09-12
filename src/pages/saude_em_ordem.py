@@ -126,6 +126,7 @@ def chunks(l, n):
 
 # SEÇÃO DE INTRODUÇÃO
 
+
 def gen_intro(alert):
     if alert == "baixo":
         st.write(
@@ -149,6 +150,7 @@ def gen_intro(alert):
 
 def gen_illustrative_plot(sectors_data, session_state, place_name):
     """ Generates our illustrative sector diagram Version saude v2 """
+
     text = f""" 
     <div class="saude-alert-banner saude-blue-bg mb" style="margin-bottom: 0px;">
         <div class="base-wrapper flex flex-column" style="margin-top: 0px;">
@@ -157,9 +159,12 @@ def gen_illustrative_plot(sectors_data, session_state, place_name):
             </div>
             <span class="white-span p3">Sugerimos uma retomada <b>em fases</b>, a começar pelos <b>setores mais seguros</b> e com <b>maior contribuição econômica.</b></span>
             <div class="flex flex-row flex-m-column">"""
+
+    # add indicators cards
     names_in_order = list(reversed(["d", "c", "b", "a"]))
     for index, sector_dict in enumerate(reversed(sectors_data)):
         text += gen_sector_plot_card(names_in_order[index], sector_dict, size_sectors=3)
+
     text += """
             </div>
         </div>
@@ -206,22 +211,22 @@ def gen_sector_plot_card(sector_name, sector_data, size_sectors=5):
         sum([float(i["total_wage_bill"]) for i in top_n_sectors]) / size_sectors
     )
     num_people = sum([int(i["n_employee"]) for i in top_n_sectors])
+
+    # TODO: discover why mr (margin right) it's not working here - need to pass explicit to style
     text = f"""
-    <div class="saude-indicator-card flex flex-column mr" style="z-index:1;display:inline-block;position:relative;">
-        <span class="saude-card-header-v2">{titles[sector_name]}</span>
-        <span class="saude-card-list-v2">
-            {item_list}
-        </span>
-        <div class="flex flex-row flex-justify-space-between mt" style="width:250px;">
+    <div class=main-indicator-card flex flex-column mr" style="z-index:1;display:inline-block;position:relative;margin-right:1em">
+        <span class="main-card-header-v2">{titles[sector_name]}</span>
+        <span class="main-card-list-v2">{item_list}</span>
+        <div class="flex flex-row flex-justify-space-between mt" style="width:300px;">
         </div>
         <div class="saude-card-redirect">
             {continuation_text}
         </div>
-        <div class="saude-card-display-text-v2 sdcardtext-left">
-                <span class="lighter">Massa Salarial Média:<br></span>
+        <div class="main-card-display-text-v2 sdcardtext-left">
+                <span class="lighter">Massa Salarial<br>Média:<br></span>
                 <span class="bold">R$ {convert_money(average_wage)}</span>
         </div>
-        <div class="saude-card-display-text-v2 sdcardtext-right">
+        <div class="main-card-display-text-v2 sdcardtext-right">
                 <span class="lighter">Número de Trabalhadores:<br></span>
                 <span class="bold">{convert_money(num_people)}</span>
         </div>
@@ -304,9 +309,10 @@ def gen_detailed_vision(economic_data, session_state, config):
             display_detailed_plot(economic_data, session_state)
 
     utils.stylizeButton(
-        name="Visão Detalhada", 
-        style_string="""border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;""", 
-        session_state=session_state)
+        name="Visão Detalhada",
+        style_string="""border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;""",
+        session_state=session_state,
+    )
 
 
 def get_clean_data(in_econ_data):
@@ -516,8 +522,8 @@ def gen_sector_tables(
             gen_single_table(session_state, score_groups, table_index, default_size)
 
         utils.stylizeButton(
-            name="Mostrar/Ocultar mais da Fase " + number, 
-            style_string="""border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;""", 
+            name="Mostrar/Ocultar mais da Fase " + number,
+            style_string="""border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 18px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;""",
             session_state=session_state,
         )
 
@@ -659,13 +665,13 @@ def main(user_input, indicators, data, config, session_state):
         }
 
     utils.genHeroSection(
-        title1="Saúde", 
+        title1="Saúde",
         title2="Em Ordem",
-        subtitle="Contribuindo para uma retomada segura da economia.", 
+        subtitle="Contribuindo para uma retomada segura da economia.",
         logo="https://i.imgur.com/FiNi6fy.png",
-        header=False
+        header=False,
     )
-    
+
     gen_intro(alert=data["overall_alert"].values[0])
     gen_slider(session_state)
     score_groups, economic_data, place_name = get_score_groups(

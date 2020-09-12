@@ -41,7 +41,7 @@ class Amplitude_user:
         """
          To be called directly only in areas with no external reruns
          like inside buttons for example.
-         For other circusmtances use the safe version.
+         For other circumstances use the safe version.
         """
         # print("logging : " + event + " at " + str(datetime.datetime.now()))
         event_data = {
@@ -147,7 +147,7 @@ class Amplitude_user:
         self, session_state
     ):  # Once we finish loading it all turn the old into new
         """ 
-        This function is essential for pages that have mutiple amplitude events that can trigger reruns.
+        This function is essential for pages that have multiple amplitude events that can trigger reruns.
         If your page does more than logging at loading, it should add this to the end of the page so that
         when we load the entire page we can make sure to make throw the current values into the old values object
         and begin a new one. This means effectively updating our manager saying that the entire page loaded sucessfully
