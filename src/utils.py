@@ -895,15 +895,15 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
     beds_img = "https://i.imgur.com/27hutU0.png"
     icu_beds_img = "https://i.imgur.com/Oh4l8qM.png"
 
-    if output.min_range_beds < 3 and output.max_range_beds < 3:
+    if output.min_range_beds < 4 and output.max_range_beds < 4:
         bed_projection = f"em até {output.max_range_beds} mês(es)"
     else:
-        bed_projection = "mais de 2 meses"
+        bed_projection = "mais de 3 meses"
 
-    if output.min_range_icu_beds < 3 and output.max_range_icu_beds < 3:
+    if output.min_range_icu_beds < 4 and output.max_range_icu_beds < 4:
         icu_bed_projection = f"em até {output.max_range_icu_beds} mês(es)"
     else:
-        icu_bed_projection = "mais de 2 meses"
+        icu_bed_projection = "mais de 3 meses"
 
     output = """
         <div>
