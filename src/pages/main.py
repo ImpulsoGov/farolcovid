@@ -57,10 +57,7 @@ def fix_type(x, group, position):
         return x
 
     if type(x) == np.float64:
-        if (x <= 1) & (group == "social_isolation"):
-            return str(int(round(100 * x, 0))) + "%"
-        else:
-            return int(x)
+        return int(x)
 
 
 def update_indicators(indicators, data, config, user_input, session_state):
@@ -97,9 +94,6 @@ def update_indicators(indicators, data, config, user_input, session_state):
         indicators[group].right_display = dic_indicators["right_display"]
         indicators[group].display = dic_indicators["display"]
 
-    # indicators["subnotification_rate"].left_display = session_state.number_cases
-    indicators["capacity"].left_display = int(session_state.number_beds)
-    indicators["capacity"].right_display = int(session_state.number_icu_beds)
 
     # Caso o usuário altere os casos confirmados, usamos esse novo valor para a estimação
     # TODO: vamos acabar com o user_iput e manter só session_state?
