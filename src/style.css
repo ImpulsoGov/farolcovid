@@ -196,7 +196,7 @@
     }
 }
 .p4 {
-    font-size: 18px;
+    font-size: 1.2vw;
 }
 
 .p5 {
@@ -1027,13 +1027,13 @@ header>.toolbar { /* Hide toolbar menu */
 
 .dimension-card{
     padding: var(--main-padding);
-    width: 330px;
+    width: 21vw;
     height: auto;
     padding-bottom: 0rem;
     background-color: white;
     margin-top: 0px;
     display: inline-block;
-    font-size:24px;
+    font-size:1.5vw;
 }
 
 /* question FAB */
@@ -1239,7 +1239,7 @@ header>.toolbar { /* Hide toolbar menu */
 
 
 .risk-pill {
-    width: 125px;
+    width: 8.5vw;
     text-align: center;
     border-radius: 5px;
 }
@@ -1950,7 +1950,7 @@ header>.toolbar { /* Hide toolbar menu */
     font-weight: normal;
     font-size: 26px;
 }
-.saude-card-list-v2{
+/* .saude-card-list-v2{
     width:86%;
     top:80px;
     position:absolute;
@@ -1959,7 +1959,7 @@ header>.toolbar { /* Hide toolbar menu */
     font-weight: normal;
     font-size: 18px;
     line-height: 23px;
-}
+} */
 .saude-card-display-region-v2{
 }
 .saude-card-display-text-v2{
@@ -2452,7 +2452,7 @@ header>.toolbar { /* Hide toolbar menu */
     position:absolute;
     font-style: normal;
     font-weight: normal;
-    font-size: 26px;
+    font-size: 2vw;
 }
 .main-card-list-v2{
     width:86%;
@@ -2461,18 +2461,21 @@ header>.toolbar { /* Hide toolbar menu */
     font-family: IBM Plex Sans;
     font-style: normal;
     font-weight: normal;
-    font-size: 18px;
+    font-size: 1.25vw;
     line-height: 23px;
 }
 .main-card-display-value{
-    top:47%;
-
+    top:45%;
+    font-size: 3vw;
     position:absolute;
+}
+.main-card-display-value-text{
+    font-size: 1vw;
 }
 .main-card-display-text-v2{
     font-family: IBM Plex Sans;
     font-style: normal;
-    font-size: 16px;
+    font-size: 1vw;
     width:50%;
     height:80px;
     bottom:20px;
@@ -2496,7 +2499,7 @@ header>.toolbar { /* Hide toolbar menu */
 .main-indicator-card {
     margin-top: 30px;
     padding: var(--main-padding);
-    width: 320px;
+    width: 22vw;
     height: 380px;
     border-radius: var(--main-border-radius);
     opacity: 0.98;
