@@ -2498,7 +2498,7 @@ header>.toolbar { /* Hide toolbar menu */
 .main-indicator-card {
     margin-top: 30px;
     padding: var(--main-padding);
-    width: 320px;
+    width: 290px;
     height: 380px;
     border-radius: var(--main-border-radius);
     opacity: 0.98;

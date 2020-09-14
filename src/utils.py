@@ -499,26 +499,26 @@ def gen_info_modal():
                 <tr>
                     <td><span>Controle da doença</span></td>
                     <td><span>Número de reprodução efetiva</span></td>
-                    <td class="light-blue-bg bold"><span>&lt;0.5</span></td>
-                    <td class="light-yellow-bg bold"><span>&lt;0.5 - 1&gt;</span></td>
-                    <td class="light-orange-bg bold"><span>&lt;1 - 1.2&gt;</span>&nbsp;</td>
-                    <td class="light-red-bg bold"><span>&gt;1.2</span></td>
+                    <td class="light-blue-bg bold"><span>&lt;0.9</span></td>
+                    <td class="light-yellow-bg bold"><span>&lt;0.9 - 1.1&gt;</span></td>
+                    <td class="light-orange-bg bold"><span>&lt;1.1 - 1.4&gt;</span>&nbsp;</td>
+                    <td class="light-red-bg bold"><span>&gt;1.4</span></td>
                 </tr>
                 <tr>
                     <td><span>Capacidade de respostas do sistema de saúde</span></td>
                     <td><span>Projeção de tempo para ocupação total de leitos UTI-Covid</span></td>
-                    <td class="light-blue-bg bold">60 - 90 dias</td>
-                    <td class="light-yellow-bg bold"><span>30 - 60 dias</span></td>
-                    <td class="light-orange-bg bold"><span>15 - 30 dias</span></td>
+                    <td class="light-blue-bg bold">30 - 90 dias</td>
+                    <td class="light-yellow-bg bold"><span>20 - 30 dias</span></td>
+                    <td class="light-orange-bg bold"><span>15 - 20 dias</span></td>
                     <td class="light-red-bg bold"><span>0 - 15 dias</span></td>
                 </tr>
                 <tr>
                     <td><span>Confiança dos dados</span></td>
                     <td><span>Subnotificação (casos <b>não</b> diagnosticados a cada 10 infectados)</span></td>
-                    <td class="light-blue-bg bold"><span>4&gt;=x&gt;0</span></td>
-                    <td class="light-yellow-bg bold"><span>6&gt;=x&gt;4</span></td>
-                    <td class="light-orange-bg bold"><span>7&gt;=x&gt;6</span></td>
-                    <td class="light-red-bg bold"><span>10&gt;=x&gt;=7</span></td>
+                    <td class="light-blue-bg bold"><span>3&gt;=x&gt;0</span></td>
+                    <td class="light-yellow-bg bold"><span>4&gt;=x&gt;3</span></td>
+                    <td class="light-orange-bg bold"><span>5&gt;=x&gt;4</span></td>
+                    <td class="light-red-bg bold"><span>10&gt;=x&gt;=5</span></td>
                 </tr>
             </tbody>
             </table>
@@ -688,7 +688,7 @@ def genAnalysisDimmensionsSection(dimensions: List[Dimension]):
                 <span class="section-header">DIMENSÕES DA ANÁLISE</span>
             </div>
             <span class="p3">O que olhamos ao avaliar o cenário da pandemia em um lugar?</span>
-            <div class="flex flex-row flex-space-around mt flex-m-column" style="margin-bottom: 0px;height:auto; display:inline-block top:0x;">
+            <div class="flex-row flex-m-column" style="margin-bottom: 0px;height:auto; display:inline-block top:0x;">
             {cards}
             </div>
         </div>""",
@@ -821,7 +821,7 @@ def genKPISection(
                          <a class="btn-wpp" href="whatsapp://send?text=%s" target="blank">Compartilhar no Whatsapp</a>
                          </div>
                         <span class="white-span p3">%s</span>
-                        <div class="flex flex-row flex-m-column">%s</div>
+                        <div class="flex-row flex-m-column">%s</div>
                         <div class = "info">%s</div>
                 </div>
         </div>
