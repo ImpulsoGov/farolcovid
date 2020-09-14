@@ -159,10 +159,10 @@ IndicatorCards: Dict[str, Indicator] = {
     ),
     IndicatorType.CAPACITY.value: Indicator(
         header="CAPACIDADE DO SISTEMA",
-        caption="Se nada mudar, a capacidade hospitalar de seu <b>estado ou regional de saúde</b> será atingida em",
-        unit="mês(es)",
-        left_label="Número de Leitos*:",
-        right_label="Capacidade de UTI:",
+        caption="Se nada mudar, todos os leitos de seu <b>estado ou regional de saúde</b> estarão ocupados em",
+        unit="dia(s)",
+        left_label="Leitos enfermaria*:",
+        right_label="Leitos UTI-Covid:",
     ),
     IndicatorType.TRUST.value: Indicator(
         header="CONFIANÇA DOS DADOS",

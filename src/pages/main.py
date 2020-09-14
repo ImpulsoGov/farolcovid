@@ -48,10 +48,7 @@ def fix_type(x, group, position):
         return str(int(x)) + " dias"
 
     if group == "capacity" and position == "display":
-        x = math.ceil(x / 30)
-        # TODO: passar para config
-        dmonth = {1: "até 1", 2: "até 2", 3: "até 3", 4: "+ 3"}
-        return dmonth[x]
+        return utils.dday_preffix(x)
 
     if (type(x) == str) or (type(x) == np.int64) or (type(x) == int):
         return x
@@ -216,11 +213,11 @@ def gen_big_table(config, dfs):
             <div class="big-table-line btl3" style="height: {proportion};"></div>
             <div class="big-table-line btl4" style="height: {proportion};"></div>
             <div class="big-table-field btt0">Estado e nível de alerta</div>
-            <div class="big-table-field btt1">Média móvel de novos casos por 100mil habitantes</div>
+            <div class="big-table-field btt1">Média móvel (últimos 7 dias) de novos casos por 100mil habitantes</div>
             <div class="big-table-field btt2">Ritmo de contágio</div>
             <div class="big-table-field btt3">Capacidade do sistema de saúde</div>
             <div class="big-table-field btt4">Taxa de subnotificação</div>
-            <div class="big-table-field btt5">Média móvel de novas mortes por 100mil habitantes</div>
+            <div class="big-table-field btt5">Média móvel (últimos 7 dias) de novas mortes por 100mil habitantes</div>
         </div>
     """
     row_order = 0
@@ -242,17 +239,15 @@ def gen_sector_big_row(my_state, index, config):
         2: ["#F77800", "⚠"],
         3: ["#F02C2E", "🛑"],
     }
-    level_data = config["br"]["farolcovid"]["rules"]
 
-    # TODO: passar para config
-    dmonth = {1: "até 1", 2: "até 2", 3: "até 3", 4: "+ 3"}
+    level_data = config["br"]["farolcovid"]["rules"]
 
     return f"""<div class="big-table-row {["btlgrey","btlwhite"][index % 2]}">
             <div class="big-table-index-background" style="background-color:{alert_info[my_state["overall_alert"]][0]};"></div>
             <div class="big-table-field btf0">{my_state["state_name"]} {alert_info[my_state["overall_alert"]][1]}</div>
             <div class="big-table-field btf1" style="color:{alert_info[find_level(level_data["situation_classification"]["cuts"],level_data["situation_classification"]["categories"],my_state["daily_cases_mavg_100k"])][0]};">{"%0.2f"%my_state["daily_cases_mavg_100k"]}</div>
             <div class="big-table-field btf2" style="color:{alert_info[find_level(level_data["control_classification"]["cuts"],level_data["control_classification"]["categories"],my_state["rt_most_likely"])][0]};" > {"%0.2f"%my_state["rt_most_likely"]}</div>
-            <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["dday_icu_beds"])][0]};">{dmonth[math.ceil(my_state["dday_icu_beds"] / 30)]} mês(es)</div>
+            <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["dday_icu_beds"])][0]};">{utils.dday_preffix(my_state["dday_icu_beds"])} dias</div>
             <div class="big-table-field btf4" style="color:{alert_info[find_level(level_data["trust_classification"]["cuts"],level_data["trust_classification"]["categories"],my_state["notification_rate"])][0]};">{int(my_state["subnotification_rate"]*100)}%</div>
             <div class="big-table-field btf5">{"%0.2f"%my_state["new_deaths_mavg_100k"]}</div>
         </div>"""
@@ -352,7 +347,7 @@ def main(session_state):
                             <p> <b>Importante: mudamos a metodologia dos indicadores - veja mais em Modelos, limitações e fontes no menu lateral.</b> Descubra o nível de alerta do estado, regional de saúde ou município de acordo com os indicadores:</p>
                             - <b>Situação da doença</b>: média de novos casos 100 mil por habitantes;</br>
                             - <b>Controle da doença</b>: taxa de contágio</br>
-                            - <b>Capacidade do sistema</b>: tempo para ocupação de leitos UTI Covid</br>
+                            - <b>Capacidade do sistema</b>: tempo para ocupação de leitos UTI-Covid</br>
                             - <b>Confiança de dados</b>: taxa de subnotificação de casos</br><br>
                         </div>
                         <div>
@@ -522,7 +517,7 @@ def main(session_state):
         )
         session_state.number_icu_beds = int(
             user_input["number_icu_beds"]
-            * config["br"]["simulacovid"]["resources_available_proportion"]
+            # * config["br"]["simulacovid"]["resources_available_proportion"]
         )
         session_state.number_cases = user_input["population_params"]["I_confirmed"]
         session_state.number_deaths = user_input["population_params"]["D"]
@@ -603,17 +598,17 @@ def main(session_state):
     st.write(
         """
         <div class='base-wrapper'>
-            <i>* Utilizamos %s&percnt; da capacidade hospitalar reportada por %s em %s 
+            <i>* Utilizamos 100&percnt; do total de leitos UTI-Covid reportados por %s em %s 
             para cálculo da projeção de dias para atingir capacidade máxima.<br><b>Para municípios, utilizamos os recursos da respectiva regional de saúde.</b>
-            São considerados leitos os tipos: cirúrgicos, clínicos e hospital-dia. A capacidade de UTI é dada pelo total de leitos UTI Covid adulto.</i>
+            São considerados leitos enfermaria os tipos: cirúrgicos, clínicos e hospital-dia. O total de leitos enfermaria considerada %s&percnt; dos leitos UTI-Covid adulto.</i>
         </div>
         """
         % (
+            user_input["author_number_beds"],
+            user_input["last_updated_number_beds"],
             str(
                 int(config["br"]["simulacovid"]["resources_available_proportion"] * 100)
             ),
-            user_input["author_number_beds"],
-            user_input["last_updated_number_beds"],
         ),
         unsafe_allow_html=True,
     )
@@ -650,7 +645,7 @@ def main(session_state):
                 unsafe_allow_html=True,
             )
         st.write(
-            "<div class='base-wrapper'><i>Em breve:</i> gráficos de subnotificação e média móvel de novos casos por 100k habitantes.</div>",
+            "<div class='base-wrapper'><i>Em breve:</i> gráficos de subnotificação e média móvel (últimos 7 dias) de novos casos por 100k habitantes.</div>",
             unsafe_allow_html=True,
         )
 

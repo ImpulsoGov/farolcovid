@@ -59,7 +59,7 @@ def main(session_state):
             decisões sobre resposta à pandemia. Cada pergunta é respondida através de um indicador
             de referência:<br><br>
             <span class="subsection-header">Situação da Covid-19: Qual a incidência da doença na minha população?</span><br>
-            <b>Indicador</b>: Novos casos por 100k habitantes (média movel 7 dias).<br>
+            <b>Indicador</b>: Novos casos por 100k habitantes (média móvel 7 dias).<br>
             <b>Qual sua tendência?</b> Aumentando, estabilizando ou diminuindo?<br><br>
             <span class="subsection-header">Controle da Covid-19: Estamos conseguindo frear o surgimento de novos casos?</span><br>
             <b>Indicador</b>: Taxa de contágio (Número efetivo de Reprodução - R_t)<br>
@@ -130,7 +130,7 @@ def main(session_state):
                 </tr>
                 <tr>
                     <td><span>Capacidade de respostas do sistema de saúde</span></td>
-                    <td><span>Projeção de tempo para ocupação total de leitos UTI</span></td>
+                    <td><span>Projeção de tempo para ocupação total de leitos UTI-Covid</span></td>
                     <td class="light-blue-bg bold">60 - 90 dias</td>
                     <td class="light-yellow-bg bold"><span>30 - 60 dias</span></td>
                     <td class="light-orange-bg bold"><span>15 - 30 dias</span></td>

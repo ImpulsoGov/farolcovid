@@ -78,6 +78,13 @@ def convert_times_to_real(row):
     return today + timedelta(row["ddias"])
 
 
+def dday_preffix(dday):
+    if dday > 30:
+        return "+ 30"
+    else:
+        return "até " + str(dday)
+
+
 # TODO: melhorar essa funcao
 def get_sources(user_input, data, cities_sources, resources):
 
@@ -499,7 +506,7 @@ def gen_info_modal():
                 </tr>
                 <tr>
                     <td><span>Capacidade de respostas do sistema de saúde</span></td>
-                    <td><span>Projeção de tempo para ocupação total de leitos UTI</span></td>
+                    <td><span>Projeção de tempo para ocupação total de leitos UTI-Covid</span></td>
                     <td class="light-blue-bg bold">60 - 90 dias</td>
                     <td class="light-yellow-bg bold"><span>30 - 60 dias</span></td>
                     <td class="light-orange-bg bold"><span>15 - 30 dias</span></td>
@@ -579,7 +586,7 @@ def genInputFields(user_input, config, session):
 
         number_icu_beds = int(
             user_input["number_icu_beds"]
-            * config["br"]["simulacovid"]["resources_available_proportion"]
+            # * config["br"]["simulacovid"]["resources_available_proportion"]
         )
         number_cases = int(user_input["population_params"]["I_confirmed"])
         number_deaths = int(user_input["population_params"]["D"])
@@ -606,7 +613,7 @@ def genInputFields(user_input, config, session):
     )
 
     user_input["number_icu_beds"] = st.number_input(
-        f"Número de leitos UTI destinados aos pacientes com Covid-19 (50% do reportado em {authors_icu_beds}; atualizado: {icu_beds_update}):",
+        f"Número de leitos UTI destinados aos pacientes com Covid-19 (100% do reportado em {authors_icu_beds}; atualizado: {icu_beds_update}):",
         0,
         None,
         number_icu_beds,
@@ -891,8 +898,8 @@ def gen_footer() -> None:
                                 Trata-se de contribuição à elaboração de cenários por parte dos governos e não configura qualquer obrigação ou responsabilidade perante as decisões efetivadas.
                                 Saiba mais sobre os cálculos por trás de análises e indicadores em nossas páginas de Níveis de Risco e Modelo Epidemiológico (menu lateral esquerdo), 
                                 que mantemos atualizadas conforme evoluímos em nossas metodologias.<br><br></span>
-                                <span><i>Todo código da ferramenta pode ser acessado no <a class="github-link" href="https://github.com/ImpulsoGov/farolcovid">Github do projeto</a>
-                                e os dados estão disponíveis em nossa <a class="github-link" href="https://github.com/ImpulsoGov/coronacidades-datasource/blob/master/README.md">API</a>.</i></span>
+                                <span><i>Todo código da ferramenta pode ser acessado no <a target="_blank" class="github-link" href="https://github.com/ImpulsoGov/farolcovid">Github do projeto</a>
+                                e os dados estão disponíveis em nossa <a target="_blank" class="github-link" href="https://github.com/ImpulsoGov/coronacidades-datasource/blob/master/README.md">API</a>.</i></span>
                                 </br></br></span>
                                 <img class="logo-img" src="%s"/>
                                 <div class="logo-section">
@@ -929,15 +936,8 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
     beds_img = "https://i.imgur.com/27hutU0.png"
     icu_beds_img = "https://i.imgur.com/Oh4l8qM.png"
 
-    if output.min_range_beds < 4 and output.max_range_beds < 4:
-        bed_projection = f"em até {output.max_range_beds} mês(es)"
-    else:
-        bed_projection = "mais de 3 meses"
-
-    if output.min_range_icu_beds < 4 and output.max_range_icu_beds < 4:
-        icu_bed_projection = f"em até {output.max_range_icu_beds} mês(es)"
-    else:
-        icu_bed_projection = "mais de 3 meses"
+    bed_projection = dday_preffix(output.max_range_beds) + " dias"
+    icu_bed_projection = dday_preffix(output.max_range_icu_beds) + " dias"
 
     output = """
         <div>
