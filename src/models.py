@@ -146,7 +146,7 @@ IndicatorCards: Dict[str, Indicator] = {
     IndicatorType.SITUATION.value: Indicator(
         header="SITUAÇÃO DA DOENÇA",
         caption="Hoje são <b>reportados</b> em média",
-        unit="casos/100k hab.",
+        unit="casos/100mil hab.",
         left_label="Nesta tendência há:",
         right_label="Tendência:",
     ),
@@ -168,7 +168,7 @@ IndicatorCards: Dict[str, Indicator] = {
         header="CONFIANÇA DOS DADOS",
         caption="A cada 10 pessoas infectadas,",
         unit="não são diagnosticadas",
-        left_label="Mortes por dia:",
+        left_label="Mortes/100mil hab:",
         right_label="Tendência:",
     ),
 }
