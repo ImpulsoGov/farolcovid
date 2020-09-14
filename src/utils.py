@@ -41,6 +41,7 @@ states = pd.read_csv(os.path.join(configs_path, "states_table.csv"))
 
 # DATASOURCE TOOLS
 
+
 def get_inloco_url(config):
 
     api_inloco = dict()
@@ -61,6 +62,7 @@ def get_inloco_url(config):
 
 
 # DATES TOOLS
+
 
 def fix_dates(df):
     for col in df.columns:
@@ -116,6 +118,7 @@ def get_sources(user_input, data, cities_sources, resources):
 
 
 # PLACES TOOLS
+
 
 def add_all(x, all_string="Todos", first=None):
     formatted = [all_string] + list(x)
@@ -209,6 +212,7 @@ class Dictionary:
         return self.dictionary.loc[self.dictionary["state_name"] == state_name][
             "state_id"
         ].values[0]
+
 
 # def get_state_str_id_by_id(place_id):
 
@@ -370,6 +374,7 @@ def reload_window():
 
 # JAVASCRIPT HACK METHODS
 
+
 def stylizeButton(name, style_string, session_state, others=dict()):
     """ adds a css option to a button you made """
     session_state.button_styles[name] = [style_string, others]
@@ -411,6 +416,7 @@ def hide_iframes():
 
 
 # END OF JAVASCRIPT HACK METHODS
+
 
 def gen_pdf_report():
     st.write(
@@ -524,6 +530,7 @@ def gen_info_modal():
 
 
 # VIEW COMPONENTS FAROLCOVID
+
 
 def genHeroSection(title1: str, title2: str, subtitle: str, logo: str, header: bool):
 
@@ -682,7 +689,7 @@ def genAnalysisDimmensionsSection(dimensions: List[Dimension]):
     )
 
 
-def genIndicatorCard(indicator: Indicator):
+def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"):
 
     if indicator.display == "None":
         indicator.display = ""
@@ -693,15 +700,42 @@ def genIndicatorCard(indicator: Indicator):
         alert = ""
     else:
         alert = loader.config["br"]["farolcovid"]["categories"][int(indicator.risk)]
-    
+
     if indicator.right_display == "estabilizando":
         indicator_right_display = "estabilizando em " + alert
     else:
         indicator_right_display = indicator.right_display
-    
-    
 
-    risk_html_class = "bold white-span p4"
+    # TODO: find better palce to save this dic
+    captions_by_place = {
+        "state_num_id": {
+            "SITUAÇÃO DA DOENÇA": "Hoje em seu <b>estado</b> são <b>reportados</b> em média",
+            "CONTROLE DA DOENÇA": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt de seu estado para classificação.</b>",
+            "CAPACIDADE DO SISTEMA": "Se nada mudar, a capacidade hospitalar de seu <b>estado</b> será atingida em",
+            "CONFIANÇA DOS DADOS": "A cada 10 pessoas infectadas em seu <b>estado</b>,",
+        },
+        "health_region_id": {
+            "SITUAÇÃO DA DOENÇA": "Hoje em sua <b>regional de saúde</b> são <b>reportados</b> em média",
+            "CONTROLE DA DOENÇA": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt de sua regional de saúde para classificação.</b>",
+            "CAPACIDADE DO SISTEMA": "Se nada mudar, a capacidade hospitalar de sua <b>regional de saúde</b> será atingida em",
+            "CONFIANÇA DOS DADOS": "A cada 10 pessoas infectadas em sua <b>regional de saúde</b>,",
+        },
+        "city_id": {
+            "SITUAÇÃO DA DOENÇA": "Hoje em seu <b>município</b> são <b>reportados</b> em média",
+            "CONTROLE DA DOENÇA": {
+                "health_region_id": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt de sua regional de saúde para classificação.</b>",
+                "city_id": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt de seu município para classificação.</b>",
+            },
+            "CAPACIDADE DO SISTEMA": "Se nada mudar, a capacidade hospitalar de sua <b>regional de saúde</b> será atingida em",
+            "CONFIANÇA DOS DADOS": "A cada 10 pessoas infectadas em sua <b>regional de saúde</b>,",
+        },
+    }
+
+    print(place_type)
+    if place_type == "city_id" and indicator.header == "CONTROLE DA DOENÇA":
+        indicator.caption = captions_by_place[place_type][indicator.header][rt_type]
+    else:
+        indicator.caption = captions_by_place[place_type][indicator.header]
 
     return f"""
     <div class="main-indicator-card flex flex-column mr" style="z-index:1;display:inline-block;position:relative;">
@@ -711,7 +745,7 @@ def genIndicatorCard(indicator: Indicator):
         </div>
         <span class="bold p2 main-card-display-value">{indicator.display}<span class="bold p5">  {indicator.unit}</span></span>
         <div class="{IndicatorBackground(try_int(indicator.risk)).name}-alert-bg risk-pill " style="position:absolute;bottom:120px;">
-            <span class="{risk_html_class}">{alert}</span>
+            <span class="bold white-span p4">{alert}</span>
         </div>
         <div class="main-card-display-text-v2 sdcardtext-left">
                 <span class="lighter">{indicator.left_label}<br></span>
@@ -730,12 +764,20 @@ def genKPISection(
     alert: str,
     indicators: Dict[str, Indicator],
     n_colapse_regions: int = 0,
+    rt_type: str = "nan",
 ):
-    print("\n\nQual o alerta?", alert)
+    # Genetate cards HTML
+    cards = "".join(
+        [genIndicatorCard(group, place_type, rt_type) for group in indicators.values()]
+    )
+    # print(cards)
+    info_modal = gen_info_modal()
+
+    # Generate subheader
     if not isinstance(alert, str):
         bg = "gray"
-        alert="Sem classificação"
-        caption = "Sugerimos que confira o nível de risco de seu estado. (Veja Níveis de Risco no menu ao lado)<br/>Seu município não possui dados consistentes suficientes para calcularmos o nível de risco."
+        alert = "Sem classificação"
+        caption = "Sugerimos que confira o nível de risco de seu estado ou regional de saúde. <br/>Seu município não possui dados consistentes suficientes para calcularmos o nível de risco."
         stoplight = "%0a%0a"
     else:
         bg = AlertBackground(alert).name
@@ -763,10 +805,7 @@ def genKPISection(
     %0a%0a👉 Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui: https://coronacidades.org/farol-covid/"""
     # msg = "temporarily disabled"
 
-    cards = list(map(genIndicatorCard, indicators.values()))
-    cards = "".join(cards)
-    info_modal = gen_info_modal()
-    
+    # Write cards section
     st.write(
         """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;height:auto;">
                 <div class="base-wrapper flex flex-column" style="margin-top: 0px;">

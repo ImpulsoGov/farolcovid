@@ -94,7 +94,6 @@ def update_indicators(indicators, data, config, user_input, session_state):
         indicators[group].right_display = dic_indicators["right_display"]
         indicators[group].display = dic_indicators["display"]
 
-
     # Caso o usuário altere os casos confirmados, usamos esse novo valor para a estimação
     # TODO: vamos acabar com o user_iput e manter só session_state?
     if (session_state.number_cases is not None) and (
@@ -581,6 +580,15 @@ def main(session_state):
             n_colapse_regions=total_alert_regions[
                 total_alert_regions.index.isin(["altíssimo", "alto"])
             ].sum(),
+        )
+
+    elif "city" in user_input["place_type"]:
+        utils.genKPISection(
+            place_type=user_input["place_type"],
+            locality=user_input["locality"],
+            alert=data["overall_alert"].values[0],
+            indicators=indicators,
+            rt_type=data["rt_place_type"].values[0],
         )
 
     else:
