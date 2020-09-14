@@ -80,7 +80,7 @@ def convert_times_to_real(row):
 
 def dday_preffix(dday):
     if dday > 30:
-        return "+ " + str(dday)
+        return "+ 30 dias"
     else:
         return "até " + str(dday)
 
