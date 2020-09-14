@@ -80,9 +80,9 @@ def convert_times_to_real(row):
 
 def dday_preffix(dday):
     if dday > 30:
-        return "até " + str(dday)
-    else:
         return "+ " + str(dday)
+    else:
+        return "até " + str(dday)
 
 
 # TODO: melhorar essa funcao
@@ -506,7 +506,7 @@ def gen_info_modal():
                 </tr>
                 <tr>
                     <td><span>Capacidade de respostas do sistema de saúde</span></td>
-                    <td><span>Projeção de tempo para ocupação total de leitos enfermaria</span></td>
+                    <td><span>Projeção de tempo para ocupação total de leitos UTI-Covid</span></td>
                     <td class="light-blue-bg bold">60 - 90 dias</td>
                     <td class="light-yellow-bg bold"><span>30 - 60 dias</span></td>
                     <td class="light-orange-bg bold"><span>15 - 30 dias</span></td>
