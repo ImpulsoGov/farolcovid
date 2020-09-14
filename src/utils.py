@@ -41,7 +41,6 @@ states = pd.read_csv(os.path.join(configs_path, "states_table.csv"))
 
 # DATASOURCE TOOLS
 
-
 def get_inloco_url(config):
 
     api_inloco = dict()
@@ -62,7 +61,6 @@ def get_inloco_url(config):
 
 
 # DATES TOOLS
-
 
 def fix_dates(df):
     for col in df.columns:
@@ -118,7 +116,6 @@ def get_sources(user_input, data, cities_sources, resources):
 
 
 # PLACES TOOLS
-
 
 def add_all(x, all_string="Todos", first=None):
     formatted = [all_string] + list(x)
@@ -212,7 +209,6 @@ class Dictionary:
         return self.dictionary.loc[self.dictionary["state_name"] == state_name][
             "state_id"
         ].values[0]
-
 
 # def get_state_str_id_by_id(place_id):
 
@@ -374,7 +370,6 @@ def reload_window():
 
 # JAVASCRIPT HACK METHODS
 
-
 def stylizeButton(name, style_string, session_state, others=dict()):
     """ adds a css option to a button you made """
     session_state.button_styles[name] = [style_string, others]
@@ -416,7 +411,6 @@ def hide_iframes():
 
 
 # END OF JAVASCRIPT HACK METHODS
-
 
 def gen_pdf_report():
     st.write(
@@ -530,7 +524,6 @@ def gen_info_modal():
 
 
 # VIEW COMPONENTS FAROLCOVID
-
 
 def genHeroSection(title1: str, title2: str, subtitle: str, logo: str, header: bool):
 
@@ -700,11 +693,13 @@ def genIndicatorCard(indicator: Indicator):
         alert = ""
     else:
         alert = loader.config["br"]["farolcovid"]["categories"][int(indicator.risk)]
-
+    
     if indicator.right_display == "estabilizando":
         indicator_right_display = "estabilizando em " + alert
     else:
         indicator_right_display = indicator.right_display
+    
+    
 
     risk_html_class = "bold white-span p4"
 
@@ -714,8 +709,8 @@ def genIndicatorCard(indicator: Indicator):
         <span class="main-card-list-v2">{indicator.caption}</span>
         <div class="flex flex-row flex-justify-space-between mt" style="width:250px;">
         </div>
-        <span class="bold main-card-display-value">{indicator.display}<span class="bold main-card-display-value-text">  {indicator.unit}</span></span>
-        <div class="{IndicatorBackground(try_int(indicator.risk)).name}-alert-bg risk-pill" style="position:absolute;bottom:110px;">
+        <span class="bold p2 main-card-display-value">{indicator.display}<span class="bold p5">  {indicator.unit}</span></span>
+        <div class="{IndicatorBackground(try_int(indicator.risk)).name}-alert-bg risk-pill " style="position:absolute;bottom:120px;">
             <span class="{risk_html_class}">{alert}</span>
         </div>
         <div class="main-card-display-text-v2 sdcardtext-left">
@@ -739,7 +734,7 @@ def genKPISection(
     print("\n\nQual o alerta?", alert)
     if not isinstance(alert, str):
         bg = "gray"
-        alert = "Sem classificação"
+        alert="Sem classificação"
         caption = "Sugerimos que confira o nível de risco de seu estado. (Veja Níveis de Risco no menu ao lado)<br/>Seu município não possui dados consistentes suficientes para calcularmos o nível de risco."
         stoplight = "%0a%0a"
     else:
@@ -771,7 +766,7 @@ def genKPISection(
     cards = list(map(genIndicatorCard, indicators.values()))
     cards = "".join(cards)
     info_modal = gen_info_modal()
-
+    
     st.write(
         """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;height:auto;">
                 <div class="base-wrapper flex flex-column" style="margin-top: 0px;">

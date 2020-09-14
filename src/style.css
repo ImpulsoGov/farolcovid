@@ -196,7 +196,7 @@
     }
 }
 .p4 {
-    font-size: 1.2vw;
+    font-size: 18px;
 }
 
 .p5 {
@@ -1027,13 +1027,13 @@ header>.toolbar { /* Hide toolbar menu */
 
 .dimension-card{
     padding: var(--main-padding);
-    width: 21vw;
+    width: 330px;
     height: auto;
     padding-bottom: 0rem;
     background-color: white;
     margin-top: 0px;
     display: inline-block;
-    font-size:1.5vw;
+    font-size:24px;
 }
 
 /* TODO: why isn't working? */
@@ -1241,7 +1241,7 @@ header>.toolbar { /* Hide toolbar menu */
 
 
 .risk-pill {
-    width: 8.5vw;
+    width: 125px;
     text-align: center;
     border-radius: 5px;
 }
@@ -1952,7 +1952,7 @@ header>.toolbar { /* Hide toolbar menu */
     font-weight: normal;
     font-size: 26px;
 }
-/* .saude-card-list-v2{
+.saude-card-list-v2{
     width:86%;
     top:80px;
     position:absolute;
@@ -1961,7 +1961,7 @@ header>.toolbar { /* Hide toolbar menu */
     font-weight: normal;
     font-size: 18px;
     line-height: 23px;
-} */
+}
 .saude-card-display-region-v2{
 }
 .saude-card-display-text-v2{
@@ -2454,7 +2454,7 @@ header>.toolbar { /* Hide toolbar menu */
     position:absolute;
     font-style: normal;
     font-weight: normal;
-    font-size: 2vw;
+    font-size: 26px;
 }
 .main-card-list-v2{
     width:86%;
@@ -2463,21 +2463,18 @@ header>.toolbar { /* Hide toolbar menu */
     font-family: IBM Plex Sans;
     font-style: normal;
     font-weight: normal;
-    font-size: 1.25vw;
+    font-size: 18px;
     line-height: 23px;
 }
 .main-card-display-value{
-    top:45%;
-    font-size: 3vw;
+    top:47%;
+
     position:absolute;
-}
-.main-card-display-value-text{
-    font-size: 1vw;
 }
 .main-card-display-text-v2{
     font-family: IBM Plex Sans;
     font-style: normal;
-    font-size: 1vw;
+    font-size: 16px;
     width:50%;
     height:80px;
     bottom:20px;
@@ -2501,7 +2498,7 @@ header>.toolbar { /* Hide toolbar menu */
 .main-indicator-card {
     margin-top: 30px;
     padding: var(--main-padding);
-    width: 22vw;
+    width: 320px;
     height: 380px;
     border-radius: var(--main-border-radius);
     opacity: 0.98;
