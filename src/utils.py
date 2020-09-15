@@ -479,7 +479,7 @@ def gen_info_modal(config):
         "cuts"
     ]
 
-    date_update = config["br"]["farolcovid"]["rules"]["date_update"]
+    date_update = config["br"]["farolcovid"]["date_update"]
 
     return f"""
     <a href="#entenda-mais" class="info-btn">Entenda a classificação dos níveis</a>

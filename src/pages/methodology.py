@@ -17,12 +17,20 @@ def main(session_state):
 
     config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
 
-    situation_classification = config["br"]["farolcovid"]["rules"]["situation_classification"]["cuts"]
-    control_classification = config["br"]["farolcovid"]["rules"]["control_classification"]["cuts"]
-    capacity_classification = config["br"]["farolcovid"]["rules"]["capacity_classification"]["cuts"]
-    trust_classification = config["br"]["farolcovid"]["rules"]["trust_classification"]["cuts"]
+    situation_classification = config["br"]["farolcovid"]["rules"][
+        "situation_classification"
+    ]["cuts"]
+    control_classification = config["br"]["farolcovid"]["rules"][
+        "control_classification"
+    ]["cuts"]
+    capacity_classification = config["br"]["farolcovid"]["rules"][
+        "capacity_classification"
+    ]["cuts"]
+    trust_classification = config["br"]["farolcovid"]["rules"]["trust_classification"][
+        "cuts"
+    ]
 
-    date_update = config["br"]["farolcovid"]["rules"]["date_update"]
+    date_update = config["br"]["farolcovid"]["date_update"]
 
     # Layout
     utils.localCSS("style.css")
@@ -172,15 +180,35 @@ def main(session_state):
             </div>
             </div>
         </div>"""
-        % (situation_classification[1], situation_classification[1], situation_classification[2], situation_classification[2],
-        situation_classification[3], situation_classification[3],
-        control_classification[1], control_classification[1], control_classification[2], control_classification[2],
-        control_classification[3], control_classification[3],
-        capacity_classification[3], capacity_classification[2], capacity_classification[3], capacity_classification[1],
-        capacity_classification[2], capacity_classification[0], capacity_classification[1],
-        trust_classification[1]*10, int(trust_classification[0]*10), int(trust_classification[2]*10), trust_classification[1]*10,
-        int(trust_classification[3]*10), int(trust_classification[2]*10), int(trust_classification[3]*10),
-        date_update),
+        % (
+            situation_classification[1],
+            situation_classification[1],
+            situation_classification[2],
+            situation_classification[2],
+            situation_classification[3],
+            situation_classification[3],
+            control_classification[1],
+            control_classification[1],
+            control_classification[2],
+            control_classification[2],
+            control_classification[3],
+            control_classification[3],
+            capacity_classification[3],
+            capacity_classification[2],
+            capacity_classification[3],
+            capacity_classification[1],
+            capacity_classification[2],
+            capacity_classification[0],
+            capacity_classification[1],
+            trust_classification[1] * 10,
+            int(trust_classification[0] * 10),
+            int(trust_classification[2] * 10),
+            trust_classification[1] * 10,
+            int(trust_classification[3] * 10),
+            int(trust_classification[2] * 10),
+            int(trust_classification[3] * 10),
+            date_update,
+        ),
         unsafe_allow_html=True,
     )
 
@@ -365,7 +393,7 @@ def main(session_state):
                 Utilizando uma <a class="github-link" href="https://www.inf.ufsc.br/~andre.zibetti/probabilidade/binomial_negativa.html">distribuição binomial negativa</a> 
                 como modelo probabilístico, o cálculo gera o número de casos positivos que seriam esperados dado o número mortes observadas.
                 A distribuição modela a probabilidade de que um número  de novos infectados possa falecer 14 dias
-                após de ter se tornado infeccioso, dado o total de mortes até a data () e a taxa de mortalidade por
+                após de ter se tornado infeccioso, dado o total de mortes até a data (D) e a taxa de mortalidade por
                 infecção (IFR). A taxa de mortalidade por infecção (IFR) das regiões é calculada utilizando IFRs por
                 faixa etária estimados em Hubei, segundo Verity, Robert, et al. (2020)[1], e obtém-se a IFR total da
                 região ponderada pela população em cada faixa com os dados da População Residente (CNES - 2019).<br><br>
@@ -412,7 +440,7 @@ def main(session_state):
 
         # st.write(
         #     """<div class="base-wrapper">
-        #     <span class="subsection-header"><b>O que é?</b></span><br> 
+        #     <span class="subsection-header"><b>O que é?</b></span><br>
         #     O número de reprodução efetivo (Rt) traduz a quantidade de pessoas que cada pessoa
         #     doente infectará em determinado intervalo de tempo.  Já o número básico de reprodução
         #     (<i>R0</i>) da uma doença traduz qual a dinâmica de contágio de todo o curso de transmissão em
@@ -431,7 +459,7 @@ def main(session_state):
         #     comportamento e intervenções ativas até aquele dia, ainda há tendência de crescimento
         #     exponencial da doença naquela população. Esperamos que cada pessoa infectada naquele momento
         #     infectará mais de uma pessoa no futuro - gerando uma curva de contágio que se acelera
-        #     rapidamente. Já um <i>Rt</i> abaixo de 1 se traduz na expectativa de que o número de novas infecções 
+        #     rapidamente. Já um <i>Rt</i> abaixo de 1 se traduz na expectativa de que o número de novas infecções
         #     vai diminuir ao longo do tempo, indicando que a situação está sob controle se todas as medidas e
         #     comportamentos forem mantidos.<br><br>Uma boa notícia: por causa da mudança de comportamento, o
         #     <i>Rt</i> tende a ser menor que o <i>R0</i>, como explicam os desenvolvedores do
@@ -440,7 +468,7 @@ def main(session_state):
         #     adotadas.<br> Medir diretamente o número efetivo de reprodução da Covid-19 não é possível.
         #     Porém, podemos estimar o número de reprodução instantâneo (<i>Rt</i>) mais provável pelo
         #     número de novos casos por dia.<br><br>
-        #     <span class="subsection-header"><b>Como funciona o modelo?</b></span><br> 
+        #     <span class="subsection-header"><b>Como funciona o modelo?</b></span><br>
         #     O modelo utilizado para o cálculo do Rt foi desenvolvido por Cori et.
         #     al (2013) e implementado no pacote <i>EpiEstim</i>, podendo ser utilizado no R (linguagem de
         #     programação) ou no Excel. Ele toma como entrada a série de casos da doença na população e
