@@ -466,10 +466,18 @@ def gen_whatsapp_button(info) -> None:
 
 
 def gen_info_modal(config):
-    situation_classification = config["br"]["farolcovid"]["rules"]["situation_classification"]["cuts"]
-    control_classification = config["br"]["farolcovid"]["rules"]["control_classification"]["cuts"]
-    capacity_classification = config["br"]["farolcovid"]["rules"]["capacity_classification"]["cuts"]
-    trust_classification = config["br"]["farolcovid"]["rules"]["trust_classification"]["cuts"]
+    situation_classification = config["br"]["farolcovid"]["rules"][
+        "situation_classification"
+    ]["cuts"]
+    control_classification = config["br"]["farolcovid"]["rules"][
+        "control_classification"
+    ]["cuts"]
+    capacity_classification = config["br"]["farolcovid"]["rules"][
+        "capacity_classification"
+    ]["cuts"]
+    trust_classification = config["br"]["farolcovid"]["rules"]["trust_classification"][
+        "cuts"
+    ]
 
     date_update = config["br"]["farolcovid"]["rules"]["date_update"]
 
@@ -480,6 +488,9 @@ def gen_info_modal(config):
             <a href="#" title="Close" class="info-btn-close" style="color: white;">&times</a>
             <div style="margin: 10px 15px 15px 15px;">
             <h1 class="primary-span">Valores de referência</h1>
+            <div style="font-size: 12px">
+                <b>Atualizado em</b>: {date_update}<br>
+            </div>
             <div class="info-div-table">
             <table class="info-table">
             <tbody>
@@ -539,9 +550,6 @@ def gen_info_modal(config):
                     <li> Descrescendo: caso a diminuição de novos casos esteja acontecendo por pelo menos 14 dias. </li>
                     <li> Estabilizando: qualquer outra mudança. </li>
                 </ul>
-            </div>
-            <div style="font-size: 12px">
-                Atualizado em: {date_update}
             </div>
             </div>
         </div>
