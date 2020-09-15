@@ -237,25 +237,25 @@ def main(session_state):
         unsafe_allow_html=True,
     )
 
-    # st.image(
-    #     Image.open("imgs/cities_indicators_202009.png"),
-    #     use_column_width=True,
-    #     caption="Distribuição de indicadores-chaves para cidades (retrato de 1/set/2020. Cada ponto representa uma cidade, os eixos x e y trazem os valores dos indicadores-chaves para aquela cidade. Na diagonal segue o histograma do indicador-chave.",
-    # )
+    st.image(
+        Image.open("imgs/methodology_v2/cities_indicators_20200915.png"),
+        use_column_width=True,
+        caption="Distribuição de indicadores-chaves para cidades (retrato de 15/set/2020. Cada ponto representa uma cidade, os eixos x e y trazem os valores dos indicadores-chaves para aquela cidade. Na diagonal segue o histograma do indicador-chave.",
+    )
 
-    # st.write("<br><br>", unsafe_allow_html=True)
+    st.write("<br><br>", unsafe_allow_html=True)
 
-    # st.image(
-    #     Image.open("imgs/states_indicators_202009.png"),
-    #     use_column_width=True,
-    #     caption="Distribuição de indicadores-chaves para regionais de saúde (retrato de 1/set/2020). Cada ponto representa uma estado, os eixos x e y trazem os valores dos indicadores-chaves para aquela cidade. Na diagonal segue o histograma do indicador-chave.",
-    # )
+    st.image(
+        Image.open("imgs/methodology_v2/health_region_indicators_20200915.png"),
+        use_column_width=True,
+        caption="Distribuição de indicadores-chaves para regionais de saúde (retrato de 15/set/2020). Cada ponto representa uma estado, os eixos x e y trazem os valores dos indicadores-chaves para aquela cidade. Na diagonal segue o histograma do indicador-chave.",
+    )
 
-    # st.image(
-    #     Image.open("imgs/states_indicators_202009.png"),
-    #     use_column_width=True,
-    #     caption="Distribuição de indicadores-chaves para estados (retrato de 1/set/2020). Cada ponto representa uma estado, os eixos x e y trazem os valores dos indicadores-chaves para aquela cidade. Na diagonal segue o histograma do indicador-chave.",
-    # )
+    st.image(
+        Image.open("imgs/methodology_v2/states_indicators_20200915.png"),
+        use_column_width=True,
+        caption="Distribuição de indicadores-chaves para estados (retrato de 15/set/2020). Cada ponto representa uma estado, os eixos x e y trazem os valores dos indicadores-chaves para aquela cidade. Na diagonal segue o histograma do indicador-chave.",
+    )
 
     st.write(
         """<div class="base-wrapper primary-span">
