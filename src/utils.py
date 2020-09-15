@@ -682,27 +682,49 @@ def translate_risk(risk_value):
 
 
 def genAnalysisDimmensionsCard(dimension: Dimension):
-    return f"""<div style="margin-top: 0px; display: inline-block; top:0x;">
-            <div class="dimension-card primary-span style="top:0x;">
-                {dimension.text}
-            </div>
-        </div>"""
+    #return f"""<div style="margin-top: 0px; display: inline-block; top:0x;">
+    #        <div class="dimension-card primary-span style="top:0x; padding-left: 24px; padding-top: 24px; padding-right: 24px;">
+    #            {dimension.text}
+    #        </div>
+    #    </div>"""
+    return f"""
+    <div class="dimension-card flex flex-column mr primary-span" style="z-index:1;display:inline-block;position:relative;">
+        {dimension.text}
+    </div>"""
 
 
 def genAnalysisDimmensionsSection(dimensions: List[Dimension]):
     cards = list(map(genAnalysisDimmensionsCard, dimensions))
     cards = "".join(cards)
 
+    #st.write(
+    #    f"""<div class="container">
+    #    <div class="base-wrapper primary-span">
+    #        <div>
+    #            <span class="section-header">DIMENSÕES DA ANÁLISE</span>
+    #        </div>
+    #        <span class="p3">O que olhamos ao avaliar o cenário da pandemia em um lugar?</span>
+    #        <div class="flex flex-row mt flex-m-column" style="margin-bottom: 0px;height:auto; display:inline-block top:0x;">
+    #        {cards}
+    #        </div>
+    #    </div>
+    #    </div>""",
+    #    unsafe_allow_html=True,
+    #)
     st.write(
         f"""
-        <div class="base-wrapper primary-span">
-            <div>
-                <span class="section-header">DIMENSÕES DA ANÁLISE</span>
-            </div>
-            <span class="p3">O que olhamos ao avaliar o cenário da pandemia em um lugar?</span>
-            <div class="flex flex-row flex-space-around mt flex-m-column" style="margin-bottom: 0px;height:auto; display:inline-block top:0x;">
-            {cards}
-            </div>
+        <div class="container">
+        <div class="alert-banner mb" style="margin-bottom: 0px;height:auto;">
+                <div class="base-wrapper flex flex-column primary-span" style="margin-top: 0px;">
+                    <div class="flex flex-row flex-space-between flex-align-items-center">
+                        <span class="section-header">DIMENSÕES DA ANÁLISE</span>
+                    </div>
+                    <span class="p3">O que olhamos ao avaliar o cenário da pandemia em um lugar?</span>
+                    <div class="flex-row flex-m-column">
+                        {cards}
+                    </div>
+                </div>
+        </div>
         </div>""",
         unsafe_allow_html=True,
     )
@@ -826,7 +848,8 @@ def genKPISection(
 
     # Write cards section
     st.write(
-        """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;height:auto;">
+        """<div class="container">
+        <div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;height:auto;">
                 <div class="base-wrapper flex flex-column" style="margin-top: 0px;">
                         <div class="flex flex-row flex-space-between flex-align-items-center">
                          <span class="white-span header p1">%s</span>
@@ -836,6 +859,7 @@ def genKPISection(
                         <div class="flex-row flex-m-column">%s</div>
                         <div class = "info">%s</div>
                 </div>
+        </div>
         </div>
         <div class='base-wrapper product-section' ></div>
         """
