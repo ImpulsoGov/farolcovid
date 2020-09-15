@@ -1027,10 +1027,10 @@ header>.toolbar { /* Hide toolbar menu */
 
 .dimension-card{
     padding: var(--main-padding);
-    width: 330px;
+    width: 290px;
     height: 200px;
     padding-bottom: 0rem;
-    padding-right: 0rem;
+    /*padding-right: 0rem;*/
     background-color: white;
     margin-top: 0px;
     display: inline-block;
