@@ -1,6 +1,7 @@
 import streamlit as st
 import amplitude
 import utils
+import yaml
 from PIL import Image
 from pages import model_description, rt_description, saude_em_ordem_description
 
@@ -11,6 +12,17 @@ def main(session_state):
     opening_response = user_analytics.safe_log_event(
         "opened saude_em_ordem_description", session_state, is_new_page=True
     )
+
+    # Config labels
+
+    config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
+
+    situation_classification = config["br"]["farolcovid"]["rules"]["situation_classification"]["cuts"]
+    control_classification = config["br"]["farolcovid"]["rules"]["control_classification"]["cuts"]
+    capacity_classification = config["br"]["farolcovid"]["rules"]["capacity_classification"]["cuts"]
+    trust_classification = config["br"]["farolcovid"]["rules"]["trust_classification"]["cuts"]
+
+    date_update = config["br"]["farolcovid"]["rules"]["date_update"]
 
     # Layout
     utils.localCSS("style.css")
@@ -111,10 +123,10 @@ def main(session_state):
                     <p><span>Situação da doença</span></p><br/>
                     </td>
                     <td><span>Novos casos diários (Média móvel 7 dias)</span></td>
-                    <td class="light-blue-bg bold"><span>x&lt;=3.7</span></td>
-                    <td class="light-yellow-bg bold"><span>3.7&lt;x&lt;=12.5</span></td>
-                    <td class="light-orange-bg bold"><span>12.5&lt;=x&lt;=27.4</span></td>
-                    <td class="light-red-bg bold"><span>x &gt;= 27.4</span></td>
+                    <td class="light-blue-bg bold"><span>x&lt;=%s</span></td>
+                    <td class="light-yellow-bg bold"><span>%s&lt;x&lt;=%s</span></td>
+                    <td class="light-orange-bg bold"><span>%s&lt;=x&lt;=%s</span></td>
+                    <td class="light-red-bg bold"><span>x &gt;= %s</span></td>
                 </tr>
                 <tr>
                     <td><span>Tendência de novos casos diários</span></td>
@@ -123,26 +135,26 @@ def main(session_state):
                 <tr>
                     <td><span>Controle da doença</span></td>
                     <td><span>Número de reprodução efetiva</span></td>
-                    <td class="light-blue-bg bold"><span>&lt;0.5</span></td>
-                    <td class="light-yellow-bg bold"><span>&lt;0.5 - 1&gt;</span></td>
-                    <td class="light-orange-bg bold"><span>&lt;1 - 1.2&gt;</span>&nbsp;</td>
-                    <td class="light-red-bg bold"><span>&gt;1.2</span></td>
+                    <td class="light-blue-bg bold"><span>&lt;%s</span></td>
+                    <td class="light-yellow-bg bold"><span>&lt;%s - %s&gt;</span></td>
+                    <td class="light-orange-bg bold"><span>&lt;%s - %s&gt;</span>&nbsp;</td>
+                    <td class="light-red-bg bold"><span>&gt;%s</span></td>
                 </tr>
                 <tr>
                     <td><span>Capacidade de respostas do sistema de saúde</span></td>
                     <td><span>Projeção de tempo para ocupação total de leitos UTI-Covid</span></td>
-                    <td class="light-blue-bg bold">60 - 90 dias</td>
-                    <td class="light-yellow-bg bold"><span>30 - 60 dias</span></td>
-                    <td class="light-orange-bg bold"><span>15 - 30 dias</span></td>
-                    <td class="light-red-bg bold"><span>0 - 15 dias</span></td>
+                    <td class="light-blue-bg bold">%s - 90 dias</td>
+                    <td class="light-yellow-bg bold"><span>%s - %s dias</span></td>
+                    <td class="light-orange-bg bold"><span>%s - %s dias</span></td>
+                    <td class="light-red-bg bold"><span>%s - %s} dias</span></td>
                 </tr>
                 <tr>
                     <td><span>Confiança dos dados</span></td>
                     <td><span>Subnotificação (casos <b>não</b> diagnosticados a cada 10 infectados)</span></td>
-                    <td class="light-blue-bg bold"><span>4&gt;=x&gt;0</span></td>
-                    <td class="light-yellow-bg bold"><span>6&gt;=x&gt;4</span></td>
-                    <td class="light-orange-bg bold"><span>7&gt;=x&gt;6</span></td>
-                    <td class="light-red-bg bold"><span>10&gt;=x&gt;=7</span></td>
+                    <td class="light-blue-bg bold"><span>%s&gt;=x&gt;%a</span></td>
+                    <td class="light-yellow-bg bold"><span>%s&gt;=x&gt;%s</span></td>
+                    <td class="light-orange-bg bold"><span>%s&gt;=x&gt;%s</span></td>
+                    <td class="light-red-bg bold"><span>10&gt;=x&gt;=%s</span></td>
                 </tr>
             </tbody>
             </table>
@@ -155,8 +167,20 @@ def main(session_state):
                     <li> Estabilizando: qualquer outra mudança. </li>
                 </ul>
             </div>
+            <div style="font-size: 14px">
+                Atualizado em: %s
             </div>
-        </div>""",
+            </div>
+        </div>"""
+        % (situation_classification[1], situation_classification[1], situation_classification[2], situation_classification[2],
+        situation_classification[3], situation_classification[3],
+        control_classification[1], control_classification[1], control_classification[2], control_classification[2],
+        control_classification[3], control_classification[3],
+        capacity_classification[3], capacity_classification[2], capacity_classification[3], capacity_classification[1],
+        capacity_classification[2], capacity_classification[0], capacity_classification[1],
+        trust_classification[1]*10, int(trust_classification[0]*10), int(trust_classification[2]*10), trust_classification[1]*10,
+        int(trust_classification[3]*10), int(trust_classification[2]*10), int(trust_classification[3]*10),
+        date_update),
         unsafe_allow_html=True,
     )
 

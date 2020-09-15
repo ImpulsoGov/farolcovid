@@ -524,8 +524,8 @@ def gen_info_modal(config):
                 <tr>
                     <td><span>Confiança dos dados</span></td>
                     <td><span>Subnotificação (casos <b>não</b> diagnosticados a cada 10 infectados)</span></td>
-                    <td class="light-blue-bg bold"><span>{int(trust_classification[1])}&gt;=x&gt;{int(trust_classification[0]*10)}</span></td>
-                    <td class="light-yellow-bg bold"><span>{int(trust_classification[2]*10)}&gt;=x&gt;{int(trust_classification[1])}</span></td>
+                    <td class="light-blue-bg bold"><span>{trust_classification[1]*10}&gt;=x&gt;{int(trust_classification[0]*10)}</span></td>
+                    <td class="light-yellow-bg bold"><span>{int(trust_classification[2]*10)}&gt;=x&gt;{trust_classification[1]*10}</span></td>
                     <td class="light-orange-bg bold"><span>{int(trust_classification[3]*10)}&gt;=x&gt;{int(trust_classification[2]*10)}</span></td>
                     <td class="light-red-bg bold"><span>10&gt;=x&gt;={int(trust_classification[3]*10)}</span></td>
                 </tr>
