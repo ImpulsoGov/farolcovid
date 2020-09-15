@@ -39,6 +39,8 @@ configs_path = os.path.join(os.path.dirname(__file__), "configs")
 cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
 states = pd.read_csv(os.path.join(configs_path, "states_table.csv"))
 
+config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
+
 # DATASOURCE TOOLS
 
 
@@ -463,7 +465,14 @@ def gen_whatsapp_button(info) -> None:
     )
 
 
-def gen_info_modal():
+def gen_info_modal(config):
+    situation_classification = config["br"]["farolcovid"]["rules"]["situation_classification"]["cuts"]
+    control_classification = config["br"]["farolcovid"]["rules"]["control_classification"]["cuts"]
+    capacity_classification = config["br"]["farolcovid"]["rules"]["capacity_classification"]["cuts"]
+    trust_classification = config["br"]["farolcovid"]["rules"]["trust_classification"]["cuts"]
+
+    date_update = config["br"]["farolcovid"]["rules"]["date_update"]
+
     return f"""
     <a href="#entenda-mais" class="info-btn">Entenda a classificação dos níveis</a>
     <div id="entenda-mais" class="info-modal-window">
@@ -487,10 +496,10 @@ def gen_info_modal():
                     <p><span>Situação da doença</span></p><br/>
                     </td>
                     <td><span>Novos casos diários (Média móvel 7 dias)</span></td>
-                    <td class="light-blue-bg bold"><span>x&lt;=3.7</span></td>
-                    <td class="light-yellow-bg bold"><span>3.7&lt;x&lt;=12.5</span></td>
-                    <td class="light-orange-bg bold"><span>12.5&lt;=x&lt;=27.4</span></td>
-                    <td class="light-red-bg bold"><span>x &gt;= 27.4</span></td>
+                    <td class="light-blue-bg bold"><span>x&lt;={situation_classification[1]}</span></td>
+                    <td class="light-yellow-bg bold"><span>{situation_classification[1]}&lt;x&lt;={situation_classification[2]}</span></td>
+                    <td class="light-orange-bg bold"><span>{situation_classification[2]}&lt;=x&lt;={situation_classification[3]}</span></td>
+                    <td class="light-red-bg bold"><span>x &gt;= {situation_classification[3]} </span></td>
                 </tr>
                 <tr>
                     <td><span>Tendência de novos casos diários</span></td>
@@ -499,26 +508,26 @@ def gen_info_modal():
                 <tr>
                     <td><span>Controle da doença</span></td>
                     <td><span>Número de reprodução efetiva</span></td>
-                    <td class="light-blue-bg bold"><span>&lt;0.9</span></td>
-                    <td class="light-yellow-bg bold"><span>&lt;0.9 - 1.1&gt;</span></td>
-                    <td class="light-orange-bg bold"><span>&lt;1.1 - 1.4&gt;</span>&nbsp;</td>
-                    <td class="light-red-bg bold"><span>&gt;1.4</span></td>
+                    <td class="light-blue-bg bold"><span>&lt;{control_classification[1]}</span></td>
+                    <td class="light-yellow-bg bold"><span>&lt;{control_classification[1]} - {control_classification[2]}&gt;</span></td>
+                    <td class="light-orange-bg bold"><span>&lt;{control_classification[2]} - {control_classification[3]}&gt;</span>&nbsp;</td>
+                    <td class="light-red-bg bold"><span>&gt;{control_classification[3]}</span></td>
                 </tr>
                 <tr>
                     <td><span>Capacidade de respostas do sistema de saúde</span></td>
                     <td><span>Projeção de tempo para ocupação total de leitos UTI-Covid</span></td>
-                    <td class="light-blue-bg bold">30 - 90 dias</td>
-                    <td class="light-yellow-bg bold"><span>20 - 30 dias</span></td>
-                    <td class="light-orange-bg bold"><span>15 - 20 dias</span></td>
-                    <td class="light-red-bg bold"><span>0 - 15 dias</span></td>
+                    <td class="light-blue-bg bold">{capacity_classification[3]} - 90 dias</td>
+                    <td class="light-yellow-bg bold"><span>{capacity_classification[2]} - {capacity_classification[3]} dias</span></td>
+                    <td class="light-orange-bg bold"><span>{capacity_classification[1]} - {capacity_classification[2]} dias</span></td>
+                    <td class="light-red-bg bold"><span>{capacity_classification[0]} - {capacity_classification[1]} dias</span></td>
                 </tr>
                 <tr>
                     <td><span>Confiança dos dados</span></td>
                     <td><span>Subnotificação (casos <b>não</b> diagnosticados a cada 10 infectados)</span></td>
-                    <td class="light-blue-bg bold"><span>3&gt;=x&gt;0</span></td>
-                    <td class="light-yellow-bg bold"><span>4&gt;=x&gt;3</span></td>
-                    <td class="light-orange-bg bold"><span>5&gt;=x&gt;4</span></td>
-                    <td class="light-red-bg bold"><span>10&gt;=x&gt;=5</span></td>
+                    <td class="light-blue-bg bold"><span>{int(trust_classification[1])}&gt;=x&gt;{int(trust_classification[0]*10)}</span></td>
+                    <td class="light-yellow-bg bold"><span>{int(trust_classification[2]*10)}&gt;=x&gt;{int(trust_classification[1])}</span></td>
+                    <td class="light-orange-bg bold"><span>{int(trust_classification[3]*10)}&gt;=x&gt;{int(trust_classification[2]*10)}</span></td>
+                    <td class="light-red-bg bold"><span>10&gt;=x&gt;={int(trust_classification[3]*10)}</span></td>
                 </tr>
             </tbody>
             </table>
@@ -530,6 +539,9 @@ def gen_info_modal():
                     <li> Descrescendo: caso a diminuição de novos casos esteja acontecendo por pelo menos 14 dias. </li>
                     <li> Estabilizando: qualquer outra mudança. </li>
                 </ul>
+            </div>
+            <div style="font-size: 12px">
+                Atualizado em: {date_update}
             </div>
             </div>
         </div>
@@ -688,7 +700,7 @@ def genAnalysisDimmensionsSection(dimensions: List[Dimension]):
                 <span class="section-header">DIMENSÕES DA ANÁLISE</span>
             </div>
             <span class="p3">O que olhamos ao avaliar o cenário da pandemia em um lugar?</span>
-            <div class="flex-row flex-m-column" style="margin-bottom: 0px;height:auto; display:inline-block top:0x;">
+            <div class="flex flex-row flex-space-around mt flex-m-column" style="margin-bottom: 0px;height:auto; display:inline-block top:0x;">
             {cards}
             </div>
         </div>""",
@@ -778,7 +790,7 @@ def genKPISection(
         [genIndicatorCard(group, place_type, rt_type) for group in indicators.values()]
     )
     # print(cards)
-    info_modal = gen_info_modal()
+    info_modal = gen_info_modal(config)
 
     # Generate subheader
     if not isinstance(alert, str):
