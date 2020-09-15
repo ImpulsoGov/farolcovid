@@ -1028,8 +1028,9 @@ header>.toolbar { /* Hide toolbar menu */
 .dimension-card{
     padding: var(--main-padding);
     width: 330px;
-    height: auto;
+    height: 200px;
     padding-bottom: 0rem;
+    padding-right: 0rem;
     background-color: white;
     margin-top: 0px;
     display: inline-block;
@@ -2601,3 +2602,36 @@ header>.toolbar { /* Hide toolbar menu */
         width:0px;
     }
 }
+
+/*container para melhorar a responsividade*/
+.container {
+    width: 100%;
+    padding-right: 0px;
+    padding-left: 0px;
+    margin-right: 0;
+    margin-left: 0;
+  }
+  
+  @media (min-width: 576px) {
+    .container {
+      max-width: 540px;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .container {
+      max-width: 720px;
+    }
+  }
+  
+  @media (min-width: 992px) {
+    .container {
+      max-width: 960px;
+    }
+  }
+  
+  @media (min-width: 1200px) {
+    .container {
+      max-width: 1140px;
+    }
+  }
