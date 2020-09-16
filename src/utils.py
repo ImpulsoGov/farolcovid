@@ -743,20 +743,20 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
     captions_by_place = {
         "state_num_id": {
             "SITUAÇÃO DA DOENÇA": "Hoje em seu <b>estado</b> são <b>reportados</b> em média",
-            "CONTROLE DA DOENÇA": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt de seu estado para classificação.</b>",
+            "CONTROLE DA DOENÇA": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>classificamos pela estimativas de Rt de seu estado.</b>",
             "CAPACIDADE DO SISTEMA": "Se nada mudar, a capacidade hospitalar de seu <b>estado</b> será atingida em",
             "CONFIANÇA DOS DADOS": "A cada 10 pessoas infectadas em seu <b>estado</b>,",
         },
         "health_region_id": {
             "SITUAÇÃO DA DOENÇA": "Hoje em sua <b>regional de saúde</b> são <b>reportados</b> em média",
-            "CONTROLE DA DOENÇA": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt de sua regional de saúde para classificação.</b>",
+            "CONTROLE DA DOENÇA": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>classificamos pela estimativas de Rt de sua regional.</b>",
             "CAPACIDADE DO SISTEMA": "Se nada mudar, a capacidade hospitalar de sua <b>regional de saúde</b> será atingida em",
             "CONFIANÇA DOS DADOS": "A cada 10 pessoas infectadas em sua <b>regional de saúde</b>,",
         },
         "city_id": {
             "SITUAÇÃO DA DOENÇA": "Hoje em seu <b>município</b> são <b>reportados</b> em média",
             "CONTROLE DA DOENÇA": {
-                "health_region_id": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt de sua regional de saúde para classificação.</b>",
+                "health_region_id": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>classificamos pela estimativas de Rt de sua regional.</b>",
                 "city_id": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt de seu município para classificação.</b>",
             },
             "CAPACIDADE DO SISTEMA": "Se nada mudar, a capacidade hospitalar de sua <b>regional de saúde</b> será atingida em",
