@@ -115,7 +115,10 @@ def main(session_state):
     # Valores de referência
     st.write(
         """<div class="base-wrapper"><div style="margin: 10px 10px 10px 10px;">
-            <div class="info-div-table">
+            <div style="font-size: 14px">
+                Atualizado em: %s
+            </div>
+            <div class="info-div-table" style="height: auto;">
             <table class="info-table">
             <tbody>
                 <tr>
@@ -175,12 +178,9 @@ def main(session_state):
                     <li> Estabilizando: qualquer outra mudança. </li>
                 </ul>
             </div>
-            <div style="font-size: 14px">
-                Atualizado em: %s
-            </div>
             </div>
         </div>"""
-        % (
+        % ( date_update,
             situation_classification[1],
             situation_classification[1],
             situation_classification[2],
@@ -207,7 +207,6 @@ def main(session_state):
             int(trust_classification[3] * 10),
             int(trust_classification[2] * 10),
             int(trust_classification[3] * 10),
-            date_update,
         ),
         unsafe_allow_html=True,
     )
@@ -547,6 +546,88 @@ def main(session_state):
 
     gen_table()
 
+    st.write(
+        """<div class="base-wrapper primary-span">
+            <span class="section-header">FarolCovid V2 - O que mudou?</span>
+        </div>""",
+        unsafe_allow_html=True,
+    )
+
+    st.write(
+        """<div class="base-wrapper">
+            <b>1. Níveis de classificação:</b> Adaptamos os antigos "níveis de risco" dos municípios, 
+            regiões de saúde e estados com a nova metodologia de <a target="_blank" style="color:#3E758A;" href="https://coronacidades.org/niveis-de-alerta/">Níveis de Alerta</a> 
+            desenvolvida pela Vital Strategies e adaptada pela Impulso. Passamos a trabalhar com 4 níveis de alerta: Novo normal, 
+            Moderado, Alto e Altíssimo; </br>
+            <br>
+            O que cada nível de alerta quer dizer? <br>
+            <li><b>Altíssimo:</b> Há um crescente número de casos de Covid-19 e grande número deles não são detectados</li>
+            <li><b>Alto:</b> Há muitos casos de Covid-19 com transmissão comunitária. A presença de casos não detectados é provável.</li>
+            <li><b>Moderado:</b> há um número moderado de casos e a maioria tem uma fonte de transmissão conhecida.</li>
+            <li><b>Novo normal:</b> casos são raros e técnicas de rastreamento de contato e monitoramento de casos suspeitos evitam disseminação.</li>
+            <br>
+            <b>2. Indicadores:</b> Segundo à nova metodologia, desmembramos os indicadores em 4 dimensões de análise:</br>
+            <br>
+            <b>a. Situação da doença</b>, que busca medir como a doença está se espalhando no território e se existe risco de ressurgência. 
+            Utilizamos como indicador nessa dimensão os <b>novos casos reportados de Covid-19 por 100 mil habitantes (medido em média móvel de sete dias)</b>. 
+            Essa é uma métrica importante para entender como a doença está atingindo a população no momento atual, e qual sua <b>tendência</b> de evolução dos 
+            novos casos - piorando (crescendo pelo menos há 5 dias), melhorando (diminuindo pelo menos há 14 dias) ou estável.</br>
+            <br>
+            <b>b. Controle da doença</b>, que retrata a capacidade do poder público de detectar os casos por meio de testagem e de quebrar cadeias de 
+            transmissão por meio do rastreamento de contatos e monitoramento de casos suspeitos, prevenindo novos surtos da doença. Por não possuirmos 
+            dados abertos de testagem estruturados da maioria dos municípios brasileiros, optamos por classificar o controle através da <b>taxa de contágio</b>. 
+            Essa métrica busca estimar quantas pessoas em média uma pessoa está infectando hoje - é uma tentativa de entender o espalhamento da doença 
+            quando não temos informação de rastreamento de contatos.</br>
+            <br>
+            Comparado com a versão anterior do Farol, fizemos uma alteração em nosso modelo estatístico de forma <b>a capturar melhor as variações 
+            nos novos casos</b>, porém este modelo não se mostrou consistente para algumas cidades. Revertemos o cálculo para o modelo anterior 
+            enquanto estudamos uma solução.</br>
+            <br>
+            Calculamos a taxa de contágio utilizando o número de casos reportados de Covid-19 em cada município. Quando o município não registra 
+            dados por mais de uma semana, ou não tem pelo menos 1 mês desde o primeiro caso reportado, nós reportamos a taxa da regional de saúde 
+            à qual aquele município pertence. Ajustamos os valores de referência na nova versão com base valores de classificação de <i>Infection 
+            rate</i> atualizados pelo <a target="_blank" style="color:#3E758A;" href="https://covidactnow.org/?s=1044223">CovidActNow</a>, 
+            nossa principal referência.</br>
+            <br>
+            Por usarmos a base de reporte de casos confirmados de Covid-19 pública, nosso modelo sofre uma série de limitações. Destacamos as 
+            principais aqui:</br>
+            <br>
+            - Ele segue a data de reporte e não a data de primeiro sintoma da doença. Esse valor é muito sensível portanto a variações de 
+            reporte (como não ter reporte nos1 finais de semana, e depois todos os dados serem adicionados na segunda-feira) que prejudicam 
+            esta métrica. </br>
+            - O número de casos reportados inclui tanto aqueles testados com exame PCR, em que a pessoa ainda está com sintomas ativos, 
+            quanto com exame sorológico, que não tem data de referência de sintoma. </br>
+            Estamos fazendo ajustes finais nessa metodologia para garantir maior estabilidade deste número.</br>
+            <br>
+            <b>c. Capacidade de resposta do sistema de saúde</b>, que traduz a situação do sistema de saúde como um todo e seu preparo para 
+            endereçar a crise da Covid-19, englobando a estrutura hospitalar, os trabalhadores da saúde e o atendimento dos demais serviços 
+            à população.</br>
+            <br>
+            Comparado à versão anterior do Farol Covid, passamos a realizar a projeção de em quanto tempo todos os leitos UTI-Covid da regional 
+            de saúde (caso município ou região) ou estado estarão ocupados, não mais o número de ventiladores. Realizamos essa mudança por entender 
+            que essa rubrica, adotada pelo CNES a partir do mês de maio, traduz de maneira mais fiel a disponibilidade de equipamentos para 
+            pacientes Covid. Ajustamos também os valores de referência para ser mais conservadores, observando um período de até 1 mês de cobertura 
+            ao invés de 3 meses na versão anterior.</br>
+            <br>
+            Entendemos que a gestão de leitos UTI é realizada a nível supramunicipal, portanto, deve ser classificada dessa forma também - 
+            pois a disponibilidade de um leito UTI para um município depende da demanda de outros municípios na mesma região de saúde ou estado 
+            que este se encontra. <b>Isso fez com que alguns municípios que tinham uma boa infraestrutura hospitalar aumentassem seu nível de 
+            alerta</b>, pois sua infraestrutura agora é distribuída também com outros municípios menores em sua região de saúde.</br>
+            <br>
+            <b>d. (extra) Confiança dos dados:</b> Propomos um 4º nível de análise devido a lidarmos com <b>dados abertos de reporte de casos e 
+            mortes</b>, e já ser conhecido o baixo nível de testagem no país. Na versão anterior do Farol já apresentávamos a taxa de subnotificação 
+            de casos como uma métrica importante dado o baixo nível de testagem e protocolos de reporte de casos com sintomas avançados para mostrar 
+            o quanto possivelmente não estamos observando do espalhamento da doença.</br>
+            <br>
+            Na nova versão, junto à organização ModCovid com pesquisadores da USP, ajustamos a taxa de notificação para capturar melhor 
+            características locais, com base na distribuição etária do município, região ou estado e na incidência da doença em diferentes 
+            faixas etárias, e também estimar casos assintomáticos. <b>Isso fez com que alguns municípios que tinham uma baixa subnotificação 
+            aumentassem seu nível de alerta</b>, pois consideramos os casos assintomáticos agora nessa métrica. Em contrapartida, ajustamos os 
+            valores de referência dos níveis de subnotificação considerando cerca de 30%, de casos assintomáticos, que são de extrema dificuldade 
+            de serem diagnosticados.
+        </div>""",
+        unsafe_allow_html=True,
+    )
     st.write(
         """<div class="base-wrapper primary-span">
             <span class="section-header">REFERÊNCIAS</span>
