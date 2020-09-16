@@ -310,7 +310,7 @@ def main(session_state):
         )
 
         st.image(
-            Image.open("imgs/new_cases_aracaju_20200830.png"),
+            Image.open("imgs/methodology_v2/new_cases_aracaju_20200830.png"),
             use_column_width=True,
             caption="Distribuição da média móvel semanal de novos casos por 100mil habitantes em Aracaju (retrato de 30/ago/2020).",
         )
@@ -327,7 +327,7 @@ def main(session_state):
         )
 
         st.image(
-            Image.open("imgs/new_cases_capitals_20200830.png"),
+            Image.open("imgs/methodology_v2/new_cases_capitals_20200830.png"),
             use_column_width=True,
             caption="Distribuição da média móvel semanal de novos casos por 100mil habitantes para todas as capitais (retrato de 30/ago/2020).",
         )
