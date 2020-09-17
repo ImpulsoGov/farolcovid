@@ -596,7 +596,7 @@ def main(session_state):
         <div class='base-wrapper'>
             <i>* Utilizamos %s&percnt; do total de leitos UTI reportados por %s em %s 
             para cálculo da projeção de dias para atingir capacidade máxima.<br><b>Para municípios, utilizamos os recursos da respectiva regional de saúde.</b>
-            São considerados leitos enfermaria os tipos: cirúrgicos, clínicos e hospital-dia, sendo considerada %s&percnt de leitos enfermaria já ocupados.</i>
+            Leitos enfermaria contém os tipos: cirúrgicos, clínicos e hospital-dia; sendo considerado %s&percnt; já ocupado.</i>
         </div>
         """
         % (
