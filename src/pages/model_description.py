@@ -36,9 +36,9 @@ def main(session_state):
         intensidade do caso, mantivemos a razão entre severos (I3) e graves (I2) constante: antes tínhamos
         12.5% graves e 2.5% severos do total de casos ativos (I) - ou seja, uma razão de 0.2 severos em
         relação a graves -, que passa a ser de 83.3% graves (I2) e 16.7% severos (I3) do percentual estimado
-        de hospitalizados (I2+I3 / I).  Alteramos ainda a categoria “Ventiladores” para “Leitos UTI-Covid”
-        seguindo a atualização realizada na base do CNES, que agora conta com as categorias “UTI-Covid
-        Adulto” e “UTI-Covid Infantil”.  A taxa de contágio utilizada nos diferentes cenários segue a nova
+        de hospitalizados (I2+I3 / I).  Alteramos ainda a categoria “Ventiladores” para “Leitos UTI”, 
+        removemos a classificação por "Leitos UTI Covid" pois mais de 30% das regionais não possuiam esse dado.
+        A taxa de contágio utilizada nos diferentes cenários segue a nova
         metodologia da Taxa de Contágio descrita nos indicadores dos Níveis de Alerta.
         """
     )

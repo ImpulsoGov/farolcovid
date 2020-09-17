@@ -65,7 +65,7 @@ def main(session_state):
             <b>Indicador</b>: Taxa de contágio (Número efetivo de Reprodução - R_t)<br>
             <b>Qual sua tendência?</b>Aumentado, estabilizando ou diminuindo?<br><br>
             <span class="subsection-header">Capacidade do sistema: Como está a capacidade de resposta do sistema de saúde? </span><br>
-            <b>Indicador</b>: Dias até atingir ocupação total de leitos UTI-Covid<br>
+            <b>Indicador</b>: Dias até atingir ocupação total de leitos UTI<br>
             <b>Qual sua tendência?</b> Aumentado, estabilizando ou diminuindo?<br><br>
             <span class="subsection-header">Confiança nos dados: Quão representativo são os casos oficialmente identificados 
             frente ao total de casos esperados?</span><br>
@@ -218,7 +218,7 @@ def main(session_state):
         [
             "SITUAÇÃO DA DOENÇA: Média móvel de novos casos por 100 mil habitantes",
             "CONTROLE DA DOENÇA: Taxa de contágio (Rt)",
-            "CAPACIDADE DO SISTEMA: Dias até atingir ocupação total de leitos UTI-Covid",
+            "CAPACIDADE DO SISTEMA: Dias até atingir ocupação total de leitos UTI",
             "CONFIANÇA NOS DADOS: Taxa de subnotificação de casos",
         ],
     )
@@ -388,7 +388,7 @@ def main(session_state):
 
         # st.write(
         #     """<div class="base-wrapper">
-        #     <span class="subsection-header"><b>O que é?</b></span><br> 
+        #     <span class="subsection-header"><b>O que é?</b></span><br>
         #     O número de reprodução efetivo (Rt) traduz a quantidade de pessoas que cada pessoa
         #     doente infectará em determinado intervalo de tempo.  Já o número básico de reprodução
         #     (<i>R0</i>) da uma doença traduz qual a dinâmica de contágio de todo o curso de transmissão em
@@ -407,7 +407,7 @@ def main(session_state):
         #     comportamento e intervenções ativas até aquele dia, ainda há tendência de crescimento
         #     exponencial da doença naquela população. Esperamos que cada pessoa infectada naquele momento
         #     infectará mais de uma pessoa no futuro - gerando uma curva de contágio que se acelera
-        #     rapidamente. Já um <i>Rt</i> abaixo de 1 se traduz na expectativa de que o número de novas infecções 
+        #     rapidamente. Já um <i>Rt</i> abaixo de 1 se traduz na expectativa de que o número de novas infecções
         #     vai diminuir ao longo do tempo, indicando que a situação está sob controle se todas as medidas e
         #     comportamentos forem mantidos.<br><br>Uma boa notícia: por causa da mudança de comportamento, o
         #     <i>Rt</i> tende a ser menor que o <i>R0</i>, como explicam os desenvolvedores do
@@ -416,7 +416,7 @@ def main(session_state):
         #     adotadas.<br> Medir diretamente o número efetivo de reprodução da Covid-19 não é possível.
         #     Porém, podemos estimar o número de reprodução instantâneo (<i>Rt</i>) mais provável pelo
         #     número de novos casos por dia.<br><br>
-        #     <span class="subsection-header"><b>Como funciona o modelo?</b></span><br> 
+        #     <span class="subsection-header"><b>Como funciona o modelo?</b></span><br>
         #     O modelo utilizado para o cálculo do Rt foi desenvolvido por Cori et.
         #     al (2013) e implementado no pacote <i>EpiEstim</i>, podendo ser utilizado no R (linguagem de
         #     programação) ou no Excel. Ele toma como entrada a série de casos da doença na população e
@@ -439,7 +439,7 @@ def main(session_state):
 
     if (
         indicador
-        == "CAPACIDADE DO SISTEMA: Dias até atingir ocupação total de leitos UTI-Covid"
+        == "CAPACIDADE DO SISTEMA: Dias até atingir ocupação total de leitos UTI"
     ):
 
         st.write(

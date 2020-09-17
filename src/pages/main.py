@@ -352,7 +352,7 @@ def main(session_state):
                             <p> <b>Importante: mudamos a metodologia dos indicadores - veja mais em Modelos, limitações e fontes no menu lateral.</b> Descubra o nível de alerta do estado, regional de saúde ou município de acordo com os indicadores:</p>
                             - <b>Situação da doença</b>: média de novos casos 100 mil por habitantes;</br>
                             - <b>Controle da doença</b>: taxa de contágio</br>
-                            - <b>Capacidade do sistema</b>: tempo para ocupação de leitos UTI Covid</br>
+                            - <b>Capacidade do sistema</b>: tempo para ocupação de leitos UTI</br>
                             - <b>Confiança de dados</b>: taxa de subnotificação de casos</br><br>
                         </div>
                         <div>
@@ -605,7 +605,7 @@ def main(session_state):
         <div class='base-wrapper'>
             <i>* Utilizamos %s&percnt; da capacidade hospitalar reportada por %s em %s 
             para cálculo da projeção de dias para atingir capacidade máxima.<br><b>Para municípios, utilizamos os recursos da respectiva regional de saúde.</b>
-            São considerados leitos os tipos: cirúrgicos, clínicos e hospital-dia. A capacidade de UTI é dada pelo total de leitos UTI Covid adulto.</i>
+            São considerados leitos os tipos: cirúrgicos, clínicos e hospital-dia. A capacidade de UTI é dada pelo total de leitos UTI adulto.</i>
         </div>
         """
         % (
