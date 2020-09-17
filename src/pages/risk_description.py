@@ -85,9 +85,9 @@ def main(session_state):
         nos novos casos</b>, porém este modelo não se mostrou consistente para algumas cidades. Revertemos o cálculo para o modelo anterior 
         enquanto estudamos uma solução.</br>
         <br><span class="subsection-header"><b>Capacidade do sistema:</b> Como está a capacidade de resposta do sistema de saúde? </span><br>
-        <b>Indicador</b>: Dias até atingir ocupação total de leitos UTI-Covid<br>
+        <b>Indicador</b>: Dias até atingir ocupação total de leitos UTI<br>
         <b>Qual sua tendência?</b> Aumentado, estabilizando ou diminuindo?<br><br>
-        Comparado à versão anterior do Farol Covid, passamos a realizar a projeção de em quanto tempo todos os leitos UTI-Covid da regional 
+        Comparado à versão anterior do Farol Covid, passamos a realizar a projeção de em quanto tempo todos os leitos UTI da regional 
         de saúde (caso município ou região) ou estado estarão ocupados, não mais o número de ventiladores. Realizamos essa mudança por entender 
         que essa rubrica, adotada pelo CNES a partir do mês de maio, traduz de maneira mais fiel a disponibilidade de equipamentos para 
         pacientes Covid. Ajustamos também os valores de referência para ser mais conservadores, observando um período de até 1 mês de cobertura 
@@ -464,7 +464,7 @@ def gen_classification_table(config, date_update):
                 </tr>
                 <tr>
                     <td><span>Capacidade de respostas do sistema de saúde</span></td>
-                    <td><span>Projeção de tempo para ocupação total de leitos UTI-Covid</span></td>
+                    <td><span>Projeção de tempo para ocupação total de leitos UTI</span></td>
                     <td class="light-blue-bg bold">%s - 90 dias</td>
                     <td class="light-yellow-bg bold"><span>%s - %s dias</span></td>
                     <td class="light-orange-bg bold"><span>%s - %s dias</span></td>
