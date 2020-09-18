@@ -157,7 +157,7 @@ def main(session_state):
                     <td class="light-blue-bg bold">%s - 90 dias</td>
                     <td class="light-yellow-bg bold"><span>%s - %s dias</span></td>
                     <td class="light-orange-bg bold"><span>%s - %s dias</span></td>
-                    <td class="light-red-bg bold"><span>%s - %s} dias</span></td>
+                    <td class="light-red-bg bold"><span>%s - %s dias</span></td>
                 </tr>
                 <tr>
                     <td><span>Confiança dos dados</span></td>

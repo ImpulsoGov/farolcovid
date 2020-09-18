@@ -814,20 +814,29 @@ def genKPISection(
         stoplight = "%0a%0a"
     else:
         bg = AlertBackground(alert).name
+        if alert == "altíssimo":
+            caption_alert = "há um crescente número de casos de Covid-19 e grande parte deles não são detectados"
+        elif alert == "alto":
+            caption_alert = "há muitos casos de Covid-19 com transmissão comunitária. A presença de casos não detectados é provável"
+        elif alert == "moderado":
+            caption_alert = "há um número moderado de casos e a maioria tem uma fonte de transmissão conhecida"
+        elif alert == "novo normal":
+            caption_alert = "casos são raros e técnicas de rastreamento de contato e monitoramento de casos suspeitos evitam disseminação"
 
         if "state" in place_type:
             place_type = "estado"
+            state_caption = f"No seu estado {caption_alert}."
             if n_colapse_regions > 0:
-                caption = f"Seu estado está em Risco {alert.upper()} de colapso. <b>Note que {n_colapse_regions} regionais de saúde avaliadas estão em Risco Alto ou Altíssimo</b>.<br>Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
+                caption = f"{state_caption} <b>Note que {n_colapse_regions} regionais de saúde avaliadas estão em Alerta Alto ou Altíssimo</b>.<br>Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
             else:
-                caption = f"Seu estado está em Risco {alert.upper()} de colapso. Nenhuma regional de saúde avaliada está em Risco Alto ou Altíssimo de colapso.<br>Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
+                caption = f"{state_caption} Nenhuma regional de saúde avaliada está em Alerta Alto ou Altíssimo de colapso.<br>Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
 
-        elif "healt_region" in place_type:
+        elif "health_region" in place_type:
             place_type = "regional"
-            caption = f"Risco {alert.upper()} de colapso no sistema de saúde."
+            caption = f"Na sua regional {caption_alert}."
         else:
             place_type = "município"
-            caption = f"Risco {alert.upper()} de colapso no sistema de saúde."
+            caption = f"No seu município {caption_alert}."
 
     msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  
     🚨%0a%0aNÍVEL DE ALERTA: {alert.upper()}
