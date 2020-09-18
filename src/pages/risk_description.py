@@ -473,10 +473,10 @@ def gen_classification_table(config, date_update):
                 <tr>
                     <td><span>Confiança dos dados</span></td>
                     <td><span>Subnotificação (casos <b>não</b> diagnosticados a cada 10 infectados)</span></td>
-                    <td class="light-blue-bg bold"><span>%s&gt;=x&gt;%a</span></td>
-                    <td class="light-yellow-bg bold"><span>%s&gt;=x&gt;%s</span></td>
-                    <td class="light-orange-bg bold"><span>%s&gt;=x&gt;%s</span></td>
-                    <td class="light-red-bg bold"><span>10&gt;=x&gt;=%s</span></td>
+                    <td class="light-blue-bg bold"><span>%s&lt;=x&lt;%a</span></td>
+                    <td class="light-yellow-bg bold"><span>%s&lt;=x&lt;%s</span></td>
+                    <td class="light-orange-bg bold"><span>%s&lt;=x&lt;%s</span></td>
+                    <td class="light-red-bg bold"><span>%s&lt;=x&lt;=10</span></td>
                 </tr>
             </tbody>
             </table>
@@ -512,12 +512,12 @@ def gen_classification_table(config, date_update):
             capacity_classification[2],
             capacity_classification[0],
             capacity_classification[1],
-            trust_classification[1] * 10,
             int(trust_classification[0] * 10),
+            int(trust_classification[1] * 10),
+            int(trust_classification[1] * 10),
             int(trust_classification[2] * 10),
-            trust_classification[1] * 10,
+            int(trust_classification[2] * 10),
             int(trust_classification[3] * 10),
-            int(trust_classification[2] * 10),
             int(trust_classification[3] * 10),
         ),
         unsafe_allow_html=True,
