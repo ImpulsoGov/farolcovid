@@ -162,7 +162,7 @@ IndicatorCards: Dict[str, Indicator] = {
         caption="Se nada mudar, todos os leitos de seu <b>estado ou regional de saúde</b> estarão ocupados em",
         unit="dia(s)",
         left_label="Leitos enfermaria*:",
-        right_label="Leitos UTI-Covid:",
+        right_label="Leitos UTI:",
     ),
     IndicatorType.TRUST.value: Indicator(
         header="CONFIANÇA DOS DADOS",

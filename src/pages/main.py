@@ -76,16 +76,11 @@ def update_indicators(indicators, data, config, user_input, session_state):
                 dic_indicators[position] = "None"
 
         if np.isnan(data[config["br"]["indicators"][group]["risk"]].values[0]):
-            # print("aqui!!!")
-            # dic_indicators["display"] = "- "
             dic_indicators["risk"] = "nan"
 
             if group == "rt":  # doesn't show values
                 indicators[group].right_display = "- "
                 indicators[group].left_display = "- "
-
-        print(dic_indicators)
-
         indicators[group].risk = dic_indicators["risk"]
         indicators[group].left_display = dic_indicators["left_display"]
         indicators[group].right_display = dic_indicators["right_display"]
@@ -272,8 +267,9 @@ def get_data(config):
         for place in ["city", "health_region", "state"]
     }
 
+    cnes_sources = loader.read_data("br", config, "br/cities/cnes")
     # places_ids = loader.read_data("br", config, "br/places/ids")
-    return dfs
+    return dfs, cnes_sources
 
 
 def main(session_state):
@@ -347,7 +343,7 @@ def main(session_state):
                             <p> <b>Importante: mudamos a metodologia dos indicadores - veja mais em Modelos, limitações e fontes no menu lateral.</b> Descubra o nível de alerta do estado, regional de saúde ou município de acordo com os indicadores:</p>
                             - <b>Situação da doença</b>: média de novos casos 100 mil por habitantes;</br>
                             - <b>Controle da doença</b>: taxa de contágio</br>
-                            - <b>Capacidade do sistema</b>: tempo para ocupação de leitos UTI-Covid</br>
+                            - <b>Capacidade do sistema</b>: tempo para ocupação de leitos UTI</br>
                             - <b>Confiança de dados</b>: taxa de subnotificação de casos</br><br>
                         </div>
                         <div>
@@ -399,7 +395,7 @@ def main(session_state):
     )
 
     # GET DATA
-    dfs = get_data(config)
+    dfs, cnes_sources = get_data(config)
 
     # REGION/CITY USER INPUT
     user_input = dict()
@@ -468,7 +464,7 @@ def main(session_state):
     )
 
     # SOURCES PARAMS
-    user_input = utils.get_sources(user_input, data, dfs["city"], ["beds", "icu_beds"])
+    user_input = utils.get_sources(user_input, data, cnes_sources, ["beds", "icu_beds"])
 
     # POPULATION PARAMS
     try:
@@ -517,7 +513,7 @@ def main(session_state):
         )
         session_state.number_icu_beds = int(
             user_input["number_icu_beds"]
-            # * config["br"]["simulacovid"]["resources_available_proportion"]
+            * config["br"]["simulacovid"]["resources_available_proportion"]
         )
         session_state.number_cases = user_input["population_params"]["I_confirmed"]
         session_state.number_deaths = user_input["population_params"]["D"]
@@ -598,12 +594,15 @@ def main(session_state):
     st.write(
         """
         <div class='base-wrapper'>
-            <i>* Utilizamos 100&percnt; do total de leitos UTI-Covid reportados por %s em %s 
+            <i>* Utilizamos %s&percnt; do total de leitos UTI reportados por %s em %s 
             para cálculo da projeção de dias para atingir capacidade máxima.<br><b>Para municípios, utilizamos os recursos da respectiva regional de saúde.</b>
-            São considerados leitos enfermaria os tipos: cirúrgicos, clínicos e hospital-dia. O total de leitos enfermaria considerada %s&percnt; dos leitos UTI-Covid adulto.</i>
+            Leitos enfermaria contém os tipos: cirúrgicos, clínicos e hospital-dia; sendo considerado %s&percnt; já ocupado.</i>
         </div>
         """
         % (
+            str(
+                int(config["br"]["simulacovid"]["resources_available_proportion"] * 100)
+            ),
             user_input["author_number_beds"],
             user_input["last_updated_number_beds"],
             str(
@@ -658,12 +657,6 @@ def main(session_state):
     # AMBASSADOR SECTION
     utils.gen_ambassador_section()
 
-    # indicators["hospital_capacity"].left_display = user_input["number_beds"]
-    # indicators["hospital_capacity"].right_display = user_input["number_icu_beds"]
-    # indicators["subnotification_rate"].left_display = user_input["population_params"][
-    # "D"
-    # ]
-
     # PDF-REPORT GEN BUTTON
     # if st.button("Gerar Relatório PDF"):
     #     user_analytics.log_event("generated pdf")
@@ -678,7 +671,6 @@ def main(session_state):
 
     # TOOLS
     products = ProductCards
-    # products[2].recommendation = f'Risco {data["overall_alert"].values[0]}'
 
     utils.genProductsSection(products)
 
@@ -742,10 +734,6 @@ def main(session_state):
             ],
         )
         # Downloading the saved data from memory
-        user_input["number_beds"] = session_state.number_beds
-        user_input["number_icu_beds"] = session_state.number_icu_beds
-        user_input["number_deaths"] = session_state.number_deaths
-        user_input["number_cases"] = session_state.number_cases
         sm.main(user_input, indicators, data, config, session_state)
         # TODO: remove comment on this later!
         # utils.gen_pdf_report()

@@ -88,7 +88,7 @@ def dday_preffix(dday):
 
 
 # TODO: melhorar essa funcao
-def get_sources(user_input, data, cities_sources, resources):
+def get_sources(user_input, data, cnes_sources, resources):
 
     cols_agg = {
         "number": lambda x: x.sum() if np.isnan(x.sum()) == False else 0,
@@ -102,18 +102,14 @@ def get_sources(user_input, data, cities_sources, resources):
 
             col = "_".join([item, x])
 
-            if (
-                user_input["place_type"] == "state_num_id"
-                or user_input["place_type"] == "health_region_id"
-            ):
+            if user_input["place_type"] == "city_id":  # usa dados da regional
+                place_type = "health_region_id"
+            else:
+                place_type = user_input["place_type"]
 
-                user_input[col] = cities_sources[
-                    cities_sources[user_input["place_type"]]
-                    == data[user_input["place_type"]].iloc[0]
-                ][col].agg(cols_agg[item])
-
-            if user_input["place_type"] == "city_id":
-                user_input[col] = data[col].fillna(0).values[0]
+            user_input[col] = cnes_sources[
+                cnes_sources[place_type] == data[place_type].iloc[0]
+            ][col].agg(cols_agg[item])
 
     user_input["last_updated_number_beds"] = pd.to_datetime(
         user_input["last_updated_number_beds"]
@@ -526,7 +522,7 @@ def gen_info_modal(config):
                 </tr>
                 <tr>
                     <td><span>Capacidade de respostas do sistema de saúde</span></td>
-                    <td><span>Projeção de tempo para ocupação total de leitos UTI-Covid</span></td>
+                    <td><span>Projeção de tempo para ocupação total de leitos UTI</span></td>
                     <td class="light-blue-bg bold">{capacity_classification[3]} - 90 dias</td>
                     <td class="light-yellow-bg bold"><span>{capacity_classification[2]} - {capacity_classification[3]} dias</span></td>
                     <td class="light-orange-bg bold"><span>{capacity_classification[1]} - {capacity_classification[2]} dias</span></td>
@@ -600,16 +596,17 @@ def genInputFields(user_input, config, session):
 
     authors_icu_beds = user_input["author_number_icu_beds"]
     icu_beds_update = user_input["last_updated_number_icu_beds"]
+    
+    print("\nSESSION_STATE:", session.number_beds, session.number_icu_beds)
 
     if session.reset or session.number_beds == None:
         number_beds = int(
             user_input["number_beds"]
             * config["br"]["simulacovid"]["resources_available_proportion"]
         )
-
         number_icu_beds = int(
             user_input["number_icu_beds"]
-            # * config["br"]["simulacovid"]["resources_available_proportion"]
+            * config["br"]["simulacovid"]["resources_available_proportion"]
         )
         number_cases = int(user_input["population_params"]["I_confirmed"])
         number_deaths = int(user_input["population_params"]["D"])
@@ -659,6 +656,8 @@ def genInputFields(user_input, config, session):
     # Faz o update quando clica o botão
     if st.button("Finalizar alteração"):
 
+        print("FINALIZADO:", user_input)
+
         session.number_beds = int(user_input["number_beds"])
         session.number_icu_beds = int(user_input["number_icu_beds"])
         session.number_cases = int(user_input["population_params"]["I_confirmed"])
@@ -670,6 +669,8 @@ def genInputFields(user_input, config, session):
 
     if st.button("Resetar aos valores oficais"):
         session.reset = True
+
+    # Estiliza botão
     alteration_button_style = """border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 14px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
     reset_button_style = """position:absolute;right:3em;top:-68px;border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: rgb(160,170,178);font-weight: bold;text-align: center;text-decoration: none;font-size: 14px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
     stylizeButton(
@@ -698,7 +699,6 @@ def genAnalysisDimmensionsCard(dimension: Dimension):
                 {dimension.text}
             </div>
         </div>"""
-    
 
 
 def genAnalysisDimmensionsSection(dimensions: List[Dimension]):
@@ -719,7 +719,6 @@ def genAnalysisDimmensionsSection(dimensions: List[Dimension]):
         </div>""",
         unsafe_allow_html=True,
     )
-    
 
 
 def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"):
@@ -764,7 +763,6 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
         },
     }
 
-    print(place_type)
     if place_type == "city_id" and indicator.header == "CONTROLE DA DOENÇA":
         indicator.caption = captions_by_place[place_type][indicator.header][rt_type]
     else:
@@ -913,7 +911,10 @@ def genInputCustomizationSectionHeader(locality: str) -> None:
         <div class="base-wrapper">
                 <span class="section-header primary-span">Verifique os dados disponíveis <span class="yellow-span">(%s)</span></span>
                 <br><br>
-                <span>Usamos os dados do Brasil.io e DataSUS, mas é possível que esses dados estejam um pouco desatualizados. Se estiverem, é só ajustar os valores abaixo para continuar a simulação.</span>
+                <span>
+                Usamos os dados do Brasil.io e DataSUS, mas é possível que esses dados estejam um pouco desatualizados. Se estiverem, é só ajustar os valores abaixo para continuar a simulação.
+                <br><b>Para municípios usamos os dados de leitos da respectiva regional de saúde.</b>
+                </span>
                 <br>
         </div>"""
         % locality,
