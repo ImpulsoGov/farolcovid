@@ -831,7 +831,7 @@ def genKPISection(
  
         elif "health_region" in place_type:
             place_type = "regional"
-            caption = f"Na sua regional {caption_alert}."
+            caption = f"Na sua regional {caption_alert}." 
         else:
             place_type = "município"
             caption = f"No seu município {caption_alert}."
