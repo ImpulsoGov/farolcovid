@@ -830,7 +830,7 @@ def genKPISection(
                 caption = f"{state_caption} <b>Note que {n_colapse_regions} regionais de saúde avaliadas estão em Alerta Alto ou Altíssimo</b>.<br>Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
             else:
                 caption = f"{state_caption} Nenhuma regional de saúde avaliada está em Alerta Alto ou Altíssimo de colapso.<br>Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
-
+ 
         elif "health_region" in place_type:
             place_type = "regional"
             caption = f"Na sua regional {caption_alert}."
