@@ -168,7 +168,7 @@ IndicatorCards: Dict[str, Indicator] = {
         header="CONFIANÇA DOS DADOS",
         caption="A cada 10 pessoas infectadas,",
         unit="não são diagnosticadas",
-        left_label="Mortes/100mil hab:",
+        left_label="Casos ativos estimados:",
         right_label="Tendência:",
     ),
 }

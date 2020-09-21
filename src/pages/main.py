@@ -36,9 +36,7 @@ def fix_type(x, group, position):
     if x == "- ":
         return x
 
-    if (group == "situation" and position == "display") or (
-        group == "trust" and position == "left_display"
-    ):
+    if group == "situation" and position == "display":
         return round(float(x), 2)
 
     if group == "trust" and position == "display":

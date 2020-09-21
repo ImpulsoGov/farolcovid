@@ -96,7 +96,7 @@ br:
         trust:
             risk: "trust_classification"
             right_display: "new_deaths_growth"
-            left_display: "new_deaths_mavg_100k"
+            left_display: "active_cases"
             display: "notification_rate"
     inloco:
         replace: 
