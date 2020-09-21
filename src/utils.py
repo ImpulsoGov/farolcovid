@@ -786,6 +786,7 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
                 <span class="lighter">{indicator.right_label}<br></span>
                 <span class="bold">{indicator_right_display}</span>
         </div>
+        <div class="last-updated-text">Atualizado em: {indicator.last_updated}</div>
     </div>"""
 
 
@@ -851,7 +852,7 @@ def genKPISection(
                 </div>
         </div>
         </div>
-        <div class='base-wrapper product-section' ></div>
+        <div class='base-wrapper product-section'></div>
         """
         % (bg, locality, msg, caption, cards, info_modal),
         unsafe_allow_html=True,

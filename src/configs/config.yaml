@@ -83,21 +83,25 @@ br:
             right_display: "daily_cases_growth"
             left_display: "daily_cases_growth_ndays"
             display: "daily_cases_mavg_100k"
+            last_updated: "last_updated_cases"
         control:
             risk: "control_classification"
             right_display: "rt_most_likely_growth"
             left_display: ["rt_low_95", "rt_high_95"]
             display: "None"
+            last_updated: "last_updated_rt"
         capacity:
             risk: "capacity_classification"
             right_display: "number_icu_beds"
             left_display: "number_beds"
             display: "dday_icu_beds"
+            last_updated: "last_updated_subnotification"
         trust:
             risk: "trust_classification"
             right_display: "new_deaths_growth"
             left_display: "active_cases"
             display: "notification_rate"
+            last_updated: "last_updated_subnotification"
     inloco:
         replace: 
             "São Valério da Natividade":

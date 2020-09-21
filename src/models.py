@@ -74,6 +74,7 @@ class Indicator:
         unit,
         left_label,
         right_label,
+        last_updated=None,
         risk="nan",
         display="",
         left_display="",
@@ -88,6 +89,7 @@ class Indicator:
         self.right_label = right_label
         self.left_display = left_display
         self.right_display = right_display
+        self.last_updated = last_updated
 
 
 class ResourceAvailability(NamedTuple):

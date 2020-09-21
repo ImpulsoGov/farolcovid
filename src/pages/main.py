@@ -33,6 +33,9 @@ def fix_type(x, group, position):
                 [str(round(i, 1)) if type(i) != str else i.strip() for i in x]
             )
 
+    if position == "last_updated":
+        return pd.to_datetime(str(x)).strftime("%d/%m/%Y")
+
     if x == "- ":
         return x
 
@@ -58,9 +61,11 @@ def fix_type(x, group, position):
 def update_indicators(indicators, data, config, user_input, session_state):
     # TODO: indicadores quando cidade não posssui dados
     for group in config["br"]["indicators"].keys():
+
         # Fix values for each position
         dic_indicators = dict()
         for position in config["br"]["indicators"][group].keys():
+            
             # Filter indicators
             if config["br"]["indicators"][group][position] != "None":
                 dic_indicators[position] = fix_type(
@@ -79,10 +84,13 @@ def update_indicators(indicators, data, config, user_input, session_state):
             if group == "rt":  # doesn't show values
                 indicators[group].right_display = "- "
                 indicators[group].left_display = "- "
+
+        # TODO: melhroar aqui para não ter que passar os dados de um dic para outro
         indicators[group].risk = dic_indicators["risk"]
         indicators[group].left_display = dic_indicators["left_display"]
         indicators[group].right_display = dic_indicators["right_display"]
         indicators[group].display = dic_indicators["display"]
+        indicators[group].last_updated = dic_indicators["last_updated"]
 
     # Caso o usuário altere os casos confirmados, usamos esse novo valor para a estimação
     # TODO: vamos acabar com o user_iput e manter só session_state?
