@@ -58,7 +58,7 @@ br:
             {0: "novo normal", 1: "moderado", 2: "alto", 3: "altíssimo"}
         rules:
             situation_classification:
-                column_name: 'daily_cases_mavg_100k'
+                column_name: 'daily_cases_mavg_100k' 
                 cuts: [0, 3.7, 12.5, 27.4, 1000000]
                 categories: [0, 1, 2, 3]
 
@@ -74,29 +74,34 @@ br:
             
             trust_classification:
                 column_name: 'notification_rate'
-                cuts: [0, 0.25, 0.4, 0.5, 1.001]
+                cuts: [0, 0.3, 0.4, 0.6, 1.001]
                 categories: [3, 2, 1, 0]
+        date_update: "15/09/2020"
     indicators:
         situation:
             risk: "situation_classification"
             right_display: "daily_cases_growth"
             left_display: "daily_cases_growth_ndays"
             display: "daily_cases_mavg_100k"
+            last_updated: "last_updated_cases"
         control:
             risk: "control_classification"
             right_display: "rt_most_likely_growth"
             left_display: ["rt_low_95", "rt_high_95"]
             display: "None"
+            last_updated: "last_updated_rt"
         capacity:
             risk: "capacity_classification"
             right_display: "number_icu_beds"
             left_display: "number_beds"
             display: "dday_icu_beds"
+            last_updated: "last_updated_subnotification"
         trust:
             risk: "trust_classification"
             right_display: "new_deaths_growth"
-            left_display: "new_deaths_mavg_100k"
+            left_display: "active_cases"
             display: "notification_rate"
+            last_updated: "last_updated_subnotification"
     inloco:
         replace: 
             "São Valério da Natividade":

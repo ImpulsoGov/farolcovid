@@ -36,9 +36,9 @@ def main(session_state):
         intensidade do caso, mantivemos a razão entre severos (I3) e graves (I2) constante: antes tínhamos
         12.5% graves e 2.5% severos do total de casos ativos (I) - ou seja, uma razão de 0.2 severos em
         relação a graves -, que passa a ser de 83.3% graves (I2) e 16.7% severos (I3) do percentual estimado
-        de hospitalizados (I2+I3 / I).  Alteramos ainda a categoria “Ventiladores” para “Leitos UTI-Covid”
-        seguindo a atualização realizada na base do CNES, que agora conta com as categorias “UTI-Covid
-        Adulto” e “UTI-Covid Infantil”.  A taxa de contágio utilizada nos diferentes cenários segue a nova
+        de hospitalizados (I2+I3 / I).  Alteramos ainda a categoria “Ventiladores” para “Leitos UTI” - testamos utitlizar 
+        a nova categoria do CNES de leitos "UTI-Covid Adulto” e “UTI-Covid Infantil” porém muitas regionais 
+        não possuiam dados (~30%). A taxa de contágio utilizada nos diferentes cenários segue a nova
         metodologia da Taxa de Contágio descrita nos indicadores dos Níveis de Alerta.
         """
     )
@@ -60,7 +60,7 @@ def main(session_state):
         - Os números básicos de reprodução estimados para cada cenário são meramente fictícios, não
           estão atrelados diretamente a nenhuma intervenção que dobre ou diminua pela metade o valor
           observado hoje. Não esperamos, portanto, uma equivalência perfeita com a situação
-          brasileira.  Os dados do número de leitos e leitos UTI Covid são atualizados mensalmente
+          brasileira.  Os dados do número de leitos e leitos UTI são atualizados mensalmente
           no DATASUS CNES e há conhecidos problemas de reporte.
         - Os dados do número de casos confirmados em cada município reportados pelas secretarias
           estaduais de saúde frequentemente refletem metodologia distinta do que aqueles reportados

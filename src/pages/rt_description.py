@@ -8,9 +8,10 @@ def main(session_state):
     opening_response = user_analytics.safe_log_event(
         "opened spread_rhythm", session_state, is_new_page=True
     )
-    st.header("""$$R_t$$ de Estados e Municípios""")
 
-    st.subheader("""Calculo do $$R_t$$""")
+    st.header("""Taxa de contágio ($$R_t$$) de Estados e Municípios""")
+
+    st.subheader("""Cálculo da taxa de contágio ($$R_t$$)""")
 
     st.write(
         """
@@ -23,7 +24,8 @@ def main(session_state):
 
         A Covid-19 chegou em momentos distintos em cada cidade brasileira e a sociedade também reagiu de maneira diferente em cada uma delas. 
         Portanto, medir o $$R_t$$, traduzindo o $$R_0$$ para o momento específico no qual cada local se encontra, a nível municipal e estadual, traz informações 
-        importantes sobre o ritmo de contágio da doença. Enquanto o $$R_0$$ é um número geral, portanto, o  então é calculado para cada local e momento no tempo.
+        importantes sobre a taxa de contágio da doença. Enquanto o $$R_0$$ é um número geral,
+        portanto, o $$R_t$$ então é calculado para cada local e momento no tempo.
 
         Por exemplo, um $$R_t$$ maior do que 1 indica que, mantendo-se o comportamento e intervenções ativas até aquele dia, ainda há tendência de 
         crescimento exponencial da doença naquela população. Esperamos que cada pessoa infectada naquele momento infectará mais de uma pessoa no futuro - gerando 
