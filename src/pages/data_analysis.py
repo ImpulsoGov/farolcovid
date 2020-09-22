@@ -139,6 +139,8 @@ def plot_heatmap(
         y=states_total_deaths.index,
         xaxis="x2",
         yaxis="y2",
+        text=states_total_deaths,
+        textposition='outside',
         orientation="h",
         hoverinfo="text",
         hovertext=[
