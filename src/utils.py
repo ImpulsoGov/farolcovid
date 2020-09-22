@@ -39,6 +39,8 @@ configs_path = os.path.join(os.path.dirname(__file__), "configs")
 cities = pd.read_csv(os.path.join(configs_path, "cities_table.csv"))
 states = pd.read_csv(os.path.join(configs_path, "states_table.csv"))
 
+config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
+
 # DATASOURCE TOOLS
 
 
@@ -78,8 +80,15 @@ def convert_times_to_real(row):
     return today + timedelta(row["ddias"])
 
 
+def dday_preffix(dday):
+    if dday > 30:
+        return "+ 30"
+    else:
+        return "até " + str(dday)
+
+
 # TODO: melhorar essa funcao
-def get_sources(user_input, data, cities_sources, resources):
+def get_sources(user_input, data, cnes_sources, resources):
 
     cols_agg = {
         "number": lambda x: x.sum() if np.isnan(x.sum()) == False else 0,
@@ -93,18 +102,14 @@ def get_sources(user_input, data, cities_sources, resources):
 
             col = "_".join([item, x])
 
-            if (
-                user_input["place_type"] == "state_num_id"
-                or user_input["place_type"] == "health_region_id"
-            ):
+            if user_input["place_type"] == "city_id":  # usa dados da regional
+                place_type = "health_region_id"
+            else:
+                place_type = user_input["place_type"]
 
-                user_input[col] = cities_sources[
-                    cities_sources[user_input["place_type"]]
-                    == data[user_input["place_type"]].iloc[0]
-                ][col].agg(cols_agg[item])
-
-            if user_input["place_type"] == "city_id":
-                user_input[col] = data[col].fillna(0).values[0]
+            user_input[col] = cnes_sources[
+                cnes_sources[place_type] == data[place_type].iloc[0]
+            ][col].agg(cols_agg[item])
 
     user_input["last_updated_number_beds"] = pd.to_datetime(
         user_input["last_updated_number_beds"]
@@ -456,7 +461,22 @@ def gen_whatsapp_button(info) -> None:
     )
 
 
-def gen_info_modal():
+def gen_info_modal(config):
+    situation_classification = config["br"]["farolcovid"]["rules"][
+        "situation_classification"
+    ]["cuts"]
+    control_classification = config["br"]["farolcovid"]["rules"][
+        "control_classification"
+    ]["cuts"]
+    capacity_classification = config["br"]["farolcovid"]["rules"][
+        "capacity_classification"
+    ]["cuts"]
+    trust_classification = config["br"]["farolcovid"]["rules"]["trust_classification"][
+        "cuts"
+    ]
+
+    date_update = config["br"]["farolcovid"]["date_update"]
+
     return f"""
     <a href="#entenda-mais" class="info-btn">Entenda a classificação dos níveis</a>
     <div id="entenda-mais" class="info-modal-window">
@@ -464,6 +484,9 @@ def gen_info_modal():
             <a href="#" title="Close" class="info-btn-close" style="color: white;">&times</a>
             <div style="margin: 10px 15px 15px 15px;">
             <h1 class="primary-span">Valores de referência</h1>
+            <div style="font-size: 12px">
+                <b>Atualizado em</b>: {date_update}<br>
+            </div>
             <div class="info-div-table">
             <table class="info-table">
             <tbody>
@@ -480,10 +503,10 @@ def gen_info_modal():
                     <p><span>Situação da doença</span></p><br/>
                     </td>
                     <td><span>Novos casos diários (Média móvel 7 dias)</span></td>
-                    <td class="light-blue-bg bold"><span>x&lt;=3.7</span></td>
-                    <td class="light-yellow-bg bold"><span>3.7&lt;x&lt;=12.5</span></td>
-                    <td class="light-orange-bg bold"><span>12.5&lt;=x&lt;=27.4</span></td>
-                    <td class="light-red-bg bold"><span>x &gt;= 27.4</span></td>
+                    <td class="light-blue-bg bold"><span>x&lt;={situation_classification[1]}</span></td>
+                    <td class="light-yellow-bg bold"><span>{situation_classification[1]}&lt;x&lt;={situation_classification[2]}</span></td>
+                    <td class="light-orange-bg bold"><span>{situation_classification[2]}&lt;=x&lt;={situation_classification[3]}</span></td>
+                    <td class="light-red-bg bold"><span>x &gt;= {situation_classification[3]} </span></td>
                 </tr>
                 <tr>
                     <td><span>Tendência de novos casos diários</span></td>
@@ -492,26 +515,26 @@ def gen_info_modal():
                 <tr>
                     <td><span>Controle da doença</span></td>
                     <td><span>Número de reprodução efetiva</span></td>
-                    <td class="light-blue-bg bold"><span>&lt;0.5</span></td>
-                    <td class="light-yellow-bg bold"><span>&lt;0.5 - 1&gt;</span></td>
-                    <td class="light-orange-bg bold"><span>&lt;1 - 1.2&gt;</span>&nbsp;</td>
-                    <td class="light-red-bg bold"><span>&gt;1.2</span></td>
+                    <td class="light-blue-bg bold"><span>&lt;{control_classification[1]}</span></td>
+                    <td class="light-yellow-bg bold"><span>&lt;{control_classification[1]} - {control_classification[2]}&gt;</span></td>
+                    <td class="light-orange-bg bold"><span>&lt;{control_classification[2]} - {control_classification[3]}&gt;</span>&nbsp;</td>
+                    <td class="light-red-bg bold"><span>&gt;{control_classification[3]}</span></td>
                 </tr>
                 <tr>
                     <td><span>Capacidade de respostas do sistema de saúde</span></td>
                     <td><span>Projeção de tempo para ocupação total de leitos UTI</span></td>
-                    <td class="light-blue-bg bold">60 - 90 dias</td>
-                    <td class="light-yellow-bg bold"><span>30 - 60 dias</span></td>
-                    <td class="light-orange-bg bold"><span>15 - 30 dias</span></td>
-                    <td class="light-red-bg bold"><span>0 - 15 dias</span></td>
+                    <td class="light-blue-bg bold">{capacity_classification[3]} - 90 dias</td>
+                    <td class="light-yellow-bg bold"><span>{capacity_classification[2]} - {capacity_classification[3]} dias</span></td>
+                    <td class="light-orange-bg bold"><span>{capacity_classification[1]} - {capacity_classification[2]} dias</span></td>
+                    <td class="light-red-bg bold"><span>{capacity_classification[0]} - {capacity_classification[1]} dias</span></td>
                 </tr>
                 <tr>
                     <td><span>Confiança dos dados</span></td>
                     <td><span>Subnotificação (casos <b>não</b> diagnosticados a cada 10 infectados)</span></td>
-                    <td class="light-blue-bg bold"><span>4&gt;=x&gt;0</span></td>
-                    <td class="light-yellow-bg bold"><span>6&gt;=x&gt;4</span></td>
-                    <td class="light-orange-bg bold"><span>7&gt;=x&gt;6</span></td>
-                    <td class="light-red-bg bold"><span>10&gt;=x&gt;=7</span></td>
+                    <td class="light-blue-bg bold"><span>{int(trust_classification[0]*10)}&lt;=x&lt;{int(trust_classification[1]*10)}</span></td>
+                    <td class="light-yellow-bg bold"><span>{int(trust_classification[1]*10)}&lt;=x&lt;{int(trust_classification[2]*10)}</span></td>
+                    <td class="light-orange-bg bold"><span>{int(trust_classification[2]*10)}&lt;=x&lt;{int(trust_classification[3]*10)}</span></td>
+                    <td class="light-red-bg bold"><span>{int(trust_classification[3]*10)}&lt;=x&lt;=10</span></td>
                 </tr>
             </tbody>
             </table>
@@ -523,6 +546,9 @@ def gen_info_modal():
                     <li> Descrescendo: caso a diminuição de novos casos esteja acontecendo por pelo menos 14 dias. </li>
                     <li> Estabilizando: qualquer outra mudança. </li>
                 </ul>
+            </div>
+            <div style="font-size: 14px">
+                Para mais detalhes confira nossa página de Metodologia no menu lateral</a>.
             </div>
             </div>
         </div>
@@ -571,12 +597,13 @@ def genInputFields(user_input, config, session):
     authors_icu_beds = user_input["author_number_icu_beds"]
     icu_beds_update = user_input["last_updated_number_icu_beds"]
 
+    print("\nSESSION_STATE:", session.number_beds, session.number_icu_beds)
+
     if session.reset or session.number_beds == None:
         number_beds = int(
             user_input["number_beds"]
             * config["br"]["simulacovid"]["resources_available_proportion"]
         )
-
         number_icu_beds = int(
             user_input["number_icu_beds"]
             * config["br"]["simulacovid"]["resources_available_proportion"]
@@ -606,7 +633,7 @@ def genInputFields(user_input, config, session):
     )
 
     user_input["number_icu_beds"] = st.number_input(
-        f"Número de leitos UTI destinados aos pacientes com Covid-19 (50% do reportado em {authors_icu_beds}; atualizado: {icu_beds_update}):",
+        f"Número de leitos UTI destinados aos pacientes com Covid-19 (100% do reportado em {authors_icu_beds}; atualizado: {icu_beds_update}):",
         0,
         None,
         number_icu_beds,
@@ -629,6 +656,8 @@ def genInputFields(user_input, config, session):
     # Faz o update quando clica o botão
     if st.button("Finalizar alteração"):
 
+        print("FINALIZADO:", user_input)
+
         session.number_beds = int(user_input["number_beds"])
         session.number_icu_beds = int(user_input["number_icu_beds"])
         session.number_cases = int(user_input["population_params"]["I_confirmed"])
@@ -640,6 +669,8 @@ def genInputFields(user_input, config, session):
 
     if st.button("Resetar aos valores oficais"):
         session.reset = True
+
+    # Estiliza botão
     alteration_button_style = """border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: var(--main-primary);font-weight: bold;text-align: center;text-decoration: none;font-size: 14px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
     reset_button_style = """position:absolute;right:3em;top:-68px;border: 1px solid var(--main-white);box-sizing: border-box;border-radius: 15px; width: auto;padding: 0.5em;text-transform: uppercase;font-family: var(--main-header-font-family);color: var(--main-white);background-color: rgb(160,170,178);font-weight: bold;text-align: center;text-decoration: none;font-size: 14px;animation-name: fadein;animation-duration: 3s;margin-top: 1em;"""
     stylizeButton(
@@ -664,7 +695,7 @@ def translate_risk(risk_value):
 
 def genAnalysisDimmensionsCard(dimension: Dimension):
     return f"""<div style="margin-top: 0px; display: inline-block; top:0x;">
-            <div class="dimension-card primary-span style="top:0x;">
+            <div class="dimension-card primary-span style="top:0x; padding-left: 24px; padding-top: 24px; padding-right: 24px;">
                 {dimension.text}
             </div>
         </div>"""
@@ -675,15 +706,16 @@ def genAnalysisDimmensionsSection(dimensions: List[Dimension]):
     cards = "".join(cards)
 
     st.write(
-        f"""
+        f"""<div class="container">
         <div class="base-wrapper primary-span">
             <div>
                 <span class="section-header">DIMENSÕES DA ANÁLISE</span>
             </div>
             <span class="p3">O que olhamos ao avaliar o cenário da pandemia em um lugar?</span>
-            <div class="flex flex-row flex-space-around mt flex-m-column" style="margin-bottom: 0px;height:auto; display:inline-block top:0x;">
+            <div class="flex flex-row mt flex-m-column" style="margin-bottom: 0px;height:auto; display:inline-block top:0x;">
             {cards}
             </div>
+        </div>
         </div>""",
         unsafe_allow_html=True,
     )
@@ -710,20 +742,20 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
     captions_by_place = {
         "state_num_id": {
             "SITUAÇÃO DA DOENÇA": "Hoje em seu <b>estado</b> são <b>reportados</b> em média",
-            "CONTROLE DA DOENÇA": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt de seu estado para classificação.</b>",
+            "CONTROLE DA DOENÇA": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>classificamos pela estimativas de Rt de seu estado.</b>",
             "CAPACIDADE DO SISTEMA": "Se nada mudar, a capacidade hospitalar de seu <b>estado</b> será atingida em",
             "CONFIANÇA DOS DADOS": "A cada 10 pessoas infectadas em seu <b>estado</b>,",
         },
         "health_region_id": {
             "SITUAÇÃO DA DOENÇA": "Hoje em sua <b>regional de saúde</b> são <b>reportados</b> em média",
-            "CONTROLE DA DOENÇA": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt de sua regional de saúde para classificação.</b>",
+            "CONTROLE DA DOENÇA": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>classificamos pela estimativas de Rt de sua regional.</b>",
             "CAPACIDADE DO SISTEMA": "Se nada mudar, a capacidade hospitalar de sua <b>regional de saúde</b> será atingida em",
             "CONFIANÇA DOS DADOS": "A cada 10 pessoas infectadas em sua <b>regional de saúde</b>,",
         },
         "city_id": {
             "SITUAÇÃO DA DOENÇA": "Hoje em seu <b>município</b> são <b>reportados</b> em média",
             "CONTROLE DA DOENÇA": {
-                "health_region_id": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt de sua regional de saúde para classificação.</b>",
+                "health_region_id": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>classificamos pela estimativas de Rt de sua regional.</b>",
                 "city_id": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt de seu município para classificação.</b>",
             },
             "CAPACIDADE DO SISTEMA": "Se nada mudar, a capacidade hospitalar de sua <b>regional de saúde</b> será atingida em",
@@ -731,7 +763,6 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
         },
     }
 
-    print(place_type)
     if place_type == "city_id" and indicator.header == "CONTROLE DA DOENÇA":
         indicator.caption = captions_by_place[place_type][indicator.header][rt_type]
     else:
@@ -755,6 +786,7 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
                 <span class="lighter">{indicator.right_label}<br></span>
                 <span class="bold">{indicator_right_display}</span>
         </div>
+        <div class="last-updated-text">Atualizado em: {indicator.last_updated}</div>
     </div>"""
 
 
@@ -771,7 +803,7 @@ def genKPISection(
         [genIndicatorCard(group, place_type, rt_type) for group in indicators.values()]
     )
     # print(cards)
-    info_modal = gen_info_modal()
+    info_modal = gen_info_modal(config)
 
     # Generate subheader
     if not isinstance(alert, str):
@@ -781,20 +813,20 @@ def genKPISection(
         stoplight = "%0a%0a"
     else:
         bg = AlertBackground(alert).name
+        if alert == "altíssimo":
+            caption = f"Nível de alerta <b>{alert.upper()}</b>: há um crescente número de casos de Covid-19 e grande parte deles não são detectados."
+        elif alert == "alto":
+            caption = f"Nível de alerta <b>{alert.upper()}</b>: há muitos casos de Covid-19 com transmissão comunitária. A presença de casos não detectados é provável."
+        elif alert == "moderado":
+            caption = f"Nível de alerta <b>{alert.upper()}</b>: há um número moderado de casos e a maioria tem uma fonte de transmissão conhecida."
+        elif alert == "novo normal":
+            caption = f"Nível de alerta <b>{alert.upper()}</b>: casos são raros e técnicas de rastreamento de contato e monitoramento de casos suspeitos evitam disseminação."
 
         if "state" in place_type:
-            place_type = "estado"
             if n_colapse_regions > 0:
-                caption = f"Seu estado está em Risco {alert.upper()} de colapso. <b>Note que {n_colapse_regions} regionais de saúde avaliadas estão em Risco Alto ou Altíssimo</b>.<br>Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
+                caption = f"{caption}<br><b>Note que {n_colapse_regions} regionais de saúde avaliadas estão em Alerta Alto ou Altíssimo</b>. Sugerimos que políticas de resposta à Covid-19 sejam avaliadas a nível subestatal."
             else:
-                caption = f"Seu estado está em Risco {alert.upper()} de colapso. Nenhuma regional de saúde avaliada está em Risco Alto ou Altíssimo de colapso.<br>Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
-
-        elif "healt_region" in place_type:
-            place_type = "regional"
-            caption = f"Risco {alert.upper()} de colapso no sistema de saúde."
-        else:
-            place_type = "município"
-            caption = f"Risco {alert.upper()} de colapso no sistema de saúde."
+                caption = f"{caption}<br>Nenhuma regional de saúde avaliada está em Alerta Alto ou Altíssimo de colapso. Sugerimos que políticas de resposta à Covid-19 sejam avaliadas a nível subestatal."
 
     msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  
     🚨%0a%0aNÍVEL DE ALERTA: {alert.upper()}
@@ -807,18 +839,20 @@ def genKPISection(
 
     # Write cards section
     st.write(
-        """<div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;height:auto;">
+        """<div class="container">
+        <div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;height:auto;">
                 <div class="base-wrapper flex flex-column" style="margin-top: 0px;">
                         <div class="flex flex-row flex-space-between flex-align-items-center">
                          <span class="white-span header p1">%s</span>
                          <a class="btn-wpp" href="whatsapp://send?text=%s" target="blank">Compartilhar no Whatsapp</a>
                          </div>
                         <span class="white-span p3">%s</span>
-                        <div class="flex flex-row flex-m-column">%s</div>
+                        <div class="flex-row flex-m-column">%s</div>
                         <div class = "info">%s</div>
                 </div>
         </div>
-        <div class='base-wrapper product-section' ></div>
+        </div>
+        <div class='base-wrapper product-section'></div>
         """
         % (bg, locality, msg, caption, cards, info_modal),
         unsafe_allow_html=True,
@@ -869,7 +903,10 @@ def genInputCustomizationSectionHeader(locality: str) -> None:
         <div class="base-wrapper">
                 <span class="section-header primary-span">Verifique os dados disponíveis <span class="yellow-span">(%s)</span></span>
                 <br><br>
-                <span>Usamos os dados do Brasil.io e DataSUS, mas é possível que esses dados estejam um pouco desatualizados. Se estiverem, é só ajustar os valores abaixo para continuar a simulação.</span>
+                <span>
+                Usamos os dados do Brasil.io e DataSUS, mas é possível que esses dados estejam um pouco desatualizados. Se estiverem, é só ajustar os valores abaixo para continuar a simulação.
+                <br><b>Para municípios usamos os dados de leitos da respectiva regional de saúde.</b>
+                </span>
                 <br>
         </div>"""
         % locality,
@@ -891,8 +928,8 @@ def gen_footer() -> None:
                                 Trata-se de contribuição à elaboração de cenários por parte dos governos e não configura qualquer obrigação ou responsabilidade perante as decisões efetivadas.
                                 Saiba mais sobre os cálculos por trás de análises e indicadores em nossas páginas de Níveis de Risco e Modelo Epidemiológico (menu lateral esquerdo), 
                                 que mantemos atualizadas conforme evoluímos em nossas metodologias.<br><br></span>
-                                <span><i>Todo código da ferramenta pode ser acessado no <a class="github-link" href="https://github.com/ImpulsoGov/farolcovid">Github do projeto</a>
-                                e os dados estão disponíveis em nossa <a class="github-link" href="https://github.com/ImpulsoGov/coronacidades-datasource/blob/master/README.md">API</a>.</i></span>
+                                <span><i>Todo código da ferramenta pode ser acessado no <a target="_blank" class="github-link" href="https://github.com/ImpulsoGov/farolcovid">Github do projeto</a>
+                                e os dados estão disponíveis em nossa <a target="_blank" class="github-link" href="https://github.com/ImpulsoGov/coronacidades-datasource/blob/master/README.md">API</a>.</i></span>
                                 </br></br></span>
                                 <img class="logo-img" src="%s"/>
                                 <div class="logo-section">
@@ -929,15 +966,8 @@ def genSimulatorOutput(output: SimulatorOutput) -> str:
     beds_img = "https://i.imgur.com/27hutU0.png"
     icu_beds_img = "https://i.imgur.com/Oh4l8qM.png"
 
-    if output.min_range_beds < 4 and output.max_range_beds < 4:
-        bed_projection = f"em até {output.max_range_beds} mês(es)"
-    else:
-        bed_projection = "mais de 3 meses"
-
-    if output.min_range_icu_beds < 4 and output.max_range_icu_beds < 4:
-        icu_bed_projection = f"em até {output.max_range_icu_beds} mês(es)"
-    else:
-        icu_bed_projection = "mais de 3 meses"
+    bed_projection = dday_preffix(output.max_range_beds) + " dias"
+    icu_bed_projection = dday_preffix(output.max_range_icu_beds) + " dias"
 
     output = """
         <div>

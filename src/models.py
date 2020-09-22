@@ -74,6 +74,7 @@ class Indicator:
         unit,
         left_label,
         right_label,
+        last_updated=None,
         risk="nan",
         display="",
         left_display="",
@@ -88,6 +89,7 @@ class Indicator:
         self.right_label = right_label
         self.left_display = left_display
         self.right_display = right_display
+        self.last_updated = last_updated
 
 
 class ResourceAvailability(NamedTuple):
@@ -159,16 +161,16 @@ IndicatorCards: Dict[str, Indicator] = {
     ),
     IndicatorType.CAPACITY.value: Indicator(
         header="CAPACIDADE DO SISTEMA",
-        caption="Se nada mudar, a capacidade hospitalar de seu <b>estado ou regional de saúde</b> será atingida em",
-        unit="mês(es)",
-        left_label="Número de Leitos*:",
-        right_label="Capacidade de UTI:",
+        caption="Se nada mudar, todos os leitos de seu <b>estado ou regional de saúde</b> estarão ocupados em",
+        unit="dia(s)",
+        left_label="Leitos enfermaria*:",
+        right_label="Leitos UTI:",
     ),
     IndicatorType.TRUST.value: Indicator(
         header="CONFIANÇA DOS DADOS",
         caption="A cada 10 pessoas infectadas,",
         unit="não são diagnosticadas",
-        left_label="Mortes/100mil hab:",
+        left_label="Casos ativos estimados:",
         right_label="Tendência:",
     ),
 }

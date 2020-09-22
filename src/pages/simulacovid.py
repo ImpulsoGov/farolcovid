@@ -193,9 +193,9 @@ def main(user_input, indicators, data, config, session_state):
 
         # Roda a simulação
         dfs = simulator.run_simulation(_prepare_simulation(user_input, config), config)
-        dday_beds = simulator.get_dmonth(dfs, "I2", int(user_input["number_beds"]))
+        dday_beds = simulator.get_dday(dfs, "I2", int(user_input["number_beds"]))
 
-        dday_icu_beds = simulator.get_dmonth(
+        dday_icu_beds = simulator.get_dday(
             dfs, "I3", int(user_input["number_icu_beds"])
         )
 

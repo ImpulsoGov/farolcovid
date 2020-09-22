@@ -17,8 +17,8 @@ def main(session_state):
     st.write(
         """
         Nosso modelo de projeção da capacidade hospitalar estima 2 tipos de demandas baseadas na
-        intensidade da infecção: **casos severos (I2) e casos graves (I3)**. Como ponto de partida do modelo,
-        determinamos qual o percentual de casos severos e graves dentre o total de casos ativos - já
+        intensidade da infecção: **casos severos (I2) e casos críticos (I3)**. Como ponto de partida do modelo,
+        determinamos qual o percentual de casos severos e críticos dentre o total de casos ativos - já
         ajustados pela taxa de subnotificação conforme definimos anteriormente (ver Inicialização dos
         estados em v1.2). 
         
@@ -26,19 +26,19 @@ def main(session_state):
         assintomáticos dentre o total de casos ativos e consideramos também a distribuição etária da
         população na definição dos percentuais considerados para a inicialização. Conforme o levantamento de
         parâmetros de referência de Alison Hill (2020), cerca de 30% dos casos totais são assintomáticos.
-        Dentre os 70% restantes, passamos a calcular o percentual de hospitalizados graves (I2 / I) e
-        severos (I3 / I) estimando a proporção esperada de hospitalizações na região/estado (I2+I3 / I).
+        Dentre os 70% restantes, passamos a calcular o percentual de hospitalizados severos (I2 / I) e
+        críticos (I3 / I) estimando a proporção esperada de hospitalizações na região/estado (I2+I3 / I).
         
         A proporção esperada de hospitalizações é dada pela estimativa de hospitalizações de cada faixa, de
         Verity, Robert, et al. (2020) num amplo estudo com base em 3.665 casos na China, ponderado pelo
         total da população em cada faixa etária (População residente em 2019 - CNES). Esse valor nos fornece
         o percentual total de hospitalizações esperadas na população (I2+I3/I). Para obter o percentual por
-        intensidade do caso, mantivemos a razão entre severos (I3) e graves (I2) constante: antes tínhamos
-        12.5% graves e 2.5% severos do total de casos ativos (I) - ou seja, uma razão de 0.2 severos em
-        relação a graves -, que passa a ser de 83.3% graves (I2) e 16.7% severos (I3) do percentual estimado
-        de hospitalizados (I2+I3 / I).  Alteramos ainda a categoria “Ventiladores” para “Leitos UTI”, 
-        removemos a classificação por "Leitos UTI Covid" pois mais de 30% das regionais não possuiam esse dado.
-        A taxa de contágio utilizada nos diferentes cenários segue a nova
+        intensidade do caso, mantivemos a razão entre severos (I2) e críticos (I3) constante: antes tínhamos
+        12.5% severos e 2.5% críticos do total de casos ativos (I) - ou seja, uma razão de 0.2 críticos
+        para cada caso severo (I3/I2) -, que passa a ser de 83.3% severos (I2) e 16.7% críticos (I3) do total estimado
+        de hospitalizados (I2+I3 / I).  Alteramos ainda a categoria “Ventiladores” para “Leitos UTI” - testamos utitlizar 
+        a nova categoria do CNES de leitos "UTI-Covid Adulto” e “UTI-Covid Infantil” porém muitas regionais 
+        não possuiam dados (~30%). A taxa de contágio utilizada nos diferentes cenários segue a nova
         metodologia da Taxa de Contágio descrita nos indicadores dos Níveis de Alerta.
         """
     )
@@ -60,7 +60,7 @@ def main(session_state):
         - Os números básicos de reprodução estimados para cada cenário são meramente fictícios, não
           estão atrelados diretamente a nenhuma intervenção que dobre ou diminua pela metade o valor
           observado hoje. Não esperamos, portanto, uma equivalência perfeita com a situação
-          brasileira.  Os dados do número de leitos e leitos UTI Covid são atualizados mensalmente
+          brasileira.  Os dados do número de leitos e leitos UTI são atualizados mensalmente
           no DATASUS CNES e há conhecidos problemas de reporte.
         - Os dados do número de casos confirmados em cada município reportados pelas secretarias
           estaduais de saúde frequentemente refletem metodologia distinta do que aqueles reportados
@@ -138,7 +138,7 @@ def main(session_state):
 
 
         A demanda por equipamento $$e$$ ($$\mathcal{D^e(t)}$$) é dada pelo número de
-        casos graves e críticos em $$t$$, estimado por meio de de um modelo
+        casos severos e críticos em $$t$$, estimado por meio de de um modelo
         epidemiológico. A oferta $$e$$ ($$\mathcal{O^e(t)}$$) é determinada pelo
         número de equipamentos que o município tem a disposição para pacientes
         de Covid-19. Ela também é dinâmica pois os municípios estão, por
@@ -505,7 +505,7 @@ def main(session_state):
           Ministério da Saúde do Brasil lançado em 28 de março de 2020,
           consideramos que aproximadamente $14.6\%$ dos casos confirmados são
           hospitalizados (569 dos 3904 casos totais). Não há reporte oficial da
-          porcentagem de casos graves e severos para o Brasil. Portanto,
+          porcentagem de casos severos e críticos para o Brasil. Portanto,
           buscamos a referência dos Estados Unidos, onde o CDC (2020) reportou
           que:
 
@@ -518,7 +518,7 @@ def main(session_state):
           de comorbidades e hábitos entre a população dos Estados Unidos quando
           comparado à da China, além da maior semelhança na atual fase de
           transmissão comunitária da doença e da capacidade de testagem.
-          Ademais, o percentual total de casos graves/severos e críticos deste
+          Ademais, o percentual total de casos severos e críticos deste
           país ($14.5\%$) resulta em percentual similar ao reportado pelo
           Ministério da Saúde brasileiro ($14.6\%$).
 
