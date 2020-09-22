@@ -596,7 +596,7 @@ def genInputFields(user_input, config, session):
 
     authors_icu_beds = user_input["author_number_icu_beds"]
     icu_beds_update = user_input["last_updated_number_icu_beds"]
-    
+
     print("\nSESSION_STATE:", session.number_beds, session.number_icu_beds)
 
     if session.reset or session.number_beds == None:
@@ -786,6 +786,7 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
                 <span class="lighter">{indicator.right_label}<br></span>
                 <span class="bold">{indicator_right_display}</span>
         </div>
+        <div class="last-updated-text">Atualizado em: {indicator.last_updated}</div>
     </div>"""
 
 
@@ -813,28 +814,19 @@ def genKPISection(
     else:
         bg = AlertBackground(alert).name
         if alert == "altíssimo":
-            caption_alert = "há um crescente número de casos de Covid-19 e grande parte deles não são detectados"
+            caption = f"Nível de alerta <b>{alert.upper()}</b>: há um crescente número de casos de Covid-19 e grande parte deles não são detectados."
         elif alert == "alto":
-            caption_alert = "há muitos casos de Covid-19 com transmissão comunitária. A presença de casos não detectados é provável"
+            caption = f"Nível de alerta <b>{alert.upper()}</b>: há muitos casos de Covid-19 com transmissão comunitária. A presença de casos não detectados é provável."
         elif alert == "moderado":
-            caption_alert = "há um número moderado de casos e a maioria tem uma fonte de transmissão conhecida"
+            caption = f"Nível de alerta <b>{alert.upper()}</b>: há um número moderado de casos e a maioria tem uma fonte de transmissão conhecida."
         elif alert == "novo normal":
-            caption_alert = "casos são raros e técnicas de rastreamento de contato e monitoramento de casos suspeitos evitam disseminação"
+            caption = f"Nível de alerta <b>{alert.upper()}</b>: casos são raros e técnicas de rastreamento de contato e monitoramento de casos suspeitos evitam disseminação."
 
         if "state" in place_type:
-            place_type = "estado"
-            state_caption = f"No seu estado {caption_alert}."
             if n_colapse_regions > 0:
-                caption = f"{state_caption} <b>Note que {n_colapse_regions} regionais de saúde avaliadas estão em Alerta Alto ou Altíssimo</b>.<br>Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
+                caption = f"{caption}<br><b>Note que {n_colapse_regions} regionais de saúde avaliadas estão em Alerta Alto ou Altíssimo</b>. Sugerimos que políticas de resposta à Covid-19 sejam avaliadas a nível subestatal."
             else:
-                caption = f"{state_caption} Nenhuma regional de saúde avaliada está em Alerta Alto ou Altíssimo de colapso.<br>Recomendamos que políticas de resposta à crise da Covid-19 sejam avaliadas a nível subestatal."
- 
-        elif "health_region" in place_type:
-            place_type = "regional"
-            caption = f"Na sua regional {caption_alert}." 
-        else:
-            place_type = "município"
-            caption = f"No seu município {caption_alert}."
+                caption = f"{caption}<br>Nenhuma regional de saúde avaliada está em Alerta Alto ou Altíssimo de colapso. Sugerimos que políticas de resposta à Covid-19 sejam avaliadas a nível subestatal."
 
     msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  
     🚨%0a%0aNÍVEL DE ALERTA: {alert.upper()}
@@ -860,7 +852,7 @@ def genKPISection(
                 </div>
         </div>
         </div>
-        <div class='base-wrapper product-section' ></div>
+        <div class='base-wrapper product-section'></div>
         """
         % (bg, locality, msg, caption, cards, info_modal),
         unsafe_allow_html=True,
