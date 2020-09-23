@@ -307,15 +307,14 @@ def prepare_heatmap(
         gen_cards(df, your_city, group)
         legend = """
         <div class="base-wrapper" style="display: flex; flex-direction: column;">
-            <span style="border-radius: 15px; border: dashed 2px  #F2C94C; padding: 1em">
+            <span style="border-radius: 15px; border: dashed 2px  #F2C94C; padding: 1em; display: flex; flex-direction: column;">
             O gráfico abaixo mostra a média do número de mortes
             diárias dos últimos cinco dias para os 30 municípios com mais mortes, desde a data da primeira morte reportada e também o que você selecionou mesmo que este não esteja entre os 30 primeiros.
             Para comparação, os números foram normalizados pelo 
             maior valor encontrado em cada município:
             <b>quanto mais vermelho, mais próximo está o valor do
             maior número de mortes por dia observado no município
-            até hoje</b>.
-            <br><br>
+            até hoje.</b>
             </span>
             Os municípios estão ordenadas pelo dia que atingiu o máximo de mortes, 
             ou seja, municípios no pico de mortes aparecerão no topo. {}
@@ -329,18 +328,17 @@ def prepare_heatmap(
     if place_type == "state_id":
 
         legend = """
-        <div class="base-wrapper"  style="display: flex; flex-direction: column;">
+        <div class="base-wrapper">
             <span class="section-header primary-span">ONDA DE MORTES DIÁRIAS POR ESTADO</span>
             <br><br>
             <div class="onda-headercaption">
-            <span style="border-radius: 15px; border: dashed 2px  #F2C94C; padding: 1em">
+            <span style="border-radius: 15px; border: dashed 2px  #F2C94C; padding: 1em; display: flex; flex-direction: column;">
                 O gráfico abaixo mostra a média do número de mortes
                 diárias dos últimos cinco dias em cada UF, desde a data da
                 primeira morte reportada. Para comparação, os números foram
                 normalizados pelo maior valor encontrado em cada UF:
                 <b>quanto mais vermelho, mais próximo está o valor do
-                maior número de mortes por dia observado na UF até hoje</b>.
-                <br><br>
+                maior número de mortes por dia observado na UF até hoje.</b>
             </span>
                 As UFs estão ordenadas pelo dia que atingiu o máximo de mortes, 
                 ou seja, UFs no pico de mortes aparecerão no topo. {}
@@ -355,18 +353,17 @@ def prepare_heatmap(
     if place_type == "country_pt":
 
         legend = """
-        <div class="base-wrapper"  style="display: flex; flex-direction: column;">
+        <div class="base-wrapper">
             <span class="section-header primary-span">ONDA DE MORTES DIÁRIAS POR PAÍS</span>
             <br><br>
-            <span style="border-radius: 15px; border: dashed 2px  #F2C94C; padding: 1em">
+            <span style="border-radius: 15px; border: dashed 2px  #F2C94C; padding: 1em; display: flex; flex-direction: column;">
             O gráfico abaixo mostra a média do número de mortes
             diárias dos últimos cinco dias para os 30 países com mais 
             mortes, desde a data da primeira morte reportada.
             Para comparação, os números foram normalizados pelo maior
             valor encontrado em cada país:<b> quanto mais vermelho,
             mais próximo está o valor do maior número de mortes por
-            dia observado no país até hoje</b>.
-            <br><br>
+            dia observado no país até hoje.</b>
             </span>
             Os países estão ordernados pelo dia que atingiu o máximo de mortes,
             ou seja, os países no pico de mortes aparecerão no topo. {}
@@ -378,14 +375,13 @@ def prepare_heatmap(
         """
     if deaths_per_cases:
         legend = """
-        <div class="base-wrapper"  style="display: flex; flex-direction: column;">
-            <span style="border-radius: 15px; border: dashed 2px  #F2C94C; padding: 1em">
+        <div class="base-wrapper">
+            <span style="border-radius: 15px; border: dashed 2px  #F2C94C; padding: 1em; display: flex; flex-direction: column;">
             O gráfico abaixo mostra a taxa de mortes
             por casos (acumulado histórico) para os 30 municípios com mais mortes por casos, desde a data da primeira morte reportada e também o que você selecionou mesmo que este não esteja entre os 30 primeiros.
             <b>Quanto mais vermelho, mais próximo está o valor do
             de 1 morte a cada 1 caso registrado no município
             até aquela data.</b>
-            <br><br>
             </span>
             Os municípios estão ordenadas pelo dia que atingiram o seu máximo de mortes por casos, 
             ou seja, municípios no pico de mortes por casos aparecerão no topo. 
