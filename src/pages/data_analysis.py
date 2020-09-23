@@ -120,10 +120,10 @@ def plot_heatmap(
         sorted_index = sorted_index.sort_values(by=["0_x", "0_y"]).index
     states_total_deaths = states_total_deaths.reindex(sorted_index)
     data = _df_to_plotly(pivot.loc[states_total_deaths.index])
-    data["y"] = [conversion_renames[city_name] for city_name in data["y"]]
-    states_total_deaths.index = [
-        conversion_renames[city_name] for city_name in states_total_deaths.index
-    ]
+    #data["y"] = [conversion_renames[city_name] for city_name in data["y"]]
+    #states_total_deaths.index = [
+    #    conversion_renames[city_name] for city_name in states_total_deaths.index
+    #]
     trace1 = go.Heatmap(
         data,
         hoverinfo="text",
