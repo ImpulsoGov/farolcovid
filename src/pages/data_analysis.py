@@ -26,10 +26,12 @@ def _generate_hovertext(df_to_plotly, deaths_per_cases=False):
     for yi, yy in enumerate(df_to_plotly["y"]):
         hovertext.append(list())
         for xi, xx in enumerate(df_to_plotly["x"]):
+            new_xx = xx.to_pydatetime().strftime('%d/%m/%Y')
             hovertext[-1].append(
                 "<b>{}</b><br>Data: {}<br>{}: {}".format(
                     yy,
-                    str(xx)[:10],
+                    #str(xx)[:10],
+                    new_xx,
                     color_value_label,
                     round(df_to_plotly["z"][yi][xi], 2),
                 )
@@ -120,10 +122,7 @@ def plot_heatmap(
         sorted_index = sorted_index.sort_values(by=["0_x", "0_y"]).index
     states_total_deaths = states_total_deaths.reindex(sorted_index)
     data = _df_to_plotly(pivot.loc[states_total_deaths.index])
-    #data["y"] = [conversion_renames[city_name] for city_name in data["y"]]
-    #states_total_deaths.index = [
-    #    conversion_renames[city_name] for city_name in states_total_deaths.index
-    #]
+
     trace1 = go.Heatmap(
         data,
         hoverinfo="text",
