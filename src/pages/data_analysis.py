@@ -9,6 +9,9 @@ import pandas as pd
 import utils
 import amplitude
 
+from datetime import datetime
+
+
 
 def _get_rolling_amount(grp, time, data_col="last_updated", col_to_roll="new_deaths"):
     return grp.rolling(time, min_periods=1, on=data_col)[col_to_roll].mean()
@@ -26,7 +29,7 @@ def _generate_hovertext(df_to_plotly, deaths_per_cases=False):
     for yi, yy in enumerate(df_to_plotly["y"]):
         hovertext.append(list())
         for xi, xx in enumerate(df_to_plotly["x"]):
-            #new_xx = xx.to_datetime().strftime('%d/%m/%Y') #converter tudo pra string e depois pra data?
+            #new_xx = datetime.strptime(str(xx),'%d/%m/%Y') #converter tudo pra string e depois pra data?
             hovertext[-1].append(
                 "<b>{}</b><br>Data: {}<br>{}: {}".format(
                     yy,
