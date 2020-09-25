@@ -156,8 +156,7 @@ def plot_heatmap(
         # width=1000,
         height=700,
         margin={"l": 100, "r": 100, "t": 30},
-        #xaxis=dict(domain=[0, 0.8]),
-        xaxis=dict(tickformat="%d %B"),
+        xaxis=dict(domain=[0, 0.8], tickformat="%d %B"),
         xaxis2=dict(domain=[0.85, 1]),
         yaxis=dict(tickmode="linear"),
         # yaxis2=dict(tickmode="linear", anchor="x2"),
@@ -316,6 +315,7 @@ def prepare_heatmap(
             maior número de mortes por dia observado no município
             até hoje.</b>
             </span>
+            <br><br>
             Os municípios estão ordenadas pelo dia que atingiu o máximo de mortes, 
             ou seja, municípios no pico de mortes aparecerão no topo. {}
             é o município com o maior número de mortos, com: <i>{}</i>
@@ -340,6 +340,7 @@ def prepare_heatmap(
                 <b>quanto mais vermelho, mais próximo está o valor do
                 maior número de mortes por dia observado na UF até hoje.</b>
             </span>
+            <br><br>
                 As UFs estão ordenadas pelo dia que atingiu o máximo de mortes, 
                 ou seja, UFs no pico de mortes aparecerão no topo. {}
                 é o estado com o maior número de mortos, com: <i>{}</i>
@@ -365,6 +366,7 @@ def prepare_heatmap(
             mais próximo está o valor do maior número de mortes por
             dia observado no país até hoje.</b>
             </span>
+            <br><br>
             Os países estão ordernados pelo dia que atingiu o máximo de mortes,
             ou seja, os países no pico de mortes aparecerão no topo. {}
             é o país com o maior número de mortos, com: <i>{}</i>
@@ -383,6 +385,7 @@ def prepare_heatmap(
             de 1 morte a cada 1 caso registrado no município
             até aquela data.</b>
             </span>
+            <br><br>
             Os municípios estão ordenadas pelo dia que atingiram o seu máximo de mortes por casos, 
             ou seja, municípios no pico de mortes por casos aparecerão no topo. 
             {} é o município com o maior número de mortos por casos, com: <i>{}</i> mortos por casos
