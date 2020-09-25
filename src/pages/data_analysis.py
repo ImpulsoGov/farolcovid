@@ -26,12 +26,12 @@ def _generate_hovertext(df_to_plotly, deaths_per_cases=False):
     for yi, yy in enumerate(df_to_plotly["y"]):
         hovertext.append(list())
         for xi, xx in enumerate(df_to_plotly["x"]):
-            new_xx = xx.to_pydatetime().strftime('%d/%m/%Y')
+            #new_xx = xx.to_datetime().strftime('%d/%m/%Y') #converter tudo pra string e depois pra data?
             hovertext[-1].append(
                 "<b>{}</b><br>Data: {}<br>{}: {}".format(
                     yy,
-                    #str(xx)[:10],
-                    new_xx,
+                    str(xx)[:10],
+                    #new_xx,
                     color_value_label,
                     round(df_to_plotly["z"][yi][xi], 2),
                 )
@@ -156,7 +156,8 @@ def plot_heatmap(
         # width=1000,
         height=700,
         margin={"l": 100, "r": 100, "t": 30},
-        xaxis=dict(domain=[0, 0.8]),
+        #xaxis=dict(domain=[0, 0.8]),
+        xaxis=dict(tickformat="%d %B"),
         xaxis2=dict(domain=[0.85, 1]),
         yaxis=dict(tickmode="linear"),
         # yaxis2=dict(tickmode="linear", anchor="x2"),
