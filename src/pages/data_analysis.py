@@ -9,7 +9,7 @@ import pandas as pd
 import utils
 import amplitude
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 
@@ -230,14 +230,24 @@ def gen_cards(df, your_city, group):
     city_peak_daily_deaths = city_evaluation_df.loc[
         city_evaluation_df.index == city_peak_daily_deaths_day
     ]["new_deaths"].values[0]
+    print(city_peak_daily_deaths_day)
+
+    yesterday = datetime.now() - timedelta(1)
+    yesterday= yesterday.strftime('%Y-%m-%d')
+    print(yesterday)
+
+    #city_today_daily_deaths = city_evaluation_df.loc[
+    #    city_evaluation_df.index.strftime('%Y-%m-%d') == yesterday
+    #]["new_deaths"].values[0]
+
     deaths_banner_design_dict = {
-        "stable": {"background-color": "grey", "text": "comportamento estável"},
-        "falling": {"background-color": "#0090A7", "text": "queda"},
-        "increasing": {"background-color": "#F02C2E", "text": "alta"},
+        "stable": {"background-color": "grey", "text": "estabilizando"},
+        "falling": {"background-color": "#0090A7", "text": "decrescendo"},
+        "increasing": {"background-color": "#F02C2E", "text": "crescendo"},
     }
 
     if city_peak_daily_deaths >= 1:
-        pico = f"Seu pico de mortes diárias foi de {city_peak_daily_deaths} mortes em {city_peak_daily_deaths_day.strftime('%d/%m/%Y')}"
+        pico = f"O pico de mortes diárias ocorreu em {city_peak_daily_deaths_day.strftime('%d/%m/%Y')} com {city_peak_daily_deaths} mortes."
     else:
         pico = f"Seu município ainda não reportou nenhuma morte."
 
@@ -246,31 +256,24 @@ def gen_cards(df, your_city, group):
                 <div class="distancing-container distancing-card-bg">
                         <div class="distancing-output-wrapper">
                                 <span class="distancing-output-row-prediction-label">
-                                    Seu estado ({group}) está há 
-                                </span>
-                                <div class="distancing-output-row">
-                                        <span class="distancing-output-row-prediction-value" style="font-size:28px;font-weight:normal;">
-                                                <b>{behaviour_length} dia{["","s"][int(behaviour_length> 1)]} em {deaths_banner_design_dict[deaths_behaviour]["text"]}</b>
-                                        </span>  
-                                </div> 
-                                <span class="distancing-output-row-prediction-label">
-                                        da média móvel de mortes. O pico de mortes diárias até hoje foi de {peak_daily_deaths} mortes, em {peak_daily_deaths_day.strftime('%d/%m/%Y')}.
-                                </span>
+                                    A média móvel de seu estado ({group}) é de xx mortes hoje e está 
+                                    <span class="distancing-output-row-prediction-value" style="font-size:28px;">
+                                        {deaths_banner_design_dict[deaths_behaviour]["text"]} há {behaviour_length} dia{["","s"][int(behaviour_length> 1)]}. 
+                                    </span>
+                                    <br> 
+                                    O pico de mortes diárias ocorreu em {peak_daily_deaths_day.strftime('%d/%m/%Y')} com {peak_daily_deaths} mortes.
+                                </span>  
                         </div>
                 </div>
                 <div class="distancing-card-separator"></div>
                 <div class="distancing-container distancing-card-bg">
                         <div class="distancing-output-wrapper">
                                 <span class="distancing-output-row-prediction-label">
-                                        Seu município ({your_city}) está há 
-                                </span>
-                                <div class="distancing-output-row">
-                                        <span class="distancing-output-row-prediction-value" style="font-size:28px;font-weight:normal;">
-                                                <b>{city_behaviour_length} dia{["","s"][int(city_behaviour_length> 1)]} em {deaths_banner_design_dict[city_deaths_behaviour]["text"]} </b>
-                                        </span>  
-                                </div> 
-                                <span class="distancing-output-row-prediction-label">
-                                        da média móvel de mortes. {pico}
+                                    A média móvel do seu município ({your_city}) é de xx mortes hoje e está
+                                    <span class="distancing-output-row-prediction-value" style="font-size:28px;">
+                                    {deaths_banner_design_dict[city_deaths_behaviour]["text"]} há {city_behaviour_length} dia{["","s"][int(city_behaviour_length> 1)]}.
+                                </span> 
+                                {pico}
                                 </span>
                         </div>
                 </div>
@@ -319,7 +322,7 @@ def prepare_heatmap(
             até hoje.</b>
             </span>
             <br><br>
-            Os municípios estão ordenadas pelo dia que atingiu o máximo de mortes, 
+            Os municípios estão ordenados pelo dia que atingiu o máximo de mortes, 
             ou seja, municípios no pico de mortes aparecerão no topo. {}
             é o município com o maior número de mortos, com: <i>{}</i>
             e o estado totaliza: <i>{}</i>.
