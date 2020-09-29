@@ -208,16 +208,23 @@ def make_deaths_per_cases(row):
 
 
 def gen_cards(df, your_city, group):
+    yesterday = datetime.now() - timedelta(1)
+    yesterday= yesterday.strftime('%Y-%m-%d')
+    
     # State evalaution
     state_evaluation_df = df.groupby(["last_updated"]).sum().sort_index(ascending=False)
     peak_daily_deaths_day = state_evaluation_df["new_deaths"].idxmax()
     peak_daily_deaths = state_evaluation_df.loc[
         state_evaluation_df.index == peak_daily_deaths_day
     ]["new_deaths"].values[0]
+    peak_today_daily_deaths = state_evaluation_df.loc[
+        state_evaluation_df.index == yesterday
+    ]["new_deaths"].values[0]
 
     deaths_behaviour, behaviour_length = evaluate_scrolling_deaths_behaviour(
         state_evaluation_df
     )
+
     # City evaluation for the banner
     city_evaluation_df = (
         df[df["city_name"] == your_city].groupby(["last_updated"]).sum()
@@ -230,15 +237,10 @@ def gen_cards(df, your_city, group):
     city_peak_daily_deaths = city_evaluation_df.loc[
         city_evaluation_df.index == city_peak_daily_deaths_day
     ]["new_deaths"].values[0]
-    print(city_peak_daily_deaths_day)
 
-    yesterday = datetime.now() - timedelta(1)
-    yesterday= yesterday.strftime('%Y-%m-%d')
-    print(yesterday)
-
-    #city_today_daily_deaths = city_evaluation_df.loc[
-    #    city_evaluation_df.index.strftime('%Y-%m-%d') == yesterday
-    #]["new_deaths"].values[0]
+    city_today_daily_deaths = city_evaluation_df.loc[
+        city_evaluation_df.index == yesterday
+    ]["new_deaths"].values[0]
 
     deaths_banner_design_dict = {
         "stable": {"background-color": "grey", "text": "estabilizando"},
@@ -256,7 +258,7 @@ def gen_cards(df, your_city, group):
                 <div class="distancing-container distancing-card-bg">
                         <div class="distancing-output-wrapper">
                                 <span class="distancing-output-row-prediction-label">
-                                    A média móvel de seu estado ({group}) é de xx mortes hoje e está 
+                                    A média móvel de seu estado ({group}) é de {peak_today_daily_deaths} mortes ontem e está 
                                     <span class="distancing-output-row-prediction-value" style="font-size:28px;">
                                         {deaths_banner_design_dict[deaths_behaviour]["text"]} há {behaviour_length} dia{["","s"][int(behaviour_length> 1)]}. 
                                     </span>
@@ -269,7 +271,7 @@ def gen_cards(df, your_city, group):
                 <div class="distancing-container distancing-card-bg">
                         <div class="distancing-output-wrapper">
                                 <span class="distancing-output-row-prediction-label">
-                                    A média móvel do seu município ({your_city}) é de xx mortes hoje e está
+                                    A média móvel do seu município ({your_city}) é de {city_today_daily_deaths} mortes ontem e está
                                     <span class="distancing-output-row-prediction-value" style="font-size:28px;">
                                     {deaths_banner_design_dict[city_deaths_behaviour]["text"]} há {city_behaviour_length} dia{["","s"][int(city_behaviour_length> 1)]}.
                                 </span> 
