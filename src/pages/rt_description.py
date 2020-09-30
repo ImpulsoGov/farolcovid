@@ -8,9 +8,10 @@ def main(session_state):
     opening_response = user_analytics.safe_log_event(
         "opened spread_rhythm", session_state, is_new_page=True
     )
-    st.header("""$$R_t$$ de Estados e Municípios""")
 
-    st.subheader("""Calculo do $$R_t$$""")
+    st.header("""Taxa de contágio ($$R_t$$) de Estados e Municípios""")
+
+    st.subheader("""Cálculo da taxa de contágio ($$R_t$$)""")
 
     st.write(
         """
@@ -23,7 +24,8 @@ def main(session_state):
 
         A Covid-19 chegou em momentos distintos em cada cidade brasileira e a sociedade também reagiu de maneira diferente em cada uma delas. 
         Portanto, medir o $$R_t$$, traduzindo o $$R_0$$ para o momento específico no qual cada local se encontra, a nível municipal e estadual, traz informações 
-        importantes sobre o ritmo de contágio da doença. Enquanto o $$R_0$$ é um número geral, portanto, o  então é calculado para cada local e momento no tempo.
+        importantes sobre a taxa de contágio da doença. Enquanto o $$R_0$$ é um número geral,
+        portanto, o $$R_t$$ então é calculado para cada local e momento no tempo.
 
         Por exemplo, um $$R_t$$ maior do que 1 indica que, mantendo-se o comportamento e intervenções ativas até aquele dia, ainda há tendência de 
         crescimento exponencial da doença naquela população. Esperamos que cada pessoa infectada naquele momento infectará mais de uma pessoa no futuro - gerando 
@@ -78,22 +80,31 @@ def main(session_state):
     st.subheader("""Referências""")
     st.write(
         """
-        [1] COVID ActNow Blog, 2020. [Inference projections for states.](https://blog.covidactnow.org/inference-projections-for-states/)
+        [1] COVID ActNow Blog, 2020. Inference projections for states. Disponível em: 
+        https://blog.covidactnow.org/inference-projections-for-states
         
         
-        [2] Bettencourt & Ribeiro. 2008. [Real Time Bayesian Estimation of the Epidemic Potential of Emerging Infectious Diseases](https://doi.org/10.1371/journal.pone.0002185). PLoS ONE 3(5): e2185.
+        [2] Bettencourt & Ribeiro. 2008. Real Time Bayesian Estimation of the Epidemic Potential of
+        Emerging Infectious Diseases. Disponível em: https://doi.org/10.1371/journal.pone.0002185).
+        PLoS ONE 3(5): e2185.
         
         
-        [3] COVID ActNow Blog, 2020. [Modeling metrics critical to reopen safely](https://blog.covidactnow.org/modeling-metrics-critical-to-reopen-safely/)
+        [3] COVID ActNow Blog, 2020. Modeling metrics critical to reopen safely. Disponível em: 
+        https://blog.covidactnow.org/modeling-metrics-critical-to-reopen-safely/
         
         
-        [4] Kevin Systrom. 2020. [The Metric We Need to Manage COVID-19 (código base)](http://systrom.com/blog/the-metric-we-need-to-manage-covid-19/)
+        [4] Kevin Systrom. 2020. The Metric We Need to Manage COVID-19 (código base). Disponível em:
+        http://systrom.com/blog/the-metric-we-need-to-manage-covid-19/
         
         
-        [5] Loft-BR. 2020. [Visualizando a evolução do número de reprodução no Brasil (código adaptado).](https://github.com/loft-br/realtime_r0_brazil/blob/master/realtime_r0_bettencourt_ribeiro.ipynb) 
+        [5] Loft-BR. 2020. [Visualizando a evolução do número de reprodução no Brasil (código
+        adaptado). Disponível em:
+        https://github.com/loft-br/realtime_r0_brazil/blob/master/realtime_r0_bettencourt_ribeiro.ipynb
         
         
-        [6] COVID ActNow, 2020. [Infer R_t (código adaptado)](https://github.com/covid-projections/covid-data-model/blob/089e4e81db32befd6e86e4e105454629fd834ad2/pyseir/inference/infer_rt.py)
+        
+        [6] COVID ActNow, 2020. [Infer R_t (código adaptado). Disponível em: 
+        https://github.com/covid-projections/covid-data-model/blob/089e4e81db32befd6e86e4e105454629fd834ad2/pyseir/inference/infer_rt.py
         """
     )
 

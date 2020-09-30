@@ -9,6 +9,9 @@ import pandas as pd
 import utils
 import amplitude
 
+from datetime import datetime, timedelta
+
+
 
 def _get_rolling_amount(grp, time, data_col="last_updated", col_to_roll="new_deaths"):
     return grp.rolling(time, min_periods=1, on=data_col)[col_to_roll].mean()
@@ -26,10 +29,12 @@ def _generate_hovertext(df_to_plotly, deaths_per_cases=False):
     for yi, yy in enumerate(df_to_plotly["y"]):
         hovertext.append(list())
         for xi, xx in enumerate(df_to_plotly["x"]):
+            #new_xx = datetime.strptime(str(xx),'%d/%m/%Y') #converter tudo pra string e depois pra data?
             hovertext[-1].append(
                 "<b>{}</b><br>Data: {}<br>{}: {}".format(
                     yy,
                     str(xx)[:10],
+                    #new_xx,
                     color_value_label,
                     round(df_to_plotly["z"][yi][xi], 2),
                 )
@@ -120,10 +125,7 @@ def plot_heatmap(
         sorted_index = sorted_index.sort_values(by=["0_x", "0_y"]).index
     states_total_deaths = states_total_deaths.reindex(sorted_index)
     data = _df_to_plotly(pivot.loc[states_total_deaths.index])
-    data["y"] = [conversion_renames[city_name] for city_name in data["y"]]
-    states_total_deaths.index = [
-        conversion_renames[city_name] for city_name in states_total_deaths.index
-    ]
+
     trace1 = go.Heatmap(
         data,
         hoverinfo="text",
@@ -139,6 +141,8 @@ def plot_heatmap(
         y=states_total_deaths.index,
         xaxis="x2",
         yaxis="y2",
+        text=states_total_deaths,
+        textposition='outside',
         orientation="h",
         hoverinfo="text",
         hovertext=[
@@ -155,7 +159,7 @@ def plot_heatmap(
         # width=1000,
         height=700,
         margin={"l": 100, "r": 100, "t": 30},
-        xaxis=dict(domain=[0, 0.8]),
+        xaxis=dict(domain=[0, 0.8], tickformat="%d %B"),
         xaxis2=dict(domain=[0.85, 1]),
         yaxis=dict(tickmode="linear"),
         # yaxis2=dict(tickmode="linear", anchor="x2"),
@@ -204,16 +208,23 @@ def make_deaths_per_cases(row):
 
 
 def gen_cards(df, your_city, group):
+    yesterday = datetime.now() - timedelta(1)
+    yesterday= yesterday.strftime('%Y-%m-%d')
+    
     # State evalaution
     state_evaluation_df = df.groupby(["last_updated"]).sum().sort_index(ascending=False)
     peak_daily_deaths_day = state_evaluation_df["new_deaths"].idxmax()
     peak_daily_deaths = state_evaluation_df.loc[
         state_evaluation_df.index == peak_daily_deaths_day
     ]["new_deaths"].values[0]
+    peak_today_daily_deaths = state_evaluation_df.loc[
+        state_evaluation_df.index == yesterday
+    ]["new_deaths"].values[0]
 
     deaths_behaviour, behaviour_length = evaluate_scrolling_deaths_behaviour(
         state_evaluation_df
     )
+
     # City evaluation for the banner
     city_evaluation_df = (
         df[df["city_name"] == your_city].groupby(["last_updated"]).sum()
@@ -226,14 +237,19 @@ def gen_cards(df, your_city, group):
     city_peak_daily_deaths = city_evaluation_df.loc[
         city_evaluation_df.index == city_peak_daily_deaths_day
     ]["new_deaths"].values[0]
+
+    city_today_daily_deaths = city_evaluation_df.loc[
+        city_evaluation_df.index == yesterday
+    ]["new_deaths"].values[0]
+
     deaths_banner_design_dict = {
-        "stable": {"background-color": "grey", "text": "comportamento estável"},
-        "falling": {"background-color": "#0090A7", "text": "queda"},
-        "increasing": {"background-color": "#F02C2E", "text": "alta"},
+        "stable": {"background-color": "grey", "text": "estabilizando"},
+        "falling": {"background-color": "#0090A7", "text": "decrescendo"},
+        "increasing": {"background-color": "#F02C2E", "text": "crescendo"},
     }
 
     if city_peak_daily_deaths >= 1:
-        pico = f"Seu pico de mortes diárias foi de {city_peak_daily_deaths} mortes em {city_peak_daily_deaths_day.strftime('%d/%m/%Y')}"
+        pico = f"O pico de mortes diárias ocorreu em {city_peak_daily_deaths_day.strftime('%d/%m/%Y')} com {city_peak_daily_deaths} mortes."
     else:
         pico = f"Seu município ainda não reportou nenhuma morte."
 
@@ -242,31 +258,24 @@ def gen_cards(df, your_city, group):
                 <div class="distancing-container distancing-card-bg">
                         <div class="distancing-output-wrapper">
                                 <span class="distancing-output-row-prediction-label">
-                                    Seu estado ({group}) está há 
-                                </span>
-                                <div class="distancing-output-row">
-                                        <span class="distancing-output-row-prediction-value" style="font-size:28px;font-weight:normal;">
-                                                <b>{behaviour_length} dia{["","s"][int(behaviour_length> 1)]} em {deaths_banner_design_dict[deaths_behaviour]["text"]}</b>
-                                        </span>  
-                                </div> 
-                                <span class="distancing-output-row-prediction-label">
-                                        da média móvel de mortes. O pico de mortes diárias até hoje foi de {peak_daily_deaths} mortes, em {peak_daily_deaths_day.strftime('%d/%m/%Y')}.
-                                </span>
+                                    A média móvel de seu estado ({group}) é de {peak_today_daily_deaths} mortes ontem e está 
+                                    <span class="distancing-output-row-prediction-value" style="font-size:28px;">
+                                        {deaths_banner_design_dict[deaths_behaviour]["text"]} há {behaviour_length} dia{["","s"][int(behaviour_length> 1)]}. 
+                                    </span>
+                                    <br> 
+                                    O pico de mortes diárias ocorreu em {peak_daily_deaths_day.strftime('%d/%m/%Y')} com {peak_daily_deaths} mortes.
+                                </span>  
                         </div>
                 </div>
                 <div class="distancing-card-separator"></div>
                 <div class="distancing-container distancing-card-bg">
                         <div class="distancing-output-wrapper">
                                 <span class="distancing-output-row-prediction-label">
-                                        Seu município ({your_city}) está há 
-                                </span>
-                                <div class="distancing-output-row">
-                                        <span class="distancing-output-row-prediction-value" style="font-size:28px;font-weight:normal;">
-                                                <b>{city_behaviour_length} dia{["","s"][int(city_behaviour_length> 1)]} em {deaths_banner_design_dict[city_deaths_behaviour]["text"]} </b>
-                                        </span>  
-                                </div> 
-                                <span class="distancing-output-row-prediction-label">
-                                        da média móvel de mortes. {pico}
+                                    A média móvel do seu município ({your_city}) é de {city_today_daily_deaths} mortes ontem e está
+                                    <span class="distancing-output-row-prediction-value" style="font-size:28px;">
+                                    {deaths_banner_design_dict[city_deaths_behaviour]["text"]} há {city_behaviour_length} dia{["","s"][int(city_behaviour_length> 1)]}.
+                                </span> 
+                                {pico}
                                 </span>
                         </div>
                 </div>
@@ -304,16 +313,18 @@ def prepare_heatmap(
 
         gen_cards(df, your_city, group)
         legend = """
-        <div class="base-wrapper">
+        <div class="base-wrapper" style="display: flex; flex-direction: column;">
+            <span style="border-radius: 15px; border: dashed 2px  #F2C94C; padding: 1em; display: flex; flex-direction: column;">
             O gráfico abaixo mostra a média do número de mortes
             diárias dos últimos cinco dias para os 30 municípios com mais mortes, desde a data da primeira morte reportada e também o que você selecionou mesmo que este não esteja entre os 30 primeiros.
             Para comparação, os números foram normalizados pelo 
             maior valor encontrado em cada município:
             <b>quanto mais vermelho, mais próximo está o valor do
             maior número de mortes por dia observado no município
-            até hoje</b>.
+            até hoje.</b>
+            </span>
             <br><br>
-            Os municípios estão ordenadas pelo dia que atingiu o máximo de mortes, 
+            Os municípios estão ordenados pelo dia que atingiu o máximo de mortes, 
             ou seja, municípios no pico de mortes aparecerão no topo. {}
             é o município com o maior número de mortos, com: <i>{}</i>
             e o estado totaliza: <i>{}</i>.
@@ -329,13 +340,15 @@ def prepare_heatmap(
             <span class="section-header primary-span">ONDA DE MORTES DIÁRIAS POR ESTADO</span>
             <br><br>
             <div class="onda-headercaption">
+            <span style="border-radius: 15px; border: dashed 2px  #F2C94C; padding: 1em; display: flex; flex-direction: column;">
                 O gráfico abaixo mostra a média do número de mortes
                 diárias dos últimos cinco dias em cada UF, desde a data da
                 primeira morte reportada. Para comparação, os números foram
                 normalizados pelo maior valor encontrado em cada UF:
                 <b>quanto mais vermelho, mais próximo está o valor do
-                maior número de mortes por dia observado na UF até hoje</b>.
-                <br><br>
+                maior número de mortes por dia observado na UF até hoje.</b>
+            </span>
+            <br><br>
                 As UFs estão ordenadas pelo dia que atingiu o máximo de mortes, 
                 ou seja, UFs no pico de mortes aparecerão no topo. {}
                 é o estado com o maior número de mortos, com: <i>{}</i>
@@ -352,13 +365,15 @@ def prepare_heatmap(
         <div class="base-wrapper">
             <span class="section-header primary-span">ONDA DE MORTES DIÁRIAS POR PAÍS</span>
             <br><br>
+            <span style="border-radius: 15px; border: dashed 2px  #F2C94C; padding: 1em; display: flex; flex-direction: column;">
             O gráfico abaixo mostra a média do número de mortes
             diárias dos últimos cinco dias para os 30 países com mais 
             mortes, desde a data da primeira morte reportada.
             Para comparação, os números foram normalizados pelo maior
             valor encontrado em cada país:<b> quanto mais vermelho,
             mais próximo está o valor do maior número de mortes por
-            dia observado no país até hoje</b>.
+            dia observado no país até hoje.</b>
+            </span>
             <br><br>
             Os países estão ordernados pelo dia que atingiu o máximo de mortes,
             ou seja, os países no pico de mortes aparecerão no topo. {}
@@ -371,11 +386,13 @@ def prepare_heatmap(
     if deaths_per_cases:
         legend = """
         <div class="base-wrapper">
+            <span style="border-radius: 15px; border: dashed 2px  #F2C94C; padding: 1em; display: flex; flex-direction: column;">
             O gráfico abaixo mostra a taxa de mortes
             por casos (acumulado histórico) para os 30 municípios com mais mortes por casos, desde a data da primeira morte reportada e também o que você selecionou mesmo que este não esteja entre os 30 primeiros.
             <b>Quanto mais vermelho, mais próximo está o valor do
             de 1 morte a cada 1 caso registrado no município
             até aquela data.</b>
+            </span>
             <br><br>
             Os municípios estão ordenadas pelo dia que atingiram o seu máximo de mortes por casos, 
             ou seja, municípios no pico de mortes por casos aparecerão no topo. 

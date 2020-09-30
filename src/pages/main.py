@@ -7,8 +7,6 @@ import pandas as pd
 # import sys
 from models import IndicatorType, IndicatorCards, ProductCards, DimensionCards
 
-from model.simulator import run_simulation, get_dmonth
-
 # import pdf_report.pdfgen as pdfgen
 import pages.simulacovid as sm
 import pages.saude_em_ordem as so
@@ -35,12 +33,13 @@ def fix_type(x, group, position):
                 [str(round(i, 1)) if type(i) != str else i.strip() for i in x]
             )
 
+    if position == "last_updated":
+        return pd.to_datetime(str(x)).strftime("%d/%m/%Y")
+
     if x == "- ":
         return x
 
-    if (group == "situation" and position == "display") or (
-        group == "trust" and position == "left_display"
-    ):
+    if group == "situation" and position == "display":
         return round(float(x), 2)
 
     if group == "trust" and position == "display":
@@ -50,27 +49,23 @@ def fix_type(x, group, position):
         return str(int(x)) + " dias"
 
     if group == "capacity" and position == "display":
-        x = math.ceil(x / 30)
-        # TODO: passar para config
-        dmonth = {1: "até 1", 2: "até 2", 3: "até 3", 4: "+ 3"}
-        return dmonth[x]
+        return utils.dday_preffix(x)
 
     if (type(x) == str) or (type(x) == np.int64) or (type(x) == int):
         return x
 
     if type(x) == np.float64:
-        if (x <= 1) & (group == "social_isolation"):
-            return str(int(round(100 * x, 0))) + "%"
-        else:
-            return int(x)
+        return int(x)
 
 
 def update_indicators(indicators, data, config, user_input, session_state):
     # TODO: indicadores quando cidade não posssui dados
     for group in config["br"]["indicators"].keys():
+
         # Fix values for each position
         dic_indicators = dict()
         for position in config["br"]["indicators"][group].keys():
+            
             # Filter indicators
             if config["br"]["indicators"][group][position] != "None":
                 dic_indicators[position] = fix_type(
@@ -84,24 +79,18 @@ def update_indicators(indicators, data, config, user_input, session_state):
                 dic_indicators[position] = "None"
 
         if np.isnan(data[config["br"]["indicators"][group]["risk"]].values[0]):
-            # print("aqui!!!")
-            # dic_indicators["display"] = "- "
             dic_indicators["risk"] = "nan"
 
             if group == "rt":  # doesn't show values
                 indicators[group].right_display = "- "
                 indicators[group].left_display = "- "
 
-        print(dic_indicators)
-
+        # TODO: melhroar aqui para não ter que passar os dados de um dic para outro
         indicators[group].risk = dic_indicators["risk"]
         indicators[group].left_display = dic_indicators["left_display"]
         indicators[group].right_display = dic_indicators["right_display"]
         indicators[group].display = dic_indicators["display"]
-
-    # indicators["subnotification_rate"].left_display = session_state.number_cases
-    indicators["capacity"].left_display = int(session_state.number_beds)
-    indicators["capacity"].right_display = int(session_state.number_icu_beds)
+        indicators[group].last_updated = dic_indicators["last_updated"]
 
     # Caso o usuário altere os casos confirmados, usamos esse novo valor para a estimação
     # TODO: vamos acabar com o user_iput e manter só session_state?
@@ -251,17 +240,15 @@ def gen_sector_big_row(my_state, index, config):
         2: ["#F77800", "⚠"],
         3: ["#F02C2E", "🛑"],
     }
-    level_data = config["br"]["farolcovid"]["rules"]
 
-    # TODO: passar para config
-    dmonth = {1: "até 1", 2: "até 2", 3: "até 3", 4: "+ 3"}
+    level_data = config["br"]["farolcovid"]["rules"]
 
     return f"""<div class="big-table-row {["btlgrey","btlwhite"][index % 2]}">
             <div class="big-table-index-background" style="background-color:{alert_info[my_state["overall_alert"]][0]};"></div>
             <div class="big-table-field btf0">{my_state["state_name"]} {alert_info[my_state["overall_alert"]][1]}</div>
             <div class="big-table-field btf1" style="color:{alert_info[find_level(level_data["situation_classification"]["cuts"],level_data["situation_classification"]["categories"],my_state["daily_cases_mavg_100k"])][0]};">{"%0.2f"%my_state["daily_cases_mavg_100k"]}</div>
             <div class="big-table-field btf2" style="color:{alert_info[find_level(level_data["control_classification"]["cuts"],level_data["control_classification"]["categories"],my_state["rt_most_likely"])][0]};" > {"%0.2f"%my_state["rt_most_likely"]}</div>
-            <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["dday_icu_beds"])][0]};">{dmonth[math.ceil(my_state["dday_icu_beds"] / 30)]} mês(es)</div>
+            <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["dday_icu_beds"])][0]};">{utils.dday_preffix(my_state["dday_icu_beds"])} dias</div>
             <div class="big-table-field btf4" style="color:{alert_info[find_level(level_data["trust_classification"]["cuts"],level_data["trust_classification"]["categories"],my_state["notification_rate"])][0]};">{int(my_state["subnotification_rate"]*100)}%</div>
             <div class="big-table-field btf5">{"%0.2f"%my_state["new_deaths_mavg_100k"]}</div>
         </div>"""
@@ -286,8 +273,9 @@ def get_data(config):
         for place in ["city", "health_region", "state"]
     }
 
+    cnes_sources = loader.read_data("br", config, "br/cities/cnes")
     # places_ids = loader.read_data("br", config, "br/places/ids")
-    return dfs
+    return dfs, cnes_sources
 
 
 def main(session_state):
@@ -361,7 +349,7 @@ def main(session_state):
                             <p> <b>Importante: mudamos a metodologia dos indicadores - veja mais em Modelos, limitações e fontes no menu lateral.</b> Descubra o nível de alerta do estado, regional de saúde ou município de acordo com os indicadores:</p>
                             - <b>Situação da doença</b>: média de novos casos 100 mil por habitantes;</br>
                             - <b>Controle da doença</b>: taxa de contágio</br>
-                            - <b>Capacidade do sistema</b>: tempo para ocupação de leitos UTI Covid</br>
+                            - <b>Capacidade do sistema</b>: tempo para ocupação de leitos UTI</br>
                             - <b>Confiança de dados</b>: taxa de subnotificação de casos</br><br>
                         </div>
                         <div>
@@ -413,7 +401,7 @@ def main(session_state):
     )
 
     # GET DATA
-    dfs = get_data(config)
+    dfs, cnes_sources = get_data(config)
 
     # REGION/CITY USER INPUT
     user_input = dict()
@@ -482,7 +470,7 @@ def main(session_state):
     )
 
     # SOURCES PARAMS
-    user_input = utils.get_sources(user_input, data, dfs["city"], ["beds", "icu_beds"])
+    user_input = utils.get_sources(user_input, data, cnes_sources, ["beds", "icu_beds"])
 
     # POPULATION PARAMS
     try:
@@ -591,6 +579,15 @@ def main(session_state):
             ].sum(),
         )
 
+    elif "city" in user_input["place_type"]:
+        utils.genKPISection(
+            place_type=user_input["place_type"],
+            locality=user_input["locality"],
+            alert=data["overall_alert"].values[0],
+            indicators=indicators,
+            rt_type=data["rt_place_type"].values[0],
+        )
+
     else:
         utils.genKPISection(
             place_type=user_input["place_type"],
@@ -603,9 +600,9 @@ def main(session_state):
     st.write(
         """
         <div class='base-wrapper'>
-            <i>* Utilizamos %s&percnt; da capacidade hospitalar reportada por %s em %s 
+            <i>* Utilizamos %s&percnt; do total de leitos UTI reportados por %s em %s 
             para cálculo da projeção de dias para atingir capacidade máxima.<br><b>Para municípios, utilizamos os recursos da respectiva regional de saúde.</b>
-            São considerados leitos os tipos: cirúrgicos, clínicos e hospital-dia. A capacidade de UTI é dada pelo total de leitos UTI Covid adulto.</i>
+            Leitos enfermaria contém os tipos: cirúrgicos, clínicos e hospital-dia; sendo considerado %s&percnt; já ocupado.</i>
         </div>
         """
         % (
@@ -614,6 +611,9 @@ def main(session_state):
             ),
             user_input["author_number_beds"],
             user_input["last_updated_number_beds"],
+            str(
+                int(config["br"]["simulacovid"]["resources_available_proportion"] * 100)
+            ),
         ),
         unsafe_allow_html=True,
     )
@@ -663,12 +663,6 @@ def main(session_state):
     # AMBASSADOR SECTION
     utils.gen_ambassador_section()
 
-    # indicators["hospital_capacity"].left_display = user_input["number_beds"]
-    # indicators["hospital_capacity"].right_display = user_input["number_icu_beds"]
-    # indicators["subnotification_rate"].left_display = user_input["population_params"][
-    # "D"
-    # ]
-
     # PDF-REPORT GEN BUTTON
     # if st.button("Gerar Relatório PDF"):
     #     user_analytics.log_event("generated pdf")
@@ -683,7 +677,6 @@ def main(session_state):
 
     # TOOLS
     products = ProductCards
-    # products[2].recommendation = f'Risco {data["overall_alert"].values[0]}'
 
     utils.genProductsSection(products)
 
@@ -747,10 +740,6 @@ def main(session_state):
             ],
         )
         # Downloading the saved data from memory
-        user_input["number_beds"] = session_state.number_beds
-        user_input["number_icu_beds"] = session_state.number_icu_beds
-        user_input["number_deaths"] = session_state.number_deaths
-        user_input["number_cases"] = session_state.number_cases
         sm.main(user_input, indicators, data, config, session_state)
         # TODO: remove comment on this later!
         # utils.gen_pdf_report()
