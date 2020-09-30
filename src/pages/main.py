@@ -215,7 +215,7 @@ def gen_big_table(config, dfs):
             <div class="big-table-line btl4" style="height: {proportion};"></div>
             <div class="big-table-field btt0">Estado e nível de alerta</div>
             <div class="big-table-field btt1">Média móvel (últimos 7 dias) de novos casos por 100mil habitantes</div>
-            <div class="big-table-field btt2">Ritmo de contágio</div>
+            <div class="big-table-field btt2">Taxa de contágio</div>
             <div class="big-table-field btt3">Capacidade do sistema de saúde</div>
             <div class="big-table-field btt4">Taxa de subnotificação</div>
             <div class="big-table-field btt5">Média móvel (últimos 7 dias) de novas mortes por 100mil habitantes</div>
@@ -355,7 +355,7 @@ def main(session_state):
                         <div>
                         <p class="darkblue-span uppercase"> <b>SimulaCovid</b> </p>
                         <img class="img-modal" src=%s alt="Ícone SimulaCovid">	
-                        <p style="height:100px;">Simule o que pode acontecer com o sistema de saúde local se o ritmo de contágio aumentar 
+                        <p style="height:100px;">Simule o que pode acontecer com o sistema de saúde local se a taxa de contágio aumentar 
                             ou diminuir e planeje suas ações para evitar a sobrecarga hospitalar.</p>
                         </div>
                         <div>
@@ -629,11 +629,11 @@ def main(session_state):
         st.write(
             f"""
             <div class="base-wrapper">
-                    <span class="section-header primary-span">CÁLCULO DO RITMO DE CONTÁGIO EM {user_input["locality"]}</span>
+                    <span class="section-header primary-span">CÁLCULO DA TAXA DE CONTÁGIO EM {user_input["locality"]}</span>
                     <br><br>
-                    O ritmo de contágio, conhecido como número de reprodução efetivo (Rt), traduz a dinâmica de disseminação do Covid a cada dia.
+                    <b>A taxa de contágio, conhecida como número de reprodução efetivo (Rt), traduz a dinâmica de disseminação da Covid-19 a cada dia.</b>
                     <br>O valor pode ser lido como o número médio de novas infecções diárias causadas por uma única pessoa infectada.
-                    Para mais informações, visite a página de Metodologia.
+                    Para mais informações, visite a página de Modelos no menu lateral.
             </div>
             """,
             unsafe_allow_html=True,
@@ -641,7 +641,7 @@ def main(session_state):
 
         try:
             fig2 = plots.plot_rt_wrapper(
-                user_input[user_input["place_type"]], user_input["place_type"]
+                user_input[user_input["place_type"]], user_input["place_type"], config
             )
             st.plotly_chart(fig2, use_container_width=True)
         except:
