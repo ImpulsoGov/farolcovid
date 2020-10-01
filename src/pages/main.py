@@ -196,10 +196,11 @@ def update_user_input_places(user_input, dfs, config):
     return user_input, utils.fix_dates(data)
 
 
-def gen_big_table(config, dfs):
+def gen_big_table(config, dfs, currentstate):
     # st.write(dfs["state"])
     state_data = dfs["state"].sort_values(by="state_name")
     proportion = str((state_data.shape[0] + 1) * 5) + "vw"
+    sector_row = state_data[state_data["state_name"] == currentstate].squeeze()
     text = f"""
     <br>
     <div class="base-wrapper flex flex-column" style="background-color: rgb(0, 144, 167);">
@@ -213,7 +214,7 @@ def gen_big_table(config, dfs):
             <div class="big-table-line btl2" style="height: {proportion};"></div>
             <div class="big-table-line btl3" style="height: {proportion};"></div>
             <div class="big-table-line btl4" style="height: {proportion};"></div>
-            <div class="big-table-field btt0">Estado e nível de alerta</div>
+            <div class="big-table-field btt0">Estado e nível de alerta </div>
             <div class="big-table-field btt1">Média móvel (últimos 7 dias) de novos casos por 100mil habitantes</div>
             <div class="big-table-field btt2">Taxa de contágio</div>
             <div class="big-table-field btt3">Capacidade do sistema de saúde</div>
@@ -221,10 +222,13 @@ def gen_big_table(config, dfs):
             <div class="big-table-field btt5">Média móvel (últimos 7 dias) de novas mortes por 100mil habitantes</div>
         </div>
     """
+    state_data = state_data[state_data["state_name"] != currentstate]
     row_order = 0
+    text += gen_sector_big_row(sector_row, row_order, config)
     for index, sector_data in state_data.iterrows():
-        text += gen_sector_big_row(sector_data, row_order, config)
         row_order += 1
+        text += gen_sector_big_row(sector_data, row_order, config)
+        
     text += f"""<div class="big-table-endspacer">
         </div>
     </div>"""
@@ -240,9 +244,7 @@ def gen_sector_big_row(my_state, index, config):
         2: ["#F77800", "⚠"],
         3: ["#F02C2E", "🛑"],
     }
-
     level_data = config["br"]["farolcovid"]["rules"]
-
     return f"""<div class="big-table-row {["btlgrey","btlwhite"][index % 2]}">
             <div class="big-table-index-background" style="background-color:{alert_info[my_state["overall_alert"]][0]};"></div>
             <div class="big-table-field btf0">{my_state["state_name"]} {alert_info[my_state["overall_alert"]][1]}</div>
@@ -354,8 +356,8 @@ def main(session_state):
                         </div>
                         <div>
                         <p class="darkblue-span uppercase"> <b>SimulaCovid</b> </p>
-                        <img class="img-modal" src=%s alt="Ícone SimulaCovid">	
-                        <p style="height:100px;">Simule o que pode acontecer com o sistema de saúde local se a taxa de contágio aumentar 
+                        <img class="img-modal" src=%s alt="Ícone SimulaCovid">  
+                        <p style="height:100px;">Simule o que pode acontecer com o sistema de saúde local se o ritmo de contágio aumentar 
                             ou diminuir e planeje suas ações para evitar a sobrecarga hospitalar.</p>
                         </div>
                         <div>
@@ -799,7 +801,7 @@ def main(session_state):
         oc.main(user_input, indicators, data, config, session_state)
 
     # BIG TABLE
-    gen_big_table(config, dfs)
+    gen_big_table(config, dfs, user_input["state_name"])
     # FOOTER
     utils.gen_whatsapp_button(config["impulso"]["contact"])
     utils.gen_footer()
