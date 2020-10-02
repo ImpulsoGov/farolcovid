@@ -39,25 +39,28 @@ def plot_heatmap(df, x, y, z, title, colorscale="oranges"):
 
 
 # FAROLCOVID INDICATOR: RT
-def plot_rt(t, title=""):
-    # TODO: put dicts in config
-    rt_classification = {
-        "Risco médio: Uma pessoa infecta em média mais 1.2 outras": {
-            "threshold": 1.2,
-            "color": "#F02C2E",
-            "fill": None,
-            "width": 3,
-        },
+def plot_rt(t, config, title=""):
 
-        "Risco alto: Uma pessoa infecta em média outras 1.0-1.2": {
-            "threshold": 1,
-            "color": "#F77800",
+    cuts = config["br"]["farolcovid"]["rules"]["control_classification"]["cuts"]
+    categories = config["br"]["farolcovid"]["categories"]
+    colors = config["br"]["farolcovid"]["colors"]
+
+    rt_classification = {
+        f"Risco {categories[1]}: Uma pessoa infecta em média outras {cuts[1]}-{cuts[2]}": {
+            "threshold": cuts[1],
+            "color": colors[1],
             "fill": None,
             "width": 3,
         },
-        "Risco moderado: Uma pessoa infecta em média outras 0.5-1": {
-            "threshold": 0.5,
-            "color": "#F7B500",
+        f"Risco {categories[2]}: Uma pessoa infecta em média outras {cuts[2]}-{cuts[3]}": {
+            "threshold": cuts[2],
+            "color": colors[2],
+            "fill": None,
+            "width": 3,
+        },
+        f"Risco {categories[3]}: Uma pessoa infecta em média mais {cuts[3]} outras": {
+            "threshold": cuts[3],
+            "color": colors[3],
             "fill": None,
             "width": 3,
         },
@@ -126,7 +129,7 @@ def plot_rt(t, title=""):
     return fig
 
 
-def plot_rt_wrapper(place_id, place_type):
+def plot_rt_wrapper(place_id, place_type, config):
 
     endpoints = {
         "state_num_id": "state",
@@ -145,7 +148,7 @@ def plot_rt_wrapper(place_id, place_type):
     if len(data) < 30:
         return None
 
-    fig = plot_rt(data)
+    fig = plot_rt(data, config)
     fig.update_layout(xaxis=dict(tickformat="%d/%m"))
     fig.update_layout(margin=dict(l=50, r=50, b=100, t=20, pad=4))
     fig.update_yaxes(automargin=True)

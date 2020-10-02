@@ -56,6 +56,8 @@ br:
     farolcovid:
         categories:
             {0: "novo normal", 1: "moderado", 2: "alto", 3: "altíssimo"}
+        colors:
+            {0: "#0090A7", 1: "#F7B500", 2: "#F77800", 3: "#F02C2E"}
         rules:
             situation_classification:
                 column_name: 'daily_cases_mavg_100k' 
