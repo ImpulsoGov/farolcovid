@@ -281,7 +281,7 @@ def get_data(config):
 
 
 def main(session_state):
-    if os.getenv("IS_DEV").upper() == "FALSE":
+    if os.getenv("IS_DEV") == "FALSE":
         #  ==== GOOGLE ANALYTICS SETUP ====
         GOOGLE_ANALYTICS_CODE = os.getenv("GOOGLE_ANALYTICS_CODE")
         if GOOGLE_ANALYTICS_CODE:
