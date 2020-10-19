@@ -317,9 +317,14 @@ def main(session_state):
                 script_tag_loader = soup.new_tag("script", id="google-analytics-loader")
                 script_tag_loader.string = GA_JS
                 soup.head.append(script_tag_loader)
-                script_tag_manager = soup.new_tag("script", id="google-tag-manager")
-                script_tag_manager.string = TAG_MANAGER
-                soup.head.append(script_tag_manager)
+                script_tag_managerhead = soup.new_tag("script", id="google-tagmanagerhead")
+                script_tag_managerhead.string = TAG_MANAGER
+                soup.head.append(script_tag_managerhead)
+                script_tag_manager_body = soup.new_tag(
+                    "script",
+                    src="https://www.googletagmanager.com/gtm.js?id=GTM-MKWTV7X"
+                )
+                soup.head.append(script_tag_manager_body)
                 index_path.write_text(str(soup))
         # ====
 
