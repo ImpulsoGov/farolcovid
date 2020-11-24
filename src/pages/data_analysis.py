@@ -336,7 +336,7 @@ def prepare_heatmap(
                 <b>quanto mais vermelho, mais próximo está o valor do
                 maior número de mortes por dia observado na UF até hoje</b>.
                 <br><br>
-                As UFs estão ordenadas pelo dia que atingiu o máximo de mortes, 
+                As UFs estão ordenadas pelo dia que atingiram o máximo de mortes, 
                 ou seja, UFs no pico de mortes aparecerão no topo. {}
                 é o estado com o maior número de mortos com: <i>{}</i>
                 e o Brasil totaliza: <i>{}</i>.
@@ -360,7 +360,7 @@ def prepare_heatmap(
             mais próximo está o valor do maior número de mortes por
             dia observado no país até hoje</b>.
             <br><br>
-            Os países estão ordernados pelo dia que atingiu o máximo de mortes,
+            Os países estão ordernados pelo dia que atingiram o máximo de mortes,
             ou seja, os países no pico de mortes aparecerão no topo. {}
             é o país com o maior número de mortos com: <i>{}</i>
             e o mundo totaliza: <i>{}</i>.
@@ -402,17 +402,17 @@ def prepare_heatmap(
                 "{:,.0f}".format(place_max_deaths.iloc[0]).replace(',','.'),
                 "{:,.0f}".format(place_max_deaths.values[int(len(place_max_deaths.values) / 2)]).replace(',','.'),
                 refresh[:10],
-            ).replace(',','.'),
+            ),
             unsafe_allow_html=True,
         )
     else:
         st.write(
             legend.format(
-                "{:,.0f}".format(place_max_deaths.iloc[-1][place_type]).replace(',','.'),
+                "{}".format(place_max_deaths.iloc[-1][place_type]),
                 "{:,.0f}".format(place_max_deaths.max()[col_deaths]).replace(',','.'),
                 "{:,.0f}".format(place_max_deaths.sum()[col_deaths]).replace(',','.'),
                 refresh[:10],
-            ).replace(',','.'),
+            ),
             unsafe_allow_html=True,
         )
 
