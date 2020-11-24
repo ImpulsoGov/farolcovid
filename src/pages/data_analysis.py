@@ -315,7 +315,7 @@ def prepare_heatmap(
             <br><br>
             Os municípios estão ordenadas pelo dia que atingiu o máximo de mortes, 
             ou seja, municípios no pico de mortes aparecerão no topo. {}
-            é o município com o maior número de mortos, com: <i>{}</i>
+            é o município com o maior número de mortos com: <i>{}</i>
             e o estado totaliza: <i>{}</i>.
             <br><br>
             <i>Última atualização: {}</i>
@@ -338,7 +338,7 @@ def prepare_heatmap(
                 <br><br>
                 As UFs estão ordenadas pelo dia que atingiu o máximo de mortes, 
                 ou seja, UFs no pico de mortes aparecerão no topo. {}
-                é o estado com o maior número de mortos, com: <i>{}</i>
+                é o estado com o maior número de mortos com: <i>{}</i>
                 e o Brasil totaliza: <i>{}</i>.
                 <br><br>
                 <i>Última atualização: {}</i>
@@ -362,7 +362,7 @@ def prepare_heatmap(
             <br><br>
             Os países estão ordernados pelo dia que atingiu o máximo de mortes,
             ou seja, os países no pico de mortes aparecerão no topo. {}
-            é o país com o maior número de mortos, com: <i>{}</i>
+            é o país com o maior número de mortos com: <i>{}</i>
             e o mundo totaliza: <i>{}</i>.
             <br><br>
             <i>Última atualização: {}</i>
@@ -379,7 +379,7 @@ def prepare_heatmap(
             <br><br>
             Os municípios estão ordenadas pelo dia que atingiram o seu máximo de mortes por casos, 
             ou seja, municípios no pico de mortes por casos aparecerão no topo. 
-            {} é o município com o maior número de mortos por casos, com: <i>{}</i> mortos por casos
+            {} é o município com o maior número de mortos por casos com: <i>{}</i> mortos por casos
             e o estado tem uma mediana de: <i>{}</i> mortos por casos.
             <br><br>
             <i>Última atualização: {}</i>
@@ -399,21 +399,20 @@ def prepare_heatmap(
         st.write(
             legend.format(
                 place_max_deaths.index[0],
-                "%0.3f" % place_max_deaths.iloc[0],
-                "%0.3f"
-                % place_max_deaths.values[int(len(place_max_deaths.values) / 2)],
+                "{:,.0f}".format(place_max_deaths.iloc[0]).replace(',','.'),
+                "{:,.0f}".format(place_max_deaths.values[int(len(place_max_deaths.values) / 2)]).replace(',','.'),
                 refresh[:10],
-            ),
+            ).replace(',','.'),
             unsafe_allow_html=True,
         )
     else:
         st.write(
             legend.format(
-                place_max_deaths.iloc[-1][place_type],
-                place_max_deaths.max()[col_deaths],
-                place_max_deaths.sum()[col_deaths],
+                "{:,.0f}".format(place_max_deaths.iloc[-1][place_type]).replace(',','.'),
+                "{:,.0f}".format(place_max_deaths.max()[col_deaths]).replace(',','.'),
+                "{:,.0f}".format(place_max_deaths.sum()[col_deaths]).replace(',','.'),
                 refresh[:10],
-            ),
+            ).replace(',','.'),
             unsafe_allow_html=True,
         )
 
