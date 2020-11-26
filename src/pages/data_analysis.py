@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import utils
 import amplitude
+import math
 
 
 def _get_rolling_amount(grp, time, data_col="last_updated", col_to_roll="new_deaths"):
@@ -26,12 +27,21 @@ def _generate_hovertext(df_to_plotly, deaths_per_cases=False):
     for yi, yy in enumerate(df_to_plotly["y"]):
         hovertext.append(list())
         for xi, xx in enumerate(df_to_plotly["x"]):
+            # Check for NaN values
+            if math.isnan(round(df_to_plotly["z"][yi][xi], 2)):
+                # Missing Value
+                perc_value = "Não há dados para a data."
+            else:
+                # Numerical Value
+                perc_value = round(df_to_plotly["z"][yi][xi], 2)
+
+            # Add hover text
             hovertext[-1].append(
                 "<b>{}</b><br>Data: {}<br>{}: {}".format(
                     yy,
                     str(xx)[:10],
                     color_value_label,
-                    round(df_to_plotly["z"][yi][xi], 2),
+                    perc_value,
                 )
             )
 
@@ -62,7 +72,6 @@ def plot_heatmap(
     pivot = (
         df.reset_index()
         .pivot(index=place_type, columns=col_date, values=col_actual_data)
-        .fillna(0)
     )
     if not deaths_per_cases:
         pivot = pivot.apply(lambda x: x / x.max(), axis=1)
@@ -150,7 +159,7 @@ def plot_heatmap(
     d = [trace1, trace2]
     layout = go.Layout(
         title=title,
-        plot_bgcolor="rgba(0,0,0,0)",
+        #plot_bgcolor="rgba(0,0,0,0)",
         # autosize=True,
         # width=1000,
         height=700,
@@ -204,7 +213,7 @@ def make_deaths_per_cases(row):
 
 
 def gen_cards(df, your_city, group):
-    # State evalaution
+    # State evaluation
     state_evaluation_df = df.groupby(["last_updated"]).sum().sort_index(ascending=False)
     peak_daily_deaths_day = state_evaluation_df["new_deaths"].idxmax()
     peak_daily_deaths = state_evaluation_df.loc[
@@ -278,8 +287,15 @@ def gen_cards(df, your_city, group):
 # @st.cache(suppress_st_warning=True)
 def prepare_heatmap(
     df, place_type, group=None, mavg_days=7, your_city=None, deaths_per_cases=False
-):
+):  
+    # Eliminate Dates in which Data wasn't collected
+    if "is_repeated" in df:
+        df = df[df["is_repeated"]==0]
+
+    # Determine last date that the data was obtained
     refresh = df["data_last_refreshed"].max()
+
+    # Filter Data according to Place Type
     if place_type == "city_name":
         df = df[df["state_id"] == group]
 
@@ -295,11 +311,13 @@ def prepare_heatmap(
     if place_type == "country_pt":
         col_date = "date"
         col_deaths = "total_deaths"
-
+    
+    # Find place with most deaths
     place_max_deaths = (
         df.groupby(place_type)[[col_deaths]].max().reset_index().sort_values(col_deaths)
     )
 
+    # Prepare HTML for Cities
     if place_type == "city_name":
 
         gen_cards(df, your_city, group)
@@ -322,6 +340,7 @@ def prepare_heatmap(
         </div>
         """
 
+    # Prepare HTML for States
     if place_type == "state_id":
 
         legend = """
@@ -346,6 +365,7 @@ def prepare_heatmap(
         </div>
         """
 
+    # Prepare HTML for countries
     if place_type == "country_pt":
 
         legend = """
