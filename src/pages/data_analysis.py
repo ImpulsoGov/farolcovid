@@ -11,8 +11,8 @@ import amplitude
 import math
 
 
-def _get_rolling_amount(grp, time, data_col="last_updated", col_to_roll="new_deaths"):
-    return grp.rolling(time, min_periods=1, on=data_col)[col_to_roll].mean()
+def _get_rolling_amount(grp, time, min_periods,data_col="last_updated", col_to_roll="new_deaths"):
+    return grp.rolling(time, min_periods=min_periods, on=data_col)[col_to_roll].mean()
 
 
 def _df_to_plotly(df):
@@ -27,12 +27,12 @@ def _generate_hovertext(df_to_plotly, deaths_per_cases=False):
     for yi, yy in enumerate(df_to_plotly["y"]):
         hovertext.append(list())
         for xi, xx in enumerate(df_to_plotly["x"]):
-            # Check for NaN values
+            # Check for Missing Values
             if math.isnan(round(df_to_plotly["z"][yi][xi], 2)):
-                # Missing Value
+                # Hover Text warns of Missing Value
                 perc_value = "Não há dados para a data."
             else:
-                # Numerical Value
+                # Hover Text displays appropriate numerical value
                 perc_value = round(df_to_plotly["z"][yi][xi], 2)
 
             # Add hover text
@@ -57,6 +57,7 @@ def plot_heatmap(
     city_name=None,
     deaths_per_cases=False,
 ):
+    # Determine Data to be Used by Place Type
     if place_type == "state_id" or place_type == "city_name":
         col_date = "last_updated"
         col_deaths = "deaths"
@@ -69,16 +70,14 @@ def plot_heatmap(
         col_date = "date"
         col_deaths = "total_deaths"
         col_actual_data = "rolling_deaths_new"
+    
     pivot = (
         df.reset_index()
         .pivot(index=place_type, columns=col_date, values=col_actual_data)
     )
+
     if not deaths_per_cases:
         pivot = pivot.apply(lambda x: x / x.max(), axis=1)
-
-    pivot = pivot.dropna(how="all")
-    # remove days with all states zero
-    pivot = pivot.loc[:, (pivot != 0).any(axis=0)]
 
     # TODO: analisar remoção de mortes nos locais
     pivot = pivot.applymap(lambda x: 0 if x < 0 else x)
@@ -89,6 +88,7 @@ def plot_heatmap(
         .loc[pivot.index]
         .sort_values(ascending=False)
     )
+
     if deaths_per_cases:
         states_total_deaths = df.reset_index()
         states_total_deaths = states_total_deaths[
@@ -101,6 +101,7 @@ def plot_heatmap(
         states_total_deaths = pd.Series(states_total_deaths[col_deaths].values)
         states_total_deaths.index = old_index
         states_total_deaths.index.name = "city_name"
+
     states_total_deaths = states_total_deaths.sort_values(ascending=False)
     conversion_renames = {}  # saves for renaming later
     for order, item_pair in enumerate(states_total_deaths.iteritems()):
@@ -123,10 +124,12 @@ def plot_heatmap(
         .to_frame()
         .merge(states_total_deaths.to_frame(), left_index=True, right_index=True)
     )
+
     if not deaths_per_cases:
         sorted_index = sorted_index.sort_values(by=[0, col_deaths]).index
     else:
         sorted_index = sorted_index.sort_values(by=["0_x", "0_y"]).index
+    
     states_total_deaths = states_total_deaths.reindex(sorted_index)
     data = _df_to_plotly(pivot.loc[states_total_deaths.index])
     data["y"] = [conversion_renames[city_name] for city_name in data["y"]]
@@ -175,31 +178,34 @@ def plot_heatmap(
     st.plotly_chart(fig, use_container_width=True)
 
 
-def _generate_mvg_deaths(df, place_type, mavg_days, deaths_per_cases=False):
+def _generate_mvg_deaths(df, place_type, mavg_days, min_periods, deaths_per_cases=False):
+    # Consolidate Entries according to Place Type
     if deaths_per_cases:
         df = (
-            df[~df["deaths"].isnull()][
+            df[
                 [place_type, "last_updated", "deaths", "new_deaths", "confirmed_cases"]
             ]
             .groupby([place_type, "last_updated"])[
                 "deaths", "new_deaths", "confirmed_cases"
             ]
-            .sum()
+            .sum(min_count=1)
             .reset_index()
         )
     else:
         df = (
-            df[~df["deaths"].isnull()][
+            df[
                 [place_type, "last_updated", "deaths", "new_deaths"]
             ]
             .groupby([place_type, "last_updated"])["deaths", "new_deaths",]
-            .sum()
+            .sum(min_count=1)
             .reset_index()
         )
 
+    # Calculate Moving Average for New Deaths
     df["rolling_deaths_new"] = df.groupby(
         place_type, as_index=False, group_keys=False
-    ).apply(lambda x: _get_rolling_amount(x, mavg_days))
+    ).apply(lambda x: _get_rolling_amount(x, mavg_days, min_periods))
+
     if deaths_per_cases:
         df["deaths_per_cases"] = df.apply(make_deaths_per_cases, axis=1)
     return df
@@ -286,22 +292,22 @@ def gen_cards(df, your_city, group):
 
 # @st.cache(suppress_st_warning=True)
 def prepare_heatmap(
-    df, place_type, group=None, mavg_days=7, your_city=None, deaths_per_cases=False
+    df, place_type, group=None, mavg_days=7, min_periods=4, your_city=None, deaths_per_cases=False
 ):  
-    # Eliminate Dates in which Data wasn't collected
+    # Change Zeros of Days without Data Collection to NaNs
     if "is_repeated" in df:
-        df = df[df["is_repeated"]==0]
+        df.loc[df["is_repeated"]==1, "new_deaths"] = np.nan
 
-    # Determine last date that the data was obtained
     refresh = df["data_last_refreshed"].max()
 
-    # Filter Data according to Place Type
+    # Determine Data to be Used according to Place Type
     if place_type == "city_name":
         df = df[df["state_id"] == group]
 
     if place_type == "city_name" or place_type == "state_id":
+        # Calculate Moving Average of Deaths
         df = _generate_mvg_deaths(
-            df, place_type, mavg_days, deaths_per_cases=deaths_per_cases
+            df, place_type, mavg_days, min_periods, deaths_per_cases=deaths_per_cases
         )
         col_date = "last_updated"
         col_deaths = "deaths"
@@ -324,12 +330,14 @@ def prepare_heatmap(
         legend = """
         <div class="base-wrapper">
             O gráfico abaixo mostra a média do número de mortes
-            diárias dos últimos cinco dias para os 30 municípios com mais mortes, desde a data da primeira morte reportada e também o que você selecionou mesmo que este não esteja entre os 30 primeiros.
+            diárias dos últimos sete dias para os 30 municípios com mais mortes, desde a data da primeira morte reportada e também o que você selecionou mesmo que este não esteja entre os 30 primeiros.
             Para comparação, os números foram normalizados pelo 
             maior valor encontrado em cada município:
             <b>quanto mais vermelho, mais próximo está o valor do
             maior número de mortes por dia observado no município
             até hoje</b>.
+            <br><br>
+            Dependemos de dados públicos. Eventuais dados faltantes são uma consequência de dias em que nossas fontes não reportaram uma coleta. Nosso cálculo da média móvel leva em consideração pequenas interrupções nos dados. Quando dados faltantes representam menos de quatro dos últimos sete dias, calculamos a média móvel com base nos dias remascentes para os quais temos dados. 
             <br><br>
             Os municípios estão ordenadas pelo dia que atingiu o máximo de mortes, 
             ou seja, municípios no pico de mortes aparecerão no topo. {}
@@ -349,11 +357,13 @@ def prepare_heatmap(
             <br><br>
             <div class="onda-headercaption">
                 O gráfico abaixo mostra a média do número de mortes
-                diárias dos últimos cinco dias em cada UF, desde a data da
+                diárias dos últimos sete dias em cada UF, desde a data da
                 primeira morte reportada. Para comparação, os números foram
                 normalizados pelo maior valor encontrado em cada UF:
                 <b>quanto mais vermelho, mais próximo está o valor do
                 maior número de mortes por dia observado na UF até hoje</b>.
+                <br><br>
+                Dependemos de dados públicos. Eventuais dados faltantes são uma consequência de dias em que nossas fontes não reportaram uma coleta. Sendo assim, é possível que em determinadas datas os números estaduais sejam menores por conta de municípios que não notificaram mortes. Nosso cálculo da média móvel leva em consideração pequenas interrupções nos dados. Quando dados faltantes representam menos de quatro dos últimos sete dias, calculamos a média móvel com base nos dias remascentes para os quais temos dados. 
                 <br><br>
                 As UFs estão ordenadas pelo dia que atingiram o máximo de mortes, 
                 ou seja, UFs no pico de mortes aparecerão no topo. {}
@@ -365,7 +375,7 @@ def prepare_heatmap(
         </div>
         """
 
-    # Prepare HTML for countries
+    # Prepare HTML for Countries
     if place_type == "country_pt":
 
         legend = """
@@ -373,7 +383,7 @@ def prepare_heatmap(
             <span class="section-header primary-span">ONDA DE MORTES DIÁRIAS POR PAÍS</span>
             <br><br>
             O gráfico abaixo mostra a média do número de mortes
-            diárias dos últimos cinco dias para os 30 países com mais 
+            diárias dos últimos sete dias para os 30 países com mais 
             mortes, desde a data da primeira morte reportada.
             Para comparação, os números foram normalizados pelo maior
             valor encontrado em cada país:<b> quanto mais vermelho,
