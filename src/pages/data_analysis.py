@@ -177,6 +177,10 @@ def plot_heatmap(
 
     st.plotly_chart(fig, use_container_width=True)
 
+    # Display Note about Missing Data and Moving Averages
+    st.write("<i>Nossos gráficos dependem de dados públicos. Eventuais dados faltantes são uma consequência de dias em que nossas fontes não reportaram uma coleta. Caso um município ou estado tenha mais de três dias consecutivos de dados faltantes, não calculamos uma média móvel para a data.</i>",
+    unsafe_allow_html=True)
+
 
 def _generate_mvg_deaths(df, place_type, mavg_days, min_periods, deaths_per_cases=False):
     # Consolidate Entries according to Place Type
@@ -289,7 +293,6 @@ def gen_cards(df, your_city, group):
         unsafe_allow_html=True,
     )
 
-
 # @st.cache(suppress_st_warning=True)
 def prepare_heatmap(
     df, place_type, group=None, mavg_days=7, min_periods=4, your_city=None, deaths_per_cases=False
@@ -323,7 +326,7 @@ def prepare_heatmap(
         df.groupby(place_type)[[col_deaths]].max().reset_index().sort_values(col_deaths)
     )
 
-    # Prepare HTML for Cities
+    # Prepare Introductory Text for Cities Heatmap
     if place_type == "city_name":
 
         gen_cards(df, your_city, group)
@@ -337,8 +340,6 @@ def prepare_heatmap(
             maior número de mortes por dia observado no município
             até hoje</b>.
             <br><br>
-            Dependemos de dados públicos. Eventuais dados faltantes são uma consequência de dias em que nossas fontes não reportaram uma coleta. Nosso cálculo da média móvel leva em consideração pequenas interrupções nos dados. Quando dados faltantes representam menos de quatro dos últimos sete dias, calculamos a média móvel com base nos dias remascentes para os quais temos dados. 
-            <br><br>
             Os municípios estão ordenadas pelo dia que atingiu o máximo de mortes, 
             ou seja, municípios no pico de mortes aparecerão no topo. {}
             é o município com o maior número de mortos com: <i>{}</i>
@@ -348,7 +349,7 @@ def prepare_heatmap(
         </div>
         """
 
-    # Prepare HTML for States
+    # Prepare Introductory Text for States Heatmap
     if place_type == "state_id":
 
         legend = """
@@ -363,8 +364,6 @@ def prepare_heatmap(
                 <b>quanto mais vermelho, mais próximo está o valor do
                 maior número de mortes por dia observado na UF até hoje</b>.
                 <br><br>
-                Dependemos de dados públicos. Eventuais dados faltantes são uma consequência de dias em que nossas fontes não reportaram uma coleta. Sendo assim, é possível que em determinadas datas os números estaduais sejam menores por conta de municípios que não notificaram mortes. Nosso cálculo da média móvel leva em consideração pequenas interrupções nos dados. Quando dados faltantes representam menos de quatro dos últimos sete dias, calculamos a média móvel com base nos dias remascentes para os quais temos dados. 
-                <br><br>
                 As UFs estão ordenadas pelo dia que atingiram o máximo de mortes, 
                 ou seja, UFs no pico de mortes aparecerão no topo. {}
                 é o estado com o maior número de mortos com: <i>{}</i>
@@ -375,7 +374,7 @@ def prepare_heatmap(
         </div>
         """
 
-    # Prepare HTML for Countries
+    # Prepare Introductory Text for Countries Heatmap
     if place_type == "country_pt":
 
         legend = """
