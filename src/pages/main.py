@@ -309,11 +309,10 @@ def main(session_state):
     )
 
     # TEMPORARY BANNER FC
-    st.write(
-        """
-        <div>
+    escolasegura_logo = utils.load_image("imgs/escolasegura_favicon.png")
+    st.write(f"""<div>
             <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
-                <div class="white-span header p1" style="font-size:30px;">🏫 COMO PLANEJAR UMA REABERTURA SEGURA?</div>
+                <div class="white-span header p1" style="font-size:30px;"><img class="icon-cards" src="data:image/png;base64,{escolasegura_logo}" alt="Fonte: Impulso"> COMO PLANEJAR UMA REABERTURA SEGURA?</div>
                 <span class="white-span">Veja guias e protocolos para facilitar uma reabertura planejada da rede pública de ensino, respeitando boas práticas de distanciamento e segurança sanitária para controle da Covid-19.
                 <br><b>Acesse o Escola Segura: <a target="_blank" style="color:#FFFFFF;" href="http://escolasegura.coronacidades.org">http://escolasegura.coronacidades.org</a></b></span>
         </div>""",

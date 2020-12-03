@@ -2640,3 +2640,8 @@ header>.toolbar { /* Hide toolbar menu */
       max-width: 1140px;
     }
   }
+
+.icon-cards{
+    width: 2rem;
+    height: 2rem;
+}
