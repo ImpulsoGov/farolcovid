@@ -55,7 +55,7 @@ def main(session_state):
     )
 
     st.latex(
-        r"""P(k_t) = \sum_{R_t} P(k_t \mid R_t) P(R_t) \rightarrow P(R_t \mid k_t) = \frac{P(R_t \mid k_t) P(R_t)}{P(k_t)}"""
+        r"""P(k_t) = \sum_{R_t} P(k_t \mid R_t) P(R_t) \rightarrow P(R_t \mid k_t) = \frac{P(k_t \mid R_t) P(R_t)}{P(k_t)}"""
     )
 
     st.subheader("""Considerações""")

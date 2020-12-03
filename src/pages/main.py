@@ -33,11 +33,11 @@ def fix_type(x, group, position):
                 [str(round(i, 1)) if type(i) != str else i.strip() for i in x]
             )
 
-    if position == "last_updated":
-        return pd.to_datetime(str(x)).strftime("%d/%m/%Y")
-
     if x == "- ":
         return x
+
+    if position == "last_updated":
+        return pd.to_datetime(str(x)).strftime("%d/%m/%Y")
 
     if group == "situation" and position == "display":
         return round(float(x), 2)
@@ -281,52 +281,9 @@ def get_data(config):
 
 
 def main(session_state):
+    # GOOGLE ANALYTICS SETUP
     if os.getenv("IS_DEV") == "FALSE":
-        #  ==== GOOGLE ANALYTICS SETUP ====
-        GOOGLE_ANALYTICS_CODE = os.getenv("GOOGLE_ANALYTICS_CODE")
-        if GOOGLE_ANALYTICS_CODE:
-            import pathlib
-            from bs4 import BeautifulSoup
-            TAG_MANAGER = (
-                """
-                function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                })(window,document,'script','dataLayer','GTM-MKWTV7X');
-                """
-            )
-            GA_JS = (
-                """
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '%s');
-            """
-                % GOOGLE_ANALYTICS_CODE
-            )
-            index_path = pathlib.Path(st.__file__).parent / "static" / "index.html"
-            soup = BeautifulSoup(index_path.read_text(), features="lxml")
-            if not soup.find(id="google-analytics-loader"):
-                script_tag_import = soup.new_tag(
-                    "script",
-                    src="https://www.googletagmanager.com/gtag/js?id=%s"
-                    % GOOGLE_ANALYTICS_CODE,
-                )
-                soup.head.append(script_tag_import)
-                script_tag_loader = soup.new_tag("script", id="google-analytics-loader")
-                script_tag_loader.string = GA_JS
-                soup.head.append(script_tag_loader)
-                script_tag_managerhead = soup.new_tag("script", id="google-tagmanagerhead")
-                script_tag_managerhead.string = TAG_MANAGER
-                soup.head.append(script_tag_managerhead)
-                script_tag_manager_body = soup.new_tag(
-                    "script",
-                    src="https://www.googletagmanager.com/gtm.js?id=GTM-MKWTV7X"
-                )
-                soup.head.append(script_tag_manager_body)
-                index_path.write_text(str(soup))
-        # ====
+        setup_google_analytics()
 
     # Amplitude: Get user info
     user_analytics = amplitude.gen_user(utils.get_server_session())
@@ -334,83 +291,31 @@ def main(session_state):
         "opened farol", session_state, is_new_page=True
     )
 
+    config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
+
     utils.localCSS("style.css")
     st.write(
         """<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MKWTV7X" height="0" width="0" style="display:none;visibility:hidden"></iframe>""",
         unsafe_allow_html=True,
     )
+
     utils.genHeroSection(
         title1="Farol",
         title2="Covid",
         subtitle="Entenda e controle a Covid-19 em sua cidade e estado.",
         logo="https://i.imgur.com/CkYDPR7.png",
         header=True,
+        explain=True
     )
 
-    config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
-
     # TEMPORARY BANNER FC
-    st.write(
-        """
-        <div>
+    escolasegura_logo = utils.load_image("imgs/escolasegura_favicon.png")
+    st.write(f"""<div>
             <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
-                <div class="white-span header p1" style="font-size:30px;">O FAROLCOVID ESTÁ DE CARA NOVA!</div>
-                <span class="white-span">Aprimoramos a plataforma, a metodologia e adicionamos novas ferramentas para acompanhamento da crise da Covid-19 no Brasil.<br><b>Que tal explorar com a gente?</b></span>
-                <br><div style="margin-top: 15px;"></div>
-            <div>
-                <a href="#novidades" class="info-btn">Entenda como navegar</a>
-            </div>
-            <div id="novidades" class="nov-modal-window">
-                <div>
-                    <a href="#" title="Close" class="info-btn-close" style="color: white;">&times</a>
-                    <div style="margin: 10px 15px 15px 15px;">
-                        <h1 class="primary-span">Saiba como cada ferramenta apoia a resposta ao coronavírus</h1>
-                        <p class="darkblue-span uppercase"> <b>Farol Covid</b> </p>
-                        <img class="img-modal" src=%s alt="Ícone Farol Covid">
-                        <div>
-                            <p> <b>Importante: mudamos a metodologia dos indicadores - veja mais em Modelos, limitações e fontes no menu lateral.</b> Descubra o nível de alerta do estado, regional de saúde ou município de acordo com os indicadores:</p>
-                            - <b>Situação da doença</b>: média de novos casos 100 mil por habitantes;</br>
-                            - <b>Controle da doença</b>: taxa de contágio</br>
-                            - <b>Capacidade do sistema</b>: tempo para ocupação de leitos UTI</br>
-                            - <b>Confiança de dados</b>: taxa de subnotificação de casos</br><br>
-                        </div>
-                        <div>
-                        <p class="darkblue-span uppercase"> <b>SimulaCovid</b> </p>
-                        <img class="img-modal" src=%s alt="Ícone SimulaCovid">  
-                        <p style="height:100px;">Simule o que pode acontecer com o sistema de saúde local se o ritmo de contágio aumentar 
-                            ou diminuir e planeje suas ações para evitar a sobrecarga hospitalar.</p>
-                        </div>
-                        <div>
-                        <p class="darkblue-span uppercase"> <b>Distanciamento Social</b> </p>
-                        <img class="img-modal" src=%s alt="Ícone Distanciamento Social">
-                            <p style="height:100px;">Acompanhe a atualização diária do índice e descubra como está a circulação de pessoas 
-                                e o distanciamento social no seu estado ou município.    
-                            </p>
-                        </div>
-                        <div>
-                        <p class="darkblue-span uppercase"> <b>Saúde em Ordem</b> </p>
-                        <img class="img-modal" src=%s alt="Ícone Saúde em Ordem">
-                        <p> Entenda quais atividades deveriam reabrir primeiro no seu estado ou regional, considerando:
-                            - <b>Segurança Sanitária</b>: quais setores têm menor exposição à Covid-19?</br>
-                            - <b>Contribuição Econômica</b>: quais setores movimentam mais a economia local?</br></p>
-                        <p> </p>
-                        </div>
-                        <div>
-                        <p class="darkblue-span uppercase"> <b>Onda Covid</b> </p>
-                        <img class="img-modal" src=%s alt="Ícone Onda Covid">
-                        <p>Com base no número de óbitos de Covid-19 registrados, acompanhe se seu município já saiu do pico da doença. </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>"""
-        % (
-            config["br"]["icons"]["farolcovid_logo"],
-            config["br"]["icons"]["simulacovid_logo"],
-            config["br"]["icons"]["distanciamentosocial_logo"],
-            config["br"]["icons"]["saudeemordem_logo"],
-            config["br"]["icons"]["ondacovid_logo"],
-        ),
+                <div class="white-span header p1" style="font-size:30px;"><img class="icon-cards" src="data:image/png;base64,{escolasegura_logo}" alt="Fonte: Impulso"> COMO PLANEJAR UMA REABERTURA SEGURA?</div>
+                <span class="white-span">Veja guias e protocolos para facilitar uma reabertura planejada da rede pública de ensino, respeitando boas práticas de distanciamento e segurança sanitária para controle da Covid-19.
+                <br><b>Acesse o Escola Segura: <a target="_blank" style="color:#FFFFFF;" href="http://escolasegura.coronacidades.org">http://escolasegura.coronacidades.org</a></b></span>
+        </div>""",
         unsafe_allow_html=True,
     )
 
@@ -565,6 +470,21 @@ def main(session_state):
         )
         placeholder_value_pls_solve_this = 0
 
+    # TEMPORARY BANNER - TODO: remove after done
+    if user_input["state_name"] in ["Mato Grosso", "Espírito Santo"]:
+        st.write(
+            """
+            <div>
+                <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
+                    <div class="white-span header p1" style="font-size:30px;">⚠️ ATENÇÃO: Os municípios e regionais de saúde de MT e ES estão desatualizados</div>
+                        <span class="white-span">Utilizamos dados abertos das secretarias estaduais para os cálculos dos indicadores. 
+                        Esses dados são capturados diariamente por voluntários do Brasil.io, que vêm enfrenteando problemas na atualização dos dados desses estados.
+                        Estamos resolvendo a situação e iremos retornar com os indicadores o mais breve possível.</b></span>
+                </div>
+            <div>""",
+            unsafe_allow_html=True
+        )
+    
     # DIMENSIONS CARDS
     dimensions = DimensionCards
     utils.genAnalysisDimmensionsSection(dimensions)
@@ -577,6 +497,7 @@ def main(session_state):
     data["overall_alert"] = data["overall_alert"].map(
         config["br"]["farolcovid"]["categories"]
     )
+
     if "state" in user_input["place_type"]:
         # Add disclaimer to cities in state alert levels
         total_alert_regions = (
