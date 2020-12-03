@@ -43,7 +43,6 @@ config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
 
 # DATASOURCE TOOLS
 
-
 def get_inloco_url(config):
 
     api_inloco = dict()
@@ -268,6 +267,53 @@ def get_ufs_list():
 # AMPLITUDE ANALYTICS HELPER METHODS
 # PLUS SOME EXTRA STREAMLIT HACKING
 # Kept for backwards compatibility reasons
+
+def setup_google_analytics():
+    GOOGLE_ANALYTICS_CODE = os.getenv("GOOGLE_ANALYTICS_CODE")
+    if GOOGLE_ANALYTICS_CODE:
+        import pathlib
+        from bs4 import BeautifulSoup
+        TAG_MANAGER = (
+            """
+            function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-MKWTV7X');
+            """
+        )
+        GA_JS = (
+            """
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '%s');
+        """
+            % GOOGLE_ANALYTICS_CODE
+        )
+        index_path = pathlib.Path(st.__file__).parent / "static" / "index.html"
+        soup = BeautifulSoup(index_path.read_text(), features="lxml")
+        if not soup.find(id="google-analytics-loader"):
+            script_tag_import = soup.new_tag(
+                "script",
+                src="https://www.googletagmanager.com/gtag/js?id=%s"
+                % GOOGLE_ANALYTICS_CODE,
+            )
+            soup.head.append(script_tag_import)
+            script_tag_loader = soup.new_tag("script", id="google-analytics-loader")
+            script_tag_loader.string = GA_JS
+            soup.head.append(script_tag_loader)
+            script_tag_managerhead = soup.new_tag("script", id="google-tagmanagerhead")
+            script_tag_managerhead.string = TAG_MANAGER
+            soup.head.append(script_tag_managerhead)
+            script_tag_manager_body = soup.new_tag(
+                "script",
+                src="https://www.googletagmanager.com/gtm.js?id=GTM-MKWTV7X"
+            )
+            soup.head.append(script_tag_manager_body)
+            index_path.write_text(str(soup))
+
+
 def get_server_session():
     return session._get_session_raw()
 
@@ -557,29 +603,81 @@ def gen_info_modal(config):
 
 # VIEW COMPONENTS FAROLCOVID
 
-
-def genHeroSection(title1: str, title2: str, subtitle: str, logo: str, header: bool):
+def genHeroSection(title1: str, title2: str, subtitle: str, logo: str, header: bool, explain: bool = False):
 
     if header:
         header = """<a href="https://coronacidades.org/" target="blank" class="logo-link"><span class="logo-bold">corona</span><span class="logo-lighter">cidades</span></a>"""
     else:
         header = """<br>"""
 
+    if explain:
+        explain = f"""<div class="hero-container-content">
+            <div>
+                <a href="#novidades" class="info-btn">Como navegar</a>
+            </div>
+            <div id="novidades" class="nov-modal-window">
+                <div>
+                    <a href="#" title="Close" class="info-btn-close" style="color: white;">&times</a>
+                    <div style="margin: 10px 15px 15px 15px;">
+                        <h1 class="primary-span">Saiba como cada ferramenta apoia a resposta ao coronavírus</h1>
+                        <p class="darkblue-span uppercase"> <b>Farol Covid</b> </p>
+                        <img class="img-modal" src={config["br"]["icons"]["farolcovid_logo"]} alt="Ícone Farol Covid">
+                        <div>
+                            <p> <b>Importante: mudamos a metodologia dos indicadores - veja mais em Modelos, limitações e fontes no menu lateral.</b> Descubra o nível de alerta do estado, regional de saúde ou município de acordo com os indicadores:</p>
+                            - <b>Situação da doença</b>: média de novos casos 100 mil por habitantes;</br>
+                            - <b>Controle da doença</b>: taxa de contágio</br>
+                            - <b>Capacidade do sistema</b>: tempo para ocupação de leitos UTI</br>
+                            - <b>Confiança de dados</b>: taxa de subnotificação de casos</br><br>
+                        </div>
+                        <div>
+                        <p class="darkblue-span uppercase"> <b>SimulaCovid</b> </p>
+                        <img class="img-modal" src={config["br"]["icons"]["simulacovid_logo"]} alt="Ícone SimulaCovid">  
+                        <p style="height:100px;">Simule o que pode acontecer com o sistema de saúde local se o ritmo de contágio aumentar 
+                            ou diminuir e planeje suas ações para evitar a sobrecarga hospitalar.</p>
+                        </div>
+                        <div>
+                        <p class="darkblue-span uppercase"> <b>Distanciamento Social</b> </p>
+                        <img class="img-modal" src={config["br"]["icons"]["distanciamentosocial_logo"]} alt="Ícone Distanciamento Social">
+                            <p style="height:100px;">Acompanhe a atualização diária do índice e descubra como está a circulação de pessoas 
+                                e o distanciamento social no seu estado ou município.    
+                            </p>
+                        </div>
+                        <div>
+                        <p class="darkblue-span uppercase"> <b>Saúde em Ordem</b> </p>
+                        <img class="img-modal" src={config["br"]["icons"]["saudeemordem_logo"]} alt="Ícone Saúde em Ordem">
+                        <p> Entenda quais atividades deveriam reabrir primeiro no seu estado ou regional, considerando:
+                            - <b>Segurança Sanitária</b>: quais setores têm menor exposição à Covid-19?</br>
+                            - <b>Contribuição Econômica</b>: quais setores movimentam mais a economia local?</br></p>
+                        <p> </p>
+                        </div>
+                        <div>
+                        <p class="darkblue-span uppercase"> <b>Onda Covid</b> </p>
+                        <img class="img-modal" src={config["br"]["icons"]["ondacovid_logo"]} alt="Ícone Onda Covid">
+                        <p>Com base no número de óbitos de Covid-19 registrados, acompanhe se seu município já saiu do pico da doença. </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>"""
+    else:
+        explain = ""
+
     st.write(
         f"""
         <div class="base-wrapper hero-bg">
             <div class="hero-wrapper">
-            <div class="hero-container">
-                {header}
-                <div class="hero-container-content">
-                    <span class="hero-container-product primary-span">{title1}<br/>{title2}</span>
-                    <span class="hero-container-subtitle primary-span">{subtitle}</span>
+                <div class="hero-container">
+                    {header}
+                    <div class="hero-container-content">
+                        <span class="hero-container-product primary-span">{title1}<br/>{title2}</span>
+                        <span class="hero-container-subtitle primary-span">{subtitle}</span>
+                    </div>
                 </div>
-            </div>
                 <div class="hero-container-image">   
                     <img style="width: 100%;" src={logo}/>
                 </div>
-            </div>
+            </div><br>
+            {explain}
         </div>
         """,
         unsafe_allow_html=True,
