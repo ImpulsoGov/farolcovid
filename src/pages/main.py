@@ -283,7 +283,7 @@ def get_data(config):
 def main(session_state):
     # GOOGLE ANALYTICS SETUP
     if os.getenv("IS_DEV") == "FALSE":
-        setup_google_analytics()
+        utils.setup_google_analytics()
 
     # Amplitude: Get user info
     user_analytics = amplitude.gen_user(utils.get_server_session())
