@@ -474,7 +474,7 @@ def gen_whatsapp_button(info) -> None:
     Args:
         info: config["contact"]
     """
-    url = "whatsapp://send?text={}&phone=${}".format(info["msg"], info["phone"])
+    url = "https://api.whatsapp.com/send?text={}&phone=${}".format(info["msg"], info["phone"])
     st.write(
         """ 
          <a href="%s" class="float" target="_blank" id="messenger">
@@ -921,7 +921,7 @@ def genKPISection(
                 <div class="base-wrapper flex flex-column" style="margin-top: 0px;">
                         <div class="flex flex-row flex-space-between flex-align-items-center">
                          <span class="white-span header p1">%s</span>
-                         <a class="btn-wpp" href="whatsapp://send?text=%s" target="blank">Compartilhar no Whatsapp</a>
+                         <a class="btn-wpp" href="https://api.whatsapp.com/send?text=%s" target="blank">Compartilhar no Whatsapp</a>
                          </div>
                         <span class="white-span p3">%s</span>
                         <div class="flex-row flex-m-column">%s</div>
