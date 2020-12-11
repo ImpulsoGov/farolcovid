@@ -12,12 +12,16 @@ endif
 ###
 
 # Build image
-docker-build:
+docker-build: docker-remove
 	docker build -t $(IMAGE_TAG) .
+
+docker-remove:
+	docker rm -f farolcovid 2>/dev/null || true
 
 # Run just like the production environment
 docker-run:
 	docker run -d \
+		--name farolcovid \
 		--restart=unless-stopped \
 		-v $(PWD)/.env:/home/ubuntu/.env:ro \
 		-p 8501:8501 \
@@ -34,7 +38,7 @@ docker-dev:
 	touch $(PWD)/.env
 	
 	docker run --rm -it \
-		--name farolcovid-dev \
+		--name farolcovid \
 		-p 8501:8501 \
 		-p 5000:5000 \
 		-v $(PWD)/.env:/home/ubuntu/.env:ro \
