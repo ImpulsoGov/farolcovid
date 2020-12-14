@@ -880,7 +880,7 @@ def noOverallalert(user_input, data, states):
             <div>""".format(user_input["state_name"]),
             unsafe_allow_html=True
         )
-    elif data["overall_alert"].values[0] == None and user_input["city_name"] != "Todos":
+    elif not isinstance(data["overall_alert"].values[0], str) and user_input["city_name"] != "Todos":
         st.write(
             """
             <div>
