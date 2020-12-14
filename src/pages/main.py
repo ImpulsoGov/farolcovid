@@ -471,7 +471,7 @@ def main(session_state):
         placeholder_value_pls_solve_this = 0
 
     # ALERT BANNER
-    states_list = dfs["city"].groupby(["state_name"]).agg({"overall_alert": "count", "state_name": "max"})
+    states_list = dfs["city"].groupby(["state_name"]).agg({"overall_alert": "sum", "state_name": "max"})
     states_list = states_list.loc[states_list['overall_alert'] < 1]
     # Temporário para MT e ES
     states_list = states_list.append({'state_name': 'Mato Grosso', 'overall_alert': 0}, ignore_index=True)
