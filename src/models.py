@@ -159,10 +159,13 @@ IndicatorCards: Dict[str, Indicator] = {
         left_label="Taxa de contágio (Rt):",
         right_label="Tendência:",
     ),
+    # TODO -> VOLTAR PROJECAO DE LEITOS
+    # caption="Se nada mudar, todos os leitos de seu <b>estado ou regional de saúde</b> estarão ocupados em",
+    # unit="dia(s)",
     IndicatorType.CAPACITY.value: Indicator(
         header="CAPACIDADE DO SISTEMA",
-        caption="Se nada mudar, todos os leitos de seu <b>estado ou regional de saúde</b> estarão ocupados em",
-        unit="dia(s)",
+        caption="Com base no DataSUS, hoje em sua <b>regional de saúde</b> existem",
+        unit="leitos UTI/100mil hab.",
         left_label="Leitos enfermaria*:",
         right_label="Leitos UTI:",
     ),
