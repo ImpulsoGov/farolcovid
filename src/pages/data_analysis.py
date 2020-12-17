@@ -178,7 +178,15 @@ def plot_heatmap(
     st.plotly_chart(fig, use_container_width=True)
 
     # Display Note about Missing Data and Moving Averages
-    st.write("<i>Nossos gráficos dependem de dados públicos. Eventuais dados faltantes são uma consequência de dias em que nossas fontes não reportaram uma coleta. Caso um município ou estado tenha mais de três dias consecutivos de dados faltantes, não calculamos uma média móvel para a data.</i>",
+    st.write("""
+        <div class="base-wrapper">
+            <i><b>Nossos gráficos dependem de dados públicos.</b> 
+            Eventuais dados faltantes são uma consequência de dias em que não foi realizada a coleta na fonte (Brasil.io), 
+            que pode acontecer por problemas de atualização ou a não divulgação do boletim epidemiológico da respectiva secretaria estadual. 
+            Caso um município ou estado tenha mais de três dias consecutivos de dados faltantes, 
+            não calculamos uma média móvel para a data.</i>
+        </div>
+    """,
     unsafe_allow_html=True)
 
 
