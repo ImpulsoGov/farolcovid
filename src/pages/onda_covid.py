@@ -3,6 +3,7 @@ import plots
 import pages.data_analysis as da
 import loader
 import utils
+import copy
 
 
 @st.cache(suppress_st_warning=True)
@@ -83,29 +84,23 @@ def main(user_input, indicators, data, config, session_state):
         header=False
     )
 
-    try:
-        # load data
-        # print("loading br cases")
-        br_cases = loading_cached()
-        # print("finished laoding br cases")
+    # Prompt User to Select Heatmap Location
+    view = st.selectbox("Selecione a sua visão", options=["Cidade", "Estado", "País"], index=1)
+
+    # Load City/State/Country Heatmap
+    if view == "Estado":
+        load_states_heatmap(copy.deepcopy(loading_cached()))
+    elif view == "Cidade":
         my_dict = utils.Dictionary()
-        # ONDA POR ESTADO
-        load_states_heatmap(br_cases)
-        pass
-    except Exception as e:
-        st.write(str(e))
-
-    # ONDA POR MUNICIPIO
-    load_cities_heatmap(br_cases)
-
-    # ONDA POR PAÍS
-    load_countries_heatmap(config)
+        load_cities_heatmap(copy.deepcopy(loading_cached()), my_dict)
+    elif view == "País":
+        load_countries_heatmap(config)
 
 def load_states_heatmap(br_cases):
     da.prepare_heatmap(br_cases, place_type="state_id")
     st.write("")
 
-def load_cities_heatmap(br_cases):
+def load_cities_heatmap(br_cases, my_dict):
     st.write(
         """
         <div class="base-wrapper">
