@@ -558,6 +558,7 @@ def main(session_state):
         """
         <div class='base-wrapper'>
             <i>* <b>Mudamos o indicador afim de refinarmos ajustes no cálculo de projeção de leitos.</b> Entendemos que a projeção apresentada não capturava a situação da 2ª onda observada nos municípios, regionais e estados, logo substituímos este indicador por ora para revisão dos cálculos. 
+            Os valores de referência são baseados nas estatísticas de países da OCDE, <a target="_blank" style="color:#FFFFFF;" href="https://docs.google.com/spreadsheets/d/1MKFOHRCSg4KMx5Newi7TYCrjtNyPwMQ38GE1wQ6as70/edit?usp=sharing">veja em detalhe aqui</a></b>.
             As simulações personalizadas ainda podem ser realizadas através do SimulaCovid mais abaixo.<br><br>
             <li> Leitos Enfermaria: Consideramos %s&percnt; do total reportado por %s em %s dos tipos Cirúrgico, Clínico e Hospital-dia. Para municípios, utilizamos os recursos da respectiva regional de saúde.<br>
             <li> Leitos UTI: Consideramos 100&percnt; do total de leitos UTI reportado por %s em %s. Para municípios, utilizamos os recursos da respectiva regional de saúde.</i>
