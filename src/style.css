@@ -1212,9 +1212,9 @@ header>.toolbar { /* Hide toolbar menu */
   }
 
 .info-table{
-    width: 70%;
+    width: 90%;
     height: auto;
-    
+    /* margin-left: 1rem; */
 }
 
 
