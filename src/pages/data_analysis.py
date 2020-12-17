@@ -8,10 +8,11 @@ import numpy as np
 import pandas as pd
 import utils
 import amplitude
+import math
 
 
-def _get_rolling_amount(grp, time, data_col="last_updated", col_to_roll="new_deaths"):
-    return grp.rolling(time, min_periods=1, on=data_col)[col_to_roll].mean()
+def _get_rolling_amount(grp, time, min_periods,data_col="last_updated", col_to_roll="new_deaths"):
+    return grp.rolling(time, min_periods=min_periods, on=data_col)[col_to_roll].mean()
 
 
 def _df_to_plotly(df):
@@ -26,12 +27,21 @@ def _generate_hovertext(df_to_plotly, deaths_per_cases=False):
     for yi, yy in enumerate(df_to_plotly["y"]):
         hovertext.append(list())
         for xi, xx in enumerate(df_to_plotly["x"]):
+            # Check for Missing Values
+            if math.isnan(round(df_to_plotly["z"][yi][xi], 2)):
+                # Hover Text warns of Missing Value
+                perc_value = "Não há dados para a data."
+            else:
+                # Hover Text displays appropriate numerical value
+                perc_value = round(df_to_plotly["z"][yi][xi], 2)
+
+            # Add hover text
             hovertext[-1].append(
                 "<b>{}</b><br>Data: {}<br>{}: {}".format(
                     yy,
                     str(xx)[:10],
                     color_value_label,
-                    round(df_to_plotly["z"][yi][xi], 2),
+                    perc_value,
                 )
             )
 
@@ -47,6 +57,7 @@ def plot_heatmap(
     city_name=None,
     deaths_per_cases=False,
 ):
+    # Determine Data to be Used by Place Type
     if place_type == "state_id" or place_type == "city_name":
         col_date = "last_updated"
         col_deaths = "deaths"
@@ -59,17 +70,14 @@ def plot_heatmap(
         col_date = "date"
         col_deaths = "total_deaths"
         col_actual_data = "rolling_deaths_new"
+    
     pivot = (
         df.reset_index()
         .pivot(index=place_type, columns=col_date, values=col_actual_data)
-        .fillna(0)
     )
+
     if not deaths_per_cases:
         pivot = pivot.apply(lambda x: x / x.max(), axis=1)
-
-    pivot = pivot.dropna(how="all")
-    # remove days with all states zero
-    pivot = pivot.loc[:, (pivot != 0).any(axis=0)]
 
     # TODO: analisar remoção de mortes nos locais
     pivot = pivot.applymap(lambda x: 0 if x < 0 else x)
@@ -80,6 +88,7 @@ def plot_heatmap(
         .loc[pivot.index]
         .sort_values(ascending=False)
     )
+
     if deaths_per_cases:
         states_total_deaths = df.reset_index()
         states_total_deaths = states_total_deaths[
@@ -92,6 +101,7 @@ def plot_heatmap(
         states_total_deaths = pd.Series(states_total_deaths[col_deaths].values)
         states_total_deaths.index = old_index
         states_total_deaths.index.name = "city_name"
+
     states_total_deaths = states_total_deaths.sort_values(ascending=False)
     conversion_renames = {}  # saves for renaming later
     for order, item_pair in enumerate(states_total_deaths.iteritems()):
@@ -114,10 +124,12 @@ def plot_heatmap(
         .to_frame()
         .merge(states_total_deaths.to_frame(), left_index=True, right_index=True)
     )
+
     if not deaths_per_cases:
         sorted_index = sorted_index.sort_values(by=[0, col_deaths]).index
     else:
         sorted_index = sorted_index.sort_values(by=["0_x", "0_y"]).index
+    
     states_total_deaths = states_total_deaths.reindex(sorted_index)
     data = _df_to_plotly(pivot.loc[states_total_deaths.index])
     data["y"] = [conversion_renames[city_name] for city_name in data["y"]]
@@ -150,7 +162,7 @@ def plot_heatmap(
     d = [trace1, trace2]
     layout = go.Layout(
         title=title,
-        plot_bgcolor="rgba(0,0,0,0)",
+        #plot_bgcolor="rgba(0,0,0,0)",
         # autosize=True,
         # width=1000,
         height=700,
@@ -165,32 +177,39 @@ def plot_heatmap(
 
     st.plotly_chart(fig, use_container_width=True)
 
+    # Display Note about Missing Data and Moving Averages
+    st.write("<i>Nossos gráficos dependem de dados públicos. Eventuais dados faltantes são uma consequência de dias em que nossas fontes não reportaram uma coleta. Caso um município ou estado tenha mais de três dias consecutivos de dados faltantes, não calculamos uma média móvel para a data.</i>",
+    unsafe_allow_html=True)
 
-def _generate_mvg_deaths(df, place_type, mavg_days, deaths_per_cases=False):
+
+def _generate_mvg_deaths(df, place_type, mavg_days, min_periods, deaths_per_cases=False):
+    # Consolidate Entries according to Place Type
     if deaths_per_cases:
         df = (
-            df[~df["deaths"].isnull()][
+            df[
                 [place_type, "last_updated", "deaths", "new_deaths", "confirmed_cases"]
             ]
             .groupby([place_type, "last_updated"])[
                 "deaths", "new_deaths", "confirmed_cases"
             ]
-            .sum()
+            .sum(min_count=1)
             .reset_index()
         )
     else:
         df = (
-            df[~df["deaths"].isnull()][
+            df[
                 [place_type, "last_updated", "deaths", "new_deaths"]
             ]
             .groupby([place_type, "last_updated"])["deaths", "new_deaths",]
-            .sum()
+            .sum(min_count=1)
             .reset_index()
         )
 
+    # Calculate Moving Average for New Deaths
     df["rolling_deaths_new"] = df.groupby(
         place_type, as_index=False, group_keys=False
-    ).apply(lambda x: _get_rolling_amount(x, mavg_days))
+    ).apply(lambda x: _get_rolling_amount(x, mavg_days, min_periods))
+
     if deaths_per_cases:
         df["deaths_per_cases"] = df.apply(make_deaths_per_cases, axis=1)
     return df
@@ -204,7 +223,7 @@ def make_deaths_per_cases(row):
 
 
 def gen_cards(df, your_city, group):
-    # State evalaution
+    # State evaluation
     state_evaluation_df = df.groupby(["last_updated"]).sum().sort_index(ascending=False)
     peak_daily_deaths_day = state_evaluation_df["new_deaths"].idxmax()
     peak_daily_deaths = state_evaluation_df.loc[
@@ -274,18 +293,24 @@ def gen_cards(df, your_city, group):
         unsafe_allow_html=True,
     )
 
-
 # @st.cache(suppress_st_warning=True)
 def prepare_heatmap(
-    df, place_type, group=None, mavg_days=7, your_city=None, deaths_per_cases=False
-):
+    df, place_type, group=None, mavg_days=7, min_periods=4, your_city=None, deaths_per_cases=False
+):  
+    # Change Zeros of Days without Data Collection to NaNs
+    if "is_repeated" in df:
+        df.loc[df["is_repeated"]==1, "new_deaths"] = np.nan
+
     refresh = df["data_last_refreshed"].max()
+
+    # Determine Data to be Used according to Place Type
     if place_type == "city_name":
         df = df[df["state_id"] == group]
 
     if place_type == "city_name" or place_type == "state_id":
+        # Calculate Moving Average of Deaths
         df = _generate_mvg_deaths(
-            df, place_type, mavg_days, deaths_per_cases=deaths_per_cases
+            df, place_type, mavg_days, min_periods, deaths_per_cases=deaths_per_cases
         )
         col_date = "last_updated"
         col_deaths = "deaths"
@@ -295,18 +320,20 @@ def prepare_heatmap(
     if place_type == "country_pt":
         col_date = "date"
         col_deaths = "total_deaths"
-
+    
+    # Find place with most deaths
     place_max_deaths = (
         df.groupby(place_type)[[col_deaths]].max().reset_index().sort_values(col_deaths)
     )
 
+    # Prepare Introductory Text for Cities Heatmap
     if place_type == "city_name":
 
         gen_cards(df, your_city, group)
         legend = """
         <div class="base-wrapper">
             O gráfico abaixo mostra a média do número de mortes
-            diárias dos últimos cinco dias para os 30 municípios com mais mortes, desde a data da primeira morte reportada e também o que você selecionou mesmo que este não esteja entre os 30 primeiros.
+            diárias dos últimos sete dias para os 30 municípios com mais mortes, desde a data da primeira morte reportada e também o que você selecionou mesmo que este não esteja entre os 30 primeiros.
             Para comparação, os números foram normalizados pelo 
             maior valor encontrado em cada município:
             <b>quanto mais vermelho, mais próximo está o valor do
@@ -315,13 +342,14 @@ def prepare_heatmap(
             <br><br>
             Os municípios estão ordenadas pelo dia que atingiu o máximo de mortes, 
             ou seja, municípios no pico de mortes aparecerão no topo. {}
-            é o município com o maior número de mortos, com: <i>{}</i>
+            é o município com o maior número de mortos com: <i>{}</i>
             e o estado totaliza: <i>{}</i>.
             <br><br>
             <i>Última atualização: {}</i>
         </div>
         """
 
+    # Prepare Introductory Text for States Heatmap
     if place_type == "state_id":
 
         legend = """
@@ -330,15 +358,15 @@ def prepare_heatmap(
             <br><br>
             <div class="onda-headercaption">
                 O gráfico abaixo mostra a média do número de mortes
-                diárias dos últimos cinco dias em cada UF, desde a data da
+                diárias dos últimos sete dias em cada UF, desde a data da
                 primeira morte reportada. Para comparação, os números foram
                 normalizados pelo maior valor encontrado em cada UF:
                 <b>quanto mais vermelho, mais próximo está o valor do
                 maior número de mortes por dia observado na UF até hoje</b>.
                 <br><br>
-                As UFs estão ordenadas pelo dia que atingiu o máximo de mortes, 
+                As UFs estão ordenadas pelo dia que atingiram o máximo de mortes, 
                 ou seja, UFs no pico de mortes aparecerão no topo. {}
-                é o estado com o maior número de mortos, com: <i>{}</i>
+                é o estado com o maior número de mortos com: <i>{}</i>
                 e o Brasil totaliza: <i>{}</i>.
                 <br><br>
                 <i>Última atualização: {}</i>
@@ -346,6 +374,7 @@ def prepare_heatmap(
         </div>
         """
 
+    # Prepare Introductory Text for Countries Heatmap
     if place_type == "country_pt":
 
         legend = """
@@ -353,16 +382,16 @@ def prepare_heatmap(
             <span class="section-header primary-span">ONDA DE MORTES DIÁRIAS POR PAÍS</span>
             <br><br>
             O gráfico abaixo mostra a média do número de mortes
-            diárias dos últimos cinco dias para os 30 países com mais 
+            diárias dos últimos sete dias para os 30 países com mais 
             mortes, desde a data da primeira morte reportada.
             Para comparação, os números foram normalizados pelo maior
             valor encontrado em cada país:<b> quanto mais vermelho,
             mais próximo está o valor do maior número de mortes por
             dia observado no país até hoje</b>.
             <br><br>
-            Os países estão ordernados pelo dia que atingiu o máximo de mortes,
+            Os países estão ordernados pelo dia que atingiram o máximo de mortes,
             ou seja, os países no pico de mortes aparecerão no topo. {}
-            é o país com o maior número de mortos, com: <i>{}</i>
+            é o país com o maior número de mortos com: <i>{}</i>
             e o mundo totaliza: <i>{}</i>.
             <br><br>
             <i>Última atualização: {}</i>
@@ -379,7 +408,7 @@ def prepare_heatmap(
             <br><br>
             Os municípios estão ordenadas pelo dia que atingiram o seu máximo de mortes por casos, 
             ou seja, municípios no pico de mortes por casos aparecerão no topo. 
-            {} é o município com o maior número de mortos por casos, com: <i>{}</i> mortos por casos
+            {} é o município com o maior número de mortos por casos com: <i>{}</i> mortos por casos
             e o estado tem uma mediana de: <i>{}</i> mortos por casos.
             <br><br>
             <i>Última atualização: {}</i>
@@ -399,9 +428,8 @@ def prepare_heatmap(
         st.write(
             legend.format(
                 place_max_deaths.index[0],
-                "%0.3f" % place_max_deaths.iloc[0],
-                "%0.3f"
-                % place_max_deaths.values[int(len(place_max_deaths.values) / 2)],
+                "{:,.0f}".format(place_max_deaths.iloc[0]).replace(',','.'),
+                "{:,.0f}".format(place_max_deaths.values[int(len(place_max_deaths.values) / 2)]).replace(',','.'),
                 refresh[:10],
             ),
             unsafe_allow_html=True,
@@ -409,9 +437,9 @@ def prepare_heatmap(
     else:
         st.write(
             legend.format(
-                place_max_deaths.iloc[-1][place_type],
-                place_max_deaths.max()[col_deaths],
-                place_max_deaths.sum()[col_deaths],
+                "{}".format(place_max_deaths.iloc[-1][place_type]),
+                "{:,.0f}".format(place_max_deaths.max()[col_deaths]).replace(',','.'),
+                "{:,.0f}".format(place_max_deaths.sum()[col_deaths]).replace(',','.'),
                 refresh[:10],
             ),
             unsafe_allow_html=True,
