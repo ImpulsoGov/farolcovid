@@ -480,21 +480,15 @@ def main(session_state):
         )
         placeholder_value_pls_solve_this = 0
 
-    # TEMPORARY BANNER - TODO: remove after done
-    if user_input["state_name"] in ["Mato Grosso", "Espírito Santo"]:
-        st.write(
-            """
-            <div>
-                <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
-                    <div class="white-span header p1" style="font-size:30px;">⚠️ ATENÇÃO: Os municípios e regionais de saúde de MT e ES estão desatualizados</div>
-                        <span class="white-span">Utilizamos dados abertos das secretarias estaduais para os cálculos dos indicadores. 
-                        Esses dados são capturados diariamente por voluntários do Brasil.io, que vêm enfrenteando problemas na atualização dos dados desses estados.
-                        Estamos resolvendo a situação e iremos retornar com os indicadores o mais breve possível.</b></span>
-                </div>
-            <div>""",
-            unsafe_allow_html=True
-        )
-    
+    # ALERT BANNER
+    # Aqui ele cria uma lista só com os estados que todas as cidades estao sem o overall_alert para criar um alerta para o estado
+    states_list = dfs["city"].groupby(["state_name"]).agg({"overall_alert": "count", "state_name": "max"})
+    states_list = states_list.loc[states_list['overall_alert'] < 1]
+    # Adiciona forcadamente MT para a lista
+    states_list = states_list.append({'state_name': 'Mato Grosso', 'overall_alert': 0}, ignore_index=True)
+    states_list = states_list['state_name'].to_list()
+    utils.noOverallalert(user_input, data, states_list)
+
     # DIMENSIONS CARDS
     dimensions = DimensionCards
     utils.genAnalysisDimmensionsSection(dimensions)
