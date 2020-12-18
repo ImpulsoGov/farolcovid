@@ -850,7 +850,7 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
         </div>
         <span class="bold p2 main-card-display-value">{indicator.display}<span class="p5">  {indicator.unit}</span></span>
         <div class="{IndicatorBackground(try_int(indicator.risk)).name}-alert-bg risk-pill " style="position:absolute;bottom:120px;">
-            <span class="bold white-span p4">{alert}</span>
+            <span class="white-span p5">alerta <b>{alert}</b></span>
         </div>
         <div class="main-card-display-text-v2 sdcardtext-left">
                 <span class="lighter">{indicator.left_label}<br></span>
