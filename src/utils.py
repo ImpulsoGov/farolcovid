@@ -866,7 +866,34 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
         <div class="last-updated-text">Atualizado em: {indicator.last_updated}</div>
     </div>"""
 
-
+def noOverallalert(user_input, data, states):
+    if user_input["state_name"] in states:
+        st.write(
+            """
+            <div>
+                <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
+                    <div class="white-span header p1" style="font-size:30px;">⚠️ ATENÇÃO: Os municípios e regionais de saúde de {} estão desatualizados</div>
+                        <span class="white-span">Utilizamos dados abertos das secretarias estaduais para os cálculos dos indicadores. 
+                        Esses dados são capturados diariamente por voluntários do Brasil.io, que vêm enfrenteando problemas na atualização dos dados desses estados.
+                        Estamos resolvendo a situação e iremos retornar com os indicadores o mais breve possível.</b></span>
+                </div>
+            <div>""".format(user_input["state_name"]),
+            unsafe_allow_html=True
+        )
+    elif not isinstance(data["overall_alert"].values[0], str) and user_input["city_name"] != "Todos":
+        st.write(
+            """
+            <div>
+                <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
+                    <div class="white-span header p1" style="font-size:30px;">⚠️ ATENÇÃO: Os dados do município {} está desatualizado.</div>
+                        <span class="white-span">Utilizamos dados abertos das secretarias estaduais para os cálculos dos indicadores. 
+                        Esses dados são capturados diariamente por voluntários do Brasil.io, que vêm enfrenteando problemas na atualização dos dados.
+                        Estamos resolvendo a situação e iremos retornar com os indicadores o mais breve possível.</b></span>
+                </div>
+            <div>""".format(user_input["city_name"]),
+            unsafe_allow_html=True
+        )
+        
 def genKPISection(
     place_type: str,
     locality: str,
