@@ -12,8 +12,11 @@ endif
 ###
 
 # Build image
-docker-build:
+docker-build: docker-remove
 	docker build -t $(IMAGE_TAG) .
+
+docker-remove:
+	docker rm -f farolcovid 2>/dev/null || true
 
 # Run just like the production environment
 docker-run:
