@@ -217,11 +217,11 @@ def gen_big_table(config, dfs, currentstate):
             <div class="big-table-line btl3" style="height: {proportion};"></div>
             <div class="big-table-line btl4" style="height: {proportion};"></div>
             <div class="big-table-field btt0">Estado e nível de alerta </div>
-            <div class="big-table-field btt1">Média móvel (últimos 7 dias) de novos casos por 100mil habitantes</div>
+            <div class="big-table-field btt1">Média móvel (últimos 7 dias) de novos casos por 100mil hab.</div>
             <div class="big-table-field btt2">Taxa de contágio</div>
-            <div class="big-table-field btt3">Capacidade do sistema de saúde</div>
+            <div class="big-table-field btt3">Total de leitos por 100mil hab.</div>
             <div class="big-table-field btt4">Taxa de subnotificação</div>
-            <div class="big-table-field btt5">Média móvel (últimos 7 dias) de novas mortes por 100mil habitantes</div>
+            <div class="big-table-field btt5">Média móvel (últimos 7 dias) de novas mortes por 100mil hab.</div>
         </div>
     """
     state_data = state_data[state_data["state_name"] != currentstate]

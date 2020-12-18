@@ -546,7 +546,7 @@ def gen_reference_table(config):
                 <td class="light-red-bg bold"><span>&gt;{control_classification[3]}</span></td>
             </tr>
             <tr>
-                <td><span>Capacidade de respostas do sistema de saúde <i>(alterado em 16/12/2020)</i></span></td>
+                <td><span>Capacidade de respostas do sistema de saúde <i>(alterado em 18/12/2020)</i></span></td>
                 <td><span>Total de leitos UTI por 100 mil hab.</span></td>
                 <td class="light-blue-bg bold"> > {capacity_classification[3]}</td>
                 <td class="light-yellow-bg bold"><span>{capacity_classification[2]} - {capacity_classification[3]}</span></td>
