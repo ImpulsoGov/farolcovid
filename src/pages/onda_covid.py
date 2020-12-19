@@ -3,25 +3,12 @@ import plots
 import pages.data_analysis as da
 import loader
 import utils
+import copy
 
 
 @st.cache(suppress_st_warning=True)
-def get_data(config):
-
-    dfs = {
-        place: loader.read_data(
-            "br",
-            config,
-            endpoint=config["br"]["api"]["endpoints"]["farolcovid"][place],
-        )
-        .replace({"medio": "médio", "insatisfatorio": "insatisfatório"})
-        .pipe(utils.fix_dates)
-        for place in ["city", "health_region", "state"]
-    }
-
-    places_ids = loader.read_data("br", config, "br/places/ids")
-    return dfs, places_ids
-
+def get_places_ids(config):
+    return loader.read_data("br", config, "br/places/ids")
 
 def gen_banners():
     st.write(
@@ -97,20 +84,23 @@ def main(user_input, indicators, data, config, session_state):
         header=False
     )
 
-    try:
-        # load data
-        # print("loading br cases")
-        br_cases = loading_cached()
-        # print("finished laoding br cases")
-        my_dict = utils.Dictionary()
-        # ONDA POR ESTADO
-        da.prepare_heatmap(br_cases, place_type="state_id")
-        st.write("")
-        pass
-    except Exception as e:
-        st.write(str(e))
+    # Prompt User to Select Heatmap Location
+    view = st.selectbox("Selecione a sua visão", options=["Cidade", "Estado", "País"], index=1)
 
-    # ONDA POR MUNICIPIO
+    # Load City/State/Country Heatmap
+    if view == "Estado":
+        load_states_heatmap(copy.deepcopy(loading_cached()))
+    elif view == "Cidade":
+        my_dict = utils.Dictionary()
+        load_cities_heatmap(copy.deepcopy(loading_cached()), my_dict)
+    elif view == "País":
+        load_countries_heatmap(config)
+
+def load_states_heatmap(br_cases):
+    da.prepare_heatmap(br_cases, place_type="state_id")
+    st.write("")
+
+def load_cities_heatmap(br_cases, my_dict):
     st.write(
         """
         <div class="base-wrapper">
@@ -120,12 +110,13 @@ def main(user_input, indicators, data, config, session_state):
         </div>""",
         unsafe_allow_html=True,
     )
-    dfs, places_ids = get_data(loader.config)
-    state_name = st.selectbox("Estado ", utils.filter_place(dfs, "state"))
+    
+    places_ids = get_places_ids(loader.config)
+    state_name = st.selectbox("Estado ", utils.filter_place( {'city' : places_ids}, "state"))
     city_name = st.selectbox(
         "Município ",
         utils.filter_place(
-            dfs, "city", state_name=state_name, health_region_name="Todos"
+            {'city' : places_ids}, "city", state_name=state_name, health_region_name="Todos"
         ),
     )
 
@@ -147,8 +138,8 @@ def main(user_input, indicators, data, config, session_state):
             deaths_per_cases=deaths_or_cases,
         )
         # print("finished preparation")
-    
-    # ONDA POR PAÍS
+
+def load_countries_heatmap(config):
     st.write("")
     da.prepare_heatmap(
         loader.read_data(

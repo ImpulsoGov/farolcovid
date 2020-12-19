@@ -23,7 +23,8 @@ import os
 import bisect
 import math
 
-
+# Arruma os indicadores do filtro
+# Fix indicators filters
 def fix_type(x, group, position):
     if type(x) == np.ndarray:
         if "- " in x:
@@ -49,7 +50,9 @@ def fix_type(x, group, position):
         return str(int(x)) + " dias"
 
     if group == "capacity" and position == "display":
-        return utils.dday_preffix(x)
+        # TODO -> VOLTAR PARA PROJECAO DE LEITOS
+        # return utils.dday_preffix(x)
+        return int(x)
 
     if (type(x) == str) or (type(x) == np.int64) or (type(x) == int):
         return x
@@ -57,15 +60,16 @@ def fix_type(x, group, position):
     if type(x) == np.float64:
         return int(x)
 
-
+# Atualiza os indicadores para arrumar valores e disposicao
+# Updates the indicators to adjust values and disposition
 def update_indicators(indicators, data, config, user_input, session_state):
     # TODO: indicadores quando cidade não posssui dados
     for group in config["br"]["indicators"].keys():
-
+        # Arrumar valores para cada posição
         # Fix values for each position
         dic_indicators = dict()
         for position in config["br"]["indicators"][group].keys():
-            
+            # Indicadores de Filtros
             # Filter indicators
             if config["br"]["indicators"][group][position] != "None":
                 dic_indicators[position] = fix_type(
@@ -102,7 +106,8 @@ def update_indicators(indicators, data, config, user_input, session_state):
 
     return indicators
 
-
+# Atualiza as escolhas com o ID da selecao do usúario 
+# Update choices with user selection ID
 def update_user_input_ids(data, user_input):
 
     user_input["state_num_id"] = data["state_num_id"].values[0]
@@ -111,17 +116,18 @@ def update_user_input_ids(data, user_input):
 
     if user_input["place_type"] == "state_num_id":
         return user_input
-
+    # Nível de região de saúde
     # health region level
     user_input["health_region_id"] = data["health_region_id"].values[0]
     if user_input["place_type"] == "health_region_id":
         return user_input
-
+    # Nivel de cidade
     # city level
     user_input["city_id"] = data["city_id"].values[0]
     return user_input
 
-
+# Escolhe Rt para SimulaCovid
+# Choose Rt for SimulaCovid
 def choose_rt(user_input, dfs, level):
 
     places = {1: "city", 2: "health_region", 3: "state"}
@@ -151,9 +157,10 @@ def choose_rt(user_input, dfs, level):
     else:
         return choose_rt(user_input, dfs, level + 1)
 
-
+# Atualiza as escolhas com a selecao do usúario 
+# Update choices with user selection
 def update_user_input_places(user_input, dfs, config):
-
+    # State
     # Nivel Estado
     if (
         user_input["city_name"] == "Todos"
@@ -163,7 +170,7 @@ def update_user_input_places(user_input, dfs, config):
         user_input["place_type"] = "state_num_id"
         # Escolhe Rt para SimulaCovid
         user_input = choose_rt(user_input, dfs, level=3)
-
+    # Region
     # Nivel Regional
     elif user_input["city_name"] == "Todos":
         data = dfs["health_region"][
@@ -173,7 +180,7 @@ def update_user_input_places(user_input, dfs, config):
         user_input["place_type"] = "health_region_id"
         # Escolhe Rt para SimulaCovid
         user_input = choose_rt(user_input, dfs, level=2)
-
+    # City
     # Nivel Cidade
     else:
         data = dfs["city"][
@@ -183,7 +190,7 @@ def update_user_input_places(user_input, dfs, config):
         user_input["place_type"] = "city_id"
         # Escolhe Rt para SimulaCovid
         user_input = choose_rt(user_input, dfs, level=1)
-
+    # Select location for titles
     # Seleciona localidade para títulos
     user_input["locality"] = utils.choose_place(
         city=user_input["city_name"],
@@ -195,7 +202,8 @@ def update_user_input_places(user_input, dfs, config):
     user_input = update_user_input_ids(data, user_input)
     return user_input, utils.fix_dates(data)
 
-
+# Gera a tabela id "big-table" com os dados do Estado
+# Generates the tabla id: "big-table" with the state data
 def gen_big_table(config, dfs, currentstate):
     # st.write(dfs["state"])
     state_data = dfs["state"].sort_values(by="state_name")
@@ -215,11 +223,11 @@ def gen_big_table(config, dfs, currentstate):
             <div class="big-table-line btl3" style="height: {proportion};"></div>
             <div class="big-table-line btl4" style="height: {proportion};"></div>
             <div class="big-table-field btt0">Estado e nível de alerta </div>
-            <div class="big-table-field btt1">Média móvel (últimos 7 dias) de novos casos por 100mil habitantes</div>
+            <div class="big-table-field btt1">Média móvel (últimos 7 dias) de novos casos por 100mil hab.</div>
             <div class="big-table-field btt2">Taxa de contágio</div>
-            <div class="big-table-field btt3">Capacidade do sistema de saúde</div>
+            <div class="big-table-field btt3">Total de leitos por 100mil hab.</div>
             <div class="big-table-field btt4">Taxa de subnotificação</div>
-            <div class="big-table-field btt5">Média móvel (últimos 7 dias) de novas mortes por 100mil habitantes</div>
+            <div class="big-table-field btt5">Média móvel (últimos 7 dias) de novas mortes por 100mil hab.</div>
         </div>
     """
     state_data = state_data[state_data["state_name"] != currentstate]
@@ -234,7 +242,8 @@ def gen_big_table(config, dfs, currentstate):
     </div>"""
     st.write(text, unsafe_allow_html=True)
 
-
+# Gera uma linha para a tabela de id "big-table" com as informacoes provenientes de uma linha de dados
+# Generates a row for the table with id "big-table" with information coming from a sector data row
 def gen_sector_big_row(my_state, index, config):
     """ Generates a row of a table given the necessary information coming from a sector data row """
     alert_info = {
@@ -245,12 +254,15 @@ def gen_sector_big_row(my_state, index, config):
         3: ["#F02C2E", "🛑"],
     }
     level_data = config["br"]["farolcovid"]["rules"]
+    
+    # TODO -> VOLTAR PROJECAO DE LEITOS
+    # <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["dday_icu_beds"])][0]};">{utils.dday_preffix(my_state["dday_icu_beds"])} dias</div>
     return f"""<div class="big-table-row {["btlgrey","btlwhite"][index % 2]}">
             <div class="big-table-index-background" style="background-color:{alert_info[my_state["overall_alert"]][0]};"></div>
             <div class="big-table-field btf0">{my_state["state_name"]} {alert_info[my_state["overall_alert"]][1]}</div>
             <div class="big-table-field btf1" style="color:{alert_info[find_level(level_data["situation_classification"]["cuts"],level_data["situation_classification"]["categories"],my_state["daily_cases_mavg_100k"])][0]};">{"%0.2f"%my_state["daily_cases_mavg_100k"]}</div>
             <div class="big-table-field btf2" style="color:{alert_info[find_level(level_data["control_classification"]["cuts"],level_data["control_classification"]["categories"],my_state["rt_most_likely"])][0]};" > {"%0.2f"%my_state["rt_most_likely"]}</div>
-            <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["dday_icu_beds"])][0]};">{utils.dday_preffix(my_state["dday_icu_beds"])} dias</div>
+            <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["number_icu_beds_100k"])][0]};">{int(my_state["number_icu_beds_100k"])}</div>
             <div class="big-table-field btf4" style="color:{alert_info[find_level(level_data["trust_classification"]["cuts"],level_data["trust_classification"]["categories"],my_state["notification_rate"])][0]};">{int(my_state["subnotification_rate"]*100)}%</div>
             <div class="big-table-field btf5">{"%0.2f"%my_state["new_deaths_mavg_100k"]}</div>
         </div>"""
@@ -262,7 +274,8 @@ def find_level(cuts, levels, value):
     index = bisect.bisect(cuts, value)
     return levels[min(index - 1, len(levels) - 1)]
 
-
+# Puxa da API os dados
+# Get data from the API
 @st.cache(suppress_st_warning=True)
 def get_data(config):
 
@@ -327,9 +340,11 @@ def main(session_state):
         unsafe_allow_html=True,
     )
 
+    # PEGA BASE DA API
     # GET DATA
     dfs, cnes_sources = get_data(config)
-
+    
+    # REGIAO/CIDADE SELECAO USUARIO
     # REGION/CITY USER INPUT
     user_input = dict()
     user_input["state_name"] = st.selectbox("Estado", utils.filter_place(dfs, "state"))
@@ -534,12 +549,23 @@ def main(session_state):
         )
 
     # AVAILABLE CAPACITY DISCLAIMER
+    # TODO -> VOLTAR PARA PROJECAO DE LEITOS
+    # """
+    # <div class='base-wrapper'>
+    #     <i>* Utilizamos 100% do total de leitos UTI reportados por %s em %s 
+    #     para cálculo da projeção de dias para atingir capacidade máxima.<br><b>Para municípios, utilizamos os recursos da respectiva regional de saúde.</b>
+    #     Leitos enfermaria contém os tipos: cirúrgicos, clínicos e hospital-dia; sendo considerado %s&percnt; já ocupado.</i>
+    # </div>
+    # """
+
     st.write(
         """
         <div class='base-wrapper'>
-            <i>* Utilizamos %s&percnt; do total de leitos UTI reportados por %s em %s 
-            para cálculo da projeção de dias para atingir capacidade máxima.<br><b>Para municípios, utilizamos os recursos da respectiva regional de saúde.</b>
-            Leitos enfermaria contém os tipos: cirúrgicos, clínicos e hospital-dia; sendo considerado %s&percnt; já ocupado.</i>
+            <i>* <b>Mudamos o indicador afim de refinarmos ajustes no cálculo de projeção de leitos.</b> Entendemos que a projeção apresentada não capturava a situação da 2ª onda observada nos municípios, regionais e estados, logo substituímos este indicador por ora para revisão dos cálculos. 
+            Os valores de referência se baseiam nas estatísticas de países da OCDE, <a target="_blank" style="color:#0068c9;" href="https://docs.google.com/spreadsheets/d/1MKFOHRCSg4KMx5Newi7TYCrjtNyPwMQ38GE1wQ6as70/edit?usp=sharing">veja mais aqui</a></b>.
+            As simulações personalizadas ainda podem ser realizadas através do SimulaCovid mais abaixo.<br><br>
+            <li> Leitos Enfermaria: Consideramos %s&percnt; do total reportado por %s em %s dos tipos Cirúrgico, Clínico e Hospital-dia. Para municípios, utilizamos os recursos da respectiva regional de saúde.<br>
+            <li> Leitos UTI: Consideramos 100&percnt; do total de leitos UTI reportado por %s em %s. Para municípios, utilizamos os recursos da respectiva regional de saúde.</i>
         </div>
         """
         % (
@@ -548,9 +574,8 @@ def main(session_state):
             ),
             user_input["author_number_beds"],
             user_input["last_updated_number_beds"],
-            str(
-                int(config["br"]["simulacovid"]["resources_available_proportion"] * 100)
-            ),
+            user_input["author_number_icu_beds"], # remover na volta de projecao
+            user_input["last_updated_number_icu_beds"], # remover na volta de projecao
         ),
         unsafe_allow_html=True,
     )
@@ -735,9 +760,11 @@ def main(session_state):
         )
         oc.main(user_input, indicators, data, config, session_state)
 
-    # BIG TABLE
+    # CHAMA FUNCAO QUE GERA TABELA ID big_table
+    # CALL FUNCTION TO GENERATE ID big_table
     gen_big_table(config, dfs, user_input["state_name"])
-    # FOOTER
+    # CHAMA FUNCOES DO UTILS PARA O FOOTER
+    # CALL FUNCTIONS IN UTILS TO FOOTER
     utils.gen_whatsapp_button(config["impulso"]["contact"])
     utils.gen_footer()
     user_analytics.conclude_user_session(session_state)
