@@ -6,6 +6,7 @@ import amplitude
 import utils
 import yaml
 from pages import rt_description
+from utils import gen_reference_table
 
 
 def main(session_state):
@@ -62,7 +63,12 @@ def main(session_state):
     )
 
     # Valores de referência
-    gen_classification_table(config, date_update)
+    st.write(
+        """
+        <div class="base-wrapper">%s</div>
+        """ % gen_reference_table(config),
+        unsafe_allow_html=True
+    )
 
     st.write(
         """<div class="base-wrapper">
@@ -169,13 +175,15 @@ def gen_indicators_details(session_state, date_update):
         unsafe_allow_html=True,
     )
 
+    # TODO -> VOLTAR PROJECAO E LEITOS
+    # == "CAPACIDADE DO SISTEMA: Dias até atingir ocupação total de leitos UTI-Covid"
     indicador = st.radio(
         "Selecione abaixo o indicador para ver a descrição em detalhe:",
         [
             f"GERAL: Distribuição dos indicadores chaves em {date_update}",
             "SITUAÇÃO DA DOENÇA: Média móvel de novos casos por 100 mil habitantes",
             "CONTROLE DA DOENÇA: Taxa de contágio (Rt)",
-            "CAPACIDADE DO SISTEMA: Dias até atingir ocupação total de leitos UTI-Covid",
+            "CAPACIDADE DO SISTEMA: Total de leitos UTI por 100mil hab.",
             "CONFIANÇA NOS DADOS: Taxa de subnotificação de casos",
         ],
     )
@@ -397,9 +405,11 @@ def gen_indicators_details(session_state, date_update):
         #     unsafe_allow_html=True,
         # )
 
+    # TODO -> VOLTAR PROJECAO E LEITOS
+    # == "CAPACIDADE DO SISTEMA: Dias até atingir ocupação total de leitos UTI-Covid"
     if (
         indicador
-        == "CAPACIDADE DO SISTEMA: Dias até atingir ocupação total de leitos UTI-Covid"
+        == "CAPACIDADE DO SISTEMA: Total de leitos UTI por 100 mil habitantes"
     ):
 
         st.write(
@@ -407,122 +417,6 @@ def gen_indicators_details(session_state, date_update):
                 </div>""",
             unsafe_allow_html=True,
         )
-
-
-def gen_classification_table(config, date_update):
-
-    situation_classification = config["br"]["farolcovid"]["rules"][
-        "situation_classification"
-    ]["cuts"]
-    control_classification = config["br"]["farolcovid"]["rules"][
-        "control_classification"
-    ]["cuts"]
-    capacity_classification = config["br"]["farolcovid"]["rules"][
-        "capacity_classification"
-    ]["cuts"]
-    trust_classification = config["br"]["farolcovid"]["rules"]["trust_classification"][
-        "cuts"
-    ]
-
-    st.write(
-        """<div class="base-wrapper"><div style="margin: 10px 10px 10px 10px;">
-            <div style="font-size: 14px">
-                Atualizado em: %s
-            </div>
-            <div class="info-div-table" style="height: auto;">
-            <table class="info-table">
-            <tbody>
-                <tr>
-                    <td class="grey-bg"><strong>Dimensão</strong></td>
-                    <td class="grey-bg"><strong>Indicador</strong></td>
-                    <td class="grey-bg"><strong>Novo Normal</strong></td>
-                    <td class="grey-bg"><strong>Risco Moderado</strong></td>
-                    <td class="grey-bg"><strong>Risco Alto</strong></td>
-                    <td class="grey-bg"><strong>Risco Altíssimo</strong></td>
-                </tr>
-                <tr>
-                    <td rowspan="2">
-                    <p><span>Situação da doença</span></p><br/>
-                    </td>
-                    <td><span>Novos casos diários (Média móvel 7 dias)</span></td>
-                    <td class="light-blue-bg bold"><span>x&lt;=%s</span></td>
-                    <td class="light-yellow-bg bold"><span>%s&lt;x&lt;=%s</span></td>
-                    <td class="light-orange-bg bold"><span>%s&lt;=x&lt;=%s</span></td>
-                    <td class="light-red-bg bold"><span>x &gt;= %s</span></td>
-                </tr>
-                <tr>
-                    <td><span>Tendência de novos casos diários</span></td>
-                    <td class="lightgrey-bg" colspan="4"><span>Se crescendo*, mover para o nível mais alto</span></td>
-                </tr>
-                <tr>
-                    <td><span>Controle da doença</span></td>
-                    <td><span>Número de reprodução efetiva</span></td>
-                    <td class="light-blue-bg bold"><span>&lt;%s</span></td>
-                    <td class="light-yellow-bg bold"><span>&lt;%s - %s&gt;</span></td>
-                    <td class="light-orange-bg bold"><span>&lt;%s - %s&gt;</span>&nbsp;</td>
-                    <td class="light-red-bg bold"><span>&gt;%s</span></td>
-                </tr>
-                <tr>
-                    <td><span>Capacidade de respostas do sistema de saúde</span></td>
-                    <td><span>Projeção de tempo para ocupação total de leitos UTI</span></td>
-                    <td class="light-blue-bg bold">%s - 90 dias</td>
-                    <td class="light-yellow-bg bold"><span>%s - %s dias</span></td>
-                    <td class="light-orange-bg bold"><span>%s - %s dias</span></td>
-                    <td class="light-red-bg bold"><span>%s - %s dias</span></td>
-                </tr>
-                <tr>
-                    <td><span>Confiança dos dados</span></td>
-                    <td><span>Subnotificação (casos <b>não</b> diagnosticados a cada 10 infectados)</span></td>
-                    <td class="light-blue-bg bold"><span>%s&lt;=x&lt;%a</span></td>
-                    <td class="light-yellow-bg bold"><span>%s&lt;=x&lt;%s</span></td>
-                    <td class="light-orange-bg bold"><span>%s&lt;=x&lt;%s</span></td>
-                    <td class="light-red-bg bold"><span>%s&lt;=x&lt;=10</span></td>
-                </tr>
-            </tbody>
-            </table>
-            </div>
-            <div style="font-size: 14px">
-                * Como determinamos a tendência:
-                <ul class="sub"> 
-                    <li> Crescendo: caso o aumento de novos casos esteja acontecendo por pelo menos 5 dias. </li>
-                    <li> Descrescendo: caso a diminuição de novos casos esteja acontecendo por pelo menos 14 dias. </li>
-                    <li> Estabilizando: qualquer outra mudança. </li>
-                </ul>
-            </div>
-            </div>
-        </div>"""
-        % (
-            date_update,
-            situation_classification[1],
-            situation_classification[1],
-            situation_classification[2],
-            situation_classification[2],
-            situation_classification[3],
-            situation_classification[3],
-            control_classification[1],
-            control_classification[1],
-            control_classification[2],
-            control_classification[2],
-            control_classification[3],
-            control_classification[3],
-            capacity_classification[3],
-            capacity_classification[2],
-            capacity_classification[3],
-            capacity_classification[1],
-            capacity_classification[2],
-            capacity_classification[0],
-            capacity_classification[1],
-            int(trust_classification[0] * 10),
-            int(trust_classification[1] * 10),
-            int(trust_classification[1] * 10),
-            int(trust_classification[2] * 10),
-            int(trust_classification[2] * 10),
-            int(trust_classification[3] * 10),
-            int(trust_classification[3] * 10),
-        ),
-        unsafe_allow_html=True,
-    )
-
 
 # def main(session_state):
 #     user_analytics = amplitude.gen_user(utils.get_server_session())

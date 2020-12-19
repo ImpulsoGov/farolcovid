@@ -485,8 +485,8 @@ def gen_whatsapp_button(info) -> None:
         unsafe_allow_html=True,
     )
 
+def gen_reference_table(config):
 
-def gen_info_modal(config):
     situation_classification = config["br"]["farolcovid"]["rules"][
         "situation_classification"
     ]["cuts"]
@@ -502,83 +502,77 @@ def gen_info_modal(config):
 
     date_update = config["br"]["farolcovid"]["date_update"]
 
-    return f"""
-    <a href="#entenda-mais" class="info-btn">Entenda a classificação dos níveis</a>
-    <div id="entenda-mais" class="info-modal-window">
-        <div>
-            <a href="#" title="Close" class="info-btn-close" style="color: white;">&times</a>
-            <div style="margin: 10px 15px 15px 15px;">
-            <h1 class="primary-span">Valores de referência</h1>
-            <div style="font-size: 12px">
-                <b>Atualizado em</b>: {date_update}<br>
-            </div>
-            <div class="info-div-table">
-            <table class="info-table">
-            <tbody>
-                <tr>
-                    <td class="grey-bg"><strong>Dimensão</strong></td>
-                    <td class="grey-bg"><strong>Indicador</strong></td>
-                    <td class="grey-bg"><strong>Novo Normal</strong></td>
-                    <td class="grey-bg"><strong>Risco Moderado</strong></td>
-                    <td class="grey-bg"><strong>Risco Alto</strong></td>
-                    <td class="grey-bg"><strong>Risco Altíssimo</strong></td>
-                </tr>
-                <tr>
-                    <td rowspan="2">
-                    <p><span>Situação da doença</span></p><br/>
-                    </td>
-                    <td><span>Novos casos diários (Média móvel 7 dias)</span></td>
-                    <td class="light-blue-bg bold"><span>x&lt;={situation_classification[1]}</span></td>
-                    <td class="light-yellow-bg bold"><span>{situation_classification[1]}&lt;x&lt;={situation_classification[2]}</span></td>
-                    <td class="light-orange-bg bold"><span>{situation_classification[2]}&lt;=x&lt;={situation_classification[3]}</span></td>
-                    <td class="light-red-bg bold"><span>x &gt;= {situation_classification[3]} </span></td>
-                </tr>
-                <tr>
-                    <td><span>Tendência de novos casos diários</span></td>
-                    <td class="lightgrey-bg" colspan="4"><span>Se crescendo*, mover para o nível mais alto</span></td>
-                </tr>
-                <tr>
-                    <td><span>Controle da doença</span></td>
-                    <td><span>Número de reprodução efetiva</span></td>
-                    <td class="light-blue-bg bold"><span>&lt;{control_classification[1]}</span></td>
-                    <td class="light-yellow-bg bold"><span>&lt;{control_classification[1]} - {control_classification[2]}&gt;</span></td>
-                    <td class="light-orange-bg bold"><span>&lt;{control_classification[2]} - {control_classification[3]}&gt;</span>&nbsp;</td>
-                    <td class="light-red-bg bold"><span>&gt;{control_classification[3]}</span></td>
-                </tr>
-                <tr>
-                    <td><span>Capacidade de respostas do sistema de saúde</span></td>
-                    <td><span>Projeção de tempo para ocupação total de leitos UTI</span></td>
-                    <td class="light-blue-bg bold">{capacity_classification[3]} - 90 dias</td>
-                    <td class="light-yellow-bg bold"><span>{capacity_classification[2]} - {capacity_classification[3]} dias</span></td>
-                    <td class="light-orange-bg bold"><span>{capacity_classification[1]} - {capacity_classification[2]} dias</span></td>
-                    <td class="light-red-bg bold"><span>{capacity_classification[0]} - {capacity_classification[1]} dias</span></td>
-                </tr>
-                <tr>
-                    <td><span>Confiança dos dados</span></td>
-                    <td><span>Subnotificação (casos <b>não</b> diagnosticados a cada 10 infectados)</span></td>
-                    <td class="light-blue-bg bold"><span>{int(trust_classification[0]*10)}&lt;=x&lt;{int(trust_classification[1]*10)}</span></td>
-                    <td class="light-yellow-bg bold"><span>{int(trust_classification[1]*10)}&lt;=x&lt;{int(trust_classification[2]*10)}</span></td>
-                    <td class="light-orange-bg bold"><span>{int(trust_classification[2]*10)}&lt;=x&lt;{int(trust_classification[3]*10)}</span></td>
-                    <td class="light-red-bg bold"><span>{int(trust_classification[3]*10)}&lt;=x&lt;=10</span></td>
-                </tr>
-            </tbody>
-            </table>
-            </div>
-            <div style="font-size: 12px">
-                * Como determinamos a tendência:
-                <ul class="sub"> 
-                    <li> Crescendo: caso o aumento de novos casos esteja acontecendo por pelo menos 5 dias. </li>
-                    <li> Descrescendo: caso a diminuição de novos casos esteja acontecendo por pelo menos 14 dias. </li>
-                    <li> Estabilizando: qualquer outra mudança. </li>
-                </ul>
-            </div>
-            <div style="font-size: 14px">
-                Para mais detalhes confira nossa página de Metodologia no menu lateral</a>.
-            </div>
-            </div>
-        </div>
-    </div>"""
-
+    # TODO -> VOLTAR PARA PROJECAO DE LEITOS
+    # <td><span>Capacidade de respostas do sistema de saúde</span></td>
+    # <td><span>Projeção de tempo para ocupação total de leitos UTI</span></td>
+    # <td class="light-blue-bg bold">{capacity_classification[3]} - 90 dias</td>
+    # <td class="light-yellow-bg bold"><span>{capacity_classification[2]} - {capacity_classification[3]} dias</span></td>
+    # <td class="light-orange-bg bold"><span>{capacity_classification[1]} - {capacity_classification[2]} dias</span></td>
+    # <td class="light-red-bg bold"><span>{capacity_classification[0]} - {capacity_classification[1]} dias</span></td>
+    return f"""<div style="font-size: 12px">
+        <b>Atualizado em</b>: {date_update}<br>
+    </div>
+    <div class="info-div-table">
+        <table class="info-table">
+        <tbody>
+            <tr>
+                <td class="grey-bg"><strong>Dimensão</strong></td>
+                <td class="grey-bg"><strong>Indicador</strong></td>
+                <td class="grey-bg"><strong>Novo Normal</strong></td>
+                <td class="grey-bg"><strong>Risco Moderado</strong></td>
+                <td class="grey-bg"><strong>Risco Alto</strong></td>
+                <td class="grey-bg"><strong>Risco Altíssimo</strong></td>
+            </tr>
+            <tr>
+                <td rowspan="2">
+                <p><span>Situação da doença</span></p><br/>
+                </td>
+                <td><span>Novos casos diários por 100mil hab.(Média móvel 7 dias)</span></td>
+                <td class="light-blue-bg bold"><span>x&lt;={situation_classification[1]}</span></td>
+                <td class="light-yellow-bg bold"><span>{situation_classification[1]}&lt;x&lt;={situation_classification[2]}</span></td>
+                <td class="light-orange-bg bold"><span>{situation_classification[2]}&lt;=x&lt;={situation_classification[3]}</span></td>
+                <td class="light-red-bg bold"><span>x &gt;= {situation_classification[3]} </span></td>
+            </tr>
+            <tr>
+                <td><span>Tendência de novos casos diários</span></td>
+                <td class="lightgrey-bg" colspan="4"><span>Se crescendo*, mover para o nível mais alto</span></td>
+            </tr>
+            <tr>
+                <td><span>Controle da doença</span></td>
+                <td><span>Número de reprodução efetiva</span></td>
+                <td class="light-blue-bg bold"><span>&lt;{control_classification[1]}</span></td>
+                <td class="light-yellow-bg bold"><span>&lt;{control_classification[1]} - {control_classification[2]}&gt;</span></td>
+                <td class="light-orange-bg bold"><span>&lt;{control_classification[2]} - {control_classification[3]}&gt;</span>&nbsp;</td>
+                <td class="light-red-bg bold"><span>&gt;{control_classification[3]}</span></td>
+            </tr>
+            <tr>
+                <td><span>Capacidade de respostas do sistema de saúde <i>(alterado em 18/12/2020)</i></span></td>
+                <td><span>Total de leitos UTI por 100 mil hab.</span></td>
+                <td class="light-blue-bg bold"> > {capacity_classification[3]}</td>
+                <td class="light-yellow-bg bold"><span>{capacity_classification[2]} - {capacity_classification[3]}</span></td>
+                <td class="light-orange-bg bold"><span>{capacity_classification[1]} - {capacity_classification[2]}</span></td>
+                <td class="light-red-bg bold"><span>{capacity_classification[0]} - {capacity_classification[1]}</span></td>
+            </tr>
+            <tr>
+                <td><span>Confiança dos dados</span></td>
+                <td><span>Subnotificação (casos <b>não</b> diagnosticados a cada 10 infectados)</span></td>
+                <td class="light-blue-bg bold"><span>{int(trust_classification[0]*10)}&lt;=x&lt;{int(trust_classification[1]*10)}</span></td>
+                <td class="light-yellow-bg bold"><span>{int(trust_classification[1]*10)}&lt;=x&lt;{int(trust_classification[2]*10)}</span></td>
+                <td class="light-orange-bg bold"><span>{int(trust_classification[2]*10)}&lt;=x&lt;{int(trust_classification[3]*10)}</span></td>
+                <td class="light-red-bg bold"><span>{int(trust_classification[3]*10)}&lt;=x&lt;=10</span></td>
+            </tr>
+        </tbody>
+        </table>
+    </div>
+    <div style="font-size: 12px">
+        * Como determinamos a tendência:
+        <ul class="sub"> 
+            <li> Crescendo: caso o aumento de novos casos esteja acontecendo por pelo menos 5 dias. </li>
+            <li> Descrescendo: caso a diminuição de novos casos esteja acontecendo por pelo menos 14 dias. </li>
+            <li> Estabilizando: qualquer outra mudança. </li>
+        </ul>
+    </div>
+    """
 
 # VIEW COMPONENTS FAROLCOVID
 
@@ -589,6 +583,8 @@ def genHeroSection(title1: str, title2: str, subtitle: str, logo: str, header: b
     else:
         header = """<br>"""
 
+    # TODO -> VOLTAR PARA PROJECAO DE LEITOS
+    # - <b>Capacidade do sistema</b>: tempo para ocupação de leitos UTI</br>
     if explain:
         explain = f"""<div class="hero-container-content">
             <div>
@@ -605,7 +601,7 @@ def genHeroSection(title1: str, title2: str, subtitle: str, logo: str, header: b
                             <p> <b>Importante: mudamos a metodologia dos indicadores - veja mais em Modelos, limitações e fontes no menu lateral.</b> Descubra o nível de alerta do estado, regional de saúde ou município de acordo com os indicadores:</p>
                             - <b>Situação da doença</b>: média de novos casos 100 mil por habitantes;</br>
                             - <b>Controle da doença</b>: taxa de contágio</br>
-                            - <b>Capacidade do sistema</b>: tempo para ocupação de leitos UTI</br>
+                            - <b>Capacidade do sistema</b>: total de leitos UTI por 100 mil hab. (CNES)</br>
                             - <b>Confiança de dados</b>: taxa de subnotificação de casos</br><br>
                         </div>
                         <div>
@@ -815,18 +811,19 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
     else:
         indicator_right_display = indicator.right_display
 
-    # TODO: find better palce to save this dic
+    # TODO -> VOLTAR PARA PROJECAO DE LEITOS
+    # "CAPACIDADE DO SISTEMA": "Se nada mudar, a capacidade hospitalar de seu <b>...</b> será atingida em",
     captions_by_place = {
         "state_num_id": {
             "SITUAÇÃO DA DOENÇA": "Hoje em seu <b>estado</b> são <b>reportados</b> em média",
             "CONTROLE DA DOENÇA": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>classificamos pela estimativas de Rt de seu estado.</b>",
-            "CAPACIDADE DO SISTEMA": "Se nada mudar, a capacidade hospitalar de seu <b>estado</b> será atingida em",
+            "CAPACIDADE DO SISTEMA": "Com base nos dados do DataSUS, hoje em seu <b>estado</b> existem *",
             "CONFIANÇA DOS DADOS": "A cada 10 pessoas infectadas em seu <b>estado</b>,",
         },
         "health_region_id": {
             "SITUAÇÃO DA DOENÇA": "Hoje em sua <b>regional de saúde</b> são <b>reportados</b> em média",
             "CONTROLE DA DOENÇA": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>classificamos pela estimativas de Rt de sua regional.</b>",
-            "CAPACIDADE DO SISTEMA": "Se nada mudar, a capacidade hospitalar de sua <b>regional de saúde</b> será atingida em",
+            "CAPACIDADE DO SISTEMA": "Com base nos dados do DataSUS, hoje em sua <b>regional de saúde</b> existem *",
             "CONFIANÇA DOS DADOS": "A cada 10 pessoas infectadas em sua <b>regional de saúde</b>,",
         },
         "city_id": {
@@ -835,7 +832,7 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
                 "health_region_id": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>classificamos pela estimativas de Rt de sua regional.</b>",
                 "city_id": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>usamos estimativas de Rt de seu município para classificação.</b>",
             },
-            "CAPACIDADE DO SISTEMA": "Se nada mudar, a capacidade hospitalar de sua <b>regional de saúde</b> será atingida em",
+            "CAPACIDADE DO SISTEMA": "Com base nos dados do DataSUS, hoje em sua <b>regional de saúde</b> existem *",
             "CONFIANÇA DOS DADOS": "A cada 10 pessoas infectadas em sua <b>regional de saúde</b>,",
         },
     }
@@ -851,9 +848,9 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
         <span class="main-card-list-v2">{indicator.caption}</span>
         <div class="flex flex-row flex-justify-space-between mt" style="width:250px;">
         </div>
-        <span class="bold p2 main-card-display-value">{indicator.display}<span class="bold p5">  {indicator.unit}</span></span>
+        <span class="bold p2 main-card-display-value">{indicator.display}<span class="p5">  {indicator.unit}</span></span>
         <div class="{IndicatorBackground(try_int(indicator.risk)).name}-alert-bg risk-pill " style="position:absolute;bottom:120px;">
-            <span class="bold white-span p4">{alert}</span>
+            <span class="white-span p5">alerta <b>{alert}</b></span>
         </div>
         <div class="main-card-display-text-v2 sdcardtext-left">
                 <span class="lighter">{indicator.left_label}<br></span>
@@ -907,7 +904,6 @@ def genKPISection(
         [genIndicatorCard(group, place_type, rt_type) for group in indicators.values()]
     )
     # print(cards)
-    info_modal = gen_info_modal(config)
 
     # Generate subheader
     if not isinstance(alert, str):
@@ -932,34 +928,44 @@ def genKPISection(
             else:
                 caption = f"{caption}<br>Nenhuma regional de saúde avaliada está em Alerta Alto ou Altíssimo de colapso. Sugerimos que políticas de resposta à Covid-19 sejam avaliadas a nível subestatal."
 
+    # TODO -> VOLTAR PARA PROJECAO DE LEITOS
+    # %0a%0a🏥 *CAPACIDADE DO SISTEMA*: A capacidade hospitalar será atingida em *{str(indicators['capacity'].display).replace("+", "mais de")} dias* 
     msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  
     🚨%0a%0aNÍVEL DE ALERTA: {alert.upper()}
     %0a%0a😷 *SITUAÇÃO DA DOENÇA*: Hoje são reportados❗em média *{indicators['situation'].display} casos por 100mil habitantes.
     %0a%0a *CONTROLE DA DOENÇA*: A taxa de contágio mais recente é de *{indicators['control'].left_display}* - ou seja, uma pessoa infecta em média *{indicators['control'].left_display}* outras.
-    %0a%0a🏥 *CAPACIDADE DO SISTEMA*: A capacidade hospitalar será atingida em *{str(indicators['capacity'].display).replace("+", "mais de")} dias* 
+    %0a%0a🏥 *CAPACIDADE DO SISTEMA*: Hoje são registrados no CNES *{str(indicators['capacity'].display)} leitos UTI por 100mil habitantes.* 
     %0a%0a🔍 *CONFIANÇA DOS DADOS*: A cada 10 pessoas infectadas, *{indicators['trust'].display} são diagnosticadas* 
     %0a%0a👉 Saiba se seu município está no nível de alerta baixo, médio ou alto acessando o *FarolCovid* aqui: https://coronacidades.org/farol-covid/"""
     # msg = "temporarily disabled"
 
     # Write cards section
-    st.write(
-        """<div class="container">
+    st.write("""
+    <div class="container">
         <div class="alert-banner %s-alert-bg mb" style="margin-bottom: 0px;height:auto;">
-                <div class="base-wrapper flex flex-column" style="margin-top: 0px;">
-                        <div class="flex flex-row flex-space-between flex-align-items-center">
-                         <span class="white-span header p1">%s</span>
-                         <a class="btn-wpp" href="https://api.whatsapp.com/send?text=%s" target="blank">Compartilhar no Whatsapp</a>
-                         </div>
-                        <span class="white-span p3">%s</span>
-                        <div class="flex-row flex-m-column">%s</div>
-                        <div class = "info">%s</div>
+            <div class="base-wrapper flex flex-column" style="margin-top: 0px;">
+                <div class="flex flex-row flex-space-between flex-align-items-center">
+                    <span class="white-span header p1">%s</span>
+                    <a class="btn-wpp" href="https://api.whatsapp.com/send?text=%s" target="blank">Compartilhar no Whatsapp</a>
                 </div>
-        </div>
-        </div>
-        <div class='base-wrapper product-section'></div>
-        """
-        % (bg, locality, msg, caption, cards, info_modal),
-        unsafe_allow_html=True,
+                <span class="white-span p3">%s</span>
+                <div class="flex-row flex-m-column">%s
+                </div>
+                <div class = "info">
+                    <a href="#entenda-mais" class="info-btn">Entenda a classificação dos níveis</a>
+                    <div id="entenda-mais" class="info-modal-window">
+                        <div><a href="#" title="Close" class="info-btn-close" style="color: white;">&times</a>
+                            <div style="margin: 10px 15px 15px 15px;">
+                                <h1 class="primary-span">Valores de referência</h1>
+                                <div style="font-size: 14px">
+                                    <i>Para mais detalhes confira nossa página de Metodologia no menu lateral</i>.
+                                </div><br>
+                                %s
+    <div class='base-wrapper product-section'>
+    </div>
+    """
+    % (bg, locality, msg, caption, cards, gen_reference_table(config)),
+    unsafe_allow_html=True,
     )
 
 
