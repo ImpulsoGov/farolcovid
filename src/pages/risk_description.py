@@ -183,7 +183,7 @@ def gen_indicators_details(session_state, date_update):
             f"GERAL: Distribuição dos indicadores chaves em {date_update}",
             "SITUAÇÃO DA DOENÇA: Média móvel de novos casos por 100 mil habitantes",
             "CONTROLE DA DOENÇA: Taxa de contágio (Rt)",
-            "CAPACIDADE DO SISTEMA: Total de leitos UTI por 100mil hab.",
+            "CAPACIDADE DO SISTEMA: Total de leitos UTI por 100 mil habitantes",
             "CONFIANÇA NOS DADOS: Taxa de subnotificação de casos",
         ],
     )
