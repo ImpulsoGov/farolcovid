@@ -882,7 +882,7 @@ def noOverallalert(user_input, data, states):
             """
             <div>
                 <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
-                    <div class="white-span header p1" style="font-size:30px;">⚠️ ATENÇÃO: Os dados do município {} está desatualizado.</div>
+                    <div class="white-span header p1" style="font-size:30px;">⚠️ ATENÇÃO: Os dados do município {} estão desatualizados.</div>
                         <span class="white-span">Utilizamos dados abertos das secretarias estaduais para os cálculos dos indicadores. 
                         Esses dados são capturados diariamente por voluntários do Brasil.io, que vêm enfrenteando problemas na atualização dos dados.
                         Estamos resolvendo a situação e iremos retornar com os indicadores o mais breve possível.</b></span>
