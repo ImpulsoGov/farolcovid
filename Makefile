@@ -42,7 +42,9 @@ destroy-redis:
 create-network:
 	docker network ls|grep my-network > /dev/null || echo "network does not exist"
 
-docker-dev:
+# LOCAL: Running in a common network with your local API
+# YOU NEED TO HAVE RUN `make server-run-local` (datasource-coronacidades) BEFORE
+docker-local:
 	touch $(PWD)/.env
 	docker run --rm -it \
 		--net=my-network \
@@ -55,7 +57,7 @@ docker-dev:
 
 # Groups
 docker-build-run: docker-build docker-run
-docker-build-dev: create-network docker-build docker-dev
+docker-build-local: create-network docker-build docker-local
 
 # DEBUGING for production environment
 docker-shell:
