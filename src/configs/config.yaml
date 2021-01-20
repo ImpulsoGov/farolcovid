@@ -18,6 +18,7 @@ br:
                 state: "br/states/farolcovid/main"
             analysis:
                 cases: "br/cities/cases/full"
+                cases_states: "br/states/cases/full"
                 owid: "world/owid/heatmap"
             safereopen:
                 economic_data: 

@@ -66,11 +66,18 @@ def gen_banners():
 
 
 @st.cache(suppress_st_warning=True)
-def loading_cached():
+def loading_cached_cities():
     return loader.read_data(
         "br",
         loader.config,
         endpoint=loader.config["br"]["api"]["endpoints"]["analysis"]["cases"],
+    )
+
+def loading_cached_states():
+    return loader.read_data(
+        "br",
+        loader.config,
+        endpoint=loader.config["br"]["api"]["endpoints"]["analysis"]["cases_states"],
     )
 
 
@@ -79,20 +86,28 @@ def main(user_input, indicators, data, config, session_state):
     utils.genHeroSection(
         title1="Onda", 
         title2="Covid",
-        subtitle="Veja e compare a evolução da curva de contágio da Covid-19 em seu estado ou município.", 
+        subtitle="Veja e compare a evolução da curva de contágio da Covid-19 em seu estado ou país.", 
         logo="https://i.imgur.com/Oy7IiGB.png",
         header=False
     )
 
     # Prompt User to Select Heatmap Location
-    view = st.selectbox("Selecione a sua visão", options=["Cidade", "Estado", "País"], index=1)
-
+    # view = st.selectbox("Selecione a sua visão", options=["Cidade", "Estado", "País"], index=1)
+    view = st.selectbox("Selecione a sua visão", options=["Estado", "País"])
+    # TEMPORARY BANNER
+    st.write(
+        """<div class="base-wrapper">
+        <i>⚠ Devido ao alto volume de dados para municípios, removemos temporariamente a funcionalidade. 
+        Em breve adicionaremos novamente a visão de Municípios.
+        <i></div>""", 
+    unsafe_allow_html=True)
+    # view = st.selectbox("Selecione a sua visão", options=["País"])
     # Load City/State/Country Heatmap
     if view == "Estado":
-        load_states_heatmap(copy.deepcopy(loading_cached()))
+        load_states_heatmap(copy.deepcopy(loading_cached_states()))
     elif view == "Cidade":
         my_dict = utils.Dictionary()
-        load_cities_heatmap(copy.deepcopy(loading_cached()), my_dict)
+        load_cities_heatmap(copy.deepcopy(loading_cached_cities()), my_dict)
     elif view == "País":
         load_countries_heatmap(config)
 
