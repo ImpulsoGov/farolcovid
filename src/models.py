@@ -209,7 +209,7 @@ ProductCards: List[Product] = [
     Product(
         recommendation="Navegue",
         name="Onda Covid<br>",
-        caption="Onde meu município está na curva da doença?",
+        caption="Onde meu estado está na curva da doença?",
         image="https://i.imgur.com/Oy7IiGB.png",
     ),
 ]
