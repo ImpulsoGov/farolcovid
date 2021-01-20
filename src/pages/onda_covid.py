@@ -94,6 +94,13 @@ def main(user_input, indicators, data, config, session_state):
     # Prompt User to Select Heatmap Location
     # view = st.selectbox("Selecione a sua visão", options=["Cidade", "Estado", "País"], index=1)
     view = st.selectbox("Selecione a sua visão", options=["Estado", "País"])
+    # TEMPORARY BANNER
+    st.write(
+        """<div class="base-wrapper">
+        <i>⚠ Devido ao alto volume de dados para municípios, removemos temporariamente a funcionalidade. 
+        Em breve adicionaremos novamente a visão de Municípios.
+        <i></div>""", 
+    unsafe_allow_html=True)
     # view = st.selectbox("Selecione a sua visão", options=["País"])
     # Load City/State/Country Heatmap
     if view == "Estado":
