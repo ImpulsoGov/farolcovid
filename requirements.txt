@@ -15,3 +15,4 @@ lxml
 mechanize
 flask
 flask-cors
+bokeh
