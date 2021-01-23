@@ -568,11 +568,11 @@ def main(session_state):
         unsafe_allow_html=True,
     )
 
-    if "city" in user_input["place_type"]:
-        js = "window.location.href = '#pesquisa'"  # Current tab
-        html = '<img src onerror="{}">'.format(js)
-        div = Div(text=html)
-        st.bokeh_chart(div)
+    # if "city" in user_input["place_type"]:
+    #    js = "window.location.href = '#pesquisa'"  # Current tab
+    #    html = '<img src onerror="{}">'.format(js)
+    #    div = Div(text=html)
+    #    st.bokeh_chart(div)
 
     # AVAILABLE CAPACITY DISCLAIMER
     # TODO -> VOLTAR PARA PROJECAO DE LEITOS
