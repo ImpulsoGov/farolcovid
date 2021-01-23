@@ -558,7 +558,7 @@ def main(session_state):
                 <div style="font-size: 14px; color: white;">
                     <i>Responda essas perguntas em 5 minutos para melhorar o FarolCovid.</i>
                     <div class = "info">
-                        <a href="https://forms.gle/aXEyvyFgXSaQmn587" class="info-btn" id="click-responderpesquisa">Responder</a>
+                        <a href="https://forms.gle/PNn9rRQa8QLq42e39" class="info-btn" id="click-responderpesquisa">Responder</a>
                     </div>
                 </div><br>
             </div>
