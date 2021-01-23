@@ -569,7 +569,7 @@ def main(session_state):
     )
 
     if "city" in user_input["place_type"]:
-        js = "window.location.href = 'http://farolcovid.coronacidades.org/#pesquisa'"  # Current tab
+        js = "window.location.href = 'http://farolcovid.coronacidades.org/#pesquisa"  # Current tab
         html = '<img src onerror="{}">'.format(js)
         div = Div(text=html)
         st.bokeh_chart(div)
