@@ -66,11 +66,12 @@ def gen_banners():
 
 
 @st.cache(suppress_st_warning=True)
-def loading_cached_cities():
+def loading_cached_cities(params):
     return loader.read_data(
         "br",
         loader.config,
         endpoint=loader.config["br"]["api"]["endpoints"]["analysis"]["cases"],
+        params=params,
     )
 
 def loading_cached_states():
@@ -86,28 +87,19 @@ def main(user_input, indicators, data, config, session_state):
     utils.genHeroSection(
         title1="Onda", 
         title2="Covid",
-        subtitle="Veja e compare a evolução da curva de contágio da Covid-19 em seu estado ou país.", 
+        subtitle="Veja e compare a evolução da curva de contágio da Covid-19 em sua cidade, estado ou país.", 
         logo="https://i.imgur.com/Oy7IiGB.png",
         header=False
     )
 
     # Prompt User to Select Heatmap Location
-    # view = st.selectbox("Selecione a sua visão", options=["Cidade", "Estado", "País"], index=1)
-    view = st.selectbox("Selecione a sua visão", options=["Estado", "País"])
-    # TEMPORARY BANNER
-    st.write(
-        """<div class="base-wrapper">
-        <i>⚠ Devido ao alto volume de dados para municípios, removemos temporariamente a funcionalidade. 
-        Em breve adicionaremos novamente a visão de Municípios.
-        <i></div>""", 
-    unsafe_allow_html=True)
-    # view = st.selectbox("Selecione a sua visão", options=["País"])
+    view = st.selectbox("Selecione a sua visão", options=["Cidade", "Estado", "País"], index=1)
     # Load City/State/Country Heatmap
     if view == "Estado":
         load_states_heatmap(copy.deepcopy(loading_cached_states()))
     elif view == "Cidade":
         my_dict = utils.Dictionary()
-        load_cities_heatmap(copy.deepcopy(loading_cached_cities()), my_dict)
+        load_cities_heatmap(my_dict, session_state)
     elif view == "País":
         load_countries_heatmap(config)
 
@@ -115,7 +107,7 @@ def load_states_heatmap(br_cases):
     da.prepare_heatmap(br_cases, place_type="state_id")
     st.write("")
 
-def load_cities_heatmap(br_cases, my_dict):
+def load_cities_heatmap(my_dict, session_state):
     st.write(
         """
         <div class="base-wrapper">
@@ -142,7 +134,37 @@ def load_cities_heatmap(br_cases, my_dict):
     # print("checking")
     if city_name != "Todos":  # the user selected something
         # print("passed")
-        br_cases = br_cases[br_cases["state_name"] == state_name]  # .reset_index()
+        state_ids = {
+            "Acre": "AC",
+            "Alagoas": "AL",
+            "Amapá": "AP",
+            "Amazonas": "AM",
+            "Bahia": "BA",
+            "Ceará": "CE",
+            "Distrito Federal": "DF",
+            "Espírito Santo": "ES",
+            "Goiás": "GO",
+            "Maranhão": "MA",
+            "Mato Grosso": "MT",
+            "Mato Grosso do Sul": "MS",
+            "Minas Gerais": "MG",
+            "Pará": "PA",
+            "Paraíba": "PB",
+            "Paraná": "PR",
+            "Pernambuco": "PE",
+            "Piauí": "PI",
+            "Rio de Janeiro": "RJ",
+            "Rio Grande do Norte": "RN",
+            "Rio Grande do Sul": "RS",
+            "Rondônia": "RO",
+            "Roraima": "RR",
+            "Santa Catarina": "SC",
+            "São Paulo": "SP",
+            "Sergipe": "SE",
+            "Tocantins": "TO",
+        }
+        params = {"state_id": state_ids[session_state.state_name]}
+        br_cases = copy.deepcopy(loading_cached_cities(params))
         # gen_banners()
         uf = my_dict.get_state_alphabetical_id_by_name(state_name)
         da.prepare_heatmap(
