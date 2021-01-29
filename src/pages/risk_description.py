@@ -427,7 +427,7 @@ def gen_indicators_details(session_state, date_update):
             <br><br>
             Dito isso, alteramos nosso indicador para leitos UTI por
             100mil hab. com os dados atualizados mensalmente no
-            DcoataSUS/CNES como valor alternativo para classificação de
+            DataSUS/CNES como valor alternativo para classificação de
             capacidade hospitalar até resolvermos o simulador.
             </div>""",
             unsafe_allow_html=True,
