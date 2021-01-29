@@ -11,7 +11,7 @@ def main(session_state):
         "opened model", session_state, is_new_page=True
     )
 
-    st.write("v1.4 - Atualizações")
+    st.header("Metodologia v1.2 - Atualizações")
     st.subheader("Inicialização dos estados")
 
     st.write(
@@ -43,7 +43,7 @@ def main(session_state):
         """
     )
 
-    st.header("Limitações atualizadas do modelo")
+    st.subheader("Limitações atualizadas do modelo")
 
     st.write(
         """
@@ -72,7 +72,7 @@ def main(session_state):
         """
     )
 
-    st.write("v1.3 - Atualizações")
+    st.header("Metodologia v1.1 - Atualizações")
 
     st.subheader("Ritmo de contágio (**Rt**)")
 
@@ -103,7 +103,7 @@ def main(session_state):
       """
     )
 
-    st.write("v1.2")
+    st.header("Metodologia v1.0")
 
     st.write(
         """
@@ -188,7 +188,7 @@ def main(session_state):
         """
     )
 
-    st.header("Capacidade Hospitalar (Oferta)")
+    st.subheader("Capacidade Hospitalar (Oferta)")
 
     st.write(
         """
@@ -234,7 +234,7 @@ def main(session_state):
         """
     )
 
-    st.header("Quantidade de internações (Demanda)")
+    st.subheader("Quantidade de internações (Demanda)")
 
     st.write(
         """
@@ -580,7 +580,7 @@ def main(session_state):
 
     st.latex("S(0) = N - I(0) - E(0) - R(0) - D(0)")
 
-    st.header("Simulação das estratégias")
+    st.subheader("Simulação das estratégias")
 
     st.write(
         """
@@ -622,7 +622,7 @@ def main(session_state):
         """
     )
 
-    st.header("Limitações")
+    st.subheader("Limitações")
 
     st.write(
         """
@@ -661,7 +661,7 @@ def main(session_state):
         """
     )
 
-    st.header("Fonte de Dados")
+    st.subheader("Fonte de Dados")
     st.write(
         """
     Os dados iniciais utilizados na ferramenta foram coletados de:
@@ -691,7 +691,7 @@ def main(session_state):
     # )
     # st.write("<br>", unsafe_allow_html=True)
 
-    st.header("Referências")
+    st.subheader("Referências")
 
     st.write(
         """
