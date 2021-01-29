@@ -7,16 +7,15 @@ import yaml
 config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
 
 
-def read_data(country, config, endpoint, params=None):
+def read_data(country, config, endpoint):
 
-    # if os.getenv("IS_LOCAL") == "TRUE":
-    #     api_url = config[country]["api"]["local"]
-    # else:
-    #     api_url = config[country]["api"]["external"]
-    api_url = config[country]["api"]["external"]
+    if os.getenv("IS_LOCAL") == "TRUE":
+        api_url = config[country]["api"]["local"]
+    else:
+        api_url = config[country]["api"]["external"]
+
     url = api_url + endpoint
-    if params:
-        url = url + '?state_id=' + params['state_id']
+    print(url)
     df = pd.read_csv(url)
 
     if "last_updated" in df.columns:
