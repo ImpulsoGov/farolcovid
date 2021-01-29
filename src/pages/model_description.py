@@ -11,7 +11,21 @@ def main(session_state):
         "opened model", session_state, is_new_page=True
     )
 
-    st.header("Metodologia v1.2 - Atualizações")
+    st.header("Metodologia v1.3 - Atualizações (12/09/2020)")
+
+    st.write(
+      """
+      Alteramos os parâmetros de hospitalização e mortalidade utilizados
+      do compilado de estudos feito pela Alison Hill para parâmetros
+      mais refinados. Estes parâmetros são calculados com base na
+      distribuição etária de cada estado/regional de saúde e a
+      probabilidade de hospitalização de cada faixa derivadas do estudo
+      de Verity et. al (2019), também utilizado para o cálculo da taxa
+      de subnotificação de casos.
+      """
+    )
+
+    st.header("Metodologia v1.2 - Atualizações (01/09/2020)")
     st.subheader("Inicialização dos estados")
 
     st.write(
@@ -72,7 +86,7 @@ def main(session_state):
         """
     )
 
-    st.header("Metodologia v1.1 - Atualizações")
+    st.header("Metodologia v1.1 - Atualizações (10/06/2020)")
 
     st.subheader("Ritmo de contágio (**Rt**)")
 
@@ -103,7 +117,7 @@ def main(session_state):
       """
     )
 
-    st.header("Metodologia v1.0")
+    st.header("Metodologia v1.0 (08/04/2020)")
 
     st.write(
         """
