@@ -163,7 +163,7 @@ def load_cities_heatmap(my_dict, session_state):
             "Sergipe": "SE",
             "Tocantins": "TO",
         }
-        params = {"state_id": state_ids[session_state.state_name]}
+        params = {"state_id": state_ids[state_name]}
         br_cases = copy.deepcopy(loading_cached_cities(params))
         # gen_banners()
         uf = my_dict.get_state_alphabetical_id_by_name(state_name)
