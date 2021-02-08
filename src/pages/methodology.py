@@ -19,7 +19,7 @@ def main(session_state):
     utils.genHeroSection(
         title1="Farol",
         title2="Covid",
-        subtitle="Entenda a metodologia da item.",
+        subtitle="Entenda a metodologia da ferramenta.",
         logo="https://i.imgur.com/CkYDPR7.png",
         header=True,
     )

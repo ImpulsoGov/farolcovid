@@ -412,9 +412,24 @@ def gen_indicators_details(session_state, date_update):
         == "CAPACIDADE DO SISTEMA: Total de leitos UTI por 100 mil habitantes"
     ):
 
+        # Ver metodologia do SimulaCovid: a capacidade hospitalar é projetada com os dados mais recentes da doença no município, regional ou estado.
         st.write(
-            """<div class="base-wrapper">Ver metodologia do SimulaCovid: a capacidade hospitalar é projetada com os dados mais recentes da doença no município, regional ou estado.
-                </div>""",
+            """<div class="base-wrapper">Desde final de 2020 notamos que o modelo 
+            passou a calcular valores muito abaixo do que observamos na realidade - 
+            dizemos que o modelo estava "sobrehospitalizando" a projeção de casos de 
+            Covid-19. Isso foi observado primeiramente nas estimativas dos estados 
+            que sempre indicavam + de 30 dias (novo normal) para atingir da 
+            capacidade máxima de leitos UTI. Além dessa observação, vimos em 
+            outros modelos e pesquisas que muitos deixaram de performar bem 
+            devido a alterações de tratamento (positivamente uma melhoria) 
+            e na própria disseminação do vírus que mudaram o comportamento 
+            da evolução dos quadros hospitalares.
+            <br><br>
+            Dito isso, alteramos nosso indicador para leitos UTI por
+            100mil hab. com os dados atualizados mensalmente no
+            DataSUS/CNES como valor alternativo para classificação de
+            capacidade hospitalar até resolvermos o simulador.
+            </div>""",
             unsafe_allow_html=True,
         )
 
