@@ -129,7 +129,7 @@ def load_cities_heatmap(my_dict, session_state):
 
     deaths_or_cases = (
         st.selectbox("Qual análise você quer ver: Número de mortes ou Taxa de letalidade (mortes por casos)?", ["Mortes", "Letalidade"])
-        == "Mortes por casos"
+        == "Letalidade"
     )
     # print("checking")
     if city_name != "Todos":  # the user selected something
