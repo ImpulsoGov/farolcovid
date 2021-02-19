@@ -322,6 +322,17 @@ def main(session_state):
         explain=True
     )
 
+    # TEMPORARY BANNER FC
+    escolasegura_logo = utils.load_image("imgs/escolasegura_favicon.png")
+    st.write(f"""<div>
+            <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
+                <div class="white-span header p1" style="font-size:30px;"><img class="icon-cards" src="data:image/png;base64,{escolasegura_logo}" alt="Fonte: Impulso"> COMO PLANEJAR UMA REABERTURA SEGURA?</div>
+                <span class="white-span">Veja guias e protocolos para facilitar uma reabertura planejada da rede pública de ensino, respeitando boas práticas de distanciamento e segurança sanitária para controle da Covid-19.
+                <br><b>Acesse o Escola Segura: <a target="_blank" style="color:#FFFFFF;" href="http://escolasegura.coronacidades.org">http://escolasegura.coronacidades.org</a></b></span>
+        </div>""",
+        unsafe_allow_html=True,
+    )
+
     st.write(
         """
     <div class="base-wrapper primary-span">
@@ -556,12 +567,14 @@ def main(session_state):
     """,
         unsafe_allow_html=True,
     )
-
+    
     if "city" in user_input["place_type"]:
-        js = "window.location.href = 'https://simulacovid-staging.herokuapp.com/#pesquisa'"  # Current tab
+        js = "window.location.href = '#pesquisa'"  # Current tab
         html = '<img src onerror="{}">'.format(js)
         div = Div(text=html)
         st.bokeh_chart(div)
+
+
 
     # AVAILABLE CAPACITY DISCLAIMER
     # TODO -> VOLTAR PARA PROJECAO DE LEITOS
