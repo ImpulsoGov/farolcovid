@@ -34,7 +34,7 @@ Outras inspirações: http://gabgoh.github.io/COVID/index.html (Epidemic Calcula
 
 
 
-## Lançamento v1 (Streamlit): 08/04/2020 (stable) *
+## Lançamento v1 (Streamlit): [08/04/2020 (stable) *](https://github.com/ImpulsoGov/farolcovid/pull/35)
 Vimos que valia a pena investir na ideia, mas continuar no DataStudio limitava a flexibilidade de mudanças, impedindo a melhoria da experiência de usuário. Surgiu então o Saru na história, nosso expert em FE/UX, que nos ajudou a montar um site oficial para o SimulaCovid. Foram algumas semanas para todo o processo, mas muita coisa feita:
 
 O Saru criou inicialmente um mock no Figma o qual usamos para o FE da ferramenta
@@ -45,7 +45,7 @@ Pouco tempo depois [(final de abril)](https://github.com/ImpulsoGov/farolcovid/p
 
 
 
-## Lançamento v1.1 (FarolCovid): 10/06/2020 (stable) *
+## Lançamento v1.1 (FarolCovid): [10/06/2020 (stable) *](https://github.com/ImpulsoGov/farolcovid/pull/140)
 Nesta nova versão do Simula mudamos as 3 simulações que tínhamos antes, com 3 diferentes ritmos de contágio, para uma única simulação com o ritmo de contágio calculado a nível local. Assim como antes, usamos o intervalo de confiança de 95% para indicar o melhor cenário (menor Rt, limite inferior) e o pior cenário (maior Rt, limite superior) dadas as mesmas informações passadas pelo(a) gestor(a).
 
 Além disso, alteramos valores de capacidade hospitalar, como segue na metodologia do SimulaCovid v1.1 disponível no Farol:
@@ -54,7 +54,7 @@ Além disso, alteramos valores de capacidade hospitalar, como segue na metodolog
 
 
 
-## Lançamento v1.2 (Farol v2.0): 01/09/2020 (stable) *
+## Lançamento v1.2 (Farol v2.0): [01/09/2020 (stable) *](https://github.com/ImpulsoGov/farolcovid/pull/193)
 As atualizações do SimulaCovid v1.3 foram incorporadas a um conjunto maior de atualizações para o lançamento do FarolCovid v.2. Desde início de junho, o SimulaCovid já tinha deixado de ser o carro-chefe do site, e passou a ser um produto agregado. 
 
 As grandes mudanças foram:
@@ -69,7 +69,7 @@ Junto a isto, também alterarmos metodologia da taxa de contágio (Rt) para um m
 
 
 
-## Ajustes v1.3 (Parâmetros locais): 12/09/2020 *
+## Ajustes v1.3 (Parâmetros locais): [12/09/2020 *](https://github.com/ImpulsoGov/farolcovid/pull/204)
 Alteramos os parâmetros de hospitalização e mortalidade utilizados do compilado de estudos feito pela Alison Hill para parâmetros mais refinados. Estes parâmetros são calculados com base na distribuição etária de cada estado/regional de saúde e a probabilidade de hospitalização de cada faixa derivadas do estudo de [Verity et. al (2019)](https://www.medrxiv.org/content/10.1101/2020.03.09.20033357v1), também utilizado para o cálculo da taxa de subnotificação de casos.
 
 Arquivos:
