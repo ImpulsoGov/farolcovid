@@ -549,32 +549,6 @@ def main(session_state):
             indicators=indicators,
         )
 
-    # PESQUISA FAROL TEMPORÁRIO
-    st.write(f"""
-    <div id="pesquisa" class="info-pesquisa-window">
-        <div><a href="#" title="Close" class="info-btn-close" style="color: #F02C2E; background-color: white;">&times</a>
-            <div style="margin: 10px 15px 15px 15px;">
-                <h1 class="primary-span" style="color: white;">Ajude a gente a melhorar!</h1>
-                <div style="font-size: 14px; color: white;">
-                    <i>Responda essas perguntas em 5 minutos para melhorar o FarolCovid.</i>
-                    <div class = "info">
-                        <a href="https://forms.gle/PNn9rRQa8QLq42e39" class="info-btn" id="click-responderpesquisa">Responder</a>
-                    </div>
-                </div><br>
-            </div>
-        </div>
-    </div>
-    """,
-        unsafe_allow_html=True,
-    )
-    
-    if "city" in user_input["place_type"]:
-        js = "window.location.href = '#pesquisa'"  # Current tab
-        html = '<img src onerror="{}">'.format(js)
-        div = Div(text=html)
-        st.bokeh_chart(div)
-
-
 
     # AVAILABLE CAPACITY DISCLAIMER
     # TODO -> VOLTAR PARA PROJECAO DE LEITOS
