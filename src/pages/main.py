@@ -549,8 +549,6 @@ def main(session_state):
             indicators=indicators,
         )
 
-
-
     # AVAILABLE CAPACITY DISCLAIMER
     # TODO -> VOLTAR PARA PROJECAO DE LEITOS
     # """
