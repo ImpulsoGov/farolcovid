@@ -2480,7 +2480,7 @@ header>.toolbar { /* Hide toolbar menu */
 .main-card-display-text-v2{
     font-family: IBM Plex Sans;
     font-style: normal;
-    font-size: 15px;
+    font-size: 14px;
     width:50%;
     height:80px;
     bottom:20px;
@@ -2641,8 +2641,8 @@ header>.toolbar { /* Hide toolbar menu */
   }
 
 .icon-cards{
-    width: 2rem;
-    height: 2rem;
+    width: 4rem;
+    height: 4rem;
 }
 
 .info-pesquisa-window {

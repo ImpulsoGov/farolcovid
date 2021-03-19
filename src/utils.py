@@ -809,7 +809,7 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
         if place_type == "city_id":
             caption = "A porcentagem da população vacinada em seu <b>município</b>, é"
         return f"""
-        <div id="vacina" class="main-indicator-card flex flex-column mr" style="z-index:1;display:inline-block;position:relative;background-color:#bcd9e1;">
+        <div id="vacina" class="main-indicator-card flex flex-column mr" style="z-index:1;display:inline-block;position:relative;background:#fafafa;border:4px solid #0097A7;">
             <span class="main-card-header-v2" >{indicator.header}</span>
             <span class="main-card-list-v2">{caption}</span>
             <div class="flex flex-row flex-justify-space-between mt" style="width:250px;">
@@ -957,6 +957,7 @@ def genKPISection(
     # TODO -> VOLTAR PARA PROJECAO DE LEITOS
     # %0a%0a🏥 *CAPACIDADE DO SISTEMA*: A capacidade hospitalar será atingida em *{str(indicators['capacity'].display).replace("+", "mais de")} dias* 
     msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  
+    %0a%0a💉 *VACINAÇÃO*: Até hoje já foram vacinadas *{indicators['vacina'].perc_vacinados}* de cada 100 pessoas.
     🚨%0a%0aNÍVEL DE ALERTA: {alert.upper()}
     %0a%0a😷 *SITUAÇÃO DA DOENÇA*: Hoje são reportados❗em média *{indicators['situation'].display} casos por 100mil habitantes.
     %0a%0a *CONTROLE DA DOENÇA*: A taxa de contágio mais recente é de *{indicators['control'].left_display}* - ou seja, uma pessoa infecta em média *{indicators['control'].left_display}* outras.
