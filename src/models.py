@@ -42,6 +42,7 @@ class Illustration(enum.Enum):
 
 
 class IndicatorType(enum.Enum):
+    VACINA = "vacina"
     SITUATION = "situation"
     CONTROL = "control"
     CAPACITY = "capacity"
@@ -145,6 +146,13 @@ Strategies: List[ContainmentStrategy] = [
 ]
 
 IndicatorCards: Dict[str, Indicator] = {
+    IndicatorType.VACINA.value: Indicator(
+        header="VACINAÇÃO",
+        caption="A porcentagem da população vacinada em seu estado, é",
+        unit="%",
+        left_label="Porcentagem da população imunizada (duas doses):",
+        right_label="Total da populacão que falta vacinar:",
+    ),
     IndicatorType.SITUATION.value: Indicator(
         header="SITUAÇÃO DA DOENÇA",
         caption="Hoje são <b>reportados</b> em média",
