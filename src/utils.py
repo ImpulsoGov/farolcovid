@@ -795,7 +795,6 @@ def genAnalysisDimmensionsSection(dimensions: List[Dimension]):
 
 
 def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"):
-
     if indicator.display == "None":
         indicator.display = ""
         indicator.unit = ""
@@ -803,6 +802,30 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
     # Get name of alert by number
     if indicator.risk == "nan":
         alert = ""
+    elif indicator.header == "VACINAÇÃO":
+        if place_type == "state_num_id":
+            caption = "A porcentagem da populacão vacinada em seu <b>estado</b>, é"
+        if place_type == "health_region_id":
+            caption = "A porcentagem da populacão vacinada em sua <b>regional de saúde</b>, é"
+        if place_type == "city_id":
+            caption = "A porcentagem da populacão vacinada em seu <b>município</b>, é"
+        return f"""
+        <div id="vacina" class="main-indicator-card flex flex-column mr" style="z-index:1;display:inline-block;position:relative;background-color:#bcd9e1;">
+            <span class="main-card-header-v2" >{indicator.header}</span>
+            <span class="main-card-list-v2">{caption}</span>
+            <div class="flex flex-row flex-justify-space-between mt" style="width:250px;">
+            </div>
+            <span class="bold p2 main-card-display-value">{indicator.perc_vacinados}<span class="p5">{indicator.unit}</span></span>
+            <div class="main-card-display-text-v2 sdcardtext-left">
+                    <span class="lighter">{indicator.left_label}<br></span>
+                    <span class="bold">{indicator.perc_imunizados}</span>
+            </div>
+            <div class="main-card-display-text-v2 sdcardtext-right">
+                    <span class="lighter">{indicator.right_label}<br></span>
+                    <span class="bold">{indicator.vacinados}</span>
+            </div>
+            <div class="last-updated-text">Atualizado em: {indicator.last_updated}</div>
+        </div>"""
     else:
         alert = loader.config["br"]["farolcovid"]["categories"][int(indicator.risk)]
 
@@ -815,18 +838,21 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
     # "CAPACIDADE DO SISTEMA": "Se nada mudar, a capacidade hospitalar de seu <b>...</b> será atingida em",
     captions_by_place = {
         "state_num_id": {
+            "VACINAÇÃO": "A porcentagem da populacão vacinada em seu <b>estado</b>, é",
             "SITUAÇÃO DA DOENÇA": "Hoje em seu <b>estado</b> são <b>reportados</b> em média",
             "CONTROLE DA DOENÇA": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>classificamos pela estimativas de Rt de seu estado.</b>",
             "CAPACIDADE DO SISTEMA": "Com base nos dados do DataSUS, hoje em seu <b>estado</b> existem *",
             "CONFIANÇA DOS DADOS": "A cada 10 pessoas infectadas em seu <b>estado</b>,",
         },
         "health_region_id": {
+            "VACINAÇÃO": "A porcentagem da populacão vacinada em sua <b>regional de saúde</b>, é",
             "SITUAÇÃO DA DOENÇA": "Hoje em sua <b>regional de saúde</b> são <b>reportados</b> em média",
             "CONTROLE DA DOENÇA": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>classificamos pela estimativas de Rt de sua regional.</b>",
             "CAPACIDADE DO SISTEMA": "Com base nos dados do DataSUS, hoje em sua <b>regional de saúde</b> existem *",
             "CONFIANÇA DOS DADOS": "A cada 10 pessoas infectadas em sua <b>regional de saúde</b>,",
         },
         "city_id": {
+            "VACINAÇÃO": "A porcentagem da populacão vacinada em seu <b>município</b>, é",
             "SITUAÇÃO DA DOENÇA": "Hoje em seu <b>município</b> são <b>reportados</b> em média",
             "CONTROLE DA DOENÇA": {
                 "health_region_id": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>classificamos pela estimativas de Rt de sua regional.</b>",
@@ -843,7 +869,7 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
         indicator.caption = captions_by_place[place_type][indicator.header]
 
     return f"""
-    <div class="main-indicator-card flex flex-column mr" style="z-index:1;display:inline-block;position:relative;">
+    <div class="main-indicator-card flex flex-column mr" style="background-color: white;z-index:1;display:inline-block;position:relative;">
         <span class="main-card-header-v2">{indicator.header}</span>
         <span class="main-card-list-v2">{indicator.caption}</span>
         <div class="flex flex-row flex-justify-space-between mt" style="width:250px;">
@@ -858,10 +884,11 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
         </div>
         <div class="main-card-display-text-v2 sdcardtext-right">
                 <span class="lighter">{indicator.right_label}<br></span>
-                <span class="bold">{indicator_right_display}</span>
+                <span class="bold">{indicator.right_display}</span>
         </div>
         <div class="last-updated-text">Atualizado em: {indicator.last_updated}</div>
     </div>"""
+
 
 def noOverallalert(user_input, data, states):
     if user_input["state_name"] in states:
