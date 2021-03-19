@@ -344,7 +344,7 @@ def main(session_state):
             <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
                 <div class="white-span header p1" style="font-size:30px;"><img class="icon-cards" src="data:image/png;base64,{vaccine_logo}" alt="Fonte: Impulso">QUER SABER MAIS SOBRE A VACINAÇÃO?</div>
                 <span class="white-span">Acompanhe nossos novos dados e descobra como avança a vacinação no seu município ou estado!<br><br>
-                <a class="btn-ambassador" href="#vacina" target="__self">Veja aqui!</a>
+                <a class="btn-ambassador" href="#vacina" target="_self">Veja aqui!</a>
         </div>""",
         unsafe_allow_html=True,
     )
