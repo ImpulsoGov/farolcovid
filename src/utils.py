@@ -798,17 +798,16 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
     if indicator.display == "None":
         indicator.display = ""
         indicator.unit = ""
-
     # Get name of alert by number
     if indicator.risk == "nan":
         alert = ""
-    elif indicator.header == "VACINAÇÃO":
+    if indicator.header == "VACINAÇÃO":
         if place_type == "state_num_id":
-            caption = "A porcentagem da populacão vacinada em seu <b>estado</b>, é"
+            caption = "A porcentagem da população vacinada em seu <b>estado</b>, é"
         if place_type == "health_region_id":
-            caption = "A porcentagem da populacão vacinada em sua <b>regional de saúde</b>, é"
+            caption = "A porcentagem da população vacinada em sua <b>regional de saúde</b>, é"
         if place_type == "city_id":
-            caption = "A porcentagem da populacão vacinada em seu <b>município</b>, é"
+            caption = "A porcentagem da população vacinada em seu <b>município</b>, é"
         return f"""
         <div id="vacina" class="main-indicator-card flex flex-column mr" style="z-index:1;display:inline-block;position:relative;background-color:#bcd9e1;">
             <span class="main-card-header-v2" >{indicator.header}</span>
