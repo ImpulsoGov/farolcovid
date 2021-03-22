@@ -505,7 +505,7 @@ def main(session_state):
     indicators = update_indicators(indicators, data, config, user_input, session_state)
 
     data["overall_alert"] = data["overall_alert"].map(
-        config["br"]["farolcovid"]["categories"]
+        {0: "novo normal", 1: "moderado", 2: "alto", 3: "altíssimo"}
     )
 
     if "state" in user_input["place_type"]:
@@ -516,7 +516,7 @@ def main(session_state):
             ]
             .assign(
                 overall_alert=lambda df: df["overall_alert"].map(
-                    config["br"]["farolcovid"]["categories"]
+                    {0: "novo normal", 1: "moderado", 2: "alto", 3: "altíssimo"}
                 )
             )["overall_alert"]
             .value_counts()
