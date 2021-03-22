@@ -817,11 +817,11 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
             <span class="bold p2 main-card-display-value">{indicator.perc_vacinados}<span class="p5">{indicator.unit}</span></span>
             <div class="main-card-display-text-v2 sdcardtext-left">
                     <span class="lighter">{indicator.left_label}<br></span>
-                    <span class="bold">{indicator.perc_imunizados}</span>
+                    <span class="bold">{indicator.perc_imunizados} %</span>
             </div>
             <div class="main-card-display-text-v2 sdcardtext-right">
                     <span class="lighter">{indicator.right_label}<br></span>
-                    <span class="bold">{indicator.vacinados}</span>
+                    <span class="bold">{indicator.nao_vacinados}</span>
             </div>
             <div class="last-updated-text">Atualizado em: {indicator.last_updated}</div>
         </div>"""
