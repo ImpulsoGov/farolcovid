@@ -1050,7 +1050,6 @@ def genInputCustomizationSectionHeader(locality: str) -> None:
         unsafe_allow_html=True,
     )
 
-
 def gen_footer() -> None:
 
     st.write(
@@ -1072,14 +1071,14 @@ def gen_footer() -> None:
                                 <div class="logo-section">
                                         <img class="logo-img" src="%s"/>
                                         <img class="logo-img" src="%s"/>
+                                        <img class="logo-img" src="%s"/>
                                 </div>
                         </div>
                 </div>
         </div>"""
-        % (Logo.IMPULSO.value, Logo.CORONACIDADES.value, Logo.ARAPYAU.value),
+        % (Logo.IMPULSO.value, Logo.CORONACIDADES.value, Logo.ARAPYAU.value, Logo.SESI.value),
         unsafe_allow_html=True,
     )
-
 
 # VIEW COMPONENTS SIMULACOVID
 

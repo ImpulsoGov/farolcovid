@@ -151,7 +151,7 @@ IndicatorCards: Dict[str, Indicator] = {
         caption="A porcentagem da população vacinada em seu estado, é",
         unit="%",
         left_label="Porcentagem da população imunizada (duas doses):",
-        right_label="Total da populacão que falta vacinar:",
+        right_label="Total da população sem vacinar:",
     ),
     IndicatorType.SITUATION.value: Indicator(
         header="SITUAÇÃO DA DOENÇA",
