@@ -41,9 +41,6 @@ def fix_type(x, group, position):
     if position == "last_updated":
         return pd.to_datetime(str(x)).strftime("%d/%m/%Y")
 
-    if group == "vacina" and position == "display":
-        return int(round(10 * (1 - x), 0))
-
     if group == "situation" and position == "display":
         return round(float(x), 2)
 
@@ -74,18 +71,19 @@ def update_indicators(indicators, data, config, user_input, session_state):
         dic_indicators = dict()
         if group == 'vacina':
             if "state" in user_input["place_type"]:
-                dado = pd.read_csv('df_group_state.csv')
+                dado = pd.read_csv('http://datasource.coronacidades.org/br/states/vacina')
                 dado = dado[dado["state_name"] == user_input["state_name"]]
             elif "city" in user_input["place_type"]:
-                dado = pd.read_csv('df_grouped_city.csv')
+                dado = pd.read_csv('http://datasource.coronacidades.org/br/cities/vacina')
                 dado = dado[dado["city_id"] == user_input["city_id"]]
             else:
-                dado = pd.read_csv('df_group_region.csv')
+                dado = pd.read_csv('http://datasource.coronacidades.org/br/health_region/vacina')
                 dado = dado[dado['health_region_id'] == user_input["health_region_id"]]
-            indicators[group].imunizados = fix_type(dado.imunizados.fillna("-").values[0], group, 'imunizados')
-            indicators[group].vacinados = fix_type(dado.vacinados.fillna("-").values[0], group, 'vacinados')
-            indicators[group].perc_imunizados = fix_type(dado.perc_imunizados.fillna("-").values[0], group, 'perc_imunizados')
-            indicators[group].perc_vacinados = fix_type(dado.perc_vacinados.fillna("-").values[0], group, 'perc_vacinados')
+            indicators[group].last_updated = dado.last_updated.fillna("-").values[0]
+            indicators[group].imunizados = dado.imunizados.fillna("-").values[0]
+            indicators[group].nao_vacinados = dado.nao_vacinados.fillna("-").values[0]
+            indicators[group].perc_imunizados = dado.perc_imunizados.fillna("-").values[0]
+            indicators[group].perc_vacinados = dado.perc_vacinados.fillna("-").values[0]
         else:
             for position in config["br"]["indicators"][group].keys():
                 # Indicadores de Filtros
