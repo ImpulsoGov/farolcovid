@@ -29,6 +29,7 @@ class Logo(enum.Enum):
     IMPULSO = "https://i.imgur.com/zp9QCDU.png"
     CORONACIDADES = "https://i.imgur.com/BamxSJE.png"
     ARAPYAU = "https://i.imgur.com/SjsMK2A.jpg"
+    SESI = "https://imgur.com/Crnlwf8.jpg"
 
 
 class Link(enum.Enum):
