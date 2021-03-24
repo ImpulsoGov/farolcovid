@@ -408,7 +408,7 @@ header>.toolbar { /* Hide toolbar menu */
     background-image: url('https://i.imgur.com/6clFZnc.png');
     background-position:center;
     background-repeat:no-repeat;
-	background-size:cover;
+    background-size:cover;
 }
 
 .logo-bold {
@@ -2480,7 +2480,7 @@ header>.toolbar { /* Hide toolbar menu */
 .main-card-display-text-v2{
     font-family: IBM Plex Sans;
     font-style: normal;
-    font-size: 16px;
+    font-size: 14px;
     width:50%;
     height:80px;
     bottom:20px;
@@ -2508,7 +2508,6 @@ header>.toolbar { /* Hide toolbar menu */
     height: 380px;
     border-radius: var(--main-border-radius);
     opacity: 0.98;
-    background-color: white;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 .distancing-cards{
@@ -2642,8 +2641,8 @@ header>.toolbar { /* Hide toolbar menu */
   }
 
 .icon-cards{
-    width: 2rem;
-    height: 2rem;
+    width: 4rem;
+    height: 4rem;
 }
 
 .info-pesquisa-window {

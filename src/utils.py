@@ -795,14 +795,36 @@ def genAnalysisDimmensionsSection(dimensions: List[Dimension]):
 
 
 def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"):
-
     if indicator.display == "None":
         indicator.display = ""
         indicator.unit = ""
-
     # Get name of alert by number
     if indicator.risk == "nan":
         alert = ""
+    if indicator.header == "VACINAÇÃO":
+        if place_type == "state_num_id":
+            caption = "A porcentagem da população vacinada em seu <b>estado</b>, é"
+        if place_type == "health_region_id":
+            caption = "A porcentagem da população vacinada em sua <b>regional de saúde</b>, é"
+        if place_type == "city_id":
+            caption = "A porcentagem da população vacinada em seu <b>município</b>, é"
+        return f"""
+        <div id="vacina" class="main-indicator-card flex flex-column mr" style="z-index:1;display:inline-block;position:relative;background:#fafafa;border:4px solid #0097A7;">
+            <span class="main-card-header-v2" >{indicator.header}</span>
+            <span class="main-card-list-v2">{caption}</span>
+            <div class="flex flex-row flex-justify-space-between mt" style="width:250px;">
+            </div>
+            <span class="bold p2 main-card-display-value">{indicator.perc_vacinados}<span class="p5">{indicator.unit}</span></span>
+            <div class="main-card-display-text-v2 sdcardtext-left">
+                    <span class="lighter">{indicator.left_label}<br></span>
+                    <span class="bold">{indicator.perc_imunizados} %</span>
+            </div>
+            <div class="main-card-display-text-v2 sdcardtext-right">
+                    <span class="lighter">{indicator.right_label}<br></span>
+                    <span class="bold">{indicator.nao_vacinados}</span>
+            </div>
+            <div class="last-updated-text">Atualizado em: {indicator.last_updated}</div>
+        </div>"""
     else:
         alert = loader.config["br"]["farolcovid"]["categories"][int(indicator.risk)]
 
@@ -815,18 +837,21 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
     # "CAPACIDADE DO SISTEMA": "Se nada mudar, a capacidade hospitalar de seu <b>...</b> será atingida em",
     captions_by_place = {
         "state_num_id": {
+            "VACINAÇÃO": "A porcentagem da populacão vacinada em seu <b>estado</b>, é",
             "SITUAÇÃO DA DOENÇA": "Hoje em seu <b>estado</b> são <b>reportados</b> em média",
             "CONTROLE DA DOENÇA": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>classificamos pela estimativas de Rt de seu estado.</b>",
             "CAPACIDADE DO SISTEMA": "Com base nos dados do DataSUS, hoje em seu <b>estado</b> existem *",
             "CONFIANÇA DOS DADOS": "A cada 10 pessoas infectadas em seu <b>estado</b>,",
         },
         "health_region_id": {
+            "VACINAÇÃO": "A porcentagem da populacão vacinada em sua <b>regional de saúde</b>, é",
             "SITUAÇÃO DA DOENÇA": "Hoje em sua <b>regional de saúde</b> são <b>reportados</b> em média",
             "CONTROLE DA DOENÇA": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>classificamos pela estimativas de Rt de sua regional.</b>",
             "CAPACIDADE DO SISTEMA": "Com base nos dados do DataSUS, hoje em sua <b>regional de saúde</b> existem *",
             "CONFIANÇA DOS DADOS": "A cada 10 pessoas infectadas em sua <b>regional de saúde</b>,",
         },
         "city_id": {
+            "VACINAÇÃO": "A porcentagem da populacão vacinada em seu <b>município</b>, é",
             "SITUAÇÃO DA DOENÇA": "Hoje em seu <b>município</b> são <b>reportados</b> em média",
             "CONTROLE DA DOENÇA": {
                 "health_region_id": "Não há dados abertos sistematizados de testes ou rastreamento de contatos no Brasil. Logo, <b>classificamos pela estimativas de Rt de sua regional.</b>",
@@ -843,7 +868,7 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
         indicator.caption = captions_by_place[place_type][indicator.header]
 
     return f"""
-    <div class="main-indicator-card flex flex-column mr" style="z-index:1;display:inline-block;position:relative;">
+    <div class="main-indicator-card flex flex-column mr" style="background-color: white;z-index:1;display:inline-block;position:relative;">
         <span class="main-card-header-v2">{indicator.header}</span>
         <span class="main-card-list-v2">{indicator.caption}</span>
         <div class="flex flex-row flex-justify-space-between mt" style="width:250px;">
@@ -858,10 +883,11 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
         </div>
         <div class="main-card-display-text-v2 sdcardtext-right">
                 <span class="lighter">{indicator.right_label}<br></span>
-                <span class="bold">{indicator_right_display}</span>
+                <span class="bold">{indicator.right_display}</span>
         </div>
         <div class="last-updated-text">Atualizado em: {indicator.last_updated}</div>
     </div>"""
+
 
 def noOverallalert(user_input, data, states):
     if user_input["state_name"] in states:
@@ -931,6 +957,7 @@ def genKPISection(
     # TODO -> VOLTAR PARA PROJECAO DE LEITOS
     # %0a%0a🏥 *CAPACIDADE DO SISTEMA*: A capacidade hospitalar será atingida em *{str(indicators['capacity'].display).replace("+", "mais de")} dias* 
     msg = f"""🚨 *BOLETIM CoronaCidades |  {locality}, {datetime.now().strftime('%d/%m')}*  
+    %0a%0a💉 *VACINAÇÃO*: Até hoje já foram vacinadas *{indicators['vacina'].perc_vacinados}* de cada 100 pessoas.
     🚨%0a%0aNÍVEL DE ALERTA: {alert.upper()}
     %0a%0a😷 *SITUAÇÃO DA DOENÇA*: Hoje são reportados❗em média *{indicators['situation'].display} casos por 100mil habitantes.
     %0a%0a *CONTROLE DA DOENÇA*: A taxa de contágio mais recente é de *{indicators['control'].left_display}* - ou seja, uma pessoa infecta em média *{indicators['control'].left_display}* outras.
@@ -1023,7 +1050,6 @@ def genInputCustomizationSectionHeader(locality: str) -> None:
         unsafe_allow_html=True,
     )
 
-
 def gen_footer() -> None:
 
     st.write(
@@ -1053,7 +1079,6 @@ def gen_footer() -> None:
         % (Logo.IMPULSO.value, Logo.CORONACIDADES.value, Logo.ARAPYAU.value, Logo.SESI.value),
         unsafe_allow_html=True,
     )
-
 
 # VIEW COMPONENTS SIMULACOVID
 

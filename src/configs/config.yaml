@@ -7,6 +7,10 @@ br:
         mapserver_external: https://helper.coronacidades.org/
         mapserver_local: http://datasource-server:5000/
         endpoints:
+            vacina: 
+                city: "br/cities/vacina"
+                health_region: "br/health_region/vacina"
+                state: "br/states/vacina"
             simulacovid: "br/cities/simulacovid/main"
             rt:
                 city: "br/cities/rt"
@@ -81,6 +85,11 @@ br:
                 categories: [3, 2, 1, 0]
         date_update: "15/09/2020"
     indicators:
+        vacina:
+            imunizados: ""
+            vacinados: ""
+            perc_imunizados: ""
+            perc_vacinados: ""
         situation:
             risk: "situation_classification"
             right_display: "daily_cases_growth"

@@ -69,33 +69,47 @@ def update_indicators(indicators, data, config, user_input, session_state):
         # Arrumar valores para cada posição
         # Fix values for each position
         dic_indicators = dict()
-        for position in config["br"]["indicators"][group].keys():
-            # Indicadores de Filtros
-            # Filter indicators
-            if config["br"]["indicators"][group][position] != "None":
-                dic_indicators[position] = fix_type(
-                    data[config["br"]["indicators"][group][position]]
-                    .fillna("- ")
-                    .values[0],
-                    group,
-                    position,
-                )
+        if group == 'vacina':
+            if "state" in user_input["place_type"]:
+                dado = pd.read_csv('http://datasource.coronacidades.org/br/states/vacina')
+                dado = dado[dado["state_name"] == user_input["state_name"]]
+            elif "city" in user_input["place_type"]:
+                dado = pd.read_csv('http://datasource.coronacidades.org/br/cities/vacina')
+                dado = dado[dado["city_id"] == user_input["city_id"]]
             else:
-                dic_indicators[position] = "None"
+                dado = pd.read_csv('http://datasource.coronacidades.org/br/health_region/vacina')
+                dado = dado[dado['health_region_id'] == user_input["health_region_id"]]
+            indicators[group].last_updated = dado.last_updated.fillna("-").values[0]
+            indicators[group].imunizados = dado.imunizados.fillna("-").values[0]
+            indicators[group].nao_vacinados = dado.nao_vacinados.fillna("-").values[0]
+            indicators[group].perc_imunizados = dado.perc_imunizados.fillna("-").values[0]
+            indicators[group].perc_vacinados = dado.perc_vacinados.fillna("-").values[0]
+        else:
+            for position in config["br"]["indicators"][group].keys():
+                # Indicadores de Filtros
+                # Filter indicators
+                if config["br"]["indicators"][group][position] != "None":
+                    dic_indicators[position] = fix_type(
+                        data[config["br"]["indicators"][group][position]]
+                        .fillna("- ")
+                        .values[0],
+                        group,
+                        position,
+                    )
+                else:
+                    dic_indicators[position] = "None"
+            if np.isnan(data[config["br"]["indicators"][group]["risk"]].values[0]):
+                dic_indicators["risk"] = "nan"
+                if group == "rt":  # doesn't show values
+                    indicators[group].right_display = "- "
+                    indicators[group].left_display = "- "
 
-        if np.isnan(data[config["br"]["indicators"][group]["risk"]].values[0]):
-            dic_indicators["risk"] = "nan"
-
-            if group == "rt":  # doesn't show values
-                indicators[group].right_display = "- "
-                indicators[group].left_display = "- "
-
-        # TODO: melhroar aqui para não ter que passar os dados de um dic para outro
-        indicators[group].risk = dic_indicators["risk"]
-        indicators[group].left_display = dic_indicators["left_display"]
-        indicators[group].right_display = dic_indicators["right_display"]
-        indicators[group].display = dic_indicators["display"]
-        indicators[group].last_updated = dic_indicators["last_updated"]
+            # TODO: melhroar aqui para não ter que passar os dados de um dic para outro
+            indicators[group].risk = dic_indicators["risk"]
+            indicators[group].left_display = dic_indicators["left_display"]
+            indicators[group].right_display = dic_indicators["right_display"]
+            indicators[group].display = dic_indicators["display"]
+            indicators[group].last_updated = dic_indicators["last_updated"]
 
     # Caso o usuário altere os casos confirmados, usamos esse novo valor para a estimação
     # TODO: vamos acabar com o user_iput e manter só session_state?
@@ -323,12 +337,12 @@ def main(session_state):
     )
 
     # TEMPORARY BANNER FC
-    escolasegura_logo = utils.load_image("imgs/escolasegura_favicon.png")
+    vaccine_logo = utils.load_image("imgs/vaccine.png")
     st.write(f"""<div>
             <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
-                <div class="white-span header p1" style="font-size:30px;"><img class="icon-cards" src="data:image/png;base64,{escolasegura_logo}" alt="Fonte: Impulso"> COMO PLANEJAR UMA REABERTURA SEGURA?</div>
-                <span class="white-span">Veja guias e protocolos para facilitar uma reabertura planejada da rede pública de ensino, respeitando boas práticas de distanciamento e segurança sanitária para controle da Covid-19.
-                <br><b>Acesse o Escola Segura: <a target="_blank" style="color:#FFFFFF;" href="http://escolasegura.coronacidades.org">http://escolasegura.coronacidades.org</a></b></span>
+                <div class="white-span header p1" style="font-size:30px;"><img class="icon-cards" src="data:image/png;base64,{vaccine_logo}" alt="Fonte: Impulso">QUER SABER MAIS SOBRE A VACINAÇÃO?</div>
+                <span class="white-span">Acompanhe nossos novos dados e descobra como avança a vacinação no seu município ou estado!<br><br>
+                <a class="btn-ambassador" href="#vacina" target="_self">Veja aqui!</a>
         </div>""",
         unsafe_allow_html=True,
     )
@@ -370,7 +384,7 @@ def main(session_state):
         session_state,
         event_args={"state": user_input["state_name"], "city": user_input["city_name"]},
     )
-
+    
     user_input, data = update_user_input_places(user_input, dfs, config)
 
     # GENERATE MAPS
@@ -522,6 +536,7 @@ def main(session_state):
             .value_counts()
         )
 
+
         utils.genKPISection(
             place_type=user_input["place_type"],
             locality=user_input["locality"],
@@ -548,6 +563,8 @@ def main(session_state):
             alert=data["overall_alert"].values[0],
             indicators=indicators,
         )
+
+
 
     # AVAILABLE CAPACITY DISCLAIMER
     # TODO -> VOLTAR PARA PROJECAO DE LEITOS
