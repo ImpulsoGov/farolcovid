@@ -579,9 +579,16 @@ def main(session_state):
     st.write(
         """
         <div class='base-wrapper'>
+            <i>* <b>Vacinação</b> </i>
+            <li>“A porcentagem da população vacinada em seu local” - Total de pessoas que tomaram ao menos uma dose, dividido pelo total da população do local.<br>
+            <li>“Porcentagem da população imunizada” - Total de pessoas que receberam todas as doses recomendadas do imunizante, dividido pelo total da população do local.<br>
+            <li>“Total da população sem vacinar” - Número absoluto de habitantes do local que ainda não recebeu nenhuma dose do imunizante.<br>
+            <i>Para mais detalhes e explicação completa confira nossa página de Metodologia no menu lateral.</i>
+        </div>
+        <div class='base-wrapper'>
             <i>* <b>Mudamos o indicador afim de refinarmos ajustes no cálculo de projeção de leitos.</b> Entendemos que a projeção apresentada não capturava a situação da 2ª onda observada nos municípios, regionais e estados, logo substituímos este indicador por ora para revisão dos cálculos. 
             Os valores de referência se baseiam nas estatísticas de países da OCDE, <a target="_blank" style="color:#0068c9;" href="https://docs.google.com/spreadsheets/d/1MKFOHRCSg4KMx5Newi7TYCrjtNyPwMQ38GE1wQ6as70/edit?usp=sharing">veja mais aqui</a></b>.
-            As simulações personalizadas ainda podem ser realizadas através do SimulaCovid mais abaixo.<br><br>
+            As simulações personalizadas ainda podem ser realizadas através do SimulaCovid mais abaixo.<br>
             <li> Leitos Enfermaria: Consideramos %s&percnt; do total reportado por %s em %s dos tipos Cirúrgico, Clínico e Hospital-dia. Para municípios, utilizamos os recursos da respectiva regional de saúde.<br>
             <li> Leitos UTI: Consideramos 100&percnt; do total de leitos UTI reportado por %s em %s. Para municípios, utilizamos os recursos da respectiva regional de saúde.</i>
         </div>
