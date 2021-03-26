@@ -181,6 +181,7 @@ def gen_indicators_details(session_state, date_update):
         "Selecione abaixo o indicador para ver a descrição em detalhe:",
         [
             f"GERAL: Distribuição dos indicadores chaves em {date_update}",
+            "VACINAÇÃO: Porcentagem da população vacinada",
             "SITUAÇÃO DA DOENÇA: Média móvel de novos casos por 100 mil habitantes",
             "CONTROLE DA DOENÇA: Taxa de contágio (Rt)",
             "CAPACIDADE DO SISTEMA: Total de leitos UTI por 100 mil habitantes",
@@ -190,6 +191,25 @@ def gen_indicators_details(session_state, date_update):
 
     if indicador == f"GERAL: Distribuição dos indicadores chaves em {date_update}":
         gen_distribution_details()
+        
+    if (
+        indicador
+        == "VACINAÇÃO: Porcentagem da população vacinada"
+    ):
+        # Ver metodologia do SimulaCovid: a capacidade hospitalar é projetada com os dados mais recentes da doença no município, regional ou estado.
+        st.write(
+            """<div class="base-wrapper">Com o intuito de auxiliar cada vez mais o gestor público e informar a população sobre a situação da pandemia da COVID-19 em nosso país, adicionamos aos indicadores do FarolCovid três novos números. Eles são referentes ao contingente populacional que ainda não completou o esquema vacinal recomendado pelo fabricante do imunizante (vacina) utilizado; ao que já está imunizado, ou seja, já recebeu o esquema vacinal completo recomendado pelo fabricante do imunizante utilizado; e ao que ainda precisará dar início a esquema vacinal. É importante notar que os indicadores sobre a vacinação nos territórios não afetam a classificação de risco mostrada pelo FarolCovid, que continua seguindo a metodologia dos Níveis de Alerta.
+            <br><br>
+            “A porcentagem da população vacinada em seu local” selecionado é calculada dividindo o total de pessoas que já iniciaram o esquema vacinal recomendado para o imunizante recebido, mas que ainda não o concluíram, ou seja, ainda não receberam todas as doses recomendadas, pelo total da população do Estado. Essa divisão é realizada para poder informar de forma a ser possível comparar a situação de um local independente do número absoluto de população.
+            <br><br>
+            Outro indicador apresentado é a “porcentagem da população imunizada” é calculado dividindo o total de pessoas que completaram o esquema vacinal recomendado, ou seja, receberam todas as doses recomendadas do imunizante, pelo total da população do Estado.
+            <br><br>
+            O painel traz também o “total da população sem vacinar”, essa população é referente ao número absoluto de habitantes do Estado em questão que ainda não iniciou o esquema vacinal, ou seja, que ainda não recebeu nenhuma dose do imunizante. Esse dado é calculado através da diferença entre o número absoluto de população daquele Estado e o número absoluto de pessoas que já iniciaram o esquema vacinal - tendo ou não completando-o.
+            <br><br>
+            Para os dados sobre doses aplicadas, consultamos o Open DataSUS e o portal BrasilIO e as séries de dados históricos que utilizamos estão disponíveis em nossa API: http://datasource.coronacidades.org/help.
+            </div>""",
+            unsafe_allow_html=True,
+        )
 
     if (
         indicador
