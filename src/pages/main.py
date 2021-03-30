@@ -80,10 +80,10 @@ def update_indicators(indicators, data, config, user_input, session_state):
                 dado = pd.read_csv('http://datasource.coronacidades.org/br/health_region/vacina')
                 dado = dado[dado['health_region_id'] == user_input["health_region_id"]]
             indicators[group].last_updated = dado.last_updated.fillna("-").values[0]
-            indicators[group].imunizados = dado.imunizados.fillna("-").values[0]
-            indicators[group].nao_vacinados = dado.nao_vacinados.fillna("-").values[0]
-            indicators[group].perc_imunizados = dado.perc_imunizados.fillna("-").values[0]
-            indicators[group].perc_vacinados = dado.perc_vacinados.fillna("-").values[0]
+            indicators[group].imunizados = (dado.imunizados.fillna("-").values[0])*2
+            indicators[group].nao_vacinados = int((dado.nao_vacinados.fillna("-").values[0])/2)
+            indicators[group].perc_imunizados = (dado.perc_imunizados.fillna("-").values[0])*2
+            indicators[group].perc_vacinados = (dado.perc_vacinados.fillna("-").values[0])*2
         else:
             for position in config["br"]["indicators"][group].keys():
                 # Indicadores de Filtros
