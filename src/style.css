@@ -2529,6 +2529,15 @@ header>.toolbar { /* Hide toolbar menu */
     max-width: 650px;
 }
 
+.distancing-alert {
+    display: flex;
+    flex-direction: row;
+    padding: var(--main-padding);
+    border-radius: var(--main-border-radius);
+    box-shadow: 0px 5px 5px var(--main-grey);
+    align-items: center;
+}
+
 .distancing-output-wrapper {
     display: flex;
     flex-direction: column;
@@ -2569,7 +2578,7 @@ header>.toolbar { /* Hide toolbar menu */
 
 .distancing-output-row-prediction-label {
     font-weight: lighter;
-    font-size: 24px;
+    font-size: 18px;
 }
 .distancing-card-bg {
     background-color: var(--main-simulator-beds-card-bg);

@@ -6,14 +6,14 @@ def gen_alert():
         st.write(
                 f"""
                 <div class="distancing-cards">
-                        <div class="distancing-container distancing-card-bg">
+                        <div class="distancing-alert distancing-card-bg">
                                 <div class="distancing-output-wrapper">
                                         <div class="distancing-output-row">
-                                                <span class="distancing-output-row-prediction-value">
+                                                <span style="font-weight: bold; word-wrap: no-wrap; font-size: 36px;">
                                                         Atenção: Dados descontinuados
                                                 </span>  
                                         </div> 
-                                        <span class="distancing-output-row-prediction-label">
+                                        <span style="font-weight: lighter; font-size: 24px;">
                                                 A fonte de dados da taxa de isolamento social foi descontinuada em 31/03/201. 
                                                 <br>Estamos trabalhando em novas fontes de dados para continuar levando informações úteis até você!
                                         </span>
