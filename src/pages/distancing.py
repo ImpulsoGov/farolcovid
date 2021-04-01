@@ -18,7 +18,7 @@ def gen_alert():
                                                 <br>Estamos trabalhando em novas fontes de dados para continuar levando informações úteis até você!
                                         </span>
                                 </div>
-                                <img src="https://i.imgur.com/z5e70pg.png" class="distancing-alert-image">
+                                <img src="https://i.imgur.com/z5e70pg.png" class="distancing-output-image">
                         </div>
                 </div>""",
                 unsafe_allow_html=True,
