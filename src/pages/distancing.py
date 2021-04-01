@@ -2,6 +2,27 @@ import streamlit as st
 import plots
 import utils
 
+def gen_alert():
+        st.write(
+                f"""
+                <div class="distancing-cards">
+                        <div class="distancing-alert distancing-card-bg">
+                                <div class="distancing-output-wrapper">
+                                        <div class="distancing-output-row">
+                                                <span style="font-weight: bold; word-wrap: no-wrap; font-size: 28px;">
+                                                        Atenção: Dados descontinuados
+                                                </span>  
+                                        </div> 
+                                        <span style="font-weight: lighter; font-size: 20px;">
+                                                A fonte de dados da taxa de isolamento social foi descontinuada em 31/03/201. 
+                                                <br>Estamos trabalhando em novas fontes de dados para continuar levando informações úteis até você!
+                                        </span>
+                                </div>
+                                <img src="https://i.imgur.com/z5e70pg.png" class="distancing-output-image">
+                        </div>
+                </div>""",
+                unsafe_allow_html=True,
+        )
 
 def gen_cards(distancing_data):
 
@@ -65,7 +86,8 @@ def main(user_input, indicators, data, config, session_state):
 
     try:
         fig, final_y = plots.gen_social_dist_plots_state_session_wrapper(session_state)
-        gen_cards(final_y)
+        # gen_cards(final_y)
+        gen_alert()
         st.plotly_chart(fig, use_container_width=True)
     except Exception as e:
         st.write(
