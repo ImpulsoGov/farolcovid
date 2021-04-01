@@ -9,11 +9,11 @@ def gen_alert():
                         <div class="distancing-alert distancing-card-bg">
                                 <div class="distancing-output-wrapper">
                                         <div class="distancing-output-row">
-                                                <span style="font-weight: bold; word-wrap: no-wrap; font-size: 36px;">
+                                                <span style="font-weight: bold; word-wrap: no-wrap; font-size: 28px;">
                                                         Atenção: Dados descontinuados
                                                 </span>  
                                         </div> 
-                                        <span style="font-weight: lighter; font-size: 24px;">
+                                        <span style="font-weight: lighter; font-size: 20px;">
                                                 A fonte de dados da taxa de isolamento social foi descontinuada em 31/03/201. 
                                                 <br>Estamos trabalhando em novas fontes de dados para continuar levando informações úteis até você!
                                         </span>
