@@ -19,7 +19,7 @@ import pages.estudo as estudo
 import pages.main as fc
 import pages.methodology as method
 import urllib.parse as _parse
-from streamlit.ReportThread import get_report_ctx as _get_report_ctx
+from streamlit.report_thread import get_report_ctx as _get_report_ctx
 import utils
 
 # Packages
@@ -75,22 +75,39 @@ def main():
     # st.write(utils.parse_headers(utils.get_server_session().ws.request))
 
     # MENU
-    page = st.sidebar.radio(
-        "Menu", ["FarolCovid", "Modelos, limitações e fontes", "Quem somos?", "Estudo Vacinação"],
-    )
-
+    # page = st.sidebar.radio(
+    #     "Menu", ["FarolCovid", "Modelos, limitações e fontes", "Quem somos?", "Estudo Vacinação"],
+    # )
     PAGES = {   
         "FarolCovid" : fc,
         "Modelos, limitações e fontes" : method,
         "Quem somos?" : tm,
         "Estudo Vacinação" : estudo
     }
+    page_list = ["FarolCovid", "Modelos, limitações e fontes", "Quem somos?", "Estudo Vacinação"]
+    query_params = st.experimental_get_query_params()
+    default = int(query_params["page"][0]) if "page" in query_params else 0
+    page = st.sidebar.radio(
+        "Menu",
+        page_list,
+        index = default
+    )
+    st.experimental_set_query_params(page=page_list.index(page))
+    PAGES[page].main(session_state)
+    
+    
+    # if page:
+    #     PAGES[str(default)].main(session_state)
+    #     st.experimental_set_query_params(page=page_list.index(page))
+
+    
 
     # query_params = st.experimental_get_query_params()
     # page_param = query_params.get("page", [0])
     # if query_params:
     #     PAGES[page_param[0]].main(session_state)
-    PAGES[page].main(session_state)
+    # else:
+    #     PAGES[page].main(session_state)
     # utils.applyButtonStyles(session_state)
 
     # if page == "FarolCovid":
