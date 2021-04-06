@@ -2271,7 +2271,7 @@ header>.toolbar { /* Hide toolbar menu */
 .big-table-head-box{
     position: relative;
     width:100%;
-    height: 5vw;
+    height: 7vw;
     left:0%;
     top:0%;
     background: #FFFFFF;
@@ -2288,7 +2288,7 @@ header>.toolbar { /* Hide toolbar menu */
     border-right: 2px solid #000000;
 }
 .btl0{
-    left: 15%;
+    left: 20%;
 }
 .btl1{
     left: 32%;
@@ -2319,7 +2319,7 @@ header>.toolbar { /* Hide toolbar menu */
 }
 .big-table-index-background{
     left:0%;
-    width:15%;
+    width:20%;
     height: 5vw;
     position:absolute;
     top:0px;
@@ -2330,14 +2330,14 @@ header>.toolbar { /* Hide toolbar menu */
 /* btt is for title and btf is for field and bte for the end(total) row */
 .btt0 {
     left:0%;
-    width:15%;
+    width:20%;
     font-size:1.3vw;
     line-height: 3.2;
 }
 
 .btt1 {
-    left:15%;
-    width:16%;
+    left:20%;
+    width:12%;
     font-size:1.1vw;
     line-height: 2.1;
 }
@@ -2373,14 +2373,14 @@ header>.toolbar { /* Hide toolbar menu */
 }
 .btf0 {
     left:0%;
-    width:15%;
+    width:20%;
     height:90%;
     font-size:1.7vw;
     line-height: 3.2;
     z-index:2;
 }
 .btf1 {
-    left:15%;
+    left:18%;
     width:16%;
     height:90%;
     font-size:1.7vw;
@@ -2400,7 +2400,7 @@ header>.toolbar { /* Hide toolbar menu */
     line-height: 1.2;
 }
 .btf4{
-    left:60%;
+    left:58%;
     top:1.2vw;
     width:16%;
     font-size:1.7vw;
