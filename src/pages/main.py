@@ -12,6 +12,7 @@ import pages.simulacovid as sm
 import pages.saude_em_ordem as so
 import pages.distancing as ds
 import pages.onda_covid as oc
+import pages.estudo as estudo
 import plots
 import utils
 import amplitude
@@ -343,6 +344,8 @@ def main(session_state):
                 <div class="white-span header p1" style="font-size:30px;"><img class="icon-cards" src="data:image/png;base64,{vaccine_logo}" alt="Fonte: Impulso">QUER SABER MAIS SOBRE A VACINAÇÃO?</div>
                 <span class="white-span">Acompanhe nossos novos dados e descobra como avança a vacinação no seu município ou estado!<br><br>
                 <a class="btn-ambassador" href="#vacina" target="_self">Veja aqui!</a>
+                <br><br><span class="white-span">Leia também nosso estudo sobre vacinação contra Covid-19 e redução de óbitos no Brasil.<br><br>
+                <a class="btn-ambassador" href="#estudo-vacina" target="_self">Ler aqui!</a>
         </div>""",
         unsafe_allow_html=True,
     )
@@ -578,13 +581,22 @@ def main(session_state):
 
     st.write(
         """
-        <div class='base-wrapper'>
+        <div class='base-wrapper' id="estudo-vacina">
             <i>* <b>Vacinação</b> </i>
             <li>“A porcentagem da população vacinada em seu local” - Total de pessoas que tomaram ao menos uma dose, dividido pelo total da população do local.<br>
             <li>“Porcentagem da população imunizada” - Total de pessoas que receberam todas as doses recomendadas do imunizante, dividido pelo total da população do local.<br>
             <li>“Total da população sem vacinar” - Número absoluto de habitantes do local que ainda não recebeu nenhuma dose do imunizante.<br>
             <i>Para mais detalhes e explicação completa confira nossa página de Metodologia no menu lateral.</i>
+            <br><br>Para além dos dados de população vacinada, utilizando dados inéditos <b>realizamos um estudo projetando quando podemos controlar a pandemia no Brasil e quantas mortes serão evitadas</b> com a vacinação, leia abaixo.
         </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    if st.button("Ler agora"):
+        estudo.main(session_state)
+
+    st.write(
+        """
         <div class='base-wrapper'>
             <i>* <b>Mudamos o indicador afim de refinarmos ajustes no cálculo de projeção de leitos.</b> Entendemos que a projeção apresentada não capturava a situação da 2ª onda observada nos municípios, regionais e estados, logo substituímos este indicador por ora para revisão dos cálculos. 
             Os valores de referência se baseiam nas estatísticas de países da OCDE, <a target="_blank" style="color:#0068c9;" href="https://docs.google.com/spreadsheets/d/1MKFOHRCSg4KMx5Newi7TYCrjtNyPwMQ38GE1wQ6as70/edit?usp=sharing">veja mais aqui</a></b>.
