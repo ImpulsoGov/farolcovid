@@ -2288,19 +2288,22 @@ header>.toolbar { /* Hide toolbar menu */
     border-right: 2px solid #000000;
 }
 .btl0{
-    left: 20%;
+    left: 15%;
 }
 .btl1{
-    left: 36%;
+    left: 32%;
 }
 .btl2{
-    left: 52%;
+    left: 44%;
 }
 .btl3{
-    left: 68%;
+    left: 60%;
 }
 .btl4{
-    left: 84%;
+    left: 72%;
+}
+.btl5{
+    left: 86%;
 }
 .big-table-field {
     position: absolute;
@@ -2316,7 +2319,7 @@ header>.toolbar { /* Hide toolbar menu */
 }
 .big-table-index-background{
     left:0%;
-    width:20%;
+    width:15%;
     height: 5vw;
     position:absolute;
     top:0px;
@@ -2327,76 +2330,87 @@ header>.toolbar { /* Hide toolbar menu */
 /* btt is for title and btf is for field and bte for the end(total) row */
 .btt0 {
     left:0%;
-    width:20%;
+    width:15%;
     font-size:1.3vw;
     line-height: 3.2;
 }
 
 .btt1 {
-    left:20%;
+    left:15%;
     width:16%;
     font-size:1.1vw;
     line-height: 2.1;
 }
 .btt2{
-    left:36%;
+    left:30%;
     width:16%;
     font-size:1.1vw;
     line-height: 2.1;
 }
 .btt3{
-    left:52%;
+    left:44%;
     width:16%;
     font-size:1.1vw;
     line-height: 2.1;
 }
 .btt4{
-    left:68%;
+    left:58%;
     width:16%;
     font-size:1.1vw;
     line-height: 2.1;
 }
 .btt5{
-    left:84%;
+    left:72%;
+    width:14%;
+    font-size:1.1vw;
+    line-height: 2.1;
+}
+.btt6{
+    left:85%;
     width:16%;
     font-size:1.1vw;
     line-height: 2.1;
 }
 .btf0 {
     left:0%;
-    width:20%;
+    width:15%;
     height:90%;
     font-size:1.7vw;
     line-height: 3.2;
     z-index:2;
 }
 .btf1 {
-    left:20%;
+    left:15%;
     width:16%;
     height:90%;
     font-size:1.7vw;
 }
 .btf2{
-    left:36%;
+    left:30%;
     top:0.9vw;
     width:16%;
     font-size:2.3vw;
     line-height: 1.3;
 }
 .btf3{
-    left:52%;
+    left:44%;
     top:1.2vw;
     width:16%;
     font-size:2vw;
     line-height: 1.2;
 }
 .btf4{
-    left:68%;
+    left:60%;
     top:1.2vw;
     width:16%;
     font-size:1.7vw;
 }
 .btf5{
+    left:72%;
+    width:16%;
+    font-size:2vw;
+}
+.btf6{
     left:84%;
     width:16%;
     font-size:2vw;

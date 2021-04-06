@@ -81,10 +81,10 @@ def update_indicators(indicators, data, config, user_input, session_state):
                 dado = pd.read_csv('http://datasource.coronacidades.org/br/health_region/vacina')
                 dado = dado[dado['health_region_id'] == user_input["health_region_id"]]
             indicators[group].last_updated = dado.last_updated.fillna("-").values[0]
-            indicators[group].imunizados = (dado.imunizados.fillna("-").values[0])*2
-            indicators[group].nao_vacinados = int((dado.nao_vacinados.fillna("-").values[0])/2)
-            indicators[group].perc_imunizados = (dado.perc_imunizados.fillna("-").values[0])*2
-            indicators[group].perc_vacinados = (dado.perc_vacinados.fillna("-").values[0])*2
+            indicators[group].imunizados = dado.imunizados.fillna("-").values[0]
+            indicators[group].nao_vacinados = dado.nao_vacinados.fillna("-").values[0]
+            indicators[group].perc_imunizados = dado.perc_imunizados.fillna("-").values[0]
+            indicators[group].perc_vacinados = dado.perc_vacinados.fillna("-").values[0]
         else:
             for position in config["br"]["indicators"][group].keys():
                 # Indicadores de Filtros
@@ -238,12 +238,14 @@ def gen_big_table(config, dfs, currentstate):
             <div class="big-table-line btl2" style="height: {proportion};"></div>
             <div class="big-table-line btl3" style="height: {proportion};"></div>
             <div class="big-table-line btl4" style="height: {proportion};"></div>
+            <div class="big-table-line btl5" style="height: {proportion};"></div>
             <div class="big-table-field btt0">Estado e nível de alerta </div>
             <div class="big-table-field btt1">Média móvel (últimos 7 dias) de novos casos por 100mil hab.</div>
             <div class="big-table-field btt2">Taxa de contágio</div>
             <div class="big-table-field btt3">Total de leitos por 100mil hab.</div>
             <div class="big-table-field btt4">Taxa de subnotificação</div>
             <div class="big-table-field btt5">Média móvel (últimos 7 dias) de novas mortes por 100mil hab.</div>
+            <div class="big-table-field btt6">Porcentagem da população vacinada</div>
         </div>
     """
     state_data = state_data[state_data["state_name"] != currentstate]
@@ -270,7 +272,10 @@ def gen_sector_big_row(my_state, index, config):
         3: ["#F02C2E", "🛑"],
     }
     level_data = config["br"]["farolcovid"]["rules"]
-    
+
+    dado = pd.read_csv('http://datasource.coronacidades.org/br/states/vacina')
+    dado = dado[dado["state_name"] == my_state["state_name"]]
+    perc_vacinados = dado.perc_vacinados.fillna("-").values[0]
     # TODO -> VOLTAR PROJECAO DE LEITOS
     # <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["dday_icu_beds"])][0]};">{utils.dday_preffix(my_state["dday_icu_beds"])} dias</div>
     return f"""<div class="big-table-row {["btlgrey","btlwhite"][index % 2]}">
@@ -281,6 +286,7 @@ def gen_sector_big_row(my_state, index, config):
             <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["number_icu_beds_100k"])][0]};">{int(my_state["number_icu_beds_100k"])}</div>
             <div class="big-table-field btf4" style="color:{alert_info[find_level(level_data["trust_classification"]["cuts"],level_data["trust_classification"]["categories"],my_state["notification_rate"])][0]};">{int(my_state["subnotification_rate"]*100)}%</div>
             <div class="big-table-field btf5">{"%0.2f"%my_state["new_deaths_mavg_100k"]}</div>
+            <div class="big-table-field btf6">{"%0.2f"%perc_vacinados}</div>
         </div>"""
 
 
@@ -581,12 +587,15 @@ def main(session_state):
 
     st.write(
         """
-        <div class='base-wrapper' id="estudo-vacina">
+        <div class='base-wrapper' 
             <i>* <b>Vacinação</b> </i>
             <li>“A porcentagem da população vacinada em seu local” - Total de pessoas que tomaram ao menos uma dose, dividido pelo total da população do local.<br>
             <li>“Porcentagem da população imunizada” - Total de pessoas que receberam todas as doses recomendadas do imunizante, dividido pelo total da população do local.<br>
             <li>“Total da população sem vacinar” - Número absoluto de habitantes do local que ainda não recebeu nenhuma dose do imunizante.<br>
             <i>Para mais detalhes e explicação completa confira nossa página de Metodologia no menu lateral.</i>
+        </div>
+        <div class='base-wrapper' id="estudo-vacina">
+            <i>* <b>Estudo Vacinação</b> </i>
             <br><br>Para além dos dados de população vacinada, utilizando dados inéditos <b>realizamos um estudo projetando quando podemos controlar a pandemia no Brasil e quantas mortes serão evitadas</b> com a vacinação, leia abaixo.
         </div>
         """,
