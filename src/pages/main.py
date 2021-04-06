@@ -250,10 +250,11 @@ def gen_big_table(config, dfs, currentstate):
     """
     state_data = state_data[state_data["state_name"] != currentstate]
     row_order = 0
-    text += gen_sector_big_row(sector_row, row_order, config)
+    dadosvacina = pd.read_csv('http://datasource.coronacidades.org/br/states/vacina')
+    text += gen_sector_big_row(sector_row, row_order, config, dadosvacina)
     for index, sector_data in state_data.iterrows():
         row_order += 1
-        text += gen_sector_big_row(sector_data, row_order, config)
+        text += gen_sector_big_row(sector_data, row_order, config, dadosvacina)
         
     text += f"""<div class="big-table-endspacer">
         </div>
@@ -262,7 +263,7 @@ def gen_big_table(config, dfs, currentstate):
 
 # Gera uma linha para a tabela de id "big-table" com as informacoes provenientes de uma linha de dados
 # Generates a row for the table with id "big-table" with information coming from a sector data row
-def gen_sector_big_row(my_state, index, config):
+def gen_sector_big_row(my_state, index, config, dado):
     """ Generates a row of a table given the necessary information coming from a sector data row """
     alert_info = {
         "nan": ["grey", "❓"],
@@ -272,8 +273,7 @@ def gen_sector_big_row(my_state, index, config):
         3: ["#F02C2E", "🛑"],
     }
     level_data = config["br"]["farolcovid"]["rules"]
-
-    dado = pd.read_csv('http://datasource.coronacidades.org/br/states/vacina')
+    
     dado = dado[dado["state_name"] == my_state["state_name"]]
     perc_vacinados = dado.perc_vacinados.fillna("-").values[0]
     # TODO -> VOLTAR PROJECAO DE LEITOS
