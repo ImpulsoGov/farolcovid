@@ -7,11 +7,11 @@ def genHeader(active):
     This is a function that returns the "Footer" session 
     
     """
-    if os.getenv("IS_HEROKU") == "TRUE":
-	urlpath = os.getenv("urlpath")
-    else:
+#     if os.getenv("IS_HEROKU") == "TRUE":
+# 	urlpath = os.getenv("urlpath")
+#     else:
         # urlpath = 'https://farolcovid.coronacidades.org/'
-    	urlpath = 'http://localhost:8501/'
+    	urlpath = 'https://farolcovid-staging.herokuapp.com/'
 
     if active=="1":
         st.write(
