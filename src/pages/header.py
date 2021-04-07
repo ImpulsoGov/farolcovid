@@ -11,7 +11,7 @@ def genHeader(active):
 # 	urlpath = os.getenv("urlpath")
 #     else:
         # urlpath = 'https://farolcovid.coronacidades.org/'
-    	urlpath = 'https://farolcovid-staging.herokuapp.com/'
+    urlpath = 'https://farolcovid-staging.herokuapp.com/'
 
     if active=="1":
         st.write(
