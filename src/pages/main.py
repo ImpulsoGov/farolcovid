@@ -286,7 +286,7 @@ def gen_sector_big_row(my_state, index, config, dado):
             <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["number_icu_beds_100k"])][0]};">{int(my_state["number_icu_beds_100k"])}</div>
             <div class="big-table-field btf4" style="color:{alert_info[find_level(level_data["trust_classification"]["cuts"],level_data["trust_classification"]["categories"],my_state["notification_rate"])][0]};">{int(my_state["subnotification_rate"]*100)}%</div>
             <div class="big-table-field btf5">{"%0.2f"%my_state["new_deaths_mavg_100k"]}</div>
-            <div class="big-table-field btf6">{"%0.2f"%perc_vacinados}</div>
+            <div class="big-table-field btf6">{"%0.2f"%perc_vacinados} %</div>
         </div>"""
 
 
