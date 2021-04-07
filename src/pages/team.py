@@ -2,6 +2,7 @@ import streamlit as st
 import utils
 import amplitude
 from models import Logo
+import pages.header as he
 
 
 def main(session_state):
@@ -10,6 +11,14 @@ def main(session_state):
         "opened who_is", session_state, is_new_page=True
     )
     utils.localCSS("style.css")
+    utils.genHeroSection(
+        title1="Farol",
+        title2="Covid",
+        subtitle="Conheça quem está por trás da plataforma.",
+        logo="https://i.imgur.com/w5yVANW.png",
+        header=False,
+    )
+    he.genHeader("2")
 
     st.write(
         """

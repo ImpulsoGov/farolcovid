@@ -4,6 +4,7 @@ import utils
 import yaml
 from PIL import Image
 from pages import model_description, saude_em_ordem_description, risk_description
+import pages.header as he
 
 
 def main(session_state):
@@ -21,9 +22,9 @@ def main(session_state):
         title2="Covid",
         subtitle="Entenda a metodologia da ferramenta.",
         logo="https://i.imgur.com/CkYDPR7.png",
-        header=True,
+        header=False,
     )
-
+    he.genHeader("1")
     st.write(
         """
         <div class="base-wrapper flex flex-column" style="background-color: rgb(0, 144, 167);">
