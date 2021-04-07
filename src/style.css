@@ -2718,3 +2718,28 @@ header>.toolbar { /* Hide toolbar menu */
     box-shadow: 10 10 60px 10px rgba(0, 0, 0, 0.9);
 
 }
+
+#navbar {
+    overflow: hidden;
+    background-color: #EEEEEE;
+  }
+  
+  #navbar a {
+    float: left;
+    display: block;
+    color: #f2f2f2;
+    color: black;
+    text-align: center;
+    padding: 24px 16px;
+    text-decoration: none;
+  }
+  
+  #navbar a:hover {
+    background-color: #ddd;
+    color: black;
+  }
+  
+  #navbar a.active {
+    background-color: #0090A7;
+    color: white;
+  }

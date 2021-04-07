@@ -14,6 +14,7 @@ load_dotenv(dotenv_path=env_path, override=True)
 # Pages
 import pages.team as tm
 import pages.estudo as estudo
+import pages.vacina as vacina
 # import pages.model_description as md
 # import pages.saude_em_ordem_description as sod
 import pages.main as fc
@@ -78,13 +79,15 @@ def main():
     # page = st.sidebar.radio(
     #     "Menu", ["FarolCovid", "Modelos, limitações e fontes", "Quem somos?", "Estudo Vacinação"],
     # )
+    
+    page_list = ["FarolCovid", "Modelos, limitações e fontes", "Quem somos?", "Estudo Vacinação", "Vacinômetro"]
     PAGES = {   
         "FarolCovid" : fc,
         "Modelos, limitações e fontes" : method,
         "Quem somos?" : tm,
-        "Estudo Vacinação" : estudo
+        "Estudo Vacinação" : estudo,
+        "Vacinômetro": vacina
     }
-    page_list = ["FarolCovid", "Modelos, limitações e fontes", "Quem somos?", "Estudo Vacinação"]
     query_params = st.experimental_get_query_params()
     default = int(query_params["page"][0]) if "page" in query_params else 0
     page = st.sidebar.radio(

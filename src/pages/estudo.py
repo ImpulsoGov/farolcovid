@@ -3,10 +3,18 @@ import utils
 import base64
 from pathlib import Path
 import os
+import pages.header as he
 
 def main(session_state):
     utils.localCSS("style.css")
-    
+    utils.genHeroSection(
+        title1="Farol",
+        title2="Covid",
+        subtitle="Estudo sobre vacinação contra Covid-19.",
+        logo="https://i.imgur.com/CkYDPR7.png",
+        header=False,
+    )
+    he.genHeader("3")
     st.write(
         """
         <div class="base-wrapper flex flex-column" style="background-color: rgb(0, 144, 167);">
