@@ -9,7 +9,7 @@ def main(session_state):
     utils.genHeroSection(
         title1="Vacinômetro",
         title2="",
-        subtitle="Ferramenta digital para acompanhar e comparar o número de pessoas que foram vacinadas contra a Covid-19.",
+        subtitle="Veja a evolução da vacinação em sua cidade ou estado!",
         logo="https://i.imgur.com/w5yVANW.png",
         header=False,
     )
@@ -17,14 +17,7 @@ def main(session_state):
     st.write(
         """
         <div class="base-wrapper flex flex-column" style="background-color: rgb(0, 144, 167);">
-            <div class="white-span header p1" style="font-size:30px;">Dados sobre vacinação contra Covid-19 em município</div>
-        </div>
-        <div class="magenta-bg">
-                <div class="base-wrapper">
-                        <div>
-                            <span>Acompanhe e compare como diferentes municípios estão se saindo na vacinação, com dados de quantidades de doses aplicadas, porcentagem da população vacinada e imunizada.</span>
-                        </div>
-                </div>
+            <div class="white-span header p1" style="font-size:30px;">Acompanhe e compare as informações mais atualizadas sobre a vacinação nos municípios do Brasil.</div>
         </div>
         """,
         unsafe_allow_html=True,

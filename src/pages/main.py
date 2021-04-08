@@ -348,24 +348,13 @@ def main(session_state):
     else:
         # urlpath = 'https://farolcovid.coronacidades.org/'
         urlpath = 'http://localhost:8501/'
-    # TEMPORARY BANNER FC
     vaccine_logo = utils.load_image("imgs/vaccine.png")
-    # st.write(f"""<div>
-    #         <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
-    #             <div class="white-span header p1" style="font-size:30px;"><img class="icon-cards" src="data:image/png;base64,{vaccine_logo}" alt="Fonte: Impulso">QUER SABER MAIS SOBRE A VACINAÇÃO?</div>
-    #             <span class="white-span">Acompanhe nossos novos dados e descobra como avança a vacinação no seu município ou estado!<br><br>
-    #             <a class="btn-ambassador" href="#vacina" target="_self">Veja aqui!</a>
-    #             <br><br><span class="white-span">Leia também nosso estudo sobre vacinação contra Covid-19 e redução de óbitos no Brasil.<br><br>
-    #             <a class="btn-ambassador" href="#estudo-vacina" target="_self">Ler aqui!</a>
-    #     </div>""",
-    #     unsafe_allow_html=True,
-    # )
     st.write(f"""<div>
             <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
                 <div class="white-span header p1" style="font-size:30px;"><img class="icon-cards" src="data:image/png;base64,{vaccine_logo}" alt="Fonte: Impulso">QUER SABER MAIS SOBRE A VACINAÇÃO?</div>
                 <span class="white-span">Acompanhe nossos novos dados e descobra como avança a vacinação no seu município ou estado!<br><br>
                 <a class="btn-ambassador" href="#vacina" target="_self">Veja aqui!</a>
-                <br><br><span class="white-span">Leia também nosso estudo sobre vacinação contra Covid-19 e redução de óbitos no Brasil.<br><br>
+                <br><br><span class="white-span">Saiba quando podemos controlar a pandemia no Brasil no nosso estudo realizado com dados inéditos obtidos pela Lei de Acesso à Informação.<br><br>
                 <a class="btn-ambassador" href="{urlpath}?page=3" target="_self">Ler aqui!</a>
         </div>""",
         unsafe_allow_html=True,

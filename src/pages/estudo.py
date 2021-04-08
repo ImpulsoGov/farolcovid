@@ -10,7 +10,7 @@ def main(session_state):
     utils.genHeroSection(
         title1="Farol",
         title2="Covid",
-        subtitle="Estudo sobre vacinação contra Covid-19.",
+        subtitle="Estudo sobre vacinação contra covid-19 e redução de óbitos no Brasil.",
         logo="https://i.imgur.com/CkYDPR7.png",
         header=False,
     )
@@ -18,7 +18,7 @@ def main(session_state):
     st.write(
         """
         <div class="base-wrapper flex flex-column" style="background-color: rgb(0, 144, 167);">
-            <div class="white-span header p1" style="font-size:30px;">Dados sobre vacinação contra Covid-19 e redução de óbitos no Brasil</div>
+            <div class="white-span header p1" style="font-size:30px;">Saiba quando podemos controlar a pandemia no Brasil no nosso estudo realizado com dados inéditos obtidos pela Lei de Acesso à Informação.</div>
         </div>
         <div class="magenta-bg">
                 <div class="base-wrapper">
