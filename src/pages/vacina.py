@@ -19,6 +19,11 @@ def main(session_state):
         <div class="base-wrapper flex flex-column" style="background-color: rgb(0, 144, 167);">
             <div class="white-span header p1" style="font-size:30px;">Acompanhe e compare as informações mais atualizadas sobre a vacinação nos municípios do Brasil.</div>
         </div>
+        <div class="magenta-bg">
+                <div class="base-wrapper">
+                        <br>
+                </div>
+        </div>
         """,
         unsafe_allow_html=True,
     )
