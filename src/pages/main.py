@@ -12,12 +12,13 @@ import pages.simulacovid as sm
 import pages.saude_em_ordem as so
 import pages.distancing as ds
 import pages.onda_covid as oc
+import pages.estudo as estudo
 import plots
 import utils
 import amplitude
 import session
 
-from streamlit.server.Server import Server
+from streamlit.server.server import Server
 import os
 
 import bisect
@@ -80,10 +81,10 @@ def update_indicators(indicators, data, config, user_input, session_state):
                 dado = pd.read_csv('http://datasource.coronacidades.org/br/health_region/vacina')
                 dado = dado[dado['health_region_id'] == user_input["health_region_id"]]
             indicators[group].last_updated = dado.last_updated.fillna("-").values[0]
-            indicators[group].imunizados = (dado.imunizados.fillna("-").values[0])*2
-            indicators[group].nao_vacinados = int((dado.nao_vacinados.fillna("-").values[0])/2)
-            indicators[group].perc_imunizados = (dado.perc_imunizados.fillna("-").values[0])*2
-            indicators[group].perc_vacinados = (dado.perc_vacinados.fillna("-").values[0])*2
+            indicators[group].imunizados = dado.imunizados.fillna("-").values[0]
+            indicators[group].nao_vacinados = dado.nao_vacinados.fillna("-").values[0]
+            indicators[group].perc_imunizados = dado.perc_imunizados.fillna("-").values[0]
+            indicators[group].perc_vacinados = dado.perc_vacinados.fillna("-").values[0]
         else:
             for position in config["br"]["indicators"][group].keys():
                 # Indicadores de Filtros
@@ -237,20 +238,23 @@ def gen_big_table(config, dfs, currentstate):
             <div class="big-table-line btl2" style="height: {proportion};"></div>
             <div class="big-table-line btl3" style="height: {proportion};"></div>
             <div class="big-table-line btl4" style="height: {proportion};"></div>
+            <div class="big-table-line btl5" style="height: {proportion};"></div>
             <div class="big-table-field btt0">Estado e nível de alerta </div>
             <div class="big-table-field btt1">Média móvel (últimos 7 dias) de novos casos por 100mil hab.</div>
             <div class="big-table-field btt2">Taxa de contágio</div>
             <div class="big-table-field btt3">Total de leitos por 100mil hab.</div>
             <div class="big-table-field btt4">Taxa de subnotificação</div>
             <div class="big-table-field btt5">Média móvel (últimos 7 dias) de novas mortes por 100mil hab.</div>
+            <div class="big-table-field btt6">Porcentagem da população vacinada</div>
         </div>
     """
     state_data = state_data[state_data["state_name"] != currentstate]
     row_order = 0
-    text += gen_sector_big_row(sector_row, row_order, config)
+    dadosvacina = pd.read_csv('http://datasource.coronacidades.org/br/states/vacina')
+    text += gen_sector_big_row(sector_row, row_order, config, dadosvacina)
     for index, sector_data in state_data.iterrows():
         row_order += 1
-        text += gen_sector_big_row(sector_data, row_order, config)
+        text += gen_sector_big_row(sector_data, row_order, config, dadosvacina)
         
     text += f"""<div class="big-table-endspacer">
         </div>
@@ -259,7 +263,7 @@ def gen_big_table(config, dfs, currentstate):
 
 # Gera uma linha para a tabela de id "big-table" com as informacoes provenientes de uma linha de dados
 # Generates a row for the table with id "big-table" with information coming from a sector data row
-def gen_sector_big_row(my_state, index, config):
+def gen_sector_big_row(my_state, index, config, dado):
     """ Generates a row of a table given the necessary information coming from a sector data row """
     alert_info = {
         "nan": ["grey", "❓"],
@@ -270,6 +274,8 @@ def gen_sector_big_row(my_state, index, config):
     }
     level_data = config["br"]["farolcovid"]["rules"]
     
+    dado = dado[dado["state_name"] == my_state["state_name"]]
+    perc_vacinados = dado.perc_vacinados.fillna("-").values[0]
     # TODO -> VOLTAR PROJECAO DE LEITOS
     # <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["dday_icu_beds"])][0]};">{utils.dday_preffix(my_state["dday_icu_beds"])} dias</div>
     return f"""<div class="big-table-row {["btlgrey","btlwhite"][index % 2]}">
@@ -280,6 +286,7 @@ def gen_sector_big_row(my_state, index, config):
             <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["number_icu_beds_100k"])][0]};">{int(my_state["number_icu_beds_100k"])}</div>
             <div class="big-table-field btf4" style="color:{alert_info[find_level(level_data["trust_classification"]["cuts"],level_data["trust_classification"]["categories"],my_state["notification_rate"])][0]};">{int(my_state["subnotification_rate"]*100)}%</div>
             <div class="big-table-field btf5">{"%0.2f"%my_state["new_deaths_mavg_100k"]}</div>
+            <div class="big-table-field btf6">{"%0.2f"%perc_vacinados} %</div>
         </div>"""
 
 
@@ -336,13 +343,19 @@ def main(session_state):
         explain=True
     )
 
-    # TEMPORARY BANNER FC
+    if os.getenv("IS_HEROKU") == "TRUE":
+        urlpath = os.getenv("urlpath")
+    else:
+        urlpath = 'https://farolcovid.coronacidades.org/'
+        # urlpath = 'http://localhost:8501/'
     vaccine_logo = utils.load_image("imgs/vaccine.png")
     st.write(f"""<div>
             <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
                 <div class="white-span header p1" style="font-size:30px;"><img class="icon-cards" src="data:image/png;base64,{vaccine_logo}" alt="Fonte: Impulso">QUER SABER MAIS SOBRE A VACINAÇÃO?</div>
                 <span class="white-span">Acompanhe nossos novos dados e descobra como avança a vacinação no seu município ou estado!<br><br>
-                <a class="btn-ambassador" href="#vacina" target="_self">Veja aqui!</a>
+                <a class="btn-ambassador" href="{urlpath}?page=4" target="_self">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Veja aqui!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                <br><br><span class="white-span">Saiba quando podemos controlar a pandemia no Brasil no nosso estudo realizado com dados inéditos obtidos pela Lei de Acesso à Informação.<br><br>
+                <a class="btn-ambassador" href="{urlpath}?page=3" target="_self">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ler aqui!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
         </div>""",
         unsafe_allow_html=True,
     )
@@ -358,73 +371,97 @@ def main(session_state):
     # PEGA BASE DA API
     # GET DATA
     dfs, cnes_sources = get_data(config)
+    map_url = "https://helper.coronacidades.org/"
+    col1, col2 = st.beta_columns([0.6, 0.35])
     
-    # REGIAO/CIDADE SELECAO USUARIO
-    # REGION/CITY USER INPUT
-    user_input = dict()
-    user_input["state_name"] = st.selectbox("Estado", utils.filter_place(dfs, "state"))
+    with col2:
+        # REGIAO/CIDADE SELECAO USUARIO
+        # REGION/CITY USER INPUT
+        user_input = dict()
+        user_input["state_name"] = st.selectbox("Estado", utils.filter_place(dfs, "state"))
 
-    user_input["health_region_name"] = st.selectbox(
-        "Região de Saúde",
-        utils.filter_place(dfs, "health_region", state_name=user_input["state_name"]),
-    )
+        user_input["health_region_name"] = st.selectbox(
+            "Região de Saúde",
+            utils.filter_place(dfs, "health_region", state_name=user_input["state_name"]),
+        )
 
-    user_input["city_name"] = st.selectbox(
-        "Município",
-        utils.filter_place(
-            dfs,
-            "city",
-            state_name=user_input["state_name"],
-            health_region_name=user_input["health_region_name"],
-        ),
-    )
+        user_input["city_name"] = st.selectbox(
+            "Município",
+            utils.filter_place(
+                dfs,
+                "city",
+                state_name=user_input["state_name"],
+                health_region_name=user_input["health_region_name"],
+            ),
+        )
 
-    changed_city = user_analytics.safe_log_event(
-        "picked farol place",
-        session_state,
-        event_args={"state": user_input["state_name"], "city": user_input["city_name"]},
-    )
+        changed_city = user_analytics.safe_log_event(
+            "picked farol place",
+            session_state,
+            event_args={"state": user_input["state_name"], "city": user_input["city_name"]},
+        )
+        
+        user_input, data = update_user_input_places(user_input, dfs, config)
+        map_place_id = utils.Dictionary().get_state_alphabetical_id_by_name(
+            user_input["state_name"]
+        )
+        st.write(
+            f"""
+        <div class="brazil-map-div">
+            <br><br>
+            <iframe id="map-state" src="{map_url}maps/map-iframe?place_id={map_place_id}" class="map-state" scrolling="no">
+            </iframe>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+    with col1:
+        # GENERATE MAPS
+        # st.write(
+        #     f"""
+        # <div class="brazil-map-div">
+        #     <div class="alert-levels-map-overlay">
+        #     </div>
+        #     <div>
+        #     <iframe id="map" src="resources/iframe-gen.html?url={map_url}maps/map-iframe?place_id=BR" class="map-br" scrolling="no">
+        #     </iframe>
+        #     </div>
+        # </div>
+        # """,
+        #     unsafe_allow_html=True,
+        # )
+
+        st.write(
+            f"""
+        <div class="brazil-map-div">
+            <iframe id="map" src="{map_url}maps/map-iframe?place_id=BR" class="map-br" scrolling="no">
+            </iframe>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+    # st.write(
+    #     f"""
     
-    user_input, data = update_user_input_places(user_input, dfs, config)
+    # """,
+    #     unsafe_allow_html=True,
+    # )
 
-    # GENERATE MAPS
-    map_place_id = utils.Dictionary().get_state_alphabetical_id_by_name(
-        user_input["state_name"]
-    )
-
-    if os.getenv("IS_LOCAL").upper() == "TRUE":
-        map_url = config["br"]["api"]["mapserver_local"]
-    else:
-        map_url = config["br"]["api"]["mapserver_external"]
-
-    st.write(
-        f"""
-    <div class="brazil-map-div">
-        <div class="alert-levels-map-overlay">
-        </div>
-        <div>
-        <iframe id="map" src="resources/iframe-gen.html?url={map_url}maps/map-iframe?place_id=BR" class="map-br" scrolling="no">
-        </iframe>
-        </div>
-    </div>
-    """,
-        unsafe_allow_html=True,
-    )
-    st.write(
-        f"""
-    <iframe id="map-state" src="resources/iframe-gen.html?url={map_url}maps/map-iframe?place_id={map_place_id}" class="map-state" scrolling="no">
-    </iframe>
-    """,
-        unsafe_allow_html=True,
-    )
-    st.write(
-        f"""
-        <div class="selectors-box" id="selectors-box">
-        </div>
-        <iframe src="resources/select-box-mover.html?place_id={user_input["state_name"]}{user_input["health_region_name"]}{user_input["city_name"]}" height="0px">
-        </iframe>""",
-        unsafe_allow_html=True,
-    )
+    # st.write(
+    #     f"""
+    # <iframe id="map-state" src="resources/iframe-gen.html?url={map_url}maps/map-iframe?place_id={map_place_id}" class="map-state" scrolling="no">
+    # </iframe>
+    # """,
+    #     unsafe_allow_html=True,
+    # )
+    # st.write(
+    #     f"""
+    #     <div class="selectors-box" id="selectors-box">
+    #     </div>
+    #     <iframe src="resources/select-box-mover.html?place_id={user_input["state_name"]}{user_input["health_region_name"]}{user_input["city_name"]}" height="0px">
+    #     </iframe>""",
+    #     unsafe_allow_html=True,
+    # )
 
     # SOURCES PARAMS
     user_input = utils.get_sources(user_input, data, cnes_sources, ["beds", "icu_beds"])
@@ -578,13 +615,19 @@ def main(session_state):
 
     st.write(
         """
-        <div class='base-wrapper'>
+        <div class='base-wrapper' 
             <i>* <b>Vacinação</b> </i>
             <li>“A porcentagem da população vacinada em seu local” - Total de pessoas que tomaram ao menos uma dose, dividido pelo total da população do local.<br>
             <li>“Porcentagem da população imunizada” - Total de pessoas que receberam todas as doses recomendadas do imunizante, dividido pelo total da população do local.<br>
             <li>“Total da população sem vacinar” - Número absoluto de habitantes do local que ainda não recebeu nenhuma dose do imunizante.<br>
             <i>Para mais detalhes e explicação completa confira nossa página de Metodologia no menu lateral.</i>
         </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.write(
+        """
         <div class='base-wrapper'>
             <i>* <b>Mudamos o indicador afim de refinarmos ajustes no cálculo de projeção de leitos.</b> Entendemos que a projeção apresentada não capturava a situação da 2ª onda observada nos municípios, regionais e estados, logo substituímos este indicador por ora para revisão dos cálculos. 
             Os valores de referência se baseiam nas estatísticas de países da OCDE, <a target="_blank" style="color:#0068c9;" href="https://docs.google.com/spreadsheets/d/1MKFOHRCSg4KMx5Newi7TYCrjtNyPwMQ38GE1wQ6as70/edit?usp=sharing">veja mais aqui</a></b>.

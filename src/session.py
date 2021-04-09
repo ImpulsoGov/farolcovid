@@ -4,10 +4,10 @@
 
 # NEW TRY: https://gist.github.com/tvst/0899a5cdc9f0467f7622750896e6bd7f
 
-import streamlit.ReportThread as ReportThread
-from streamlit.server.Server import Server
-from streamlit.ScriptRequestQueue import RerunData
-from streamlit.ScriptRunner import RerunException
+import streamlit.report_thread as ReportThread
+from streamlit.server.server import Server
+from streamlit.script_request_queue import RerunData
+from streamlit.script_runner import RerunException
 
 import inspect
 import os
@@ -28,7 +28,8 @@ def get_user_id():
     for session_info in session_infos:
         # print("Session info session dir:")
         # print(dir(session_info.session))
-        if session_info.session.enqueue == ctx.enqueue:
+
+        if session_info.session.id == ctx.session_id:
             user_id = session_info.session.id
             # print("Current: " + str(session_info.session.id))
         else:
@@ -130,6 +131,12 @@ class SessionState(object):
                 or
                 # Streamlit >= 0.54.0
                 (not hasattr(s, "_main_dg") and s.enqueue == ctx.enqueue)
+                or
+                # Streamlit >= 0.65.2
+                (
+                    not hasattr(s, "_main_dg")
+                    and s._uploaded_file_mgr == ctx.uploaded_file_mgr
+                )
             ):
                 this_session = s
 
@@ -185,6 +192,9 @@ def _get_session_raw():
             or
             # Streamlit >= 0.54.0
             (not hasattr(s, "_main_dg") and s.session.enqueue == ctx.enqueue)
+            or
+            # Streamlit >= 0.65.2
+            (not hasattr(s, "_main_dg") and s.session.id == ctx.session_id)
         ):
             this_session = s
 
