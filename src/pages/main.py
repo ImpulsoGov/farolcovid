@@ -353,9 +353,9 @@ def main(session_state):
             <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
                 <div class="white-span header p1" style="font-size:30px;"><img class="icon-cards" src="data:image/png;base64,{vaccine_logo}" alt="Fonte: Impulso">QUER SABER MAIS SOBRE A VACINAÇÃO?</div>
                 <span class="white-span">Acompanhe nossos novos dados e descobra como avança a vacinação no seu município ou estado!<br><br>
-                <a class="btn-ambassador" href="#vacina" target="_self">Veja aqui!</a>
+                <a class="btn-ambassador" href="{urlpath}?page=4" target="_self">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Veja aqui!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
                 <br><br><span class="white-span">Saiba quando podemos controlar a pandemia no Brasil no nosso estudo realizado com dados inéditos obtidos pela Lei de Acesso à Informação.<br><br>
-                <a class="btn-ambassador" href="{urlpath}?page=3" target="_self">Ler aqui!</a>
+                <a class="btn-ambassador" href="{urlpath}?page=3" target="_self">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ler aqui!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
         </div>""",
         unsafe_allow_html=True,
     )
@@ -371,73 +371,97 @@ def main(session_state):
     # PEGA BASE DA API
     # GET DATA
     dfs, cnes_sources = get_data(config)
+    map_url = "https://helper.coronacidades.org/"
+    col1, col2 = st.beta_columns([0.6, 0.35])
     
-    # REGIAO/CIDADE SELECAO USUARIO
-    # REGION/CITY USER INPUT
-    user_input = dict()
-    user_input["state_name"] = st.selectbox("Estado", utils.filter_place(dfs, "state"))
+    with col2:
+        # REGIAO/CIDADE SELECAO USUARIO
+        # REGION/CITY USER INPUT
+        user_input = dict()
+        user_input["state_name"] = st.selectbox("Estado", utils.filter_place(dfs, "state"))
 
-    user_input["health_region_name"] = st.selectbox(
-        "Região de Saúde",
-        utils.filter_place(dfs, "health_region", state_name=user_input["state_name"]),
-    )
+        user_input["health_region_name"] = st.selectbox(
+            "Região de Saúde",
+            utils.filter_place(dfs, "health_region", state_name=user_input["state_name"]),
+        )
 
-    user_input["city_name"] = st.selectbox(
-        "Município",
-        utils.filter_place(
-            dfs,
-            "city",
-            state_name=user_input["state_name"],
-            health_region_name=user_input["health_region_name"],
-        ),
-    )
+        user_input["city_name"] = st.selectbox(
+            "Município",
+            utils.filter_place(
+                dfs,
+                "city",
+                state_name=user_input["state_name"],
+                health_region_name=user_input["health_region_name"],
+            ),
+        )
 
-    changed_city = user_analytics.safe_log_event(
-        "picked farol place",
-        session_state,
-        event_args={"state": user_input["state_name"], "city": user_input["city_name"]},
-    )
+        changed_city = user_analytics.safe_log_event(
+            "picked farol place",
+            session_state,
+            event_args={"state": user_input["state_name"], "city": user_input["city_name"]},
+        )
+        
+        user_input, data = update_user_input_places(user_input, dfs, config)
+        map_place_id = utils.Dictionary().get_state_alphabetical_id_by_name(
+            user_input["state_name"]
+        )
+        st.write(
+            f"""
+        <div class="brazil-map-div">
+            <br><br>
+            <iframe id="map-state" src="{map_url}maps/map-iframe?place_id={map_place_id}" class="map-state" scrolling="no">
+            </iframe>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+    with col1:
+        # GENERATE MAPS
+        # st.write(
+        #     f"""
+        # <div class="brazil-map-div">
+        #     <div class="alert-levels-map-overlay">
+        #     </div>
+        #     <div>
+        #     <iframe id="map" src="resources/iframe-gen.html?url={map_url}maps/map-iframe?place_id=BR" class="map-br" scrolling="no">
+        #     </iframe>
+        #     </div>
+        # </div>
+        # """,
+        #     unsafe_allow_html=True,
+        # )
+
+        st.write(
+            f"""
+        <div class="brazil-map-div">
+            <iframe id="map" src="{map_url}maps/map-iframe?place_id=BR" class="map-br" scrolling="no">
+            </iframe>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+    # st.write(
+    #     f"""
     
-    user_input, data = update_user_input_places(user_input, dfs, config)
+    # """,
+    #     unsafe_allow_html=True,
+    # )
 
-    # GENERATE MAPS
-    map_place_id = utils.Dictionary().get_state_alphabetical_id_by_name(
-        user_input["state_name"]
-    )
-
-    if os.getenv("IS_LOCAL").upper() == "TRUE":
-        map_url = config["br"]["api"]["mapserver_local"]
-    else:
-        map_url = config["br"]["api"]["mapserver_external"]
-
-    st.write(
-        f"""
-    <div class="brazil-map-div">
-        <div class="alert-levels-map-overlay">
-        </div>
-        <div>
-        <iframe id="map" src="resources/iframe-gen.html?url={map_url}maps/map-iframe?place_id=BR" class="map-br" scrolling="no">
-        </iframe>
-        </div>
-    </div>
-    """,
-        unsafe_allow_html=True,
-    )
-    st.write(
-        f"""
-    <iframe id="map-state" src="resources/iframe-gen.html?url={map_url}maps/map-iframe?place_id={map_place_id}" class="map-state" scrolling="no">
-    </iframe>
-    """,
-        unsafe_allow_html=True,
-    )
-    st.write(
-        f"""
-        <div class="selectors-box" id="selectors-box">
-        </div>
-        <iframe src="resources/select-box-mover.html?place_id={user_input["state_name"]}{user_input["health_region_name"]}{user_input["city_name"]}" height="0px">
-        </iframe>""",
-        unsafe_allow_html=True,
-    )
+    # st.write(
+    #     f"""
+    # <iframe id="map-state" src="resources/iframe-gen.html?url={map_url}maps/map-iframe?place_id={map_place_id}" class="map-state" scrolling="no">
+    # </iframe>
+    # """,
+    #     unsafe_allow_html=True,
+    # )
+    # st.write(
+    #     f"""
+    #     <div class="selectors-box" id="selectors-box">
+    #     </div>
+    #     <iframe src="resources/select-box-mover.html?place_id={user_input["state_name"]}{user_input["health_region_name"]}{user_input["city_name"]}" height="0px">
+    #     </iframe>""",
+    #     unsafe_allow_html=True,
+    # )
 
     # SOURCES PARAMS
     user_input = utils.get_sources(user_input, data, cnes_sources, ["beds", "icu_beds"])

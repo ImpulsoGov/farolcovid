@@ -29,6 +29,11 @@ import session
 import time
 
 
+st.set_page_config(
+page_title="Farol Covid",
+layout='wide',
+initial_sidebar_state='collapsed')
+
 def main():
 
     # SESSION STATE

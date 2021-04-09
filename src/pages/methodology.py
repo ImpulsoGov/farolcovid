@@ -16,20 +16,25 @@ def main(session_state):
 
     # Layout
     utils.localCSS("style.css")
-
-    utils.genHeroSection(
-        title1="Farol",
-        title2="Covid",
-        subtitle="Entenda a metodologia da ferramenta.",
-        logo="https://i.imgur.com/CkYDPR7.png",
-        header=False,
-    )
     he.genHeader("1")
     st.write(
-        """
-        <div class="base-wrapper flex flex-column" style="background-color: rgb(0, 144, 167);">
-            <div class="white-span header p1" style="font-size:30px;">MODELOS, LIMITAÇÕES E FONTES</div>
-        </div><br><br>
+        f"""
+        <div class="base-wrapper" style="background-color:#0090A7;">
+            <div class="hero-wrapper">
+                <div class="hero-container" style="width:60%;">
+                    <div class="hero-container-content">
+                        <span class="subpages-container-product white-span">MODELOS, LIMITAÇÕES <br>E FONTES</span>
+                        <span class="subpages-container-subtitle white-span"></span>
+                    </div>
+                </div>
+                <div class="subpages-container-image">   
+                    <img style="width: 100%;" src="https://i.imgur.com/FiNi6fy.png"/>
+                </div>
+            </div><br>
+        </div>
+        <div>
+            <br><br>
+        </div>
         """,
         unsafe_allow_html=True,
     )

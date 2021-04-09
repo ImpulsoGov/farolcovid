@@ -468,7 +468,39 @@ header>.toolbar { /* Hide toolbar menu */
     font-weight: lighter;
     font-size: 36px;
     max-lines: 2;
-    
+}
+
+.subpages-container-product {
+    font-family: var(--main-header-font-family);
+    text-transform: uppercase;
+    font-size: 56px;
+    font-weight: bold;
+    line-height: 64px;
+    animation-name: fadein;
+    animation-duration: 4s;
+}
+
+.subpages-subcontainer-product {
+    font-family: var(--main-header-font-family);
+    font-size: 56px;
+    font-weight: bold;
+    line-height: 64px;
+    animation-name: fadein;
+    animation-duration: 4s;
+}
+.subpages-container-subtitle {
+    font-weight: lighter;
+    font-size: 26px;
+    padding-top: 20px;
+}
+
+.subpages-container-image {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 500px;
+    height: 80%;
+    background-color:white;
+    border-radius:15px;
 }
 
 .hero-container-image {
@@ -2038,7 +2070,6 @@ header>.toolbar { /* Hide toolbar menu */
     width:32vw;
     max-height:200vw !important;
     overflow:hidden;
-    position:absolute;
     right:3rem;
     bottom:0%;
     background-color: white;
@@ -2721,7 +2752,8 @@ header>.toolbar { /* Hide toolbar menu */
 
 #navbar {
     overflow: hidden;
-    background-color: #EEEEEE;
+    background-color: white;
+    border: #0090A7;
   }
   
   #navbar a {
@@ -2743,3 +2775,4 @@ header>.toolbar { /* Hide toolbar menu */
     background-color: #0090A7;
     color: white;
   }
+

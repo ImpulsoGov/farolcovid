@@ -7,20 +7,28 @@ import pages.header as he
 
 def main(session_state):
     utils.localCSS("style.css")
-    utils.genHeroSection(
-        title1="Farol",
-        title2="Covid",
-        subtitle="Estudo sobre vacinação contra covid-19 e redução de óbitos no Brasil.",
-        logo="https://i.imgur.com/CkYDPR7.png",
-        header=False,
-    )
     he.genHeader("3")
     st.write(
-        """
-        <div class="base-wrapper flex flex-column" style="background-color: rgb(0, 144, 167);">
-            <div class="white-span header p1" style="font-size:30px;">Saiba quando podemos controlar a pandemia no Brasil no nosso estudo realizado com dados inéditos obtidos pela Lei de Acesso à Informação.</div>
+        f"""
+        <div class="base-wrapper" style="background-color:#0090A7;">
+            <div class="hero-wrapper">
+                <div class="hero-container" style="width:60%;">
+                    <div class="hero-container-content">
+                        <span class="subpages-container-product white-span">Estudo sobre vacinação </br>contra covid-19 e </br>redução de óbitos no Brasil</span>
+                        <span class="subpages-container-subtitle white-span">Saiba quando podemos controlar a pandemia no Brasil no nosso estudo realizado com dados inéditos obtidos pela Lei de Acesso à Informação.</span>
+                    </div>
+                </div>
+                <div class="subpages-container-image">   
+                    <img style="width: 100%;" src="https://i.imgur.com/w5yVANW.png"/>
+                </div>
+            </div><br>
         </div>
-        <div class="magenta-bg">
+        """,
+        unsafe_allow_html=True,
+    )
+    st.write(
+        """
+        <div>
                 <div class="base-wrapper">
                         <div>
                             <span>Utilizando dados inéditos sobre os grupos prioritários para vacinação da Covid-19, obtidos pela Lei de Acesso à Informação, nós da Impulso Gov, projetamos quando podemos controlar a pandemia no Brasil.<br><br></span>
