@@ -345,6 +345,8 @@ def main(session_state):
 
     if os.getenv("IS_HEROKU") == "TRUE":
         urlpath = os.getenv("urlpath")
+    elif os.getenv("IS_DEV") == "TRUE":
+        urlpath = 'http://localhost:8501/'
     else:
         urlpath = 'https://farolcovid.coronacidades.org/'
         # urlpath = 'http://localhost:8501/'
