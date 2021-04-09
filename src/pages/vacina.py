@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import utils
 import pages.header as he
+import json
 
 def main(session_state):
     utils.localCSS("vacinastyle.css")
@@ -35,9 +36,54 @@ def main(session_state):
     selected_options =  container.multiselect("Selecione o(s) Estado(s):",
             list(df2["state_name"].sort_values().unique()))
     df2 = df2[df2["state_name"].isin(selected_options)]
-    selected_city_name = container.multiselect("Selecione o(s) Municípios(s):",
-            list(df2["city_name"].sort_values().unique()),list(df2["city_name"].sort_values().unique()))
-    df2 = df2[df2["city_name"].isin(selected_city_name)]
+    
+    # df = pd.DataFrame([['Apple pie', '20'], ['Lemon cake', '30']], index=['row 1', 'row 2'], columns=['Product', 'Quantity'])
+    # json_data = df.to_json(orient='records')
+    # webdatarocks = {
+    #     "container": "#pivot-container",
+    #     "width": "100%",
+    #     "height": 430,
+    #     "toolbar": True,
+    #     "report": {
+    #         "dataSource": {
+    #             "type": "json",
+    #             "data": json.loads(json_data)
+    #         },
+    #         "slice": {
+    #             "rows": [
+    #                 {
+    #                     "uniqueName": "Product"
+    #                 }
+    #             ],
+    #             "columns": [
+    #                 {
+    #                     "uniqueName": "Measures"
+    #                 }
+    #             ],
+    #             "measures": [
+    #                 {
+    #                     "uniqueName": "Quantity",
+    #                     "aggregation": "sum"
+    #                 }
+    #             ]
+    #         }
+    #     }
+    # }
+    # webdatarocks_json_object = json.dumps(webdatarocks)
+    # st.write(
+    #     """ 
+    #         <link href="https://cdn.webdatarocks.com/latest/webdatarocks.min.css" rel="stylesheet">
+    #         <script src="https://cdn.webdatarocks.com/latest/webdatarocks.js"></script>
+    #         <div id="pivot-container"></div>
+    #         <script>
+    #         new WebDataRocks({0});
+    #         </script>
+    #     """.format(webdatarocks_json_object),
+    #     unsafe_allow_html=True,
+    # )
+    # selected_city_name = container.multiselect("Selecione o(s) Municípios(s):",
+    #         list(df2["city_name"].sort_values().unique()),list(df2["city_name"].sort_values().unique()))
+    # df2 = df2[df2["city_name"].isin(selected_city_name)]
 
     # all = st.checkbox("Todos os Estados", value=False)
     # if all:
@@ -64,6 +110,7 @@ def main(session_state):
                         'perc_imunizados': 'População imunizada', 
                         'nao_vacinados': 'População restante a vacinar'}, inplace=True)
     st.dataframe(df2.assign(hack='').set_index('hack'), 1500, 500)
+    
     # st.write(
     #     """
     #     <div class="base-wrapper">
