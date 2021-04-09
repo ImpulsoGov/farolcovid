@@ -11,7 +11,7 @@ def main(session_state):
         f"""
         <div class="base-wrapper" style="background-color:#0090A7;">
             <div class="hero-wrapper">
-                <div class="hero-container" style="width:40%;">
+                <div class="hero-container" style="width:45%;">
                     <div class="hero-container-content">
                         <span class="subpages-container-product white-span">Vacinômetro</span>
                         <span class="subpages-subcontainer-product white-span">Veja a evolução da vacinação em sua cidade ou estado! </span>
@@ -32,29 +32,42 @@ def main(session_state):
     df2 = pd.read_csv("http://datasource.coronacidades.org/br/cities/vacina")
     df2 = df2[["state_name", "city_name", "vacinados", "perc_vacinados", "imunizados", "perc_imunizados", "nao_vacinados"]]
     container = st.beta_container()
-    all = st.checkbox("Todos", value=True)
-    if all:
-        selected_options = container.multiselect("Estado",
-            list(df2["state_name"].sort_values().unique()),list(df2["state_name"].sort_values().unique()))
-    else:
-        selected_options =  container.multiselect("Estado",
+    selected_options =  container.multiselect("Selecione o(s) Estado(s):",
             list(df2["state_name"].sort_values().unique()))
     df2 = df2[df2["state_name"].isin(selected_options)]
+    selected_city_name = container.multiselect("Selecione o(s) Municípios(s):",
+            list(df2["city_name"].sort_values().unique()),list(df2["city_name"].sort_values().unique()))
+    df2 = df2[df2["city_name"].isin(selected_city_name)]
+
+    # all = st.checkbox("Todos os Estados", value=False)
+    # if all:
+    #     selected_options = container.multiselect("Selecione o(s) Estado(s):",
+    #         list(df2["state_name"].sort_values().unique()),list(df2["state_name"].sort_values().unique()))
+    # else:
+    #     selected_options =  container.multiselect("Selecione o(s) Estado(s):",
+    #         list(df2["state_name"].sort_values().unique()))
     
-    # import pdb; pdb.set_trace()
-    # df2['perc_imunizados'] = df2['perc_vacinados'] + ' %'
+    
+    df2['vacinados'] = df2['vacinados'].replace(np.nan, 0).astype(int)
+    df2['imunizados'] = df2['imunizados'].replace(np.nan, 0).astype(int)
+    df2['perc_vacinados'] = df2['perc_vacinados'].replace(np.nan, 0).map('{:,.2f}'.format)
+    df2['perc_imunizados'] = df2['perc_imunizados'].replace(np.nan, 0).map('{:,.2f}'.format)
+    df2['nao_vacinados'] = df2['nao_vacinados'].replace(np.nan, 0).map('{:,.0f}'.format)
+    df2["nao_vacinados"] = [x.replace(",", ".") for x in df2["nao_vacinados"]]
+    df2['perc_imunizados'] = df2['perc_imunizados'] + ' %'
+    df2['perc_vacinados'] = df2['perc_vacinados'] + ' %'
     df2.rename(columns={'state_name': 'Estado',
                         'city_name': 'Cidade', 
-                        'vacinados': 'Vacinados', 
+                        'vacinados': 'Vacinados (1 Dose)', 
                         'perc_vacinados': 'População vacinada', 
-                        'imunizados': 'Imunizados (doses completas)', 
+                        'imunizados': 'Imunizados (Dose completas)', 
                         'perc_imunizados': 'População imunizada', 
                         'nao_vacinados': 'População restante a vacinar'}, inplace=True)
-    # st.dataframe(df2.assign(hack='').set_index('hack'), 1500, 500)
-    st.write(
-        """
-        <div class="base-wrapper">
-            <embed src="https://codepen.io/gabriellearruda/embed/yLgPjyR?height=432&theme-id=light&default-tab=result" width="100%" height="550">
-        </div>""",
-        unsafe_allow_html=True,
-    )
+    st.dataframe(df2.assign(hack='').set_index('hack'), 1500, 500)
+    # st.write(
+    #     """
+    #     <div class="base-wrapper">
+    #         <embed src="https://codepen.io/gabriellearruda/embed/yLgPjyR?height=432&theme-id=light&default-tab=result" width="100%" height="550">
+    #     </div>""",
+    #     unsafe_allow_html=True,
+    # )

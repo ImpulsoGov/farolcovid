@@ -1236,7 +1236,9 @@ color: white;
 .stDataFrame{
     padding: 0px 3em;
 }
-
+.dataframe{
+    font-family:"IBM Plex Sans",sans-serif;
+}
 /* .reportview-container .dataframe.col-header, .reportview-container .dataframe.data, .reportview-container .dataframe.row-header{
     white-space:none;
     overflow: initial;

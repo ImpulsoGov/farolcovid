@@ -346,8 +346,8 @@ def main(session_state):
     if os.getenv("IS_HEROKU") == "TRUE":
         urlpath = os.getenv("urlpath")
     else:
-        # urlpath = 'https://farolcovid.coronacidades.org/'
-        urlpath = 'http://localhost:8501/'
+        urlpath = 'https://farolcovid.coronacidades.org/'
+        # urlpath = 'http://localhost:8501/'
     vaccine_logo = utils.load_image("imgs/vaccine.png")
     st.write(f"""<div>
             <div class="base-wrapper flex flex-column" style="background-color:#0090A7">

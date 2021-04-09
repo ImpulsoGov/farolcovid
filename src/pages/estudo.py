@@ -12,7 +12,7 @@ def main(session_state):
         f"""
         <div class="base-wrapper" style="background-color:#0090A7;">
             <div class="hero-wrapper">
-                <div class="hero-container" style="width:60%;">
+                <div class="hero-container" style="width:45%;">
                     <div class="hero-container-content">
                         <span class="subpages-container-product white-span">Estudo sobre vacinação </br>contra covid-19 e </br>redução de óbitos no Brasil</span>
                         <span class="subpages-container-subtitle white-span">Saiba quando podemos controlar a pandemia no Brasil no nosso estudo realizado com dados inéditos obtidos pela Lei de Acesso à Informação.</span>
