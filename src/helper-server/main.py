@@ -1,5 +1,6 @@
-from flask import Flask
+from flask import Flask, render_template, redirect
 from flask import request
+import flask
 import mechanize
 import bs4
 from flask_cors import CORS, cross_origin
@@ -8,6 +9,9 @@ import yaml
 from dotenv import load_dotenv
 from pathlib import Path
 import os
+import numpy as np
+import pandas as pd
+import requests
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -49,7 +53,6 @@ def get_iframe_map(place_id):
     except:
         return "Map datasource unreachable"
     try:
-
         is_brazil = place_id == "BR"
         new_data = place_df.loc[place_df["place_id"] == place_id]
         map_id = new_data["map_id"].values[0]  # Datawrapper id of our map
@@ -57,12 +60,13 @@ def get_iframe_map(place_id):
             cache_place_df["place_id"] == place_id
         ]  # Old data we have in store of that same state
         old_index = old_data.index[0]
+        # import pdb; pdb.set_trace()
         # print(old_data)
         if (
             old_data["hashes"].values[0] == new_data["hashes"].values[0]
             and old_data["map_id"].values[0] == new_data["map_id"].values[0]
             and old_data["cache"].values[0] == None
-        ):
+            ):
             # its time to inser in our empty cache with the HTML code
             try:
                 map_code = clone_map(
@@ -75,7 +79,7 @@ def get_iframe_map(place_id):
         elif (
             old_data["hashes"].values[0] == new_data["hashes"].values[0]
             and old_data["map_id"].values[0] == new_data["map_id"].values[0]
-        ):
+            ):
             # Its already in cache, just return it
             # print("giving from cache")
             return cache_place_df.iloc[old_index]["cache"]
@@ -203,6 +207,11 @@ def clone_two_levels(url):
 # FOLLOWING THE SAME PROTOCOL FOR FINDING THE STATE AND CITY SELECTION BOX
 # THE STATE SELECTION BOX IS THE FIRST OF THE PAGE AND THE CITY SELECTION BOX IS THE THIRD
 
+def get_vacinatable():
+    try:
+        return render_template('vacina.html')
+    except Exception as e:
+        return "An unknown error happened : " + str(e)
 
 @app.route("/")
 @cross_origin(
@@ -210,6 +219,38 @@ def clone_two_levels(url):
 )
 def hello_world():
     return "Hello, World!"
+
+@app.route("/vacinatable", methods=["GET"])
+def vacinatable():
+    place_id = request.args.get("place_id")
+    if place_id == None:
+        df2 = pd.read_csv("http://datasource.coronacidades.org/br/cities/vacina")
+        df2 = df2[["state_name", "population", "state_id", "city_name", "vacinados", "perc_vacinados", "imunizados", "perc_imunizados", "nao_vacinados"]]
+        df2['vacinados'] = df2['vacinados'].replace(np.nan, 0).astype(int)
+        df2['imunizados'] = df2['imunizados'].replace(np.nan, 0).astype(int)
+        df2['perc_vacinados'] = df2['perc_vacinados'].replace(np.nan, 0).map('{:,.2f}'.format)
+        df2['perc_imunizados'] = df2['perc_imunizados'].replace(np.nan, 0).map('{:,.2f}'.format)
+        df2['nao_vacinados'] = df2['nao_vacinados'].replace(np.nan, 0).astype(int)
+        return render_template('vacinatable.html', statistics=df2)
+    if place_id == "BR":
+        df2 = pd.read_csv("http://datasource.coronacidades.org/br/states/vacina")
+        df2 = df2[["state_name", "vacinados", "perc_vacinados", "imunizados", "perc_imunizados", "nao_vacinados"]]
+        df2['vacinados'] = df2['vacinados'].replace(np.nan, 0).astype(int)
+        df2['imunizados'] = df2['imunizados'].replace(np.nan, 0).astype(int)
+        df2['perc_vacinados'] = df2['perc_vacinados'].replace(np.nan, 0).map('{:,.2f}'.format)
+        df2['perc_imunizados'] = df2['perc_imunizados'].replace(np.nan, 0).map('{:,.2f}'.format)
+        df2['nao_vacinados'] = df2['nao_vacinados'].replace(np.nan, 0).astype(int)
+        return render_template('vacina.html', statistics=df2)
+    else:
+        df2 = pd.read_csv("http://datasource.coronacidades.org/br/cities/vacina")
+        df2 = df2[["state_name", "state_id", "city_name", "vacinados", "perc_vacinados", "imunizados", "perc_imunizados", "nao_vacinados"]]
+        df2['vacinados'] = df2['vacinados'].replace(np.nan, 0).astype(int)
+        df2['imunizados'] = df2['imunizados'].replace(np.nan, 0).astype(int)
+        df2['perc_vacinados'] = df2['perc_vacinados'].replace(np.nan, 0).map('{:,.2f}'.format)
+        df2['perc_imunizados'] = df2['perc_imunizados'].replace(np.nan, 0).map('{:,.2f}'.format)
+        df2['nao_vacinados'] = df2['nao_vacinados'].replace(np.nan, 0).astype(int)
+        df2 = df2[df2["state_id"] == place_id]
+        return render_template('vacinacidade.html', statistics=df2)
 
 
 @app.route("/maps/map-iframe", methods=["GET"])
