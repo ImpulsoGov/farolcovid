@@ -1,0 +1,100 @@
+<html>
+<head></head>
+<body>
+    <div id="wdr-cidade"></div>
+    <link href="https://cdn.webdatarocks.com/latest/webdatarocks.min.css" rel="stylesheet"/>
+    <script src="https://cdn.webdatarocks.com/latest/webdatarocks.toolbar.min.js"></script>
+    <script src="https://cdn.webdatarocks.com/latest/webdatarocks.js"></script>
+    <script type="text/javascript">
+        arr_data = [{}];
+        var key = 0;
+        {% for x in statistics.index %}
+            jsonVar = {};
+            jsonVar['Estado'] = '{{statistics.loc[x].state_name}}'
+            jsonVar['Cidade'] = '{{statistics.loc[x].city_name}}'
+            jsonVar['População'] = '{{statistics.loc[x].population}}'
+            jsonVar['Vacinados'] = '{{statistics.loc[x].vacinados}}'
+            jsonVar['Imunizados'] = '{{statistics.loc[x].imunizados}}'
+            arr_data[key] = jsonVar;
+            key++
+        {% endfor %}
+    </script>
+    <script>
+        var pivot = new WebDataRocks({
+            container: "#wdr-cidade",
+            toolbar: true,
+            report: {
+                formats: [
+                    {
+                        decimalPlaces: 2,
+                        thousandsSeparator: ".",
+                        decimalSeparator: ','
+                    },
+                    {
+                        name: "revenue",
+                        currencySymbol: "R$"
+                    },
+                    {
+                        name: "integers",
+                        decimalPlaces: 0,
+                    },
+                    {
+                        name: "percent",
+                        currencySymbol: " %",
+                        currencySymbolAlign: 'right'
+                    },
+                ],
+                dataSource: {
+                    dataSourceType: "json",
+                    data: arr_data
+                },
+                localization: "https://raw.githubusercontent.com/WebDataRocks/pivot-localizations/master/pr.json",
+                slice: {
+                    rows: [{
+                        uniqueName: "Estado"
+                        },{
+                        uniqueName: "Cidade"
+                        }],
+                    columns: [{
+                        uniqueName: "[Measures]"
+                    }],
+                    measures: [{
+                        uniqueName: "Vacinados (1 Dose)",
+                        caption: "Vacinados (1 Dose)",
+                        format: "integers",
+                        formula: "sum(\"Vacinados\")",
+                        },
+                        {
+                        uniqueName: "População vacinada",
+                        caption: "População vacinada",
+                        formula: "100*(sum(\"Vacinados\")/sum(\"População\"))",
+                        format: "percent",
+                        },
+                        {
+                        uniqueName: "Imunizados (Dose completas)",
+                        caption: "Imunizados (Dose completas)",
+                        formula: "sum(\"Imunizados\")",
+                        format: "integers",
+                        },
+                        {
+                        uniqueName: "População imunizada",
+                        caption: "População imunizada",
+                        formula: "100*(sum(\"Imunizados\")/sum(\"População\"))",
+                        format: "percent",
+                        },
+                        {
+                        uniqueName: "População restante a vacinar",
+                        caption: "População restante a vacinar",
+                        formula: "sum(\"População\") - sum(\"Vacinados\")",
+                        format: "integers",
+                        }],
+                },
+                options: {
+                    configuratorActive: false
+                },
+            },
+            with:"80%",
+        });
+    </script>
+</body>
+</html>

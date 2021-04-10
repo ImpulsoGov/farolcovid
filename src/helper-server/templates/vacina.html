@@ -1,0 +1,67 @@
+<html>
+<head></head>
+<body>
+    <div id="wdr-estado"></div>
+    <link href="https://cdn.webdatarocks.com/latest/webdatarocks.min.css" rel="stylesheet"/>
+    <script src="https://cdn.webdatarocks.com/latest/webdatarocks.toolbar.min.js"></script>
+    <script src="https://cdn.webdatarocks.com/latest/webdatarocks.js"></script>
+    <script type="text/javascript">
+        arr_data = [{}];
+        var key = 0;
+        {% for x in statistics.index %}
+            jsonVar = {};
+            jsonVar['Estado'] = '{{statistics.loc[x].state_name}}'
+            jsonVar['Vacinados (1 Dose)'] = '{{statistics.loc[x].vacinados}}'
+            jsonVar['População vacinada'] = '{{statistics.loc[x].perc_vacinados}}'
+            jsonVar['Imunizados (Dose completas)'] = '{{statistics.loc[x].imunizados}}'
+            jsonVar['População imunizada'] = '{{statistics.loc[x].perc_imunizados}}'
+            jsonVar['População restante a vacinar'] = '{{statistics.loc[x].nao_vacinados}}'
+            arr_data[key] = jsonVar;
+            key++
+        {% endfor %}
+    </script>
+    <script>
+        var pivot = new WebDataRocks({
+            container: "#wdr-estado",
+            toolbar: false,
+            report: {
+                dataSource: {
+                    dataSourceType: "json",
+                    data: arr_data
+                },
+                localization: "https://raw.githubusercontent.com/WebDataRocks/pivot-localizations/master/pr.json",
+                slice: {
+                    rows: [{
+                        uniqueName: "Estado"
+                        }],
+                    columns: [{
+                        uniqueName: "[Measures]"
+                    }],
+                    measures: [{
+                        uniqueName: "Vacinados (1 Dose)",
+                        format: "integers",
+                        formula: "sum(\"Vacinados (1 Dose)\")",
+                        },
+                        {
+                        uniqueName: "População vacinada",
+                        formula: "average(\"População vacinada\")",
+                        },
+                        {
+                        uniqueName: "Imunizados (Dose completas)",
+                        formula: "sum(\"Imunizados (Dose completas)\")",
+                        },
+                        {
+                        uniqueName: "População imunizada",
+                        formula: "average(\"População imunizada\")",
+                        },
+                        {
+                        uniqueName: "População restante a vacinar",
+                        formula: "sum(\"População restante a vacinar\")",
+                        format: "integers",
+                        }],
+                },
+            }
+        });
+    </script>
+</body>
+</html>
