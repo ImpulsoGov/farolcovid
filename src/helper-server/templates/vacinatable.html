@@ -18,21 +18,18 @@
             arr_data[key] = jsonVar;
             key++
         {% endfor %}
+        
     </script>
     <script>
         var pivot = new WebDataRocks({
             container: "#wdr-cidade",
-            toolbar: true,
+            toolbar: false,
             report: {
                 formats: [
                     {
                         decimalPlaces: 2,
                         thousandsSeparator: ".",
                         decimalSeparator: ','
-                    },
-                    {
-                        name: "revenue",
-                        currencySymbol: "R$"
                     },
                     {
                         name: "integers",
