@@ -29,6 +29,7 @@ else:
     datasource_url = config["br"]["api"]["external"]
 
 datasource_url = datasource_url + config["br"]["api"]["endpoints"]["maps"]
+datasource_url_vacina = "http://datasource.coronacidades.org/br/cities/vacina"
 
 # For trying to redownload the cache in case of failure at initialization
 def check_for_cache_download():
@@ -40,7 +41,6 @@ def check_for_cache_download():
         except Exception as e:
             print("Map Datasource unreachable" + str(e))
             cache_place_df = None
-
 
 def get_iframe_map(place_id):
     """ Clones and adapts a map inteded for use in an iframe"""
@@ -207,12 +207,6 @@ def clone_two_levels(url):
 # FOLLOWING THE SAME PROTOCOL FOR FINDING THE STATE AND CITY SELECTION BOX
 # THE STATE SELECTION BOX IS THE FIRST OF THE PAGE AND THE CITY SELECTION BOX IS THE THIRD
 
-def get_vacinatable():
-    try:
-        return render_template('vacina.html')
-    except Exception as e:
-        return "An unknown error happened : " + str(e)
-
 @app.route("/")
 @cross_origin(
     origin="*", headers=["Content-Type", "Authorization", "access-control-allow-origin"]
@@ -222,35 +216,34 @@ def hello_world():
 
 @app.route("/vacinatable", methods=["GET"])
 def vacinatable():
-    place_id = request.args.get("place_id")
-    if place_id == None:
-        df2 = pd.read_csv("http://datasource.coronacidades.org/br/cities/vacina")
-        df2 = df2[["state_name", "population", "state_id", "city_name", "vacinados", "perc_vacinados", "imunizados", "perc_imunizados", "nao_vacinados"]]
-        df2['vacinados'] = df2['vacinados'].replace(np.nan, 0).astype(int)
-        df2['imunizados'] = df2['imunizados'].replace(np.nan, 0).astype(int)
-        df2['perc_vacinados'] = df2['perc_vacinados'].replace(np.nan, 0).map('{:,.2f}'.format)
-        df2['perc_imunizados'] = df2['perc_imunizados'].replace(np.nan, 0).map('{:,.2f}'.format)
-        df2['nao_vacinados'] = df2['nao_vacinados'].replace(np.nan, 0).astype(int)
-        return render_template('vacinatable.html', statistics=df2)
-    if place_id == "BR":
-        df2 = pd.read_csv("http://datasource.coronacidades.org/br/states/vacina")
-        df2 = df2[["state_name", "vacinados", "perc_vacinados", "imunizados", "perc_imunizados", "nao_vacinados"]]
-        df2['vacinados'] = df2['vacinados'].replace(np.nan, 0).astype(int)
-        df2['imunizados'] = df2['imunizados'].replace(np.nan, 0).astype(int)
-        df2['perc_vacinados'] = df2['perc_vacinados'].replace(np.nan, 0).map('{:,.2f}'.format)
-        df2['perc_imunizados'] = df2['perc_imunizados'].replace(np.nan, 0).map('{:,.2f}'.format)
-        df2['nao_vacinados'] = df2['nao_vacinados'].replace(np.nan, 0).astype(int)
-        return render_template('vacina.html', statistics=df2)
-    else:
-        df2 = pd.read_csv("http://datasource.coronacidades.org/br/cities/vacina")
-        df2 = df2[["state_name", "state_id", "city_name", "vacinados", "perc_vacinados", "imunizados", "perc_imunizados", "nao_vacinados"]]
-        df2['vacinados'] = df2['vacinados'].replace(np.nan, 0).astype(int)
-        df2['imunizados'] = df2['imunizados'].replace(np.nan, 0).astype(int)
-        df2['perc_vacinados'] = df2['perc_vacinados'].replace(np.nan, 0).map('{:,.2f}'.format)
-        df2['perc_imunizados'] = df2['perc_imunizados'].replace(np.nan, 0).map('{:,.2f}'.format)
-        df2['nao_vacinados'] = df2['nao_vacinados'].replace(np.nan, 0).astype(int)
-        df2 = df2[df2["state_id"] == place_id]
-        return render_template('vacinacidade.html', statistics=df2)
+    # df2 = pd.read_csv("http://datasource.coronacidades.org/br/cities/vacina")
+    return render_template('vacinatable.html', statistics=cache_vacina_df)
+    # place_id = request.args.get("place_id")
+    # if place_id == None:
+    #     df2 = pd.read_csv("http://datasource.coronacidades.org/br/cities/vacina")
+    #     df2 = df2[["state_name", "population", "state_id", "city_name", "vacinados", "imunizados"]]
+    #     df2['vacinados'] = df2['vacinados'].replace(np.nan, 0).astype(int)
+    #     df2['imunizados'] = df2['imunizados'].replace(np.nan, 0).astype(int)
+    #     return render_template('vacinatable.html', statistics=df2)
+    # if place_id == "BR":
+    #     df2 = pd.read_csv("http://datasource.coronacidades.org/br/states/vacina")
+    #     df2 = df2[["state_name", "vacinados", "perc_vacinados", "imunizados", "perc_imunizados", "nao_vacinados"]]
+    #     df2['vacinados'] = df2['vacinados'].replace(np.nan, 0).astype(int)
+    #     df2['imunizados'] = df2['imunizados'].replace(np.nan, 0).astype(int)
+    #     df2['perc_vacinados'] = df2['perc_vacinados'].replace(np.nan, 0).map('{:,.2f}'.format)
+    #     df2['perc_imunizados'] = df2['perc_imunizados'].replace(np.nan, 0).map('{:,.2f}'.format)
+    #     df2['nao_vacinados'] = df2['nao_vacinados'].replace(np.nan, 0).astype(int)
+    #     return render_template('vacina.html', statistics=df2)
+    # else:
+    #     df2 = pd.read_csv("http://datasource.coronacidades.org/br/cities/vacina")
+    #     df2 = df2[["state_name", "state_id", "city_name", "vacinados", "perc_vacinados", "imunizados", "perc_imunizados", "nao_vacinados"]]
+    #     df2['vacinados'] = df2['vacinados'].replace(np.nan, 0).astype(int)
+    #     df2['imunizados'] = df2['imunizados'].replace(np.nan, 0).astype(int)
+    #     df2['perc_vacinados'] = df2['perc_vacinados'].replace(np.nan, 0).map('{:,.2f}'.format)
+    #     df2['perc_imunizados'] = df2['perc_imunizados'].replace(np.nan, 0).map('{:,.2f}'.format)
+    #     df2['nao_vacinados'] = df2['nao_vacinados'].replace(np.nan, 0).astype(int)
+    #     df2 = df2[df2["state_id"] == place_id]
+    #     return render_template('vacinacidade.html', statistics=df2)
 
 
 @app.route("/maps/map-iframe", methods=["GET"])
@@ -278,6 +271,8 @@ if __name__ == "__main__":
     try:
         cache_place_df = pd.read_csv(datasource_url)
         cache_place_df["cache"] = [None for i in range(cache_place_df.shape[0])]
+        cache_vacina_df = pd.read_csv(datasource_url_vacina)
+        cache_vacina_df["cache"] = [None for i in range(cache_vacina_df.shape[0])]
     except Exception as e:
         print("Map Datasource unreachable " + str(e))
         cache_place_df = None
