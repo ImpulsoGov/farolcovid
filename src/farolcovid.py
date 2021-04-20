@@ -86,8 +86,18 @@ def main():
         "Vacinômetro": vacina
     }
     query_params = st.experimental_get_query_params()
+    if query_params:
+        if query_params["page"][0] == '0':
+            query_params["page"][0] = "FarolCovid"
+        elif query_params["page"][0] == '1':
+            query_params["page"][0] = "Modelos, limitações e fontes"
+        elif query_params["page"][0] == '2':
+            query_params["page"][0] = "Quem somos?"
+        elif query_params["page"][0] == '3':
+            query_params["page"][0] = "Estudo Vacinação"
+        elif query_params["page"][0] == '4':
+            query_params["page"][0] = "Vacinômetro"
     default = query_params["page"][0] if "page" in query_params else "FarolCovid"
-    # import pdb; pdb.set_trace()
     page = st.sidebar.radio("Menu",page_list,index=page_list.index(default))
     st.experimental_set_query_params(page=page)
     PAGES[page].main(session_state)
