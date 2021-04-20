@@ -24,12 +24,11 @@ def main(session_state):
                 </div>
             </div><br>
         </div>
-        <div>
-            <br><br>
-        </div>
         <div class="base-wrapper">
+            <span>  Aguarde o carregamento da tabela abaixo.</span>
+            <br><br>
             <embed src="https://helper.coronacidades.org/vacinatable" width="100%" height="550">
-         </div>
+        </div>
         """,
         unsafe_allow_html=True,
     )

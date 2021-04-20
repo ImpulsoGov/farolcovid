@@ -355,9 +355,9 @@ def main(session_state):
             <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
                 <div class="white-span header p1" style="font-size:30px;"><img class="icon-cards" src="data:image/png;base64,{vaccine_logo}" alt="Fonte: Impulso">QUER SABER MAIS SOBRE A VACINAÇÃO?</div>
                 <span class="white-span">Acompanhe nossos novos dados e descobra como avança a vacinação no seu município ou estado!<br><br>
-                <a class="btn-ambassador" href="{urlpath}?page=4" target="_self">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Veja aqui!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                <a class="btn-ambassador" href="{urlpath}?page=Vacin%C3%B4metro" target="_self">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Veja aqui!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
                 <br><br><span class="white-span">Saiba quando podemos controlar a pandemia no Brasil no nosso estudo realizado com dados inéditos obtidos pela Lei de Acesso à Informação.<br><br>
-                <a class="btn-ambassador" href="{urlpath}?page=3" target="_self">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ler aqui!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                <a class="btn-ambassador" href="{urlpath}?page=Estudo+Vacina%C3%A7%C3%A3o" target="_self">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ler aqui!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
         </div>""",
         unsafe_allow_html=True,
     )

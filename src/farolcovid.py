@@ -35,7 +35,6 @@ layout='wide',
 initial_sidebar_state='collapsed')
 
 def main():
-
     # SESSION STATE
     time.sleep(
         0.05
@@ -77,13 +76,6 @@ def main():
     </iframe>""",
         unsafe_allow_html=True,
     )
-    # For Http debug
-    # st.write(utils.parse_headers(utils.get_server_session().ws.request))
-
-    # MENU
-    # page = st.sidebar.radio(
-    #     "Menu", ["FarolCovid", "Modelos, limitações e fontes", "Quem somos?", "Estudo Vacinação"],
-    # )
     
     page_list = ["FarolCovid", "Modelos, limitações e fontes", "Quem somos?", "Estudo Vacinação", "Vacinômetro"]
     PAGES = {   
@@ -94,46 +86,11 @@ def main():
         "Vacinômetro": vacina
     }
     query_params = st.experimental_get_query_params()
-    default = int(query_params["page"][0]) if "page" in query_params else 0
-    page = st.sidebar.radio(
-        "Menu",
-        page_list,
-        index = default
-    )
-    st.experimental_set_query_params(page=page_list.index(page))
+    default = query_params["page"][0] if "page" in query_params else "FarolCovid"
+    # import pdb; pdb.set_trace()
+    page = st.sidebar.radio("Menu",page_list,index=page_list.index(default))
+    st.experimental_set_query_params(page=page)
     PAGES[page].main(session_state)
-    
-    
-    # if page:
-    #     PAGES[str(default)].main(session_state)
-    #     st.experimental_set_query_params(page=page_list.index(page))
-
-    
-
-    # query_params = st.experimental_get_query_params()
-    # page_param = query_params.get("page", [0])
-    # if query_params:
-    #     PAGES[page_param[0]].main(session_state)
-    # else:
-    #     PAGES[page].main(session_state)
-    # utils.applyButtonStyles(session_state)
-
-    # if page == "FarolCovid":
-    #     PAGES[page].main(session_state)
-    #     utils.applyButtonStyles(session_state)
-        # if __name__ == "__main__":
-        #     fc.main(session_state)
-        #     utils.applyButtonStyles(session_state)
-
-    # elif page == "Quem somos?":
-    #     PAGES[page].main(session_state)
-        # if __name__ == "__main__":
-        #     tm.main(session_state)
-
-    # elif page == "Modelos, limitações e fontes":
-    #     PAGES[page].main(session_state)
-        # if __name__ == "__main__":
-        #     method.main(session_state)
 
 
 if __name__ == "__main__":
