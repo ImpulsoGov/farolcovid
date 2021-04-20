@@ -835,7 +835,6 @@ def main(session_state):
     gen_big_table(config, dfs, user_input["state_name"])
     # CHAMA FUNCOES DO UTILS PARA O FOOTER
     # CALL FUNCTIONS IN UTILS TO FOOTER
-    utils.gen_whatsapp_button(config["impulso"]["contact"])
     utils.gen_footer()
     user_analytics.conclude_user_session(session_state)
 
