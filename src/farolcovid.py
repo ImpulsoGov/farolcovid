@@ -77,30 +77,47 @@ def main():
         unsafe_allow_html=True,
     )
     
+    # Gambiarra para ter o menu lateral com caracteres especiais e ainda ter várias páginas
+    # Retirar depois de encontrar saída mais apropriada
     page_list = ["FarolCovid", "Modelos, limitações e fontes", "Quem somos?", "Estudo Vacinação", "Vacinômetro"]
+    pages_dict = {   
+        "FarolCovid" : "Inicio",
+        "Modelos, limitações e fontes" : "Metodologia",
+        "Quem somos?" : "Quem-Somos",
+        "Estudo Vacinação" : "Estudo-Vacinacao",
+        "Vacinômetro": "Vacinometro"
+    }
+    pages_index = {   
+        "Inicio" : 0,
+        "Metodologia" : 1,
+        "Quem-Somos" : 2,
+        "Estudo-Vacinacao" : 3,
+        "Vacinometro": 4
+    }
     PAGES = {   
-        "FarolCovid" : fc,
-        "Modelos, limitações e fontes" : method,
-        "Quem somos?" : tm,
-        "Estudo Vacinação" : estudo,
-        "Vacinômetro": vacina
+        "Inicio" : fc,
+        "Metodologia" : method,
+        "Quem-Somos" : tm,
+        "Estudo-Vacinacao" : estudo,
+        "Vacinometro": vacina
     }
     query_params = st.experimental_get_query_params()
     if query_params:
-        if query_params["page"][0] == '0':
-            query_params["page"][0] = "FarolCovid"
-        elif query_params["page"][0] == '1':
-            query_params["page"][0] = "Modelos, limitações e fontes"
-        elif query_params["page"][0] == '2':
-            query_params["page"][0] = "Quem somos?"
-        elif query_params["page"][0] == '3':
-            query_params["page"][0] = "Estudo Vacinação"
-        elif query_params["page"][0] == '4':
-            query_params["page"][0] = "Vacinômetro"
-    default = query_params["page"][0] if "page" in query_params else "FarolCovid"
-    page = st.sidebar.radio("Menu",page_list,index=page_list.index(default))
-    st.experimental_set_query_params(page=page)
-    PAGES[page].main(session_state)
+        # Gambiarra para redirecionar páginas
+        if query_params["page"][0] == '0' or query_params["page"][0] == 'FarolCovid':
+            query_params["page"][0] = "Inicio"
+        elif query_params["page"][0] == '1' or query_params["page"][0] == 'Modelos, limitações e fontes':
+            query_params["page"][0] = "Metodologia"
+        elif query_params["page"][0] == '2' or query_params["page"][0] == 'Quem somos?':
+            query_params["page"][0] = "Quem-Somos"
+        elif query_params["page"][0] == '3' or query_params["page"][0] == 'Estudo Vacinação':
+            query_params["page"][0] = "Estudo-Vacinacao"
+        elif query_params["page"][0] == '4' or query_params["page"][0] == 'Vacinômetro':
+            query_params["page"][0] = "Vacinometro"
+    default = query_params["page"][0] if "page" in query_params else "Inicio"
+    page = st.sidebar.radio("Menu",page_list,index=pages_index[default])
+    st.experimental_set_query_params(page=pages_dict[page])
+    PAGES[pages_dict[page]].main(session_state)
 
 
 if __name__ == "__main__":
