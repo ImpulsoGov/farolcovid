@@ -12,6 +12,7 @@ import os
 import numpy as np
 import pandas as pd
 import requests
+import json
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -216,35 +217,7 @@ def hello_world():
 
 @app.route("/vacinatable", methods=["GET"])
 def vacinatable():
-    # df2 = pd.read_csv("http://datasource.coronacidades.org/br/cities/vacina")
     return render_template('vacinatable.html', statistics=cache_vacina_df)
-    # place_id = request.args.get("place_id")
-    # if place_id == None:
-    #     df2 = pd.read_csv("http://datasource.coronacidades.org/br/cities/vacina")
-    #     df2 = df2[["state_name", "population", "state_id", "city_name", "vacinados", "imunizados"]]
-    #     df2['vacinados'] = df2['vacinados'].replace(np.nan, 0).astype(int)
-    #     df2['imunizados'] = df2['imunizados'].replace(np.nan, 0).astype(int)
-    #     return render_template('vacinatable.html', statistics=df2)
-    # if place_id == "BR":
-    #     df2 = pd.read_csv("http://datasource.coronacidades.org/br/states/vacina")
-    #     df2 = df2[["state_name", "vacinados", "perc_vacinados", "imunizados", "perc_imunizados", "nao_vacinados"]]
-    #     df2['vacinados'] = df2['vacinados'].replace(np.nan, 0).astype(int)
-    #     df2['imunizados'] = df2['imunizados'].replace(np.nan, 0).astype(int)
-    #     df2['perc_vacinados'] = df2['perc_vacinados'].replace(np.nan, 0).map('{:,.2f}'.format)
-    #     df2['perc_imunizados'] = df2['perc_imunizados'].replace(np.nan, 0).map('{:,.2f}'.format)
-    #     df2['nao_vacinados'] = df2['nao_vacinados'].replace(np.nan, 0).astype(int)
-    #     return render_template('vacina.html', statistics=df2)
-    # else:
-    #     df2 = pd.read_csv("http://datasource.coronacidades.org/br/cities/vacina")
-    #     df2 = df2[["state_name", "state_id", "city_name", "vacinados", "perc_vacinados", "imunizados", "perc_imunizados", "nao_vacinados"]]
-    #     df2['vacinados'] = df2['vacinados'].replace(np.nan, 0).astype(int)
-    #     df2['imunizados'] = df2['imunizados'].replace(np.nan, 0).astype(int)
-    #     df2['perc_vacinados'] = df2['perc_vacinados'].replace(np.nan, 0).map('{:,.2f}'.format)
-    #     df2['perc_imunizados'] = df2['perc_imunizados'].replace(np.nan, 0).map('{:,.2f}'.format)
-    #     df2['nao_vacinados'] = df2['nao_vacinados'].replace(np.nan, 0).astype(int)
-    #     df2 = df2[df2["state_id"] == place_id]
-    #     return render_template('vacinacidade.html', statistics=df2)
-
 
 @app.route("/maps/map-iframe", methods=["GET"])
 @cross_origin(

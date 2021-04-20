@@ -19,11 +19,11 @@ def genHeader(active):
             f"""
             <div class="conteudo" id="navbar">
             <a>&nbsp;</a>
-			<a href="{urlpath}?page=0">Início</a>
-            <a class="active" href="{urlpath}?page=1">Modelos, limitações e fontes</a>
-            <a href="{urlpath}?page=2">Quem somos?</a>
-            <a href="{urlpath}?page=3">Estudo Vacinação</a>
-            <a href="{urlpath}?page=4">Vacinômetro</a>
+			<a href="{urlpath}?page=FarolCovid">Início</a>
+            <a class="active" href="{urlpath}?page=Modelos%2C+limita%C3%A7%C3%B5es+e+fontes">Modelos, limitações e fontes</a>
+            <a href="{urlpath}?page=Quem+somos%3F">Quem somos?</a>
+            <a href="{urlpath}?page=Estudo+Vacina%C3%A7%C3%A3o">Estudo Vacinação</a>
+            <a href="{urlpath}?page=Vacin%C3%B4metro">Vacinômetro</a>
             </div>
             """,
         unsafe_allow_html=True,
@@ -33,11 +33,11 @@ def genHeader(active):
             f"""
             <div class="conteudo" id="navbar">
             <a>&nbsp;</a>
-			<a href="{urlpath}?page=0">Início</a>
-            <a href="{urlpath}?page=1">Modelos, limitações e fontes</a>
-            <a class="active" href="{urlpath}?page=2">Quem somos?</a>
-            <a href="{urlpath}?page=3">Estudo Vacinação</a>
-            <a href="{urlpath}?page=4">Vacinômetro</a>
+			<a href="{urlpath}?page=FarolCovid">Início</a>
+            <a href="{urlpath}?page=Modelos%2C+limita%C3%A7%C3%B5es+e+fontes">Modelos, limitações e fontes</a>
+            <a class="active" href="{urlpath}?page=Quem+somos%3F">Quem somos?</a>
+            <a href="{urlpath}?page=Estudo+Vacina%C3%A7%C3%A3o">Estudo Vacinação</a>
+            <a href="{urlpath}?page=Vacin%C3%B4metro">Vacinômetro</a>
             </div>
             """,
         unsafe_allow_html=True,
@@ -47,11 +47,11 @@ def genHeader(active):
             f"""
             <div class="conteudo" id="navbar">
 			<a>&nbsp;</a>
-            <a href="{urlpath}?page=0">Início</a>
-            <a href="{urlpath}?page=1">Modelos, limitações e fontes</a>
-            <a href="{urlpath}?page=2">Quem somos?</a>
-            <a class="active" href="{urlpath}?page=3">Estudo Vacinação</a>
-            <a href="{urlpath}?page=4">Vacinômetro</a>
+            <a href="{urlpath}?page=FarolCovid">Início</a>
+            <a href="{urlpath}?page=Modelos%2C+limita%C3%A7%C3%B5es+e+fontes">Modelos, limitações e fontes</a>
+            <a href="{urlpath}?page=Quem+somos%3F">Quem somos?</a>
+            <a class="active" href="{urlpath}?page=Estudo+Vacina%C3%A7%C3%A3o">Estudo Vacinação</a>
+            <a href="{urlpath}?page=Vacin%C3%B4metro">Vacinômetro</a>
             </div>
         """,
         unsafe_allow_html=True,
@@ -61,11 +61,11 @@ def genHeader(active):
             f"""
             <div class="conteudo" id="navbar">
 			<a>&nbsp;</a>
-            <a href="{urlpath}?page=0">Início</a>
-            <a href="{urlpath}?page=1">Modelos, limitações e fontes</a>
-            <a href="{urlpath}?page=2">Quem somos?</a>
-            <a href="{urlpath}?page=3">Estudo Vacinação</a>
-            <a class="active" href="{urlpath}?page=4">Vacinômetro</a>
+            <a href="{urlpath}?page=FarolCovid">Início</a>
+            <a href="{urlpath}?page=Modelos%2C+limita%C3%A7%C3%B5es+e+fontes">Modelos, limitações e fontes</a>
+            <a href="{urlpath}?page=Quem+somos%3F">Quem somos?</a>
+            <a href="{urlpath}?page=Estudo+Vacina%C3%A7%C3%A3o">Estudo Vacinação</a>
+            <a class="active" href="{urlpath}?page=Vacin%C3%B4metro">Vacinômetro</a>
             </div>
         """,
         unsafe_allow_html=True,
