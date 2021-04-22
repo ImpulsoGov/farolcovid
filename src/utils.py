@@ -803,8 +803,14 @@ def genIndicatorCard(indicator: Indicator, place_type: str, rt_type: str = "nan"
         alert = ""
     if indicator.header == "VACINAÇÃO":
         if place_type == "state_num_id":
+            indicator.perc_vacinados = indicator.perc_vacinados*2
+            indicator.perc_imunizados = indicator.perc_imunizados*2
+            indicator.nao_vacinados = int(indicator.nao_vacinados/2)
             caption = "A porcentagem da população vacinada em seu <b>estado</b>, é"
         if place_type == "health_region_id":
+            indicator.perc_vacinados = indicator.perc_vacinados*2
+            indicator.perc_imunizados = indicator.perc_imunizados*2
+            indicator.nao_vacinados = int(indicator.nao_vacinados/2)
             caption = "A porcentagem da população vacinada em sua <b>regional de saúde</b>, é"
         if place_type == "city_id":
             caption = "A porcentagem da população vacinada em seu <b>município</b>, é"
