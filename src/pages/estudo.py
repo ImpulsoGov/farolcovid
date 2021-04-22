@@ -36,7 +36,7 @@ def main(session_state):
                             <span><b>Os números mostram que, no cenário intermediário, que parece mais provável agora, a vacinação dos grupos prioritários seria possível até o fim de abril.</b> Já no pior cenário, em que o país só consiga alcançar metade da sua capacidade de produção de vacinas, todas as pessoas integrantes de grupos prioritários no Brasil estariam imunizadas até o fim de julho.<br><br></span>
                             <span>O estudo, coordenado por Marco Brancher, especialista em dados e saúde da Impulso Gov, também projeta como a vacinação pode impactar na redução de óbitos no Brasil.<br><br></span>
                         </div>
-                        <embed src="https://coronacidades.org/wp-content/uploads/2021/04/2020.03.31-Apresentac%CC%A7a%CC%83o-Dados-Vacinac%CC%A7a%CC%83o.pdf" width="100%" height="550">
+                        <embed src="https://coronacidades.org/wp-content/uploads/2021/04/2020.04.12-Apresentac%CC%A7a%CC%83o-Dados-Vacinac%CC%A7a%CC%83o.pdf" width="100%" height="550">
                 </div>
         </div>
         """,
