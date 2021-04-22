@@ -275,7 +275,7 @@ def gen_sector_big_row(my_state, index, config, dado):
     level_data = config["br"]["farolcovid"]["rules"]
     
     dado = dado[dado["state_name"] == my_state["state_name"]]
-    perc_vacinados = dado.perc_vacinados.fillna("-").values[0]
+    perc_vacinados = dado.perc_vacinados.fillna("-").values[0]*2
     # TODO -> VOLTAR PROJECAO DE LEITOS
     # <div class="big-table-field btf3" style="color:{alert_info[find_level(level_data["capacity_classification"]["cuts"],level_data["capacity_classification"]["categories"],my_state["dday_icu_beds"])][0]};">{utils.dday_preffix(my_state["dday_icu_beds"])} dias</div>
     return f"""<div class="big-table-row {["btlgrey","btlwhite"][index % 2]}">
