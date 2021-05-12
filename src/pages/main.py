@@ -771,20 +771,16 @@ def main(session_state):
             ],
         )
         oc.main(user_input, indicators, data, config, session_state)
-    
     st.write(
         """
-        <div class="magenta-bg">
-                <div class="base-wrapper">
-                        <div class="logo-wrapper">
-                                <span>* Desativamos <b>Simula Covid e Distanciamento Social</b> devido às mudanças na evolução da pandêmia.<br/>
-                                <li>Caso precise de alguma informação realcionada, pode nos contatar neste e-mail: contato@impulsogov.com.br</li>
-                                </span><br/>
-                </div>
-        </div>""",
+        <div class='base-wrapper' 
+            <i>* Desativamos <b>Simula Covid e Distanciamento Social</b> devido às mudanças na evolução da pandêmia.</i>
+            <li>Caso precise de alguma informação realcionada, pode nos contatar neste e-mail: contato@impulsogov.com.br<br>
+        </div>
+        """,
         unsafe_allow_html=True,
     )
-
+    
     # CHAMA FUNCAO QUE GERA TABELA ID big_table
     # CALL FUNCTION TO GENERATE ID big_table
     gen_big_table(config, dfs, user_input["state_name"])
