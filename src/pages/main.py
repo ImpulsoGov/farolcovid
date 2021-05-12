@@ -338,7 +338,7 @@ def main(session_state):
         title1="Farol",
         title2="Covid",
         subtitle="Entenda e controle a Covid-19 em sua cidade e estado.",
-        logo="https://i.imgur.com/CkYDPR7.png",
+        logo="https://i.imgur.com/GLLjEYm.png",
         header=True,
         explain=True
     )
@@ -780,7 +780,7 @@ def main(session_state):
         """,
         unsafe_allow_html=True,
     )
-    
+
     # CHAMA FUNCAO QUE GERA TABELA ID big_table
     # CALL FUNCTION TO GENERATE ID big_table
     gen_big_table(config, dfs, user_input["state_name"])
