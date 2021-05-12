@@ -778,7 +778,7 @@ def main(session_state):
                 <div class="base-wrapper">
                         <div class="logo-wrapper">
                                 <span>* Desativamos <b>Simula Covid e Distanciamento Social</b> devido às mudanças na evolução da pandêmia.<br/>
-                                <li>Caso precise de alguma informação realcionada, pode nos contatar neste e-mail: xxxxx@impulsogov.org</li>
+                                <li>Caso precise de alguma informação realcionada, pode nos contatar neste e-mail: contato@impulsogov.com.br</li>
                                 </span><br/>
                 </div>
         </div>""",
