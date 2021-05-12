@@ -717,32 +717,13 @@ def main(session_state):
     if session_state.continuation_selection is None:
         session_state.continuation_selection = [False, False, False, False]
 
-    simula_button_name = "Clique Aqui"  # Simula covid 0space
-    saude_button_name = "Clique Aqui "  # Saude em ordem 1space
-    distancia_button_name = "Clique_Aqui"  # Distanciamento social
-    onda_button_name = "Clique_Aqui "  # onda covid
-    if st.button(simula_button_name):  # SIMULA
-        session_state.continuation_selection = [True, False, False, False]
-    if st.button(distancia_button_name):  # DISTANCIAMENTO
-        session_state.continuation_selection = [False, True, False, False]
+    saude_button_name = "Abrir Saúde em Ordem"  # Distanciamento social
+    onda_button_name = "Abrir Onda Covid "  # onda covid
     if st.button(saude_button_name):  # SAUDE
         session_state.continuation_selection = [False, False, True, False]
     if st.button(onda_button_name):  # ONDA
         session_state.continuation_selection = [False, False, False, True]
 
-    utils.stylizeButton(
-        name=simula_button_name,
-        style_string="""border: 1px solid black;""",
-        session_state=session_state,
-        others={"ui_binSelect": 1},
-    )
-
-    utils.stylizeButton(
-        name=distancia_button_name,
-        style_string="""border: 1px solid black;""",
-        session_state=session_state,
-        others={"ui_binSelect": 2},
-    )
     utils.stylizeButton(
         name=saude_button_name,
         style_string="""border: 1px solid black;""",
@@ -755,46 +736,7 @@ def main(session_state):
         session_state=session_state,
         others={"ui_binSelect": 4},
     )
-    if session_state.continuation_selection[0]:
-        user_analytics.safe_log_event(
-            "picked simulacovid",
-            session_state,
-            event_args={
-                "state": session_state.state_name,
-                "health_region": session_state.health_region_name,
-                "city": session_state.city_name,
-            },
-            alternatives=[
-                "picked saude_em_ordem",
-                "picked simulacovid",
-                "picked onda",
-                "picked distanciamento",
-            ],
-        )
-        # Downloading the saved data from memory
-        sm.main(user_input, indicators, data, config, session_state)
-        # TODO: remove comment on this later!
-        # utils.gen_pdf_report()
-
-    elif session_state.continuation_selection[1]:
-        user_analytics.safe_log_event(
-            "picked distanciamento",
-            session_state,
-            event_args={
-                "state": session_state.state_name,
-                "health_region": session_state.health_region_name,
-                "city": session_state.city_name,
-            },
-            alternatives=[
-                "picked saude_em_ordem",
-                "picked simulacovid",
-                "picked onda",
-                "picked distanciamento",
-            ],
-        )
-        ds.main(user_input, indicators, data, config, session_state)
-
-    elif session_state.continuation_selection[2]:
+    if session_state.continuation_selection[2]:
         user_analytics.safe_log_event(
             "picked saude_em_ordem",
             session_state,
@@ -829,6 +771,19 @@ def main(session_state):
             ],
         )
         oc.main(user_input, indicators, data, config, session_state)
+    
+    st.write(
+        """
+        <div class="magenta-bg">
+                <div class="base-wrapper">
+                        <div class="logo-wrapper">
+                                <span>* Desativamos <b>Simula Covid e Distanciamento Social</b> devido às mudanças na evolução da pandêmia.<br/>
+                                <li>Caso precise de alguma informação realcionada, pode nos contatar neste e-mail: xxxxx@impulsogov.org</li>
+                                </span><br/>
+                </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
 
     # CHAMA FUNCAO QUE GERA TABELA ID big_table
     # CALL FUNCTION TO GENERATE ID big_table

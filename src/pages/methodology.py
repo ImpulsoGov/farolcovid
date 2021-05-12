@@ -51,7 +51,6 @@ def main(session_state):
         "Selecione abaixo um dos itens para ver mais detalhes:",
         [
             "FarolCovid",
-            "SimulaCovid",
             "Saúde em Ordem",
             "Fontes de dados e Referências",
         ],

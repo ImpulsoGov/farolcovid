@@ -1020,7 +1020,6 @@ def genProductCard(product: Product):
                         <span class="p3 header bold uppercase">{product.name}</span>
                 </div>
                 <span class="selection-card-caption">{product.caption}</span>
-                <span class="{badge_style} ml secondary-badge">{product.recommendation}</span>
                 </div>
                 """
 
@@ -1028,7 +1027,7 @@ def genProductCard(product: Product):
 def genProductsSection(products: List[Product]):
     cards = list(map(genProductCard, products))
     cards = "".join(cards)
-
+    
     st.write(
         f"""
         <div class="base-wrapper">

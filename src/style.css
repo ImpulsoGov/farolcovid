@@ -291,9 +291,6 @@
     justify-content: space-between;
 }
 
-.flex-space-around {
-    justify-content: space-around;
-}
 
 .header {
     font-family: var(--main-header-font-family);
@@ -1295,7 +1292,7 @@ header>.toolbar { /* Hide toolbar menu */
 
 .product-card {
     width: 400px;
-    height: 350px;
+    height: 300px;
     border-radius: 15px;
     margin-right: var(--main-item-margin);
     padding: var(--main-padding)

@@ -198,18 +198,6 @@ class Product:
 
 ProductCards: List[Product] = [
     Product(
-        recommendation="Simule",
-        name="SimulaCovid<br>",
-        caption="O que acontecerá com meu sistema de saúde local se o ritmo de contágio aumentar ou diminuir?",
-        image="https://i.imgur.com/OxTlsuW.png",
-    ),
-    Product(
-        recommendation="Descubra",
-        name="Distanciamento Social<br>",
-        caption="As pessoas do meu município estão ficando em casa?",
-        image="https://i.imgur.com/frUVHrY.png",
-    ),
-    Product(
         recommendation="Explore",
         name="Saúde em Ordem<br>",
         caption="Quais atividades econômicas meu município deveria reabrir primeiro?",
