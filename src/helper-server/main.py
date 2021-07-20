@@ -22,7 +22,8 @@ app.config["CORS_HEADERS"] = "Content-Type"
 # URL INITIALIZATION
 env_path = Path("..") / ".env"
 load_dotenv(dotenv_path=env_path, override=True)
-config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
+# config = yaml.load(open("configs/config.yaml", "r"), Loader=yaml.FullLoader)
+config = yaml.load(requests.get("https://raw.githubusercontent.com/ImpulsoGov/farolcovid/stable/src/configs/config.yaml").text, Loader=yaml.FullLoader)
 
 if os.getenv("IS_LOCAL") == "TRUE":
     datasource_url = config["br"]["api"]["local"]
@@ -43,9 +44,9 @@ def check_for_cache_download():
             print("Map Datasource unreachable" + str(e))
             cache_place_df = None
 
+
 def get_iframe_map(place_id):
     """ Clones and adapts a map inteded for use in an iframe"""
-
     try:
         place_df = pd.read_csv(
             datasource_url
@@ -61,38 +62,39 @@ def get_iframe_map(place_id):
             cache_place_df["place_id"] == place_id
         ]  # Old data we have in store of that same state
         old_index = old_data.index[0]
-        # import pdb; pdb.set_trace()
+        url = "https://datawrapper.dwcdn.net/" + map_id
+        return render_template("map.html", url=url)
         # print(old_data)
-        if (
-            old_data["hashes"].values[0] == new_data["hashes"].values[0]
-            and old_data["map_id"].values[0] == new_data["map_id"].values[0]
-            and old_data["cache"].values[0] == None
-            ):
-            # its time to inser in our empty cache with the HTML code
-            try:
-                map_code = clone_map(
-                    f"https://datawrapper.dwcdn.net/{map_id}/", is_brazil=is_brazil
-                )
-                cache_place_df.loc[old_index, "cache"] = map_code
-                return map_code
-            except Exception as e:
-                return "An unknown error happened : " + str(e)
-        elif (
-            old_data["hashes"].values[0] == new_data["hashes"].values[0]
-            and old_data["map_id"].values[0] == new_data["map_id"].values[0]
-            ):
-            # Its already in cache, just return it
-            # print("giving from cache")
-            return cache_place_df.iloc[old_index]["cache"]
-        else:
-            # overriding the cache with new cache info and html code
-            map_code = clone_map(
-                f"https://datawrapper.dwcdn.net/{map_id}/", is_brazil=is_brazil
-            )
-            cache_place_df.loc[old_index, "cache"] = map_code
-            cache_place_df.loc[old_index, "hashes"] = new_data["hashes"].values[0]
-            cache_place_df.loc[old_index, "map_id"] = new_data["map_id"].values[0]
-            return map_code
+        # if (
+        #     old_data["hashes"].values[0] == new_data["hashes"].values[0]
+        #     and old_data["map_id"].values[0] == new_data["map_id"].values[0]
+        #     and old_data["cache"].values[0] == None
+        #     ):
+        #     # its time to inser in our empty cache with the HTML code
+        #     try:
+        #         map_code = clone_map(
+        #             f"https://datawrapper.dwcdn.net/{map_id}/", is_brazil=is_brazil
+        #         )
+        #         cache_place_df.loc[old_index, "cache"] = map_code
+        #         return map_code
+        #     except Exception as e:
+        #         return "An unknown error happened : " + str(e)
+        # elif (
+        #     old_data["hashes"].values[0] == new_data["hashes"].values[0]
+        #     and old_data["map_id"].values[0] == new_data["map_id"].values[0]
+        #     ):
+        #     # Its already in cache, just return it
+        #     # print("giving from cache")
+        #     return cache_place_df.iloc[old_index]["cache"]
+        # else:
+        #     # overriding the cache with new cache info and html code
+        #     map_code = clone_map(
+        #         f"https://datawrapper.dwcdn.net/{map_id}/", is_brazil=is_brazil
+        #     )
+        #     cache_place_df.loc[old_index, "cache"] = map_code
+        #     cache_place_df.loc[old_index, "hashes"] = new_data["hashes"].values[0]
+        #     cache_place_df.loc[old_index, "map_id"] = new_data["map_id"].values[0]
+        #     return map_code
     except Exception as e:
         return "A unknown exception has occurred : " + str(e)
 
@@ -164,6 +166,7 @@ def simple_clone(url):
 
 def clone_map(url, is_brazil=False):
     """ Clones our map webpage by replacing the script sources, link sources and adding new scripts hosted on our main streamlit server"""
+    # import pdb; pdb.set_trace()
     soup = main_clone(url)
     for script in soup.find_all("script"):  # Replaces the sources of scripts
         if script.get("src") != None and script["src"][0] != "h":
@@ -189,7 +192,6 @@ def clone_map(url, is_brazil=False):
     body[
         "onload"
     ] = "init_listener();resize_iframe_map();"  # Makes it so that the listeners are initialized at iframe load
-
     return soup.prettify()
 
 
