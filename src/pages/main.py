@@ -352,6 +352,18 @@ def main(session_state):
         # urlpath = 'http://localhost:8501/'
     vaccine_logo = utils.load_image("imgs/vaccine.png")
     st.write(f"""<div>
+            <div class="base-wrapper flex flex-column" style="background-color:#a30000">
+                <div class="white-span header p1" style="font-size:30px;"><img class="icon-cards">ATENÇÃO: APLICAÇÃO DESCONTINUADA</div>
+                <span class="white-span">Devido aos avanços na vacinação da covid-19, descontinuamos as atualizações de dados e do site FarolCovid em Julho de 2021.<br><br>
+                <br><br><span class="white-span">Hoje a Impulso tem atuado em ajudar os gestores de saúde a melhorar seus indicadores na atenção primária, 
+                principalmente com nosso novo produto, o Impulso Previne. 
+                Conheça essas e outras novas iniciativas no link abaixo.<br><br>
+                <a class="btn-ambassador" href="https://www.impulsogov.org/" target="_self">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Conhecer!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>""",
+        unsafe_allow_html=True,
+    )
+    
+    st.write(f"""<div>
             <div class="base-wrapper flex flex-column" style="background-color:#0090A7">
                 <div class="white-span header p1" style="font-size:30px;"><img class="icon-cards" src="data:image/png;base64,{vaccine_logo}" alt="Fonte: Impulso">QUER SABER MAIS SOBRE A VACINAÇÃO?</div>
                 <span class="white-span">Acompanhe nossos novos dados e descobra como avança a vacinação no seu município ou estado!<br><br>
